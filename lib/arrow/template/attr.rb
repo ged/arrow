@@ -4,6 +4,10 @@
 # derivative of Arrow::Directive. This is the class which defines the behaviour
 # of the 'attr' template directive.
 # 
+# == Syntax
+#
+#   <?attr foo?>
+#
 # == Subversion Id
 #
 #  $Id$

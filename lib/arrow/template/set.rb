@@ -4,6 +4,10 @@
 # Arrow::Template::Directive. This is the class which defines the behaviour of
 # the 'set' template directive.
 # 
+# == Syntax
+#
+#   <?set foo 1?>
+#
 # == Subversion Id
 #
 #  $Id$

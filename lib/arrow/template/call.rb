@@ -4,6 +4,12 @@
 # Arrow::Template::ContainerDirective. This is the class which defines the
 # behaviour of the 'call' template directive.
 # 
+# == Syntax
+#
+#   <?call 1+1?>
+#   <?call foo.to_html?>
+#   <?call arbitrary(Ruby.code)?>
+#
 # == Subversion Id
 #
 #  $Id$

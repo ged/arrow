@@ -43,21 +43,49 @@
 		  included with Arrow our own templating system - complete, extensible
 		  and (we think) intuitive - but have also made it easy for you to use
 		  any other templating system.  If you already have a favorite, and have
-		  no interest in seeing another, (no matter how likely it is you might
-		  like it,) you can skip past the tutorial on ours and learn <a
-		  href="#others">how to use your own</a>.
+		  no interest in seeing another, (even if you might like it,) you can
+		  skip past the tutorial on ours and learn <a href="#others">how to use
+		  your own</a>.
+		</p>
+		<p>
+		  Template handling is, to some degree, integrated with the Arrow
+		  server.  The arrow config file has a templates section.
 		</p>
 	  </div>
 	  <div class="section">
 		<h2><a href="#ats" id="ats">Arrow Templating System</a></h2>
-		<p>
-		</p>
+		<p></p>
 		<h2>Syntax</h2>
+		<p>The Arrow Templating System uses preprocessing tags to distinguish
+		template directives.  These are both &lt;?...?&gt; and [?...?], with the
+		square bracket version to be used inside of other html tags (as in:
+		&lt;a href="[?attr link?]"&gt;...)</p>
+		<h2>The Directives</h2>
+		<p></p>
+        <h3>attr</h3>
+		<p></p>
+        <h3>call</h3>
+		<p></p>
+        <h3>escape</h3>
+		<p></p>
+        <h3>set</h3>
+		<p></p>
+        <h3>if/elsif/else</h3>
+		<p></p>
+        <h3>yield</h3>
+		<p></p>
+        <h3>for</h3>
+		<p></p>
+        <h3>import</h3>
+		<p></p>
+        <h3>include</h3>
 		<p></p>
 	  </div>
 	  <div class="section">
 		<h2><a href="#example" id="example">Templated Applets - Hello World (templated)</a></h2>
-		<p></p>
+		<p>
+		  The Signature of an app has room for mention of the templates it uses
+		</p>
 	  </div>
 	  <div class="section">
 		<h2><a href="#adding" id="adding">Adding Directives</a></h2>

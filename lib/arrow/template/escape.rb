@@ -5,6 +5,11 @@
 # of the 'escape' template directive., which HTML escapes the stringified
 # version of its associated attribute/s.
 # 
+# == Syntax
+#
+#   <pre><?escape data.to_yaml?></pre>
+#   <?escape some_string_with_htmlish_bits?>
+#
 # == Subversion Id
 #
 #  $Id$

@@ -4,7 +4,7 @@
 # Arrow::Template::BracketingDirective. This is the class which defines the
 # behaviour of the 'for' template directive.
 #
-# The format of the directive is:
+# == Syntax
 #
 #   <?for <arglist> in <obj>?>...<?end for?>
 #

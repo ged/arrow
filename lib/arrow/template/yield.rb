@@ -4,7 +4,7 @@
 # of Arrow::Template::BracketingDirective. This is the class which defines the
 # behaviour of the 'yield' template directive.
 # 
-# The formats the directives can take are:
+# == Syntax
 #
 #  <?yield <args> from <attribute>.<block_method> ?>
 #
