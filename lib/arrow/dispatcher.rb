@@ -91,7 +91,10 @@ module Arrow
 			configspec.each {|key, configfile|
 
 				configfile = File::expand_path( configfile )
-				return @@Instance[ configfile ] if @@Instance.key?( configfile )
+				if @@Instance.key?( configfile )
+					@@Instance[ key ] = @@Instance[ configfile ]
+					next
+				end
 
 				# Set up logging
 				if Arrow::Logger::global.outputters.empty?
@@ -111,7 +114,7 @@ module Arrow
 				end
 
 				# Create and return the dispatcher
-				@@Instance[ key ] = new( config )
+				@@Instance[ key ] = @@Instance[ configfile ] = new( config )
 			}
 
 			@@Instance.values.first
@@ -128,7 +131,13 @@ module Arrow
 		### Get the instance of the Dispatcher set up under the given +key+. If
 		### only one config file was specified, no key should be passed.
 		def self::instance( key=:__default__ )
-			@@Instance[ key ]
+			if key.is_a?( Symbol )
+				return @@Instance[ key ]
+			else
+				configfile = File::expand_path( key )
+				self.create( configfile )
+				return @@Instance[ configfile ]
+			end
 		end
 
 
