@@ -30,18 +30,25 @@ $stderr.sync = $stdout.sync = true
 safelevel = 0
 patterns = []
 requires = []
+$DebugPattern = nil
 $Apache = true
 
 # Parse command-line switches
 ARGV.options {|oparser|
 	oparser.banner = "Usage: #$0 [options] [TARGETS]\n"
 
-	oparser.on( "--debug", "-d", TrueClass, "Turn debugging on" ) {
-		$DEBUG = true
-		Arrow::Logger::global.outputters <<
-			Arrow::Logger::Outputter::create( 'file', $stderr, "STDERR" )
-		Arrow::Logger::global.level = :debug
-		debugMsg "Turned debugging on."
+	oparser.on( "--debug[=PATTERN]", "-d[=PATTERN]", String,
+		"Turn debugging on (for tests which match PATTERN)" ) {|arg|
+		if arg
+			$DebugPattern = Regexp::new( arg )
+			puts "Turned debugging on for %p." % $DebugPattern
+		else
+			Arrow::Logger::global.outputters <<
+				Arrow::Logger::Outputter::create( 'file', $stderr, "STDERR" )
+			Arrow::Logger::global.level = :debug
+			$DEBUG = true
+			debugMsg "Turned debugging on globally."
+		end
 	}
 
 	oparser.on( "--verbose", "-v", TrueClass, "Make progress verbose" ) {

@@ -665,7 +665,24 @@ class Arrow::TestCase < Test::Unit::TestCase
 	### Output the name of the test as it's running if in verbose mode.
 	def run( result )
 		$stderr.puts self.name if $VERBOSE || $DEBUG
+
+		# Support debugging for individual tests
+		olddb = nil
+		if $DebugPattern && $DebugPattern =~ @method_name
+			Arrow::Logger::global.outputters <<
+				Arrow::Logger::Outputter::create( 'file', $stderr, "STDERR" )
+			Arrow::Logger::global.level = :debug
+
+			olddb = $DEBUG
+			$DEBUG = true
+		end
+		
 		super
+
+		unless olddb.nil?
+			$DEBUG = olddb 
+			Arrow::Logger::global.outputters.clear
+		end
 	end
 
 
