@@ -119,7 +119,7 @@ module Arrow
 
 	### A class for representing directory search paths.
 	class Path
-		include Enumerable
+		include Enumerable, Arrow::Loggable
 		extend Forwardable
 
 		# SVN Revision
@@ -169,6 +169,8 @@ module Arrow
 						path.to_a.flatten
 					end
 
+			path.each {|dir| dir.untaint}
+
 			@valid_dirs = []
 			@cache_lifespan = cache_lifespan
 			@last_stat = Time::at(0)
@@ -194,6 +196,7 @@ module Arrow
 		def valid_dirs
 			if ( @cache_lifespan.nonzero? &&
 				 ((Time::now - @last_stat) < @cache_lifespan) )
+				self.log.debug "Returning cached dirs."
 				return @valid_dirs
 			end
 
@@ -201,7 +204,9 @@ module Arrow
 				begin
 					stat = File::stat(dir)
 					stat.directory? && stat.readable?
-				rescue Errno::ENOENT, ::SecurityError
+				rescue Errno::ENOENT, ::SecurityError => err
+					self.log.debug "Discarded invalid directory %p: %s" %
+						[ dir, err.message ]
 					false
 				end
 			}
