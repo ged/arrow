@@ -192,6 +192,9 @@ class Arrow::TemplateTestCase < Arrow::TestCase
 							}
 							assert_equal false, rval
 
+							# Compare memsize with the length of the actual source.
+							assert_equal source.length, template.memsize
+
 							#{content[:code]}
 						end
 						}.gsub( /^\t{6}/, '' )
@@ -234,6 +237,35 @@ class Arrow::TemplateTestCase < Arrow::TestCase
 
 		assert_include TestDataDir, rval
 	end
+
+	### Test template loading
+	def test_02_Load
+		printTestHeader "Template: Load"
+		template = size = nil
+		source = File::read( File::join(TestDataDir, "loadtest.tmpl") )
+
+		# Test the ::load method loads template using the path
+		assert_nothing_raised do
+			template = Arrow::Template::load( "loadtest.tmpl" )
+		end
+		assert_instance_of Arrow::Template, template
+
+		# Test for source-size bug
+		assert_nothing_raised do
+			size = template.memsize
+		end
+		assert_equal source.length, size,
+			"Template memsize should equal source length"
+
+		# Test for loaded attributes
+		assert template._attributes.key?( 'mooselips' ),
+			"Expect loaded template to have a 'mooselips' attribute"
+		assert template._attributes.key?( 'queenofallbroccoli' ),
+			"Expect loaded template to have a 'queenofallbroccoli' attribute"
+	end
+
+
+
 end
 
 

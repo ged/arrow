@@ -212,9 +212,10 @@ class Arrow::Template < Arrow::Object
 		source = File::read( filename )
 		source.untaint
 
-		obj = new( source )
+		obj = new()
 		obj._file = filename
 		obj._loadPath.replace( path )
+		obj.parse( source )
 
 		return obj
 	end
@@ -375,6 +376,7 @@ class Arrow::Template < Arrow::Object
 	### Parse the given template source (a String) and put the resulting
 	### nodes into the template's syntaxTree.
 	def parse( source )
+		@source = source
 		parserClass = @config[:parserClass]
 		@syntaxTree = parserClass::new( @config ).parse( source, self )
 
