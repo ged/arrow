@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 # 
-# This file contains the Arrow::ErrorDemo class, a derivative of
+# This file contains the ErrorDemo class, a derivative of
 # Arrow::Applet. This applet raises an exception to demonstrate Arrow's
 # error-handling.
 # 
@@ -23,7 +23,7 @@ require 'arrow/applet'
 
 
 ### A demo applet to trigger Arrow's error-handler.
-class Arrow::ErrorDemo < Arrow::Applet
+class ErrorDemo < Arrow::Applet
 
 	# SVN Revision
 	SVNRev = %q$Rev$
@@ -40,7 +40,7 @@ class Arrow::ErrorDemo < Arrow::Applet
 		:description => "Intentionally raises an exception to demonstrate "\
 			"Arrow's error-handler.",
 		:maintainer => "ged@FaerieMUD.org",
-		:version => Version,
+		:version => SVNRev,
 		:config => {},
 		:templates => {},
 		:vargs => {},
@@ -65,6 +65,6 @@ class Arrow::ErrorDemo < Arrow::Applet
 	#########
 
 
-end # class Arrow::ErrorDemo
+end # class ErrorDemo
 
 

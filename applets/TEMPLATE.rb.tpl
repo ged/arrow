@@ -27,7 +27,6 @@ class (>>>class<<<) < Arrow::Applet
 	Signature = {
 		:name => "(>>>name<<<)",
 		:description => "(>>>desc<<<)",
-		:uri => "(>>>uri<<<)",
 		:maintainer => "(>>>AUTHOR<<<)",
 		:defaultAction => 'display',
 	}
@@ -55,6 +54,5 @@ end # class (>>>class<<<)
 ("class" "App class: ")
 ("name" "App name (for the signature): ")
 ("desc" "Description: ")
-("uri" "App URI: ")
 
 

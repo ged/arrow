@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 # 
-# This file contains the Arrow::TemplateViewer class, a derivative of
+# This file contains the TemplateViewer class, a derivative of
 # Arrow::Applet. It is an introspection applet that displays information about
 # Arrow templates.
 # 
@@ -17,7 +17,7 @@ require 'arrow/applet'
 require 'arrow/htmltokenizer'
 
 ### A template viewer applet
-class Arrow::TemplateViewer < Arrow::Applet
+class TemplateViewer < Arrow::Applet
 
 	# SVN Revision
 	SVNRev = %q$Rev$
@@ -99,6 +99,6 @@ class Arrow::TemplateViewer < Arrow::Applet
 	}
 
 
-end # class Arrow::TemplateViewer
+end # class TemplateViewer
 
 

@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 # 
-# This file contains the Arrow::NoSuchApplet class, a derivative of
+# This file contains the NoSuchAppletHandler class, a derivative of
 # Arrow::Applet. It is an example 'noSuchAppletHandler' applet.
 # 
 # == Subversion Id
@@ -15,8 +15,8 @@
 require 'arrow/applet'
 
 
-### An example noSuchAppletHandler applet.
-class Arrow::NoSuchAppletHandler < Arrow::Applet
+### An example missingApplet applet.
+class NoSuchAppletHandler < Arrow::Applet
 
 	# SVN Revision
 	SVNRev = %q$Rev$
@@ -41,6 +41,6 @@ class Arrow::NoSuchAppletHandler < Arrow::Applet
 		},
 	}
 
-end # class Arrow::NoSuchAppletHandler
+end # class NoSuchAppletHandler
 
 

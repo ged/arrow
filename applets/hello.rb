@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 # 
-# This file contains the Arrow::Hello class, a derivative of Arrow::Applet. A
+# This file contains the HelloWorld class, a derivative of Arrow::Applet. A
 # "hello world" applet.
 # 
 # == Subversion Id
@@ -16,7 +16,7 @@ require 'arrow/applet'
 
 
 ### A "hello world" applet.
-class Arrow::Hello < Arrow::Applet
+class HelloWorld < Arrow::Applet
 
 	# SVN Revision
 	SVNRev = %q$Rev$
@@ -80,6 +80,6 @@ class Arrow::Hello < Arrow::Applet
 		return templ
 	}
 
-end # class Arrow::Hello
+end # class HelloWorld
 
 

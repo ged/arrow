@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 # 
-# This file contains the Arrow::ArgumentTester class, a derivative of
+# This file contains the ArgumentTester class, a derivative of
 # Arrow::Applet. This applet is for testing/debugging/demonstrating the argument
 # validator.
 # 
@@ -17,7 +17,7 @@ require 'arrow/applet'
 
 
 ### An applet for testing/debugging the argument validator.
-class Arrow::ArgumentTester < Arrow::Applet
+class ArgumentTester < Arrow::Applet
 
 	# SVN Revision
 	SVNRev = %q$Rev$
@@ -51,6 +51,6 @@ class Arrow::ArgumentTester < Arrow::Applet
 		},
 	}
 
-end # class Arrow::ArgumentTester
+end # class ArgumentTester
 
 

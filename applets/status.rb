@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 # 
-# This file contains the Arrow::Status class, a derivative of Arrow::Applet. An
+# This file contains the ServerStatus class, a derivative of Arrow::Applet. An
 # appserver status applet.
 # 
 # == Subversion Id
@@ -22,7 +22,7 @@ require 'arrow/applet'
 
 
 ### An Arrow appserver status applet.
-class Arrow::Status < Arrow::Applet
+class ServerStatus < Arrow::Applet
 
 	# SVN Revision
 	SVNRev = %q$Rev$
@@ -39,7 +39,7 @@ class Arrow::Status < Arrow::Applet
 		:description => "Displays a list of all loaded applets or information " +
 			"about a particular one.",
 		:maintainer => "ged@FaerieMUD.org",
-		:version => Version,
+		:version => SVNRev,
 		:config => {},
 		:templates => {
 			:status	=> 'status.tmpl',
@@ -60,7 +60,7 @@ class Arrow::Status < Arrow::Applet
 			self.signature.name 
 
 		templ = txn.templates[:status]
-		templ.applets = txn.broker.registry.collect {|uri, re| re.object }
+		templ.registry = txn.broker.registry
 		templ.transaction = txn
 		templ.pid = Process::pid
 		templ.ppid = Process::ppid
@@ -74,15 +74,19 @@ class Arrow::Status < Arrow::Applet
 		self.log.debug "In the 'applet' action of the '%s' applet." %
 			self.signature.name
 
-		targetapp = txn.broker.registry[ args.join("/") ]
-		if targetapp.nil?
-			self.log.info "%s: no such applet to inspect. Registry contains: %p" % 
+		re = txn.broker.registry[ args.join("/") ]
+		if re.nil?
+			self.log.error "%s: no such applet to inspect. Registry contains: %p" % 
 				[ args[0], txn.broker.registry.keys.sort ]
 			return self.run( txn, 'display' )
 		end
 
+		targetapp = re.object
+
 		templ = txn.templates[:applet]
+		templ.uri = args.join("/")
 		templ.applet = targetapp
+		templ.re = re
 		templ.txn = txn
 		templ.currentApplet = self
 		
@@ -90,6 +94,6 @@ class Arrow::Status < Arrow::Applet
 	}
 
 
-end # class Arrow::Status
+end # class ServerStatus
 
 

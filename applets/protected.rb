@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 # 
-# This file contains the Arrow::Protected class, a derivative of
+# This file contains the ProtectedDelegator class, a derivative of
 # Arrow::Applet. It is an applet you can chain through for authentication
 # purposes.
 # 
@@ -19,7 +19,7 @@ require 'arrow/applet'
 
 
 ### An example applet that you can chain through for simple authentication.
-class Arrow::Protected < Arrow::Applet
+class ProtectedDelegator < Arrow::Applet
 
 	# SVN Revision
 	SVNRev = %q$Rev$
@@ -107,6 +107,6 @@ class Arrow::Protected < Arrow::Applet
 	}
 
 
-end # class Arrow::Protected
+end # class ProtectedDelegator
 
 

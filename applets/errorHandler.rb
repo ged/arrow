@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 # 
-# This file contains the Arrow::ErrorHandler class, a derivative of
+# This file contains the ErrorHandler class, a derivative of
 # Arrow::Applet. It's an example of an error-handler applet.
 # 
 # == Subversion Id
@@ -22,7 +22,7 @@ require 'arrow/applet'
 
 
 ### An error-handling applet.
-class Arrow::ErrorHandler < Arrow::Applet
+class ErrorHandler < Arrow::Applet
 
 	# SVN Revision
 	SVNRev = %q$Rev$
@@ -40,7 +40,7 @@ class Arrow::ErrorHandler < Arrow::Applet
 			"readable fashion. Cannot be called directly; it is used internally "\
 			"by the appserver to handle errors which happen in applets.",
 		:maintainer => "ged@FaerieMUD.org",
-		:version => Version,
+		:version => SVNRev,
 		:config => {},
 		:templates => {
 			:display	=> 'error-display.tmpl',
@@ -56,7 +56,12 @@ class Arrow::ErrorHandler < Arrow::Applet
 	public
 	######
 
-	action( 'default' ) {|txn, uri, re, err|
+	action( 'default' ) {|*args|
+		intentional_undefined_local_variable_or_method
+		return "Hmmm... that didn't work"
+	}
+
+	def report_error_action( txn, re, err )
 		self.log.debug "Loading 'display' template"
 		template = txn.templates[:display]
 		self.log.debug "'display' template: %p" % template
@@ -68,12 +73,12 @@ class Arrow::ErrorHandler < Arrow::Applet
 		txn.print( template )
 
 		return true
-	}
-
+	end
+	
 
 	#########
 	protected
 	#########
 
 
-end # class Arrow::ErrorHandler
+end # class ErrorHandler

@@ -41,7 +41,7 @@ class TimeClock < Arrow::Applet
 		:description => "A web-enabled timeclock for consultants.",
 		:uri => "timeclock",
 		:maintainer => "ged@FaerieMUD.org",
-		:version => Version,
+		:version => SVNRev,
 		:config => {
 			:datadir	=> '/www/RubyCrafters.com/private/timeclock',
 		},
