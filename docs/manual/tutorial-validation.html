@@ -122,14 +122,21 @@
 		  monitors(?).)</p>
 	  </div>
 	  <div class="section">
-		<h2><a href="#example" id="example">Application With Input - Args</a></h2>
+		<h2><a href="#example" id="example">Application With Input -
+		Args</a></h2>
+
+		<p>See this one <a
+		href="http://dev.rubycrafters.com/arrow/args/">live</a> at our test
+		server, if it happens to be up today =:)</p>
+
+		<!-- TODO: this example is way too much.  Strip it down to something
+		people can understand. -->
 <pre>
 class Args < Arrow::Application
 
     Signature = {
         :name => "Argument Tester",
         :description => "This app is for testing/debugging the argument validator.",
-        :uri => "args",
         :maintainer => "god@host.com",
         :defaultAction => 'display',
         :templates => {
@@ -141,19 +148,61 @@ class Args < Arrow::Application
                 :optional       => [:email, :description],
                 :filters        => [:strip, :squeeze],
                 :constraints    => {
-                    :email   => :email,
-                    :name    => /^[\x20-\x7f]+$/,
-                    :description => /^[\x20-\x7f]+$/,
+                    :email          => :email,
+                    :name           => /^[\x20-\x7f]+$/,
+                    :description    => /^[\x20-\x7f]+$/,
                 },
             },
         },
     }
 
+    ### All of the applet's functionality is handled by the fallback action
+    ### (Arrow::Applet#action_missing_action), which loads the 'display'
+    ### template and renders it.  Cute, huh?
+
 end # class Args
 </pre>
 
+		<p>Then in the template:</p>
 <pre>
-template here?
+    &lt;html&gt;
+        &lt;body&gt;
+        &lt;h1&gt;Argument Validation/Untainting/Testing applet&lt;/h1&gt;
+        &lt;p&gt;This is an applet to test argument validation.&lt;/p&gt;
+
+        &lt;form action="[?call txn.action?]" method="get"&gt;
+            &lt;p&gt;Name: &lt;input id="name-field" type="text" name="name" 
+              value="[?call txn.request.param('name') ?]" size="20"/&gt;&lt;/p&gt;
+            &lt;p&gt;Email: &lt;input id="email-field" type="text" name="email"
+                value="[?call txn.request.param('email') ?]" size="35"/&gt;&lt;/p&gt;
+            &lt;p&gt;Description: &lt;input id="description-field" type="text"
+                name="description" value="[?call
+              txn.request.param('description') ?]" size="55"/&gt;&lt;/p&gt;
+            &lt;p&gt;Other: &lt;input id="other-field" type="text" name="other"
+                  value="[?call txn.request.param('other') ?]" size="55" /&gt;&lt;/p&gt;
+        &lt;/form&gt;
+
+        &lt;h2&gt;Valid Args&lt;/h2&gt;
+
+        &lt;p&gt;Fetched via: &lt;tt&gt;txn.vargs.valid&lt;/tt&gt;:&lt;/p&gt;
+        &lt;tt&gt;&lt;?escape txn.vargs.valid.inspect ?&gt;&lt;/tt&gt;
+
+        &lt;h2&gt;Missing Args&lt;/h2&gt;
+
+        &lt;p&gt;Fetched via: &lt;tt&gt;txn.vargs.missing&lt;/tt&gt;:&lt;/p&gt;
+        &lt;tt&gt;&lt;?escape txn.vargs.missing.inspect ?&gt;&lt;/tt&gt;
+
+        &lt;h2&gt;Invalid Args&lt;/h2&gt;
+
+        &lt;p&gt;Fetched via: &lt;tt&gt;txn.vargs.invalid&lt;/tt&gt;:&lt;/p&gt;
+        &lt;tt&gt;&lt;?escape txn.vargs.invalid.inspect ?&gt;&lt;/tt&gt;
+
+        &lt;h2&gt;Unknown Args&lt;/h2&gt;
+
+        &lt;p&gt;Fetched via: &lt;tt&gt;txn.vargs.unknown&lt;/tt&gt;:&lt;/p&gt;
+        &lt;tt&gt;&lt;?escape txn.vargs.unknown.inspect ?&gt;&lt;/tt&gt;
+        &lt;/body&gt;
+    &lt;/html&gt;
 </pre>
 		<p></p>
 	  </div>
