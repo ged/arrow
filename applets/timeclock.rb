@@ -3,9 +3,9 @@
 # This file contains the TimeClock class, a derivative of Arrow::Applet; it
 # implements a web-based timeclock applet.
 # 
-# == Rcsid
-# 
-# $Id: timeclock.rb,v 1.1 2003/12/05 00:38:15 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -26,11 +26,14 @@ require 'arrow/applet'
 ### A timeclock applet
 class TimeClock < Arrow::Applet
 
-	# CVS version tag
-	Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
+	# SVN Revision
+	SVNRev = %q$Rev$
 
-	# CVS id tag
-	Rcsid = %q$Id: timeclock.rb,v 1.1 2003/12/05 00:38:15 deveiant Exp $
+	# SVN Id
+	SVNId = %q$Id$
+
+	# SVN URL
+	SVNURL = %q$URL$
 
 	# Applet signature
 	Signature = {

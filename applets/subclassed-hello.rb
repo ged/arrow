@@ -3,9 +3,9 @@
 # This file contains the SubclassedHello class, a derivative of the Hello
 # applet to test applet inheritance.
 # 
-# == Rcsid
-# 
-# $Id: subclassed-hello.rb,v 1.1 2003/12/08 20:40:05 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -24,11 +24,14 @@ Arrow::Logger.global.debug "SubclassedHello: Past the requires"
 ### An applet for testing inheritance from other derived applets
 class SubclassedHello < SuperHello
 
-	# CVS version tag
-	Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
+	# SVN Revision
+	SVNRev = %q$Rev$
 
-	# CVS id tag
-	Rcsid = %q$Id: subclassed-hello.rb,v 1.1 2003/12/08 20:40:05 deveiant Exp $
+	# SVN Id
+	SVNId = %q$Id$
+
+	# SVN URL
+	SVNURL = %q$URL$
 
 	# Applet signature
 	Signature = {

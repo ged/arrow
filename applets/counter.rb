@@ -1,12 +1,12 @@
 #!/usr/bin/ruby
 # 
-# This file contains the Counter class, a derivative of Arrow::Applet. It's
-# a little applet for testing session persistance. It just increments and displays
-# a counter which is held in a session object.
+# This file contains the Arrow::Counter class, a derivative of
+# Arrow::Applet. It's a little applet for testing session persistance. It just
+# increments and displays a counter which is held in a session object.
 # 
-# == Rcsid
-# 
-# $Id: counter.rb,v 1.3 2003/12/05 00:39:10 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -23,19 +23,21 @@ require 'arrow/applet'
 
 
 ### An applet for testing session persistance and applet-chaining.
-class Counter < Arrow::Applet
+class Arrow::Counter < Arrow::Applet
 
-	# CVS version tag
-	Version = /([\d\.]+)/.match( %q{$Revision: 1.3 $} )[1]
+	# SVN Revision
+	SVNRev = %q$Rev$
 
-	# CVS id tag
-	Rcsid = %q$Id: counter.rb,v 1.3 2003/12/05 00:39:10 deveiant Exp $
+	# SVN Id
+	SVNId = %q$Id$
+
+	# SVN URL
+	SVNURL = %q$URL$
 
 	# Applet signature
 	Signature = {
 		:name => "Session Access Counter",
 		:description => "Increments and displays a counter contained in a session object.",
-		:uri => "counter",
 		:maintainer => "ged@FaerieMUD.org",
 		:version => Version,
 		:config => {},
@@ -101,6 +103,6 @@ class Counter < Arrow::Applet
 	}
 
 
-end # class Status
+end # class Arrow::Counter
 
 

@@ -1,11 +1,12 @@
 #!/usr/bin/ruby
 # 
-# This file contains the Args class, a derivative of Arrow::Applet. This
-# applet is for testing/debugging the argument validator.
+# This file contains the Arrow::ArgumentTester class, a derivative of
+# Arrow::Applet. This applet is for testing/debugging/demonstrating the argument
+# validator.
 # 
-# == Rcsid
-# 
-# $Id: args.rb,v 1.1 2004/01/27 06:46:41 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -16,19 +17,21 @@ require 'arrow/applet'
 
 
 ### An applet for testing/debugging the argument validator.
-class Args < Arrow::Applet
+class Arrow::ArgumentTester < Arrow::Applet
 
-	# CVS version tag
-	Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
+	# SVN Revision
+	SVNRev = %q$Rev$
 
-	# CVS id tag
-	Rcsid = %q$Id: args.rb,v 1.1 2004/01/27 06:46:41 deveiant Exp $
+	# SVN Id
+	SVNId = %q$Id$
+
+	# SVN URL
+	SVNURL = %q$URL$
 
 	# Applet signature
 	Signature = {
 		:name => "Argument Tester",
 		:description => "This app is for testing/debugging the argument validator.",
-		:uri => "args",
 		:maintainer => "ged@FaerieMUD.org",
 		:defaultAction => 'display',
 		:templates => {
@@ -48,6 +51,6 @@ class Args < Arrow::Applet
 		},
 	}
 
-end # class Status
+end # class Arrow::ArgumentTester
 
 

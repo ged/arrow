@@ -1,11 +1,11 @@
 #!/usr/bin/ruby
 # 
-# This file contains the Hello class, a derivative of Arrow::Applet. A
+# This file contains the Arrow::Hello class, a derivative of Arrow::Applet. A
 # "hello world" applet.
 # 
-# == Rcsid
-# 
-# $Id: hello.rb,v 1.5 2004/02/14 03:22:36 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -16,19 +16,21 @@ require 'arrow/applet'
 
 
 ### A "hello world" applet.
-class Hello < Arrow::Applet
+class Arrow::Hello < Arrow::Applet
 
-	# CVS version tag
-	Version = /([\d\.]+)/.match( %q{$Revision: 1.5 $} )[1]
+	# SVN Revision
+	SVNRev = %q$Rev$
 
-	# CVS id tag
-	Rcsid = %q$Id: hello.rb,v 1.5 2004/02/14 03:22:36 deveiant Exp $
+	# SVN Id
+	SVNId = %q$Id$
+
+	# SVN URL
+	SVNURL = %q$URL$
 
 	# Applet signature
 	Signature = {
 		:name => "Hello World",
 		:description => %{A 'hello world' applet.},
-		:uri => "hello",
 		:maintainer => "ged@FaerieMUD.org",
 		:defaultAction => 'templated',
 		:templates => {
@@ -78,6 +80,6 @@ class Hello < Arrow::Applet
 		return templ
 	}
 
-end # class Hello
+end # class Arrow::Hello
 
 

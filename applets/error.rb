@@ -1,12 +1,12 @@
 #!/usr/bin/ruby
 # 
-# This file contains the ErrorThrower class, a derivative of
+# This file contains the Arrow::ErrorDemo class, a derivative of
 # Arrow::Applet. This applet raises an exception to demonstrate Arrow's
 # error-handling.
 # 
-# == Rcsid
-# 
-# $Id: error.rb,v 1.2 2003/11/01 19:46:01 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -23,20 +23,22 @@ require 'arrow/applet'
 
 
 ### A demo applet to trigger Arrow's error-handler.
-class ErrorDemo < Arrow::Applet
+class Arrow::ErrorDemo < Arrow::Applet
 
-	# CVS version tag
-	Version = /([\d\.]+)/.match( %q{$Revision: 1.2 $} )[1]
+	# SVN Revision
+	SVNRev = %q$Rev$
 
-	# CVS id tag
-	Rcsid = %q$Id: error.rb,v 1.2 2003/11/01 19:46:01 deveiant Exp $
+	# SVN Id
+	SVNId = %q$Id$
+
+	# SVN URL
+	SVNURL = %q$URL$
 
 	# Applet signature
 	Signature = {
 		:name => "Appserver Error Handler Demo",
 		:description => "Intentionally raises an exception to demonstrate "\
 			"Arrow's error-handler.",
-		:uri => "raiseError",
 		:maintainer => "ged@FaerieMUD.org",
 		:version => Version,
 		:config => {},
@@ -63,6 +65,6 @@ class ErrorDemo < Arrow::Applet
 	#########
 
 
-end # class Status
+end # class Arrow::ErrorDemo
 
 

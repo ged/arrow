@@ -3,9 +3,9 @@
 # This file contains the SuperHello class, a derivative of Arrow::Applet. A
 # "hello world" applet.
 # 
-# == Rcsid
-# 
-# $Id: superhello.rb,v 1.1 2003/12/08 20:40:05 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -18,11 +18,14 @@ require 'arrow/applet'
 ### A superclass applet for testing inheritance
 class SuperHello < Arrow::Applet
 
-	# CVS version tag
-	Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
+	# SVN Revision
+	SVNRev = %q$Rev$
 
-	# CVS id tag
-	Rcsid = %q$Id: superhello.rb,v 1.1 2003/12/08 20:40:05 deveiant Exp $
+	# SVN Id
+	SVNId = %q$Id$
+
+	# SVN URL
+	SVNURL = %q$URL$
 
 	# Applet signature -- since it defines no 'uri' item, it shouldn't be loaded
 	# by the appserver directly.

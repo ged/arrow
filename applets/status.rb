@@ -1,11 +1,11 @@
 #!/usr/bin/ruby
 # 
-# This file contains the Status class, a derivative of Arrow::Applet. An
+# This file contains the Arrow::Status class, a derivative of Arrow::Applet. An
 # appserver status applet.
 # 
-# == Rcsid
-# 
-# $Id: status.rb,v 1.5 2003/12/05 01:02:35 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -22,20 +22,22 @@ require 'arrow/applet'
 
 
 ### An Arrow appserver status applet.
-class Status < Arrow::Applet
+class Arrow::Status < Arrow::Applet
 
-	# CVS version tag
-	Version = /([\d\.]+)/.match( %q{$Revision: 1.5 $} )[1]
+	# SVN Revision
+	SVNRev = %q$Rev$
 
-	# CVS id tag
-	Rcsid = %q$Id: status.rb,v 1.5 2003/12/05 01:02:35 deveiant Exp $
+	# SVN Id
+	SVNId = %q$Id$
+
+	# SVN URL
+	SVNURL = %q$URL$
 
 	# Applet signature
 	Signature = {
 		:name => "Appserver Status",
 		:description => "Displays a list of all loaded applets or information " +
 			"about a particular one.",
-		:uri => "status",
 		:maintainer => "ged@FaerieMUD.org",
 		:version => Version,
 		:config => {},
@@ -88,6 +90,6 @@ class Status < Arrow::Applet
 	}
 
 
-end # class Status
+end # class Arrow::Status
 
 

@@ -1,12 +1,12 @@
 #!/usr/bin/ruby
 # 
-# This file contains the TemplateViewer class, a derivative of
-# Arrow::Applet. It is an introspection applet that displays
-# information about Arrow templates.
+# This file contains the Arrow::TemplateViewer class, a derivative of
+# Arrow::Applet. It is an introspection applet that displays information about
+# Arrow templates.
 # 
-# == Rcsid
-# 
-# $Id: view-template.rb,v 1.3 2003/12/24 09:04:56 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -17,20 +17,22 @@ require 'arrow/applet'
 require 'arrow/htmltokenizer'
 
 ### A template viewer applet
-class TemplateViewer < Arrow::Applet
+class Arrow::TemplateViewer < Arrow::Applet
 
-	# CVS version tag
-	Version = /([\d\.]+)/.match( %q{$Revision: 1.3 $} )[1]
+	# SVN Revision
+	SVNRev = %q$Rev$
 
-	# CVS id tag
-	Rcsid = %q$Id: view-template.rb,v 1.3 2003/12/24 09:04:56 deveiant Exp $
+	# SVN Id
+	SVNId = %q$Id$
+
+	# SVN URL
+	SVNURL = %q$URL$
 
 	# Applet signature
 	Signature = {
 		:name => "Template Viewer",
 		:description => "It is an introspection applet that displays "\
 			"Arrow templates with syntax highlighting.",
-		:uri => "view-template",
 		:maintainer => "ged@FaerieMUD.org",
 		:defaultAction => 'default',
 		:templates => {
@@ -97,6 +99,6 @@ class TemplateViewer < Arrow::Applet
 	}
 
 
-end # class TemplateViewer
+end # class Arrow::TemplateViewer
 
 

@@ -1,11 +1,12 @@
 #!/usr/bin/ruby
 # 
-# This file contains the Protected class, a derivative of Arrow::Applet. It is
-# an applet you can chain through for authentication purposes.
+# This file contains the Arrow::Protected class, a derivative of
+# Arrow::Applet. It is an applet you can chain through for authentication
+# purposes.
 # 
-# == Rcsid
-# 
-# $Id: protected.rb,v 1.4 2004/02/14 03:24:29 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -18,13 +19,16 @@ require 'arrow/applet'
 
 
 ### An example applet that you can chain through for simple authentication.
-class Protected < Arrow::Applet
+class Arrow::Protected < Arrow::Applet
 
-	# CVS version tag
-	Version = /([\d\.]+)/.match( %q{$Revision: 1.4 $} )[1]
+	# SVN Revision
+	SVNRev = %q$Rev$
 
-	# CVS id tag
-	Rcsid = %q$Id: protected.rb,v 1.4 2004/02/14 03:24:29 deveiant Exp $
+	# SVN Id
+	SVNId = %q$Id$
+
+	# SVN URL
+	SVNURL = %q$URL$
 
 	Users = {
 		'ged'			=> "30ff9a6c184a0fde7ac7ade1479ee19f",
@@ -35,7 +39,6 @@ class Protected < Arrow::Applet
 	Signature = {
 		:name => "Password-protected delegator",
 		:description => "It is an applet you can chain through for authentication purposes.",
-		:uri => "protected",
 		:maintainer => "ged@FaerieMUD.org",
 		:defaultAction => 'default',
 		:templates	=> {
@@ -104,6 +107,6 @@ class Protected < Arrow::Applet
 	}
 
 
-end # class Status
+end # class Arrow::Protected
 
 

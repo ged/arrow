@@ -1,11 +1,11 @@
 #!/usr/bin/ruby
 # 
-# This file contains the NoSuchApplet class, a derivative of Arrow::Applet. It
-# is an example noSuchAppletHandler applet.
+# This file contains the Arrow::NoSuchApplet class, a derivative of
+# Arrow::Applet. It is an example 'noSuchAppletHandler' applet.
 # 
-# == Rcsid
-# 
-# $Id: noSuchApplet.rb,v 1.2 2004/02/14 03:23:17 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -16,13 +16,16 @@ require 'arrow/applet'
 
 
 ### An example noSuchAppletHandler applet.
-class NoSuchAppletHandle < Arrow::Applet
+class Arrow::NoSuchAppletHandler < Arrow::Applet
 
-	# CVS version tag
-	Version = /([\d\.]+)/.match( %q{$Revision: 1.2 $} )[1]
+	# SVN Revision
+	SVNRev = %q$Rev$
 
-	# CVS id tag
-	Rcsid = %q$Id: noSuchApplet.rb,v 1.2 2004/02/14 03:23:17 deveiant Exp $
+	# SVN Id
+	SVNId = %q$Id$
+
+	# SVN URL
+	SVNURL = %q$URL$
 
 	# Applet signature
 	Signature = {
@@ -31,7 +34,6 @@ class NoSuchAppletHandle < Arrow::Applet
 						"with the uri of this applet as the noSuchAppletHandler value, " +
 						"it will run this applet instead of declining requests for " +
 						"URIs that don't match a registered applet.",
-		:uri => "_nosuch",
 		:maintainer => "ged@FaerieMUD.org",
 		:defaultAction => 'display',
 		:templates => {
@@ -39,13 +41,6 @@ class NoSuchAppletHandle < Arrow::Applet
 		},
 	}
 
-
-
-	######
-	public
-	######
-
-
-end # class NoSuchAppletHandler
+end # class Arrow::NoSuchAppletHandler
 
 
