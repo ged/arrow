@@ -110,7 +110,7 @@ class Transaction < Arrow::Object
 
 	# The hash of templates used by the applet this transaction is
 	# bound for.
-	attr_accessor :templates
+	attr_accessor :templates # :nodoc:
 
 	# The argument validator (a FormValidator object)
 	attr_accessor :vargs
