@@ -194,7 +194,65 @@ class Transaction < Arrow::Object
 	deprecate_method :action, :applet
 
 
-	### Redirection methods
+	### If the referer was another applet under the same Arrow instance, return
+	### the uri to it. If there was no 'Referer' header, or the referer wasn't
+	### an applet under the same Arrow instance, returns +nil+.
+	def referringApplet
+		return nil unless self.referer
+		uri = URI::parse( self.referer )
+		path = uri.path or return nil
+		rootRe = Regexp::new( self.appRoot + "/" )
+
+		return nil unless rootRe.match( path )
+		subpath = path.
+			sub( rootRe, '' ).
+			split( %r{/} ).
+			first
+
+		return subpath
+	end
+
+
+	### If the referer was another applet under the same Arrow instance, return
+	### the name of the action that preceded the current one. If there was no
+	### 'Referer' header, or the referer wasn't an applet under the same Arrow
+	### instance, return +nil+.
+	def referringAction
+		return nil unless self.referer
+		uri = URI::parse( self.referer )
+		path = uri.path or return nil
+		appletRe = Regexp::new( self.appRoot + "/\\w+/" )
+
+		return nil unless appletRe.match( path )
+		subpath = path.
+			sub( appletRe, '' ).
+			split( %r{/} ).
+			first
+
+		return subpath
+	end
+
+
+	#
+	# Header convenience methods
+	#
+
+	### Fetch the client's IP, either from proxy headers or the connection's IP.
+	def remoteIp
+		return self.headers_in['X-Forwarded-For'] || self.connection.remote_ip
+	end
+	alias_method :remote_ip, :remoteIp
+
+
+	### Get the request's referer, if any
+	def referer
+		return self.headers_in['Referer']
+	end
+
+
+	#
+	# Redirection methods
+	#
 
 	### Return a minimal HTML doc for representing a given status_code
 	def statusDoc( status_code, uri=nil )
