@@ -9,8 +9,10 @@
 #	http://language.perl.com/misc/Artistic.html)
 #
 
-
 BEGIN {
+	require 'rbconfig'
+	include Config
+
 	begin
 		require 'readline'
 		include Readline
@@ -20,14 +22,6 @@ BEGIN {
 			$stderr.print prompt.chomp
 			return $stdin.gets.chomp
 		end
-	end
-
-	begin
-		require 'yaml'
-		$yaml = true
-	rescue LoadError => e
-		$stderr.puts "No YAML; try() will use .inspect instead."
-		$yaml = false
 	end
 }
 
@@ -93,7 +87,10 @@ module UtilityFunctions
 	def testForLibrary( library, nicename=nil )
 		nicename ||= library
 		message( "Testing for the #{nicename} library..." )
-		if $:.detect {|dir| File.exists?(File.join(dir,"#{library}.rb")) || File.exists?(File.join(dir,"#{library}.so"))}
+		if $:.detect {|dir|
+				File.exists?(File.join(dir,"#{library}.rb")) ||
+				File.exists?(File.join(dir,"#{library}.#{CONFIG['DLEXT']}"))
+			}
 			message( "found.\n" )
 			return true
 		else
