@@ -728,7 +728,7 @@ class Template
 		### Render each of the directive's bracketed nodes with the given
 		### +item+, +template+, and evaluation +scope+.
 		def renderSubnodes( item, template, scope )
-			template.withOverriddenAttributes( self.name => item ) {|template|
+			template.withOverriddenAttributes( scope, self.name => item ) {|template|
 				template.render( @subnodes, scope )
 			}
 		end
