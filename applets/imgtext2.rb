@@ -11,6 +11,9 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
+# Thanks to Mahlon Smith <mahlon@martini.nu> for ideas for refinement,
+# suggestions.
+# 
 
 require 'GD'
 require 'ft2'
@@ -28,15 +31,23 @@ class FancyImageText < Arrow::Applet
 	# SVN URL
 	SVNURL = %q$URL$
 
-	# TrueType font to use
+	# Default settings
 	DefaultFont = 'TektonPro-Regular'
 	DefaultFont.untaint
 	DefaultFontDir = "/Library/WebServer/Fonts"
 	DefaultFontDir.untaint
 
+	DefaultFontSize = 36
+	DefaultText = 'TrueType Font Mangler'
+
 	# Colors
 	DefaultForegroundColor = "#000000"
 	DefaultBackgroundColor = "#ffffff"
+
+	# Safety constraints
+	MaxPointSize = 180
+	MinPointSize = 5
+	MaxTextLength = 1024
 
 	# URLs of the form: /ttf/<fontname>/<size>/<caption>.<fmt>
 	# Stolen shamelessly from Mahlon.
@@ -83,7 +94,7 @@ class FancyImageText < Arrow::Applet
 		@defaultfont ||= DefaultFont
 
 		@background= GD::Image::trueColorAlpha( bkgnd, GD::AlphaTransparent )
-		@foreground = GD::Image::trueColorAlpha( fgnd, GD::AlphaTransparent/2 )
+		@foreground = GD::Image::trueColorAlpha( fgnd, GD::AlphaOpaque )
 		@fonts = load_fonts( @fontdir )
 
 		self.log.debug "Loaded %d fonts" % @fonts.length
@@ -175,11 +186,15 @@ class FancyImageText < Arrow::Applet
 	### Create a GD::Image object from the given +txn+ and +rest+-style
 	### arguments.
 	def make_image( txn, fontname, size, caption )
-		# Read the configuration from either the query args or the REST-style
-		# parameters, preferring the former.
+
+		# Arguments are read from either the query args or the REST-style
+		# parameters, preferring the latter.
+
+		# Fetch the text and normalize it
 		text = $1 if /([\x20-\x7f]+)/.match( caption )
 		text ||= txn.vargs[:imgtext]
-		text ||= "No valid text specified."
+		text ||= DefaultText
+		text = text[0, MaxTextLength] if text.length > MaxTextLength
 		self.log.debug "Set text to %p" % text
 
 		# Get the face name the same way
@@ -191,7 +206,9 @@ class FancyImageText < Arrow::Applet
 		# Get the pointsize the same way
 		pointsize = Integer($1) if /(\d+)/.match( size )
 		pointsize ||= Integer( txn.vargs[:fontsize] ) rescue nil
-		pointsize = 18 if pointsize.nil? || pointsize.zero?
+		pointsize = DefaultPointSize if pointsize.nil? || pointsize.zero?
+		pointsize = MaxPointSize if pointsize > MaxPointSize
+		pointsize = MinPointSize if pointsize < MinPointSize
 		self.log.debug "Set pointsize to %p" % pointsize
 
 		# Calculate the size of the image based on the size of the rendered text
@@ -214,12 +231,11 @@ class FancyImageText < Arrow::Applet
 
 		# Fill the image with the background and draw the text and a border with
 		# the foreground color.
+		img.saveAlpha = true
 		img.alphaBlending = false
 		img.fill( 1, 1, @background )
-		img.alphaBlending = true
 		img.stringFT( @foreground, font, pointsize, 0, 5 - brect[6], 5 - brect[7], text )
-		#img.rectangle( 0,0, width-1, height-1, @foreground )
-		img.transparent( @background )
+		#img.transparent( @background )
 		
 		self.log.debug "Filled and set string."
 
