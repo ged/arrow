@@ -59,7 +59,6 @@ module Arrow
 	# System exceptions
 	def_exception :ConfigError,				"Configuration error"
 	def_exception :LockingError,			"Locking error"
-	def_exception :FactoryError,			"Error in factory class"
 	def_exception :SessionError,			"Error in session"
 
 	# Templating errors
