@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<!--
+
+  Web Interface to MemCache
+
+  -->
+
+  <head>
+	<title>Web Interface to MemCache</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+	<link rel="stylesheet" type="text/css" href="/stylesheets/arrow.css" />
+  </head>
+  <body>
+
+	<h1>Web Interface to MemCache</h1>
+
+	<p>The following servers are visible:</p>
+
+	<ul>
+	<?for server in memcache.servers ?>
+	<li><?call server.host ?>:<?call server.port?></li>
+	<?end?>
+	</ul>
+
+	<?include navbar.incl?>
+
+  </body>
+</html>
+
+
+<!--
+  Local Variables:
+  mode: nxml
+ -->
+
