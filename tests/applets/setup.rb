@@ -7,13 +7,13 @@ require 'arrow/applet'
 class Setup < Arrow::Applet
 
 	# SVN Revision
-	SVNRev = %q$Rev: 169 $
+	SVNRev = %q$Rev$
 
 	# SVN Id
-	SVNId = %q$Id: status.rb 169 2004-08-21 05:39:00Z ged $
+	SVNId = %q$Id$
 
 	# SVN URL
-	SVNURL = %q$URL: svn+ssh://svn.FaerieMUD.org/usr/local/svn/Arrow/trunk/applets/status.rb $
+	SVNURL = %q$URL$
 
 	# Applet signature
 	Signature = {

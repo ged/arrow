@@ -40,7 +40,7 @@ module Arrow
 
 		### Class constants
 		Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
-		Rcsid = %q$Id: subjects.rb,v 1.1 2003/10/13 04:20:13 deveiant Exp $
+		Rcsid = %q$Id$
 
 
 		### Initialize a new Arrow::Subject (should be called from derivatives).

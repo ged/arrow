@@ -1,5 +1,5 @@
 #!/usr/bin/ruby
-# $Id: delimscanrcreate.rb,v 1.3 2003/08/24 22:12:50 deveiant Exp $
+# $Id$
 #
 # Benchmark DelimScanner creation to see whether using a single instance to
 # parse tag bodies is worth the additional complexity.

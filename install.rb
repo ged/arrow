@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 #
 #	Linguistics Module Install Script
-#	$Id: install.rb,v 1.4 2004/03/14 01:47:23 stillflame Exp $
+#	$Id$
 #
 #	Thanks to Masatoshi SEKI for ideas found in his install.rb.
 #
@@ -23,7 +23,7 @@ require 'ftools'
 
 
 $version	= %q$Revision: 1.4 $
-$rcsId		= %q$Id: install.rb,v 1.4 2004/03/14 01:47:23 stillflame Exp $
+$rcsId		= %q$Id$
 
 # Define required libraries
 RequiredLibraries = [

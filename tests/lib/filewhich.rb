@@ -38,7 +38,7 @@
 #
 # == Version
 #
-#  $Id: filewhich.rb,v 1.2 2003/08/28 14:07:49 deveiant Exp $
+#  $Id$
 # 
 
 class File

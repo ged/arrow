@@ -1,7 +1,7 @@
 #!/usr/bin/ruby -w
 #
 # Unit test for the Arrow::Config::Path class
-# $Id: 11_path.tests.rb,v 1.3 2003/10/13 04:42:06 deveiant Exp $
+# $Id$
 #
 # Copyright (c) 2003 RubyCrafters, LLC. Most rights reserved.
 # 

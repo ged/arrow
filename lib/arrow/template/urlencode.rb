@@ -6,7 +6,7 @@
 # 
 # == Rcsid
 # 
-# $Id: TEMPLATE.rb.tpl,v 1.1 2003/08/13 12:42:57 deveiant Exp $
+# $Id$
 # 
 # == Authors
 # 

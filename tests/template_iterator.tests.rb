@@ -1,7 +1,7 @@
 #!/usr/bin/ruby -w
 #
 # Unit test for the Arrow::Template::Iterator class
-# $Id: 06_template_iterator.tests.rb,v 1.3 2004/01/19 04:07:44 deveiant Exp $
+# $Id$
 #
 # Copyright (c) 2003, 2004 RubyCrafters, LLC. Most rights reserved.
 # 

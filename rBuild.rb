@@ -8,7 +8,7 @@
 #
 # == Rcsid
 #
-#	$Id: rBuild.rb,v 1.2 2003/12/02 07:03:25 deveiant Exp $
+#	$Id$
 #
 
 require "modulebuilder"

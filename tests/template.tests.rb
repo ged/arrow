@@ -1,7 +1,7 @@
 #!/usr/bin/ruby -w
 #
 # Unit test for the Arrow::Template class
-# $Id: 05_template.tests.rb,v 1.11 2004/01/23 16:23:51 deveiant Exp $
+# $Id$
 #
 # Copyright (c) 2003, 2004 RubyCrafters, LLC. Most rights reserved.
 # 

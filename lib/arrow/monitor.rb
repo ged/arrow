@@ -67,7 +67,7 @@ module Arrow
 
 		### Class constants, instance variables, and methods
 		Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
-		Rcsid = %q$Id: monitor.rb,v 1.1 2003/02/19 05:30:50 deveiant Exp $
+		Rcsid = %q$Id$
 
 		# The monitor instances that have been registered, keyed by the Modules
 		# that registered them.

@@ -39,7 +39,7 @@ module Arrow
 
 		### Class constants
 		Version = /([\d\.]+)/.match( %q{$Revision: 1.2 $} )[1]
-		Rcsid = %q$Id: datasource.rb,v 1.2 2003/02/19 23:35:30 stillflame Exp $
+		Rcsid = %q$Id$
 
 		@@source_types = {}
 

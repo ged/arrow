@@ -129,7 +129,7 @@ module Arrow
 
 		### Class constants/methods
 		Version = /([\d\.]+)/.match( %q{$Revision: 1.12 $} )[1]
-		Rcsid = %q$Id: config.rb,v 1.12 2003/12/30 17:39:52 deveiant Exp $
+		Rcsid = %q$Id$
 
 		def self::debugMsg( *msgs )
 			$stderr.puts msgs.join

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby -w
 #
 # Unit test for the Arrow::Logger class
-# $Id: 10_logger.tests.rb,v 1.1 2003/12/02 06:09:31 deveiant Exp $
+# $Id$
 #
 # Copyright (c) 2003 RubyCrafters, LLC. Most rights reserved.
 # 

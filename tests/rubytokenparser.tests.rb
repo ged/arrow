@@ -1,7 +1,7 @@
 #!/usr/bin/ruby -w
 #
 # Unit test for the Arrow::RubyTokenParser class
-# $Id: 07_rubytokenparser.tests.rb,v 1.1 2004/01/09 03:14:54 deveiant Exp $
+# $Id$
 #
 # Copyright (c) 2004 RubyCrafters, LLC. Most rights reserved.
 # 

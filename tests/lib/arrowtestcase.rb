@@ -28,7 +28,7 @@
 # 
 # == Rcsid
 # 
-#  $Id: arrowtestcase.rb,v 1.7 2004/01/19 04:08:09 deveiant Exp $
+#  $Id$
 # 
 # == Authors
 # 

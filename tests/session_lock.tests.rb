@@ -1,7 +1,7 @@
 #!/usr/bin/ruby -w
 #
 # Unit test for the Arrow::Session::Lock class
-# $Id: 22_session_lock.tests.rb,v 1.1 2003/10/13 04:20:13 deveiant Exp $
+# $Id$
 #
 # Copyright (c) 2003, 2004 RubyCrafters, LLC. Most rights reserved.
 # 

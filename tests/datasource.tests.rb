@@ -1,7 +1,7 @@
 #!/usr/bin/ruby -w
 #
 # Unit test for the DataSource class
-# $Id: 31_datasource.tests.rb,v 1.1 2004/02/29 02:55:38 stillflame Exp $
+# $Id$
 #
 # Copyright (c) 2004 RubyCrafters, LLC. Most rights reserved.
 # 

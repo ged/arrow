@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 #
 #	Distribution Maker Script
-#	$Id: makedist.rb,v 1.2 2004/01/20 07:56:20 deveiant Exp $
+#	$Id$
 #
 #	Copyright (c) 2001, 2002, 2004, The FaerieMUD Consortium.
 #
@@ -112,7 +112,11 @@ def main
 	end
 
 	# Find the project name
-	project = File::read( "CVS/Repository" ).chomp.sub( %r{.*/}, '' )
+	if File::directory?( "CVS" )
+		project = File::read( "CVS/Repository" ).chomp.sub( %r{.*/}, '' )
+	else
+		project = prompt( "Project name?" ).capitalize
+	end		
 	header "%s Distribution Maker" % project
 
 	# Look for programs to use

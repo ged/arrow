@@ -1,7 +1,7 @@
 #!/usr/bin/ruby -w
 #
 # Unit test for the Arrow::Session::Store class
-# $Id: 23_session_store.tests.rb,v 1.2 2003/10/25 12:20:09 deveiant Exp $
+# $Id$
 #
 # Copyright (c) 2003 RubyCrafters, LLC. Most rights reserved.
 # 

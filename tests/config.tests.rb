@@ -1,7 +1,7 @@
 #!/usr/bin/ruby -w
 #
 # Unit test for the Arrow::Config class
-# $Id: 01_config.tests.rb,v 1.4 2003/11/09 22:44:50 deveiant Exp $
+# $Id$
 #
 # Copyright (c) 2003, 2004 RubyCrafters, LLC. Most rights reserved.
 # 

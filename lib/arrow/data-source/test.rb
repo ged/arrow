@@ -29,7 +29,7 @@ module Arrow
 
 		### Class constants
 		Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
-		Rcsid = %q$Id: test.rb,v 1.1 2004/02/29 02:48:07 stillflame Exp $
+		Rcsid = %q$Id$
 
 
 		#############################################################

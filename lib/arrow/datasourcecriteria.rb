@@ -32,7 +32,7 @@ class Arrow::DataSource
     CriteriaVersion = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
 
 	# CVS id tag
-	CriteriaRcsid = %q$Id: datasourcecriteria.rb,v 1.1 2004/02/29 02:58:21 stillflame Exp $
+	CriteriaRcsid = %q$Id$
 
 
 	######

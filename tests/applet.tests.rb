@@ -1,7 +1,7 @@
 #!/usr/bin/ruby -w
 #
 # Unit test for the Arrow::Applet class
-# $Id: 40_applet.tests.rb,v 1.1 2004/03/20 18:17:40 stillflame Exp $
+# $Id$
 #
 # Copyright (c) 2004 RubyCrafters, LLC. Most rights reserved.
 # 

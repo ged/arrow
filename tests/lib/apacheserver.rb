@@ -58,7 +58,7 @@
 #
 # == Version
 #
-#  $Id: apacheserver.rb,v 1.1 2003/07/27 19:58:14 deveiant Exp $
+#  $Id$
 # 
 
 require 'apacheconfig'

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 #
 #	RDoc Documentation Generation Script
-#	$Id: makedocs.rb,v 1.2 2003/08/13 12:39:21 deveiant Exp $
+#	$Id$
 #
 #	Copyright (c) 2001-2004 The FaerieMUD Consortium.
 #

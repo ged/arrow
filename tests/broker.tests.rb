@@ -1,7 +1,7 @@
 #!/usr/bin/ruby -w
 #
 # Unit test for the Arrow::Broker class
-# $Id: TEMPLATE.rb.tpl,v 1.3 2003/09/17 22:30:08 deveiant Exp $
+# $Id$
 #
 # Copyright (c) 2004 RubyCrafters, LLC. Most rights reserved.
 # 
