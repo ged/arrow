@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<!--
+
+  Arrow Unit Tester: List Viewer
+
+  -->
+
+  <head>
+	<title>Arrow Unit Tester: List Viewer</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+	<link rel="stylesheet" type="text/css" href="/stylesheets/arrow.css" />
+  </head>
+  <body>
+
+	<h1>Arrow Unit Tester: List Viewer</h1>
+
+	<p>I know about the following applications:</p>
+
+	<table id="test-matrix">
+	  <thead>
+		<tr>
+		  <th>Applet</th>
+		</tr>
+	  </thead>
+	  <tbody>
+		<?for app in apps ?>
+		<tr class="test-matrix-app">
+		  
+		</tr>
+		<?end for?>
+	  </tbody>
+	</table>
+
+	<?include navbar.incl?>
+
+  </body>
+</html>
+
+
+<!--
+  Local Variables:
+  mode: xml
+ -->
+
