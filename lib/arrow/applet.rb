@@ -256,6 +256,9 @@ class Applet < Arrow::Object
 		# to ::load.
 		attr_reader :newlyLoaded
 
+		# The file containing the applet's class definition
+		attr_accessor :filename
+
 
 		### Inheritance callback: register any derivative classes so they can be
 		### looked up later.
@@ -291,6 +294,11 @@ class Applet < Arrow::Object
 			newderivatives = @newlyLoaded
 			@derivatives -= @newlyLoaded
 			@derivatives.push( *@newlyLoaded )
+
+			newderivatives.each {|applet|
+				applet.filename = filename
+			}
+
 			return newderivatives
 		end
 
