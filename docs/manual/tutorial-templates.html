@@ -22,8 +22,6 @@
   </head>
   <body>
 
-
-
 	<!-- Experimental linkbox thingie -->
 	<div id="linkbox">
 	  <span id="linkbox-head">Arrow Manual</span>
@@ -84,68 +82,182 @@
 		</p>
 	  </div>
 	  <div class="section">
+
 		<h2><a href="#ats" id="ats">Arrow Templating System</a></h2>
-		<p></p>
-		<h2>Syntax</h2>
+
+		<h3>Syntax</h3>
+
 		<p>The Arrow Templating System uses preprocessing tags to distinguish
-		template directives.  These are both &lt;?...?&gt; and [?...?], with the
-		square bracket version to be used inside of other html tags (as in:
-		&lt;a href="[?attr link?]"&gt;...)</p>
-		<h2>The Directives</h2>
-		<p></p>
-        <h3>attr</h3>
-		<p><strong>&lt;?attr var?&gt;</strong> A simple directive, this
-		replaces itself with the stringified contents of the template variable
-		specified.</p>
-        <h3>call</h3>
-		<p><strong>&lt;?call var.method(args)?&gt;</strong> This allows method
-		calls on a variable to be evaluated, including arguments taken from the
-		template variables or some basic ruby (such as numbers and strings).</p>
-        <h3>set</h3>
-		<p><strong>&lt;?set var value?&gt;</strong> Sets a template variable to
-		the specified value, which will then be accessible through the rest of
-		the template.</p>
-        <h3>escape</h3>
-		<p><strong>&lt;?escape statement?&gt;</strong> Entity-ifies the return
-		of the statement (so turns all &lt;'s, &gt;'s and &amp;'s into their
-		corresponding &amp;blah;'s).</p>
-        <h3>if/elsif/else</h3>
-		<p><strong>&lt;?if statement?&gt;...&lt;?elsif
-		statement?&gt;...&lt;?else?&gt;...&lt;?end if?&gt;</strong> Your run of
-		the mill conditional flow control.  The 'else' is optional, the 'elsif's
-		can be repeated any number of times (including zero), and the
-		'statement' can be any template variable, method chain off a template
-		variable, or regular expression match of a template variable (like
-		&lt;?if var.method =~ /regex/?&gt;).</p>
-        <h3>for</h3>
-		<p><strong>&lt;?for arglist in iterable?&gt;...&lt;?end for?&gt;</strong>
-		For each element of the Enumerable object, the element is assigned to a
-		template variable (or multiple, if appropriate), and the enclosed
-		segment of XHTML is evaluated.  The arglist can have default values (as
-		in: &lt;?for a,b=1 in a_hash?&gt;), array-slurping arguments (*args) and
-		hashified arguments.  This will call Enumerable#each on the iterable.</p>
-        <h3>yield</h3>
-		<p><strong>&lt;?yield arglist from var.block_accepting_method?&gt;
-		... &lt;?end yield?&gt;</strong> For calling any general method that
-		takes a block, the yield directive will assign the arglist in the same
-		fasion as with &lt;?for, then pass in the contained XHTML (the '...'
-		above) to be evaluated in the method whenever yield is called (or
-		&block.call, depending on how the method deals with the block argument).
-		This can behave exactly like &lt;?for (&lt;yield arglist in
-		var.each?&gt;), can be used to call alternate iteration methods (such as
-		#each_with_index), or used in other general case block situations (like
-		Regex#match).</p>
-		<!-- :MC: i don't understand what this does enough to document it -->
-        <!-- <h3>import</h3>
-		<p><strong>&lt;?import foo as superfoo, bar, baz as
-		bazish?&gt;</strong> Loads in template variables, either named the same
-		as the variable, or renamed to match the 'as name' name.</p> -->
-        <h3>include</h3>
-		<p><strong>&lt;?include other_template.tmpl as name?&gt;</strong> This
-		directive is replaced with the contents of the template specified, and
-		then evaluated in either the present template's namespace, or in a
-		subspace specified by 'name'.</p>
+		template directives.  These are both <code>&lt;?...?&gt;</code> and
+		<code>[?...?]</code>. The square bracket version is meant to be used
+		inside of other html tags (e.g., <code>&lt;a href="[?attr
+		link?]"&gt;</code>...)</p>
+
+		<h3>The Directives</h3>
+
+		<dl class="linelist">
+		  <dt>attr</dt>
+		  <dd class="format">
+			<samp>&lt;?attr <var>attribute</var> ?&gt;</samp><br />
+			<samp>&lt;?attr "<var>fmtstring</var>" % <var>attribute</var> ?&gt;</samp>
+		  </dd>
+		  <dd>A simple directive similar to <code>attr_accessor</code> in Ruby,
+		  this defines a method <var>attribute</var> on the template object which can
+		  be used to insert one or more objects into the template. Each object
+		  will be stringified and then joined together with the empty string,
+		  and the resultant String will replace each instance of the
+		  <code>&lt;attr&gt;</code> tag. If the tag specified a
+		  <var>fmtstring</var>, it will be used in the stringification instead
+		  of <code>#to_s</code>.</dd>
+
+		  <dt>call</dt>
+		  <dd class="format">
+		    <samp>&lt;?call <var>attribute</var>.<var>method</var> ?&gt;</samp><br />
+			<samp>&lt;?call "<var>fmtstring</var>" <var>attribute</var>.<var>method</var> ?&gt;</samp><br />
+		    <samp>&lt;?call <var>attribute</var>.<var>method</var>(<var>args</var>) ?&gt;</samp>
+		  </dd>
+		  <dd>This directive also defines a method of the template object, but
+		  also specifies one or more methods that should be called on the
+		  inserted objects before replacing the tag.</dd>
+
+		  <dt>set</dt>
+		  <dd class="format"><samp>&lt;?set <var>attribute</var> <var>value</var> ?&gt;</samp></dd>
+
+		  <dd>Sets template variable <var>attribute</var> to the specified
+		  <var>value</var>, which will then be accessible through the rest of
+		  the template.</dd>
+
+		  <dt>escape</dt>
+		  <dd class="format"><samp>&lt;?escape <var>attribute</var> ?&gt;</samp></dd>
+		  <dd>Acts like the <code>&lt;attr&gt;</code> directive, but
+		  HTML-escapes the String just before it is inserted into the output
+		  (e.g., turns all <code>&lt;</code> and <code>&gt;</code> characters
+		  into into the corresponding <code>&amp;lt;</code> and
+		  <code>&amp;gt;</code> entities).</dd>
+
+		  <dt>urlencode</dt>
+		  <dd class="format"><samp>&lt;?urlencode <var>attribute</var> ?&gt;</samp></dd>
+		  <dd>Acts like the <code>&lt;attr&gt;</code> directive, but URL-encodes
+		  the String just before it is inserted into the output.</dd>
+
+		  <dt>if/elsif/else</dt>
+		  <dd class="format">
+			<samp>
+			  &lt;?if <var>statement</var> ?&gt;<br />
+			  ...<br />
+			  &lt;?elsif <var>statement</var> ?&gt;<br />
+			  ...<br />
+			  &lt;?else?&gt;<br />
+			  ...<br />
+			  &lt;?end if ?&gt;
+			</samp>
+		  </dd>
+
+		  <dd>Your run-of-the-mill conditional flow control.  The <code>else</code>
+		  is optional, the <code>elsif</code>s can be repeated any number of times
+		  (including zero), and the <var>statement</var> can be any template
+		  variable, method chain off a template variable, or regular expression
+		  match of a template variable (like
+		  <code>&lt;?if var.method =~ /regex/ ?&gt;</code>).</dd>
+
+		  <dt>for</dt>
+		  <dd class="format">
+			<samp>
+			  &lt;?for <var>arglist</var> in <var>iterable</var> ?&gt;<br/>
+			  ...<br/>
+			  &lt;?end for ?&gt;
+			</samp>
+		  </dd>
+
+		  <dd>For each element of the <var>iterable</var> object (i.e., an
+		  object that implements the <tt>Enumerable</tt> interface), the element
+		  is assigned to a template variable (or multiple, if appropriate), and
+		  the enclosed content is rendered.  The <var>arglist</var> can have
+		  default values (as in: <code>&lt;?for a,b=1 in a_hash ?&gt;</code>),
+		  array-slurping arguments (<code>*args</code>) and hashified
+		  arguments.</dd>
+
+		  <dd>Also defined during iteration is a template variable
+		  <var>iterator</var>, which is an <tt>Arrow::Template::Iterator</tt>
+		  object that can be used to interact with the iteration. See the API
+		  documentation for the <tt>Arrow::Template::Iterator</tt> class for
+		  more on what it can do.</dd>
+
+		  <dt>yield</dt>
+		  <dd class="format">
+			<samp>
+			  &lt;?yield <var>arglist</var> from <var>attribute</var>.<var>block_method</var> ?&gt;<br/>
+			  ...<br/>
+			  &lt;?end yield ?&gt;
+			</samp>
+		  </dd>
+
+		  <dd>Calls the specified <var>block_method</var> on the given template
+		  <var>attribute</var>, passing a rendering function for the contained
+		  content as the block. Each call to the block will assign arguments to
+		  the <var>arglist</var> and render the content. This is a more-generic
+		  version of the functionality represented by the <code>for</code>
+		  directive, useful for calling block-accepting methods besides
+		  <code>#each</code>.</dd>
+
+		  <dt>import</dt>
+		  <dd class="format">
+			<samp>
+			  &lt;?import <var>attribute</var> ?&gt;<br/>
+			  &lt;?import <var>attribute</var> as <var>altname</var> ?&gt;<br/>
+			  &lt;?import <var>attribute</var>, <var>var2</var> ?&gt;<br/>
+			  &lt;?import <var>attribute</var> as <var>altname</var>, <var>var2</var> ?&gt;
+			</samp>
+		  </dd>
+
+		  <dd>This tag causes one or more template values from a containing
+		  template to be imported into a subordinate one. For example, if there
+		  is a template that contains the attribute <var>foo</var>, rendering a
+		  sub-template which has <code>&lt;?import foo ?></code> in it would
+		  cause the sub-template's <var>foo</var> to be set to the container
+		  template's <var>foo</var> at the point at which it is rendered.</dd>
+
+		  <dt>include</dt>
+		  <dd class="format">
+			<samp>
+			  &lt;?include <var>filename</var> ?&gt;<br/>
+			  &lt;?include <var>filename</var> as <var>name</var> ?&gt;
+			</samp>
+		  </dd>
+
+		  <dd>This directive is replaced either with the contents of the
+		  template specified (first form), or a placeholder attribute with the
+		  specified <var>name</var> (second form). </dd>
+
+		  <dd>The first form merges the two templates together, while the second
+		  keeps them separate for the purposes of interaction. For example, you
+		  may wish to define a generic table template called "table.tmpl", but
+		  include it in another template in such a way that it can be interacted
+		  with separately:</dd>
+
+		  <dd>
+			<strong>In the template:</strong>
+
+<pre><code>
+The times for this race were:&lt;br/&gt;
+&lt;?include <var>table.tmpl</var> as <var>thisrace</var> ?&gt;
+
+Total times:
+&lt;?include <var>table.tmpl</var> as <var>totals</var> ?&gt;
+</code></pre>
+
+		  <strong>In the applet:</strong>
+
+<pre><code>
+tmpl.thisrace.rows << ["fred" => 1.10], ["wilma" => "1.05"]
+tmpl.totals.rows << ["fred" => 5.77], ["wilma" => 4.95]
+</code></pre>
+		  </dd>
+
+		</dl>
 	  </div>
+
+
 	  <div class="section">
 		<h2><a href="#example" id="example">Templated Applets - Hello World
 		(templated)</a></h2>
@@ -153,7 +265,8 @@
 		  First, we need to tell Arrow what kind of templates to use, where to
 		  look for templates, and various other configuration options.  These
 		  settings are kept in the Arrow config file, under the templates
-		  section:
+		  section:</p>
+
 <pre>templates: 
   loader: Arrow::Template
   path:
@@ -165,45 +278,51 @@
     expiration: 36
     maxSize: 2621440
 </pre>
-		  Here, "loader" is the templating system to use, "path" is a list of
+
+		<p>Here, "loader" is the templating system to use, "path" is a list of
 		  directories to search for the templates, and the "cache" and
 		  "cacheConfig" determine how to cache templates, balancing between
 		  increased response time and decreased resource usage.
 		</p>
+
 		<p>
 		  Now we can access and use our templates in an Applet.  As a
 		  convenience, the Signature of an applet has room for mention of the
-		  templates it uses.
+		  templates it uses.</p>
+
 <pre># Applet signature
 Signature = {
     :name => "Hello World",
     :description => %{A 'hello world' applet.},
     :maintainer => "ged@FaerieMUD.org",
     :defaultAction => 'templated',
-    <font color="#aa00aa">:templates => {
+    <span class="highlighted">:templates => {
         :templated     => 'hello-world.tmpl',
-    },</font>
+    },</span>
 }
 </pre>
-		  Which then further allows the use of the Arrow::Applet#loadTemplate
+
+		<p>Which then further allows the use of the Arrow::Applet#loadTemplate
 		  method to get an Arrow::Template object.  This is mostly just for you
-		  to fill with data, and then make the return value of an action:
+		  to fill with data, and then make the return value of an action:</p>
+
 <pre>action( 'templated' ) {|txn, *args|
     self.log.debug "In the 'templated' action of the %s applet." %
         self.signature.name
 
-    <font color="#aa00aa">templ = self.loadTemplate( :templated )
+    <span class="highlighted">templ = self.loadTemplate( :templated )
     templ.txn = txn
     templ.time = Time.now.to_s
     templ.applet = self
 
-    return templ</font>
+    return templ</span>
 }
 </pre>
-		</p>
+
 		<p>
 		  So now we need to actually have a /www/templates/hello-world.tmpl file
-		  made to display our page how we want it.
+		  made to display our page how we want it.</p>
+
 <pre>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"&gt;
 &lt;html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"&gt;
 
@@ -224,27 +343,25 @@ Signature = {
 	&lt;h1&gt;Hello World&lt;/h1&gt;
 
 	&lt;p&gt;It is &lt;?attr time?&gt;.  This is a minimal demo applet that just
-	loads and prints a template.  There's also &lt;a href="<font
-	color="#aa00aa">[?call txn.action?]</font>/display"&gt;a simpler
+	loads and prints a template.  There's also &lt;a href="<span class="highlighted">[?call txn.action?]</span>/display"&gt;a simpler
 	version&lt;/a&gt; of this applet that outputs plain text (i.e., no
 	templates).&lt;p&gt;
 
-		&lt;!-- Runcount: <font color="#aa00aa">[?call applet.runCount ?]</font> --&gt;
+		&lt;!-- Runcount: <span class="highlighted">[?call applet.runCount ?]</span> --&gt;
 
-<font color="#aa00aa">&lt;?if txn.session? ?&gt;</font>
+<span class="highlighted">&lt;?if txn.session? ?&gt;</span>
 	  &lt;!-- Session found --&gt;
-  <font color="#aa00aa">&lt;?if txn.session[:user] ?&gt;</font>
-	&lt;p&gt;Since you're logged in as '<font color="#aa00aa">&lt;?call
-	txn.session[:user]?&gt;</font>', you can also &lt;a
-		href="<font color="#aa00aa">[?call txn.appRoot?]</font>/<font
-		color="#aa00aa">[?call txn.appletPath.split(%r{/})[0]
-		?]</font>/logout"&gt;log out&lt;/a&gt; to test the protectedness
+  <span class="highlighted">&lt;?if txn.session[:user] ?&gt;</span>
+	&lt;p&gt;Since you're logged in as '<span class="highlighted">&lt;?call
+	txn.session[:user]?&gt;</span>', you can also &lt;a
+		href="<span class="highlighted">[?call txn.appRoot?]</span>/<span class="highlighted">[?call txn.appletPath.split(%r{/})[0]
+		?]</span>/logout"&gt;log out&lt;/a&gt; to test the protectedness
 	  of the applet chain.&lt;/p&gt;
-  <font color="#aa00aa">&lt;?end?&gt;</font>
+  <span class="highlighted">&lt;?end?&gt;</span>
 
-<font color="#aa00aa">&lt;?end if ?&gt;</font>
+<span class="highlighted">&lt;?end if ?&gt;</span>
 
-	<font color="#aa00aa">&lt;?include navbar.incl?&gt;</font>
+	<span class="highlighted">&lt;?include navbar.incl?&gt;</span>
 
   &lt;/body&gt;
 &lt;/html&gt;
@@ -255,23 +372,30 @@ Signature = {
   mode: xml
  --&gt;
 </pre>
-		  Which is, for the most part, just static XHTML that will be displayed
+
+		<p>Which is, for the most part, just static XHTML that will be displayed
 		  verbatim.  The template directives designate places where the display
 		  will be determined by the data that had been saved into the
 		  Arrow::Template object in the action itself.  This template makes use
 		  of the attr, call, if, and include directives, as described above.
 		</p>
 	  </div>
+
+
 	  <div class="section">
 		<h2><a href="#adding" id="adding">Renderers</a></h2>
 		<p></p>
 	  </div>
+
+
 	  <div class="section">
 		<h2><a href="#adding" id="adding">Adding Directives</a></h2>
 		<p></p>
 		<h2>Sample Directive</h2>
 		<p></p>
 	  </div>
+
+
 	  <div class="section">
 		<h2><a href="#others" id="others">Using Other Templating Systems</a></h2>
 		<p></p>

@@ -1,7 +1,7 @@
 /* 
  *	Arrow Manual Stylesheet
  *	$Id$
- *	Time-stamp: <27-Jun-2004 18:47:42 ged>
+ *	Time-stamp: <06-Sep-2004 15:09:35 ged>
  */
 
 body {
@@ -102,10 +102,9 @@ button {
     display: inline;
 }
 
-kbd {
+kbd, samp {
     font-family: "Andale Mono", "Monotype.com", "Vera Sans Mono", fixed;
-    font-weight: bold;
-    color: #900;
+    color: #633;
     background: inherit;
 }
 
@@ -114,6 +113,12 @@ acronym, cite {
     font-style: normal;
 }
 acronym[title], cite[title] { cursor: help; }
+
+var {
+    font-family: "Andale Mono", "Monotype.com", "Vera Sans Mono", fixed;
+    font-weight: bold;
+    font-style: normal;
+}
 
 /* IDed entities */
 
@@ -158,11 +163,13 @@ acronym[title], cite[title] { cursor: help; }
 #linkbox-head {
     font-weight: bold;
     font-size: 110%;
+    display: inline;
 }
 
 #sub-linkbox-head {
     font-weight: bold;
     font-size: 105%;
+    display: inline;
 }
 
 #linkbox-body { list-style-type: none; }
@@ -247,7 +254,14 @@ dl.linelist > dd {
     margin: 0 15px 7px 20px;
 }
 
+dd.format {
+    margin: 2px 20px 10px;
+    padding: 3px;
+    background: #dedede;
+    border-bottom: 1px solid #999;
+}
 
+.highlighted { color: #633; }
 
 /* Template node-display classes */
 .node-tree {

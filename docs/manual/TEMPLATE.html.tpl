@@ -7,7 +7,6 @@
 		$Id: TEMPLATE.html.tpl,v 1.3 2003/12/20 20:19:24 stillflame Exp $
 
 		Author:		(>>>USER_NAME<<<)
-		Time-stamp: <23-Apr-2001 19:58:12 deveiant>
 
   -->
 
