@@ -377,7 +377,7 @@ class Applet < Arrow::Object
 		### set associated values in the applet's Signature; see the Synopsis in
 		### lib/arrow/applet.rb for examples of how to use this.
 		def action( name, &block )
-			name = '_default' if name.empty?
+			name = '_default' if name.to_s.empty?
 			
 			# Action must accept at least a transaction argument
 			unless block.arity.nonzero?
