@@ -286,7 +286,6 @@ assert_match( templateContentRe(/\|x{5}\s{10}\|/), rval )
 
 ===
 
-
 ### Call directive
 === Simple
 
@@ -650,6 +649,57 @@ assert_match( /:foo/, rval )
 assert_match( /:bar/, rval )
 assert_match( /:baz/, rval )
 assert_match( /:bim/, rval )
+===
+
+=== Iterator in evaled region
+
+<?for key in purchases.keys ?>
+  <?if foo.key?(key) ?>
+  Passed.
+  <?end if?>
+<?end for ?>
+
+---
+purchases = {"test" => 7}
+foo = {"test" => 3}
+assert_nothing_raised { template.purchases = purchases }
+assert_nothing_raised { template.foo = foo }
+assert_nothing_raised { rval = template.render }
+assert_match( templateContentRe(/Passed\./), rval )
+
+===
+
+=== Scope error
+
+<?for val in sarr ?>
+  <?if foo == val ?>
+    Key exists.
+  <?end if ?>
+<?end for ?>
+
+<?if foo == val ?>
+Failed.
+<?end if?>
+
+---
+sarr = [:something, :somethingElse, :something]
+template.sarr = sarr
+template.foo = :something
+assert_nothing_raised { rval = template.render }
+assert_match( templateContentRe(/Key exists\./, /Key exists\./), rval )
+assert_match( /<!--.*ScopeError.*-->/, rval )
+===
+
+=== Cannot override definitions ivar
+
+<?for definitions in array ?>
+	Failed.
+<?end for?>
+
+---
+array = [:foo]
+assert_nothing_raised { rval = template.render }
+assert_match( /<!--.*ScopeError.*-->/, rval )
 ===
 
 
