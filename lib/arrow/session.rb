@@ -229,9 +229,12 @@ module Arrow
 		### creating transaction's outgoing headers.
 		def save
 			begin
+				self.log.debug "Saving session data"
 				@store.save
+				self.log.debug "Writing session cookie"
 				@cookie.bake
 			ensure
+				self.log.debug "Releasing all locks"
 				@lock.releaseAllLocks
 			end
 		end
