@@ -60,6 +60,8 @@ end
 
 require 'test/unit'
 require 'test/unit/mock'
+require 'test/unit/assertions'
+require 'test/unit/util/backtracefilter'
 
 require 'net/http'
 require 'filewhich'
@@ -84,7 +86,7 @@ if $Apache
 	end
 end
 
-require 'arrow/application'
+require 'arrow/applet'
 require 'arrow/datasource'
 require 'arrow/monitor'
 require 'arrow/template'
@@ -247,6 +249,23 @@ class Arrow::TestCase < Test::Unit::TestCase
 		end
 	end
 	alias_method :tear_down, :teardown
+
+
+	### Skip the current step (called from #setup) with the +reason+ given.
+	def skip( reason=nil )
+		if reason
+			msg = "Skipping %s: %s" % [ @method_name, reason ]
+		else
+			msg = "Skipping %s: No reason given." % @method_name
+		end
+
+		$stderr.puts( msg ) if $VERBOSE
+		@method_name = :skipped_test
+	end
+
+
+	def skipped_test # :nodoc:
+	end
 
 
 	### Add the specified +block+ to the code that gets executed by #setup.
@@ -421,6 +440,23 @@ class Arrow::TestCase < Test::Unit::TestCase
 	rescue Test::Unit::AssertionFailedError => err
 		cutframe = err.backtrace.reverse.find {|frame|
 			/assert_not_match/ =~ frame
+		}
+		firstIdx = (err.backtrace.rindex( cutframe )||0) + 1
+		Kernel::raise( err, err.message, err.backtrace[firstIdx..-1] )
+	end
+
+
+	### Assert that the specified +klass+ defines the specified instance
+	### method +meth+.
+	def assert_has_instance_method( klass, meth )
+		msg = "<%s> expected to define instance method #%s" %
+			[ klass, meth ]
+		assert_block( msg ) {
+			klass.instance_methods.include?( meth.to_s )
+		}
+	rescue Test::Unit::AssertionFailedError => err
+		cutframe = err.backtrace.reverse.find {|frame|
+			/assert_has_instance_method/ =~ frame
 		}
 		firstIdx = (err.backtrace.rindex( cutframe )||0) + 1
 		Kernel::raise( err, err.message, err.backtrace[firstIdx..-1] )

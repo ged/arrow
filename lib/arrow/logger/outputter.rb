@@ -19,6 +19,8 @@
 # Please see the file COPYRIGHT in the 'docs' directory for licensing details.
 #
 
+require 'pluginfactory'
+
 require 'arrow/utils'
 require 'arrow/exceptions'
 require 'arrow/logger'
@@ -30,7 +32,7 @@ class Logger
 	### This class is the abstract base class for logging outputters for
 	### Arrow::Logger.
 	class Outputter < ::Object
-		include Arrow::Factory
+		include PluginFactory
 
 		# CVS version tag
 		Version = /([\d\.]+)/.match( %q{$Revision: 1.3 $} )[1]

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 # 
 # This file contains the SubclassedHello class, a derivative of the Hello
-# application to test application inheritance.
+# applet to test applet inheritance.
 # 
 # == Rcsid
 # 
@@ -21,7 +21,7 @@ require 'superhello'
 
 Arrow::Logger.global.debug "SubclassedHello: Past the requires"
 
-### An Arrow appserver status application.
+### An applet for testing inheritance from other derived applets
 class SubclassedHello < SuperHello
 
 	# CVS version tag
@@ -30,10 +30,10 @@ class SubclassedHello < SuperHello
 	# CVS id tag
 	Rcsid = %q$Id: subclassed-hello.rb,v 1.1 2003/12/08 20:40:05 deveiant Exp $
 
-	# Application signature
+	# Applet signature
 	Signature = {
 		:name => "Hello World (Subclassed)",
-		:description => %{A modified 'hello world' app to figure out if subclassing works.},
+		:description => %{A modified 'hello world' applet to figure out if subclassing works.},
 		:uri => "subhello",
 		:maintainer => "stillflame@FaerieMUD.org",
 	}

@@ -51,15 +51,10 @@ module Arrow
 				end					
 			end
 		}
+
 		const_set( name, eClass )
 	end
 
-
-	# General exceptions
-	def_exception :VirtualMethodError,		"Unimplemented virtual method",
-		NoMethodError
-	def_exception :InstantiationError,		"Instantiation attempted of abstract class",
-		TypeError
 
 	# System exceptions
 	def_exception :ConfigError,				"Configuration error"
@@ -76,8 +71,8 @@ module Arrow
 	def_exception :Reload,					"Configuration out of date"
 	def_exception :Shutdown,				"Server shutdown"
 
-	# Application errors
-	def_exception :AppError,				"Application error"
+	# Applet errors
+	def_exception :AppletError,				"Applet error"
 
 end # module Arrow
 

@@ -1,33 +1,34 @@
 #!/usr/bin/ruby
 # 
-# This file contains the SuperHello class, a derivative of Arrow::Application. A
-# "hello world" app.
+# This file contains the Hello class, a derivative of Arrow::Applet. A
+# "hello world" applet.
 # 
 # == Rcsid
 # 
-# $Id: superhello.rb,v 1.1 2003/12/08 20:40:05 deveiant Exp $
+# $Id: hello.rb,v 1.5 2004/02/14 03:22:36 deveiant Exp $
 # 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
 
-require 'arrow/application'
+require 'arrow/applet'
 
 
-### An Arrow appserver status application.
-class SuperHello < Arrow::Application
+### A "hello world" applet.
+class Hello < Arrow::Applet
 
 	# CVS version tag
-	Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
+	Version = /([\d\.]+)/.match( %q{$Revision: 1.5 $} )[1]
 
 	# CVS id tag
-	Rcsid = %q$Id: superhello.rb,v 1.1 2003/12/08 20:40:05 deveiant Exp $
+	Rcsid = %q$Id: hello.rb,v 1.5 2004/02/14 03:22:36 deveiant Exp $
 
-	# Application signature
+	# Applet signature
 	Signature = {
 		:name => "Hello World",
-		:description => %{A 'hello world' app.},
+		:description => %{A 'hello world' applet.},
+		:uri => "hello",
 		:maintainer => "ged@FaerieMUD.org",
 		:defaultAction => 'templated',
 		:templates => {
@@ -42,39 +43,41 @@ class SuperHello < Arrow::Application
 	public
 	######
 
-	action( 'display' ) {|txn, *args|
-		self.log.debug "In the 'display' action of the '%s' app." %
+	def display_action( txn, *args )
+		self.log.debug "In the 'display' action of the '%s' applet." %
 			self.signature.name 
 
 		txn.content_type = "text/plain"
 		return "Hello world."
-	}
+	end
 
 
 	action( 'templated' ) {|txn, *args|
-		self.log.debug "In the 'templated' action of the %s app." %
+		self.log.debug "In the 'templated' action of the %s applet." %
 			self.signature.name
 			
 		templ = txn.templates[:templated]
 		templ.txn = txn
-		templ.app = self
+		templ.applet = self
 
 		return templ
 	}
 
 
 	action( 'printsource' ) {|txn, *args|
-		self.log.debug "In the 'printsource' action of the %s app." %
+		self.log.debug "In the 'printsource' action of the %s applet." %
 			self.signature.name
 
 		src = File::read( __FILE__ ).gsub(/\t/, '    ')
 
 		templ = txn.templates[:printsource]
 		templ.txn = txn
-		templ.app = self
+		templ.applet = self
 		templ.source = src
 
 		return templ
 	}
 
-end # class SuperHello
+end # class Hello
+
+

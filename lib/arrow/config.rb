@@ -1,24 +1,24 @@
 #!/usr/bin/ruby
 # 
-# This file contains the Arrow::config class. Instance of this class
-# specify a configuration for an Arrow web application server.
+# This file contains the Arrow::Config class, instances of which use used to
+# load and save configuration values for an Arrow application.
 # 
 # == Description
 # The configuration values are as follows:
 #
 # [<b>startMonitor</b>]
 #	Start the monitoring subsystem. Defaults to +false+.
-# [<b>defaultApp</b>]
-#   The URI of the default application to run when the Arrow appserver root URI
+# [<b>defaultApplet</b>]
+#   The URI of the default applet to run when the Arrow appserver root URI
 #	is requested. A value of '(builtin)' (the default) will cause a default
 #	status method to be invoked.
-# [<b>noSuchAppHandler</b>]
-#   The URI of the application which should handle requests for apps that don't
+# [<b>noSuchAppletHandler</b>]
+#   The URI of the applet which should handle requests for applets that don't
 #   exist. A value of '(builtin)' (the default) will cause a builtin handler to
 #   be invoked.
 # [<b>errorHandler</b>]
-#	The URI of the application which should handle untrapped exceptions raised
-#	from other applications. A value of '(builtin)' (the default) will cause a
+#	The URI of the applet which should handle untrapped exceptions raised
+#	from other applets. A value of '(builtin)' (the default) will cause a
 #	builtin handler to be invoked.
 # [<b>logLevel</b>]
 #	The verbosity level of the global logger. Possible values are the same as
@@ -26,17 +26,17 @@
 #	and emerg.
 # [<b>templateLogLevel</b>]
 #	The verbosity level of the logger for the templating system.
-# [<b>applications</b>]
-#	Application configuration values:
+# [<b>applets</b>]
+#	Applet configuration values:
 #	[<b>path</b>]
 #	  An Arrow::Path object or colon-delimited list of directories to search for
-#	  application files. Defaults to: "./apps:/www/apps".
+#	  applet files. Defaults to: "./applets:/www/applets".
 #   [<b>pattern</b>]
-#	  A glob pattern that will be used to search for applications to
+#	  A glob pattern that will be used to search for applets to
 #	  load. Default to '*.rb'.
 #   [<b>pollInterval</b>]
-#	  The number of seconds between checks of the application path for
-#	  new/updated/deleted application files. Defaults to 5.
+#	  The number of seconds between checks of the applet path for
+#	  new/updated/deleted applet files. Defaults to 5.
 # [<b>templates</b>]
 #	Template configuration values:
 #   [<b>loader</b>]
@@ -107,7 +107,9 @@
 #
 
 require 'uri'
+require 'pluginfactory'
 
+require 'arrow'
 require 'arrow/mixins'
 require 'arrow/exceptions'
 require 'arrow/utils'
@@ -119,8 +121,8 @@ require 'uri'
 
 module Arrow
 
-	### Instance of this class specify a configuration for an Arrow web
-	### application server.
+	### Instances of this class contain configuration values for for an Arrow
+	### web application.
 	class Config < Arrow::Object
 		extend Forwardable
 
@@ -134,15 +136,15 @@ module Arrow
 
 		# Define the layout and defaults for the underlying structs
 		Defaults = {
-			:startMonitor		=> false,
-			:defaultApp			=> '(builtin)',
-			:noSuchAppHandler	=> '(builtin)',
-			:errorHandler		=> '(builtin)',
-			:logLevel			=> :info,
-			:templateLogLevel	=> :notice,
-			:uriCollisionFatal	=> true,
-			:applications => {
-				:path			=> Arrow::Path::new( "apps:/www/apps" ),
+			:startMonitor			=> false,
+			:defaultApplet			=> '(builtin)',
+			:noSuchAppletHandler	=> '(builtin)',
+			:errorHandler			=> '(builtin)',
+			:logLevel				=> :info,
+			:templateLogLevel		=> :notice,
+			:uriCollisionFatal		=> true,
+			:applets => {
+				:path			=> Arrow::Path::new( "applets:/www/applets" ),
 				:pattern		=> '*.rb',
 				:pollInterval	=> 5,
 			},
@@ -214,6 +216,11 @@ module Arrow
 				when Hash
 					newhash[ key ] = untaintValues( hash[key] )
 				when NilClass, TrueClass, FalseClass, Numeric
+					newhash[ key ] = val
+
+				when Arrow::Path
+					Arrow::Logger[ self ].debug "Untainting %p" % val
+					val.untaint
 					newhash[ key ] = val
 
 				when Array
@@ -514,7 +521,7 @@ module Arrow
 		### delegates. Create specific instances with the
 		### Arrow::Config::Loader::create method.
 		class Loader < Arrow::Object
-			include Arrow::Factory
+			include PluginFactory
 
 			#########################################################
 			###	C L A S S   M E T H O D S
@@ -568,7 +575,7 @@ end # module Arrow
 
 
 if __FILE__ == $0
-	filename = ARGV.shift || "default.conf" 
+	filename = ARGV.shift || "default.cfg" 
 	loader = ARGV.shift || Arrow::Config::defaultLoader
 
 	$stderr.puts "Dumping default configuration to '%s' using the '%s' loader" %

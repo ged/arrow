@@ -30,7 +30,6 @@ module Arrow
 	### track of the cached object's modification time, expiring the cached
 	### version when the disk-based version changes..
 	class Cache < ::Cache
-		include Arrow::TypeCheckFunctions
 
 		# Default configuration values
 		DefaultConfig = {
@@ -58,8 +57,6 @@ module Arrow
 		### Create a new cache. This merges the DefaultConfig with the specified
 		### values and transforms camelCased keys into under_barred ones.
 		def initialize( name, config={}, &cleanup )
-			checkType( config, Arrow::Config::ConfigStruct, ::Hash )
-
 			@name = name
 
 			# Merge defaults and specified values

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 # 
 # This file contains the ErrorThrower class, a derivative of
-# Arrow::Application. This app raises an exception to demonstrate Arrow's
+# Arrow::Applet. This applet raises an exception to demonstrate Arrow's
 # error-handling.
 # 
 # == Rcsid
@@ -19,11 +19,11 @@
 # Please see the file COPYRIGHT in the 'docs' directory for licensing details.
 #
 
-require 'arrow/application'
+require 'arrow/applet'
 
 
-### An Arrow appserver status application.
-class ErrorDemo < Arrow::Application
+### A demo applet to trigger Arrow's error-handler.
+class ErrorDemo < Arrow::Applet
 
 	# CVS version tag
 	Version = /([\d\.]+)/.match( %q{$Revision: 1.2 $} )[1]
@@ -31,7 +31,7 @@ class ErrorDemo < Arrow::Application
 	# CVS id tag
 	Rcsid = %q$Id: error.rb,v 1.2 2003/11/01 19:46:01 deveiant Exp $
 
-	# Application signature
+	# Applet signature
 	Signature = {
 		:name => "Appserver Error Handler Demo",
 		:description => "Intentionally raises an exception to demonstrate "\

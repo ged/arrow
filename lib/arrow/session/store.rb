@@ -21,6 +21,7 @@
 #
 
 require 'forwardable'
+require 'pluginfactory'
 
 require 'arrow/mixins'
 require 'arrow/exceptions'
@@ -31,7 +32,7 @@ class Session
 
 	### Serialization and semi-permanent session-data storage class.
 	class Store < Arrow::Object
-		include Arrow::Factory
+		include PluginFactory
 		extend Forwardable
 
 		# CVS version tag
@@ -57,7 +58,7 @@ class Session
 		#############################################################
 
 		### Returns the Array of directories to search for derivatives; part of
-		### the Arrow::Factory interface.
+		### the PluginFactory interface.
 		def self::derivativeDirs
 			[ 'arrow/session', 'arrow/session/store' ]
 		end

@@ -1,15 +1,15 @@
 #!/usr/bin/ruby
 # 
-# This file contains the Arrow::Dispatcher class, which is a mod_ruby handler for
-# running Arrow web applications.
+# This file contains the Arrow::Dispatcher class, which the mod_ruby handler
+# frontend for a web application.
 # 
 # == Synopsis
 # 
 #	RubyRequire 'arrow'
 #
-#   <Location /arrow>
+#   <Location /myapp>
 #		Handle ruby-object
-#		RubyHandler Arrow::Dispatcher::create( 'config.yaml' )
+#		RubyHandler Arrow::Dispatcher::create( 'myapp.yaml' )
 #	</Location>
 # 
 # == Rcsid
@@ -29,7 +29,7 @@
 
 require 'arrow/object'
 require 'arrow/config'
-require 'arrow/application'
+require 'arrow/applet'
 require 'arrow/transaction'
 require 'arrow/broker'
 require 'arrow/template'
@@ -38,7 +38,8 @@ require 'arrow/session'
 
 module Arrow
 
-	### A mod_ruby handler class for running Arrow web applications.
+	### A mod_ruby handler class for dispatching requests to an Arrow web
+	### application.
 	class Dispatcher < Arrow::Object
 
 		@@Instance = nil
@@ -130,14 +131,14 @@ module Arrow
 			self.log.notice "Configuring the Session class with %p" % config
 			Arrow::Session::configure( config )
 
-			# Create a new broker to handle applications
+			# Create a new broker to handle applets
 			self.log.notice "Creating request broker"
 			@broker = Arrow::Broker::new( config )
 		end
 
 
 		### The content handler method. Dispatches requests to registered
-		### applications based on the requests PATH_INFO.
+		### applets based on the requests PATH_INFO.
 		def handler( req )
 			self.log.debug "Dispatching request %p " % req
 
@@ -157,8 +158,8 @@ module Arrow
 			# Create the transaction
 			txn = Arrow::Transaction::new( req, @config, @broker )
 
-			# Let the broker decide what handler app should get the transaction
-			# and pass it off for handling.
+			# Let the broker decide what applet should get the transaction and
+			# pass it off for handling.
 			self.log.debug "Delegating transaction %p" % txn
 			output = @broker.delegate( txn )
 			# self.log.debug "Output = %p" % output

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 # 
-# This file contains the Status class, a derivative of Arrow::Application. An
-# appserver status application.
+# This file contains the Status class, a derivative of Arrow::Applet. An
+# appserver status applet.
 # 
 # == Rcsid
 # 
@@ -18,11 +18,11 @@
 # Please see the file COPYRIGHT in the 'docs' directory for licensing details.
 #
 
-require 'arrow/application'
+require 'arrow/applet'
 
 
-### An Arrow appserver status application.
-class Status < Arrow::Application
+### An Arrow appserver status applet.
+class Status < Arrow::Applet
 
 	# CVS version tag
 	Version = /([\d\.]+)/.match( %q{$Revision: 1.5 $} )[1]
@@ -30,17 +30,18 @@ class Status < Arrow::Application
 	# CVS id tag
 	Rcsid = %q$Id: status.rb,v 1.5 2003/12/05 01:02:35 deveiant Exp $
 
-	# Application signature
+	# Applet signature
 	Signature = {
 		:name => "Appserver Status",
-		:description => "Displays the internal status of the appserver.",
+		:description => "Displays a list of all loaded applets or information " +
+			"about a particular one.",
 		:uri => "status",
 		:maintainer => "ged@FaerieMUD.org",
 		:version => Version,
 		:config => {},
 		:templates => {
 			:status	=> 'status.tmpl',
-			:app	=> 'app-status.tmpl',
+			:applet	=> 'applet-status.tmpl',
 		},
 		:vargs => {},
 		:monitors => {},
@@ -53,42 +54,38 @@ class Status < Arrow::Application
 	######
 
 	action( 'display' ) {|txn, *args|
-		self.log.debug "In the 'display' action of the '%s' app." %
+		self.log.debug "In the 'display' action of the '%s' applet." %
 			self.signature.name 
 
 		templ = txn.templates[:status]
-		templ.apps = txn.broker.registry.collect {|uri, re| re.object }
+		templ.applets = txn.broker.registry.collect {|uri, re| re.object }
 		templ.transaction = txn
 		templ.pid = Process::pid
 		templ.ppid = Process::ppid
-		templ.currentApp = self
+		templ.currentApplet = self
 
 		return templ
 	}
 
 
-	action( 'app' ) {|txn, *args|
-		self.log.debug "In the 'app' action of the '%s' app." %
+	action( 'applet' ) {|txn, *args|
+		self.log.debug "In the 'applet' action of the '%s' applet." %
 			self.signature.name
 
 		targetapp = txn.broker.registry[ args.join("/") ]
 		if targetapp.nil?
-			self.log.info "%s: no such app to inspect. Registry contains: %p" % 
+			self.log.info "%s: no such applet to inspect. Registry contains: %p" % 
 				[ args[0], txn.broker.registry.keys.sort ]
 			return self.run( txn, 'display' )
 		end
 
-		templ = txn.templates[:app]
-		templ.app = targetapp
+		templ = txn.templates[:applet]
+		templ.applet = targetapp
 		templ.txn = txn
-		templ.currentApp = self
+		templ.currentApplet = self
 		
 		return templ
 	}
-
-	#########
-	protected
-	#########
 
 
 end # class Status

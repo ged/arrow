@@ -3,69 +3,69 @@
 
 <!--
 
-  Default Arrow Application Status Page
+  Default Arrow Applet Status Page
 
   -->
 
   <head>
-	<title>Arrow Application Server: Application Status: <?call app.signature.name ?></title>
+	<title>Arrow Applet Status: <?call applet.signature.name ?></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Script-Type" content="text/javascript" />
 	<link rel="stylesheet" type="text/css" href="/stylesheets/arrow.css" />
   </head>
   <body>
 
-	<h1>App Status: <?call app.signature.name ?></h1>
+	<h1>Applet Status: <?call applet.signature.name ?></h1>
 
-	<p><?call app.signature.description ?></p>
+	<p><?call applet.signature.description ?></p>
 
-	<p>It is currently assigned to the '/<?call app.signature.uri ?>' path in
-	  the appserver's hierarchy.</p>
+	<p>It is currently assigned to the '/<?call applet.signature.uri ?>' URI in
+	  the demo application.</p>
 
-	  <?if app.signature.uri.match(/^_/) ?><p>Because
-	  its URI has a preceeding underscore, this app can only be called from inside the
-	  application server or from another app.</p><?end if?>
+	  <?if applet.signature.uri.match(/^_/) ?><p>Because its URI has a
+	  preceeding underscore, this applet can only be called from inside the
+	  application or from another applet.</p><?end if?>
 
-	<?if app.signature.uri =~ %r{/} ?><p>This also could (possibly) be a chained
-	  app -- an app which is delegated to by apps with URIs that are a prefix of
-	  its own. If, for example, an app is installed at <tt>/<?call
-	  app.signature.uri.sub(%r{(.*)/.*}) {|m| $1} ?></tt>, it would be run via its
+	<?if applet.signature.uri =~ %r{/} ?><p>This also could (possibly) be a chained
+	  applet -- an applet which is delegated to by applets with URIs that are a prefix of
+	  its own. If, for example, an applet is installed at <tt>/<?call
+	  applet.signature.uri.sub(%r{(.*)/.*}) {|m| $1} ?></tt>, it would be run via its
 	  <tt>#delegate</tt> method <em>before</em> this one, and could call this
-	  app by calling <tt>yield</tt>.</p><?end if?>
+	  applet by calling <tt>yield</tt>.</p><?end if?>
 	  
 	<table>
 	  <tbody>
 		<tr class="odd-row">
 		  <th class="row-title">Maintainer</th>
-		  <td><?call app.signature.maintainer ?></td>
+		  <td><?call applet.signature.maintainer ?></td>
 		</tr>
 
 		<tr class="even-row">
 		  <th class="row-title">Version</th>
-		  <td><?call app.signature.version ?></td>
+		  <td><?call applet.signature.version ?></td>
 		</tr>
 
 		<tr class="odd-row">
 		  <th class="row-title">Default Action</th>
-		  <td><?call app.signature.defaultAction ?></td>
+		  <td><?call applet.signature.defaultAction ?></td>
 		</tr>
 
 		<tr class="even-row">
 		  <th class="row-title">Validator Profiles</th>
-		  <td><tt><?escape app.signature.vargs.inspect ?></tt></td>
+		  <td><tt><?escape applet.signature.vargs.inspect ?></tt></td>
 		</tr>
 
 		<tr class="odd-row">
 		  <th class="row-title">Source File</th>
-		  <td><?call app.object.class.sourcefile ?></td>
+		  <td><?call applet.object.class.sourcefile ?></td>
 		</tr>
 
 		<tr class="even-row">
 		  <th class="row-title">Actions</th>
 		  <td>
 			<ul>
-<?yield name from app.object.actions.each ?>
-			  <li><a href="[?call txn.appRoot?]/[?call app.signature.uri?]/[?call name?]"><?call name ?></a>
+<?yield name from applet.object.actions.each ?>
+			  <li><a href="[?call txn.appRoot?]/[?call applet.signature.uri?]/[?call name?]"><?call name ?></a>
 			  </li>
 <?end for?>
 			</ul>
@@ -74,14 +74,14 @@
 
 		<tr class="odd-row">
 		  <th class="row-title">Chainable?</th>
-		  <td><strong><?if app.object.respond_to?(:delegate) ?>Yes.<?else?>No.<?end if?></strong></td>
+		  <td><strong><?if applet.object.respond_to?(:delegate) ?>Yes.<?else?>No.<?end if?></strong></td>
 		</tr>
 
 		<tr class="even-row">
 		  <th class="row-title">Templates</th>
 		  <td>
 			<ul>
-<?yield name,path from app.signature.templates.each ?>
+<?yield name,path from applet.signature.templates.each ?>
 			  <li><a href="[?call txn.appRoot?]/view-template/display/[?call
 				  path?]"><?call path ?></a> (<strong><?call name.inspect
 				  ?></strong>)</li>
@@ -93,12 +93,12 @@
 		<tr class="odd-row">
 		  <th class="row-title">Config</th>
 		  <td>
-<?if app.signature.config.empty? ?>
+<?if applet.signature.config.empty? ?>
 			(Empty)
 <?else?>
 			<table class="kvlist">
 			<tbody>
-<?yield name,val from app.signature.config.each ?>
+<?yield name,val from applet.signature.config.each ?>
 			<tr><th><?attr name?></th><td><?escape val.inspect?></td></tr>
 <?end yield?>
 			</tbody>
@@ -109,7 +109,7 @@
 
 		<tr class="even-row">
 		  <th class="row-title">Timestamp</th>
-		  <td><?call app.timestamp.ctime ?></td>
+		  <td><?call applet.timestamp.ctime ?></td>
 		</tr>
 
 		<tr class="odd-row">
@@ -121,19 +121,19 @@
 			  <tbody>
 				<tr>
 				  <th class="row-title">Total Runs</th>
-				  <td><?call app.object.runCount ?></td>
+				  <td><?call applet.object.runCount ?></td>
 				</tr>
 				<tr>
 				  <th class="row-title">Total User</th>
-				  <td><?call "%0.2f" % app.object.totalUtime ?> s</td>
+				  <td><?call "%0.2f" % applet.object.totalUtime ?> s</td>
 				</tr>
 				<tr>
 				  <th class="row-title">Total System</th>
-				  <td><?call "%0.2f" % app.object.totalStime ?> s</td>
+				  <td><?call "%0.2f" % applet.object.totalStime ?> s</td>
 				</tr>
 				<tr>
 				  <th class="row-title">Average Usage</th>
-				  <td><?call "%0.3f" % app.object.averageUsage ?></td>
+				  <td><?call "%0.3f" % applet.object.averageUsage ?></td>
 				</tr>
 			  </tbody>
 			</table>

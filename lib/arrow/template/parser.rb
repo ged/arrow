@@ -22,6 +22,7 @@
 require 'strscan'
 StringScanner::must_C_version
 require 'forwardable'
+require 'pluginfactory'
 
 require 'arrow/object'
 require 'arrow/mixins'
@@ -35,7 +36,6 @@ class Template
 	### Default parser object class -- parses template source into template
 	### objects.
 	class Parser < Arrow::Object
-		include TypeCheckFunctions
 
 		### Regexp constants for parsing
 		module Patterns
@@ -281,8 +281,6 @@ class Template
 
 		### Parse and return a template syntax tree from the given +string+.
 		def parse( string, template, initialData={} )
-			checkType( string, String )
-			checkType( template, Arrow::Template )
 
 			# Create a new parse state and build the parse tree with it.
 			begin
@@ -382,7 +380,7 @@ class Template
 			unless tag == 'end'
 				begin
 					node = Directive::create( tag, self, state )
-				rescue Arrow::FactoryError => err
+				rescue FactoryError => err
 					node = self.handleUnknownPI( state )
 				end
 

@@ -1,12 +1,13 @@
 /* 
  *	Arrow Manual Stylesheet
  *	$Id: manual.css,v 1.9 2004/02/14 23:14:23 deveiant Exp $
- *	Time-stamp: <14-Feb-2004 15:12:33 ged>
+ *	Time-stamp: <22-Mar-2004 23:29:33 ged>
  */
 
 body {
     margin: 3em;
-    background: #efefef;
+    /* background: #efefef url("Crust-Of-Bread-4.JPG") fixed repeat-both; */
+    background: #efefef url("draft-wm.png") fixed repeat-both;
     color: #333;
     font: 12px "Lucida Grande", Skia, Tahoma, sans-serif;
 }
@@ -16,7 +17,16 @@ h1,h2,h3,h4,h5,h6 {
     color: #663333;
     background: transparent;
     font-family:  "Lucida Grande", Tahoma, sans-serif;
+    margin-bottom: 0;
+    padding-bottom: 0;
 }
+
+h1 + p,
+h2 + p,
+h3 + p,
+h4 + p,
+h5 + p,
+h6 + p { margin-top: 0.2em; }
 
 h1 { font: bold 170%; text-shadow: #666 2px 2px 2px; }
 h2 { font: bold 150%; text-shadow: #666 1px 1px 2px; }
@@ -33,15 +43,15 @@ p,td,th {
 }
 
 a {
-	background:		#FFE;
-	color:			#933;
+	background: #fec;
+	color: #933;
 	text-decoration: none;
 }
 
 a:hover {
 	border-bottom: 1px dotted #900;
 }
-a[id] { background: inherit; color: inherit; text-decoration: inherit; }
+a[id] { background: inherit; color: inherit; text-decoration: inherit; border: none; }
 
 table {
     background: #fefefe;
@@ -106,7 +116,8 @@ kbd {
     margin: 0.2em 0.3em 1em;
     padding: 3px 15px 25px;
     border: 1px dotted #999;
-    background: white;
+    background: #white url("draft-wm.png") fixed repeat-both;
+    /*background: rgba(255, 255, 255, 0.85); */
     color: inherit;
 }
 
@@ -126,14 +137,25 @@ kbd {
 }
 
 #linkbox {
-    margin: 4px auto;
+    margin: 4px 0 0;
     padding: 2px 4px;
-    border-top: 1px solid #633;
-    border-bottom: 1px solid #633;
-    background: #eed;
+    background: #edd;
+    border-top: 1px solid #333;
+}
+
+#sub-linkbox {
+    margin: 0 0;
+    padding: 2px 10px;
+    background: #dcc;
+    border-top: 1px dotted #666;
 }
 
 #linkbox-head {
+    font-weight: bold;
+    font-size: 110%;
+}
+
+#sub-linkbox-head {
     font-weight: bold;
     font-size: 105%;
 }
@@ -141,6 +163,10 @@ kbd {
 #linkbox-body { list-style-type: none; }
 #linkbox-body ul { display: inline; }
 #linkbox-body li { display: inline; }
+
+#sub-linkbox-body { list-style-type: none; }
+#sub-linkbox-body ul { display: inline; }
+#sub-linkbox-body li { display: inline; }
 
 /* Style classes */
 

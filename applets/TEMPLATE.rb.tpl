@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 # 
-# This file contains the (>>>class<<<) class, a derivative of Arrow::Application. (>>>desc<<<)
+# This file contains the (>>>class<<<) class, a derivative of Arrow::Applet. (>>>desc<<<)
 # 
 # == Rcsid
 # 
@@ -11,11 +11,11 @@
 # * (>>>USER_NAME<<<) <(>>>AUTHOR<<<)>
 # 
 
-require 'arrow/application'
+require 'arrow/applet'
 
 
-### An Arrow appserver status application.
-class (>>>class<<<) < Arrow::Application
+### (>>>desc<<<)
+class (>>>class<<<) < Arrow::Applet
 
 	# CVS version tag
 	Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
@@ -23,7 +23,7 @@ class (>>>class<<<) < Arrow::Application
 	# CVS id tag
 	Rcsid = %q$Id: TEMPLATE.rb.tpl,v 1.1 2003/11/01 19:42:05 deveiant Exp $
 
-	# Application signature
+	# Applet signature
 	Signature = {
 		:name => "(>>>name<<<)",
 		:description => "(>>>desc<<<)",

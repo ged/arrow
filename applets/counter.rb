@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 # 
-# This file contains the Counter class, a derivative of Arrow::Application. It's
-# a little app for testing session persistance. It just increments and displays
+# This file contains the Counter class, a derivative of Arrow::Applet. It's
+# a little applet for testing session persistance. It just increments and displays
 # a counter which is held in a session object.
 # 
 # == Rcsid
@@ -19,11 +19,11 @@
 # Please see the file COPYRIGHT in the 'docs' directory for licensing details.
 #
 
-require 'arrow/application'
+require 'arrow/applet'
 
 
-### An Arrow appserver status application.
-class Counter < Arrow::Application
+### An applet for testing session persistance and applet-chaining.
+class Counter < Arrow::Applet
 
 	# CVS version tag
 	Version = /([\d\.]+)/.match( %q{$Revision: 1.3 $} )[1]
@@ -31,7 +31,7 @@ class Counter < Arrow::Application
 	# CVS id tag
 	Rcsid = %q$Id: counter.rb,v 1.3 2003/12/05 00:39:10 deveiant Exp $
 
-	# Application signature
+	# Applet signature
 	Signature = {
 		:name => "Session Access Counter",
 		:description => "Increments and displays a counter contained in a session object.",
@@ -54,8 +54,8 @@ class Counter < Arrow::Application
 	public
 	######
 
-	### When called as a chained app, just increment two session counters and
-	### hand off control to the next app in the chain.
+	### When called as a chained applet, just increment two session counters and
+	### hand off control to the next applet in the chain.
 	def delegate( txn, *args )
 		txn.session[:counter] ||= 0
 		txn.session[:counter] += 1
@@ -69,7 +69,7 @@ class Counter < Arrow::Application
 
 	### The 'display' (default) action. Increments and displays the counter.
 	action( 'display' ) {|txn, *args|
-		self.log.debug "In the 'display' action of the '%s' app." %
+		self.log.debug "In the 'display' action of the '%s' applet." %
 			self.signature.name 
 
 		templ = txn.templates[:counter]
@@ -88,7 +88,7 @@ class Counter < Arrow::Application
 
 	### Deletes the session
 	action( 'delete' ) {|txn, *args|
-		self.log.debug "In the 'display' action of the '%s' app." %
+		self.log.debug "In the 'delete' action of the '%s' applet." %
 			self.signature.name 
 
 		templ = txn.templates[:deleted]

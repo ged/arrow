@@ -31,8 +31,6 @@ require 'arrow/exceptions'
 
 module Arrow
 
-	class TypeError < Exception; end
-	class LoadError < Exception; end
 	def_exception :TypeError, "Data type incompatable"
 	def_exception :LoadError, "Loading failed"
 

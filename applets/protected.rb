@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 # 
-# This file contains the Protected class, a derivative of Arrow::Application. It
-# is an app you can chain through for authentication purposes.
+# This file contains the Protected class, a derivative of Arrow::Applet. It is
+# an applet you can chain through for authentication purposes.
 # 
 # == Rcsid
 # 
@@ -14,11 +14,11 @@
 
 require 'digest/md5'
 
-require 'arrow/application'
+require 'arrow/applet'
 
 
-### An Arrow appserver status application.
-class Protected < Arrow::Application
+### An example applet that you can chain through for simple authentication.
+class Protected < Arrow::Applet
 
 	# CVS version tag
 	Version = /([\d\.]+)/.match( %q{$Revision: 1.4 $} )[1]
@@ -31,10 +31,10 @@ class Protected < Arrow::Application
 		'stillflame'	=> "4a484004cef4efebf22b2f7ec9cdc439",
 	}
 
-	# Application signature
+	# Applet signature
 	Signature = {
 		:name => "Password-protected delegator",
-		:description => "It is an app you can chain through for authentication purposes.",
+		:description => "It is an applet you can chain through for authentication purposes.",
 		:uri => "protected",
 		:maintainer => "ged@FaerieMUD.org",
 		:defaultAction => 'default',
@@ -52,7 +52,7 @@ class Protected < Arrow::Application
 	######
 
 	def delegate( txn, *args )
-		self.log.debug "Checking authentication for the %s app." % args[0]
+		self.log.debug "Checking authentication for the %s applet." % args[0]
 
 		if !txn.session.key?( :user )
 			rval = self.run( txn, 'loginform', *args )
@@ -75,7 +75,7 @@ class Protected < Arrow::Application
 	}
 
 	action( 'loginform' ) {|txn, *args|
-		self.log.debug "In the 'display' action of the '%s' app." %
+		self.log.debug "In the 'display' action of the '%s' applet." %
 			self.signature.name 
 
 		username = txn.request.param('username')

@@ -84,6 +84,15 @@ class Arrow::RubyTokenParserTestCase < Arrow::TestCase
 	}
 
 
+	### Setup: skip tests if the token reactor isn't functional
+	def setup
+		skip( "No Ripper installed on this system" ) unless
+			Arrow::RubyTokenReactor::loaded?
+		super
+	end
+
+
+
 	#################################################################
 	###	T E S T S
 	#################################################################

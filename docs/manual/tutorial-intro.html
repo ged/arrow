@@ -24,12 +24,13 @@
 
 
 	<!--#include virtual="linkbox.incl" -->
+	<!--#include virtual="tutorial-linkbox.incl" -->
 
 	<div id="content">
-	  <h1>Arrow: Applications Tutorial: Introduction</h1>
+	  <h1>Arrow: Tutorial: Introduction</h1>
 
 	  <div class="section">
-		<h2><a href="#architecture" id="architecture">Architecture</a></h2>
+		<h2><a href="#overview" id="overview">Overview</a></h2>
 
 		<p>Arrow is an application server that is designed somewhat like
 		  a J2EE servlet container, but using Ruby as the language of
@@ -37,37 +38,48 @@
 		  but developers familiar with the J2EE servlet specification will
 		  notice some similarities.</p>
 
-		<h3>Overview</h3>
-
-		<p>The Arrow architecture is made up of four basic parts: the
-		  Dispatcher, the Broker, one or more Applications, and Transactions
-		  which are wrapped around incoming requests.</p>
+		<p>In the Arrow framework, applications are made up of four basic parts:
+		  a Dispatcher, a Broker, one or more Applets, and Transactions which
+		  are wrapped around incoming requests.</p>
 	  </div>
 
 	  <div class="section">
-		<h2><a href="#classes" id="classes">Arrow Classes</a></h2>
+		<h2><a href="#classes" id="classes">The Basic Parts</a></h2>
 
-		<p>The Arrow appserver framework is made up of the following base
-		  classes:</p>
+		<p>An Arrow application looks conceptually something like this:</p>
+
+		<div id="structural-overview-diagram"
+		  style="margin-left: auto; margin-right: auto;">
+		  <img src="structural-overview2.png" height="250" width="680"
+			alt="[Structural Diagram]"></img>
+		</div>
 
 		<dl class="linelist">
-		  <dt>Arrow::Dispatcher</dt>
-		  <dd>This class is the actual mod_ruby request handler; it loads
-			the configuration, sets up the Broker, and reloads the configuration
-			if it has changed since the last time it was read, as well as
-			creating Transaction objects for incoming requests and rendering the
-			resulting output.</dd>
+		  <dt>Dispatcher</dt>
+		  <dd>The Dispatcher is the actual mod_ruby request handler that is
+			invoked by Apache; it loads the configuration, sets up the Broker,
+			and reloads the configuration if it has changed since the last time
+			it was read, as well as creating Transaction objects for incoming
+			requests and rendering the resulting output.</dd>
 
-		  <dt>Arrow::Transaction</dt>
-		  <dd>Encapsulates the incoming request, providing easy access to
-			request values, configuration values, session data, and validated
-			query arguments.</dd>
+		  <dt>Transaction</dt>
+		  <dd>The Transaction is created by the Dispatcher, and then passed to
+			the Broker for handling. It encapsulates the incoming request,
+			providing easy access to request values, configuration values,
+			session data, and validated query arguments.</dd>
 
-		  <dt>Arrow::Broker</dt>
-		  <dd>Decides how Transaction objects get handled by loading and
-			building a registry of Application objects.</dd>
+		  <dt>Broker</dt>
+		  <dd>The Broker decides how Transaction objects get handled by loading
+			and building a registry of Applet objects.</dd>
 
-		  
+		  <dt>Registry</dt>
+		  <dd>This is a structure inside the Broker which keeps track of the
+			registered applet objects by associating them with a URI.</dd>
+
+		  <dt>Applets</dt>
+		  <dd>Applets are objects which handle user requests, and define
+			the basic logic of different parts of the application.
+		  </dd>
 		</dl>
 
 	  </div>

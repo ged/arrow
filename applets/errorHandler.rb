@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 # 
 # This file contains the ErrorHandler class, a derivative of
-# Arrow::Application. It's an example of an error-handler application.
+# Arrow::Applet. It's an example of an error-handler applet.
 # 
 # == Rcsid
 # 
@@ -18,11 +18,11 @@
 # Please see the file COPYRIGHT in the 'docs' directory for licensing details.
 #
 
-require 'arrow/application'
+require 'arrow/applet'
 
 
-### An Arrow appserver status application.
-class ErrorHandler < Arrow::Application
+### An error-handling applet.
+class ErrorHandler < Arrow::Applet
 
 	# CVS version tag
 	Version = /([\d\.]+)/.match( %q{$Revision: 1.2 $} )[1]
@@ -30,12 +30,12 @@ class ErrorHandler < Arrow::Application
 	# CVS id tag
 	Rcsid = %q$Id: errorHandler.rb,v 1.2 2003/11/09 19:47:29 deveiant Exp $
 
-	# Application signature
+	# Applet signature
 	Signature = {
 		:name => "Appserver Error Handler",
-		:description => "Displays errors which occur in other applications in a "\
+		:description => "Displays errors which occur in other applets in a "\
 			"readable fashion. Cannot be called directly; it is used internally "\
-			"by the appserver to handle errors which happen in applications.",
+			"by the appserver to handle errors which happen in applets.",
 		:uri => "_errorHandler",
 		:maintainer => "ged@FaerieMUD.org",
 		:version => Version,
@@ -74,4 +74,4 @@ class ErrorHandler < Arrow::Application
 	#########
 
 
-end # class Arrow::ErrorHandler
+end # class ErrorHandler

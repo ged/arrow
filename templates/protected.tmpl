@@ -3,25 +3,25 @@
 
 <!--
 
-  Protected App
+  Protected Applet
 
   -->
 
   <head>
-	<title><?call txn.appPath.capitalize?> Application</title>
+	<title><?call txn.appletPath.capitalize?> Applet</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Script-Type" content="text/javascript" />
 	<link rel="stylesheet" type="text/css" href="/stylesheets/arrow.css" />
   </head>
   <body>
 
-	<h1><?call txn.appPath.capitalize?> Application</h1>
+	<h1><?call txn.appletPath.capitalize?> Applet</h1>
 
-	<p>This is the '<tt><?call txn.appPath?></tt>' application, which provides
-	  password protection to other apps. You can make any application
+	<p>This is the '<tt><?call txn.appletPath?></tt>' applet, which provides
+	  password protection to other applets. You can make any applet
 	  password-protected by chaining it through this one. For example, if your
-	  app had a current URI of '<tt>myapp</tt>', you could chain it through this
-	  app by changing its URI to '<tt><?call txn.appPath ?>/myapp</tt>'.</p>
+	  applet had a current URI of '<tt>myapp</tt>', you could chain it through this
+	  applet by changing its URI to '<tt><?call txn.appletPath ?>/myapp</tt>'.</p>
 
 	<?include navbar.incl?>
 

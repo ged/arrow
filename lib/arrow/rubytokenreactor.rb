@@ -19,7 +19,19 @@
 # Please see the file COPYRIGHT in the 'docs' directory for licensing details.
 #
 
-require 'ripper.so'
+begin
+	require 'ripper.so'
+rescue LoadError => err
+	$fakedRipper = err
+	class Ripper < ::Object #:nodoc:
+		def initialize( *args )
+			raise $fakedRipper
+		end
+	end
+else
+	$fakedRipper = false
+end
+
 
 require 'arrow/mixins'
 
@@ -42,6 +54,8 @@ module Arrow
 		###	C L A S S   M E T H O D S
 		#############################################################
 
+		### Parse the specified +source+ and call the +callback+ when any of the
+		### given +events+ are seen.
 		def self::parse( source, *events, &callback )
 			reactor = self.new( source )
 			if callback.nil?
@@ -55,6 +69,13 @@ module Arrow
 				reactor.onEvents( *events, &callback )
 				reactor.parse
 			end
+		end
+
+
+		### Returns <tt>true</tt> if the Ripper parser loaded okay. If this is
+		### false, the token reactor will not be functional.
+		def self::loaded?
+			return ! $fakedRipper
 		end
 
 

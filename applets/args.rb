@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 # 
-# This file contains the Args class, a derivative of Arrow::Application. This
-# app is for testing/debugging the argument validator.
+# This file contains the Args class, a derivative of Arrow::Applet. This
+# applet is for testing/debugging the argument validator.
 # 
 # == Rcsid
 # 
@@ -12,11 +12,11 @@
 # * Michael Granger <ged@FaerieMUD.org>
 # 
 
-require 'arrow/application'
+require 'arrow/applet'
 
 
-### An Arrow appserver status application.
-class Args < Arrow::Application
+### An applet for testing/debugging the argument validator.
+class Args < Arrow::Applet
 
 	# CVS version tag
 	Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
@@ -24,7 +24,7 @@ class Args < Arrow::Application
 	# CVS id tag
 	Rcsid = %q$Id: args.rb,v 1.1 2004/01/27 06:46:41 deveiant Exp $
 
-	# Application signature
+	# Applet signature
 	Signature = {
 		:name => "Argument Tester",
 		:description => "This app is for testing/debugging the argument validator.",

@@ -105,7 +105,11 @@ module Arrow
 			end
 
 		when Arrow::Path
-			Arrow::Path::new( newval )
+			if newval.is_a?( Arrow::Path )
+				newval
+			else
+				Arrow::Path::new( newval )
+			end
 
 		else
 			newval
@@ -130,6 +134,23 @@ module Arrow
 
 		# How many seconds to cache directory stat information, in seconds.
 		DefaultCacheLifespan = 1.5
+
+
+		#############################################################
+		###	C L A S S   M E T H O D S
+		#############################################################
+
+		### Return the YAML type for this class
+		def self::to_yaml_type
+			"!%s/arrowPath" % Arrow::YamlDomain
+		end
+
+
+
+
+		#############################################################
+		###	I N S T A N C E   M E T H O D S
+		#############################################################
 
 		### Create a new Arrow::Path object for the specified +path+, which can
 		### be either a String containing directory names separated by
@@ -208,14 +229,14 @@ module Arrow
 		end
 
 
-		### Override the inspection method
-		def inspect
-			res = super
-			return "#<%s:%0x %s>" % [
-				self.class.name,
-				self.object_id * 2,
-				res,
-			]
+		### Return the path as YAML text
+		def to_yaml( opts={} )
+			require 'yaml'
+			YAML::quick_emit( self.object_id, opts ) {|out|
+				out.seq( self.class.to_yaml_type ){|seq|
+					seq.concat( self.dirs )
+				}
+			}
 		end
 
 	end # class Path

@@ -20,6 +20,7 @@
 
 require 'uri'
 require 'hashslice'
+require 'pluginfactory'
 
 require 'arrow/object'
 require 'arrow/exceptions'
@@ -30,7 +31,7 @@ module Arrow
 
 	### This provides a container for maintaining state across multiple transactions..
 	class Session < Arrow::Object
-		include Arrow::Factory, Enumerable
+		include PluginFactory, Enumerable
 
 		require 'arrow/session/store'
 		require 'arrow/session/lock'

@@ -21,6 +21,7 @@
 #
 
 require 'uri'
+require 'pluginfactory'
 
 require 'arrow/object'
 require 'arrow/exceptions'
@@ -31,7 +32,7 @@ class Session
 
 	### The abstract base class for session lock manager objects.
 	class Lock < Arrow::Object
-		include Arrow::Factory
+		include PluginFactory
 
 		# CVS version tag
 		Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
@@ -50,7 +51,7 @@ class Session
 		#############################################################
 
 		### Returns the Array of directories to search for derivatives; part of
-		### the Arrow::Factory interface.
+		### the PluginFactory interface.
 		def self::derivativeDirs
 			[ 'arrow/session', 'arrow/session/lock' ]
 		end

@@ -24,9 +24,9 @@ Attributes
   <?attr <name>.<methodchain> <format>?>
   Ex:
 	<title><?attr title?></title>
-	<p>Amount: <?attr dollar_amount "$%0.2f"?></p>
+	<p>Amount: <?attr "$%0.2f" % dollar_amount ?></p>
 	<p>Address: <?attr customer.order[0].shipping_address?></p>
-	<p>Amount: <?attr customer.order[0].amount_paid "$%0.2f"?></p>
+	<p>Amount: "$%0.2f" % <?attr customer.order[0].amount_paid ?></p>
   Code:
 	template.title = "Order Form"
 	# => "<title>Order Form</title>"
@@ -60,8 +60,9 @@ Iterators
   Code:
 	template.userlist = ["foo", "admin", "bar", "dirk"]
 
-Subobjects
-  <?insert table.tmpl [as] table1?>
+Aggregator
+  <?include <subtemplate>?>
+  <?include <subtemplate> as <identifier>?>
 
 Truncator
   <?maxlength <length>?>...<?end maxlength?>

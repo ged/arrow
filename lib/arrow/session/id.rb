@@ -19,6 +19,8 @@
 # Please see the file COPYRIGHT in the 'docs' directory for licensing details.
 #
 
+require 'pluginfactory'
+
 require 'arrow/object'
 require 'arrow/mixins'
 
@@ -27,7 +29,7 @@ class Session
 
 	### Session ID class for in Arrow::Session objects.
 	class Id < Arrow::Object
-		include Factory
+		include PluginFactory
 
 		# CVS version tag
 		Version = /([\d\.]+)/.match( %q{$Revision: 1.3 $} )[1]
@@ -41,7 +43,7 @@ class Session
 		#############################################################
 
 		### Returns the Array of directories to search for derivatives; part of
-		### the Arrow::Factory interface.
+		### the PluginFactory interface.
 		def self::derivativeDirs
 			[ 'arrow/session', 'arrow/session/id' ]
 		end

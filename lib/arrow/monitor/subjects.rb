@@ -36,7 +36,7 @@ module Arrow
 	### An abstract base class for monitor "subjects", which are datapoints
 	### which may be subscribed to by monitoring applications.
 	class Subject < Arrow::Object
-		include Observable, Arrow::TypeCheckFunctions
+		include Observable
 
 		### Class constants
 		Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]

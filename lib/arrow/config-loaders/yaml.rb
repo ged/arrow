@@ -20,7 +20,10 @@
 #
 
 require 'yaml'
+
+require 'arrow'
 require 'arrow/config'
+require 'arrow/utils'
 
 module Arrow
 class Config
@@ -34,6 +37,22 @@ class Config
 
 		# CVS id tag
 		Rcsid = %q$Id: yaml.rb,v 1.3 2003/10/25 11:42:09 deveiant Exp $
+
+		# Add YAML domain types for Arrow classes
+
+		YAML::add_domain_type( Arrow::YamlDomain, "arrowPath" ) {|type, val|
+			obj = nil
+			case val
+			when Array
+				Arrow::Logger.debug "Adding %p to loaded Arrow::Path" % [ val ]
+				obj = Arrow::Path::new( val )
+			else
+				raise "Invalid #{type}: %p" % val
+			end
+
+			obj
+		} 
+
 
 
 		######
@@ -51,7 +70,7 @@ class Config
 		### Save configuration values to the YAML +file+ specified.
 		def save( confighash, filename )
 			self.log.info "Saving YAML-format configuration to '%s'" % filename
-			File::open( filename, File::WRONLY|File::CREAT ) {|ofh|
+			File::open( filename, File::WRONLY|File::CREAT|File::TRUNC ) {|ofh|
 				ofh.print( confighash.to_yaml )
 			}
 		end

@@ -45,6 +45,7 @@
 
 require 'strscan'
 require 'forwardable'
+require 'pluginfactory'
 
 require 'arrow/utils'
 require 'arrow/mixins'
@@ -303,7 +304,7 @@ class Template
 	### The abstract directive superclass. Instances of derivatives of this
 	### class define template behaviour and content.
 	class Directive < Arrow::Template::Node
-		include Arrow::Factory
+		include PluginFactory
 
 		# CVS version tag
 		Version = /([\d\.]+)/.match( %q{$Revision: 1.12 $} )[1]
@@ -322,7 +323,7 @@ class Template
 		end
 
 
-		### Factory method: overridden from Arrow::Factory::create to
+		### Factory method: overridden from PluginFactory::create to
 		### pass the name into constructors for parsing context.
 		def self::create( tag, parser, state )
 			super( tag, tag, parser, state )

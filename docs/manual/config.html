@@ -73,7 +73,7 @@ RubyRequire arrow
 		<pre>
 --- 
 errorHandler: "_errorHandler"
-defaultApp: "status"
+defaultApplet: "status"
 logLevel: debug
 templateLogLevel: debug
 templates: 
@@ -94,32 +94,32 @@ session:
   storeType: file:/tmp
   idType: md5:.
   idName: arrow-session
-applications: 
+applets: 
   pollInterval: 5
   pattern: "*.rb"
   path:
-    - /Users/ged/Documents/source/ruby/Arrow/apps
-    - /Library/WebServer/apps</pre>
+    - /Users/ged/Documents/source/ruby/Arrow/applets
+    - /Library/WebServer/applets</pre>
 
 		<p>Taken apart, we have...</p>
 		<dl class="linelist">
 		  <dt>errorHandler</dt>
-		  <dd>This is the URI of the application to which uncaught exceptions
+		  <dd>This is the URI of the applet to which uncaught exceptions
 			are sent. If this value is not specified, a generic handler is used
 			instead (<a
 			  href="http://dev.rubycrafters.com/html/classes/Arrow/Broker.html#M000088"
 			  >Arrow::Broker#defaultErrorHandler</a>).</dd>
 
-		  <dt>defaultApp</dt>
-		  <dd>This specifies the URI of the application which is executed when
+		  <dt>defaultApplet</dt>
+		  <dd>This specifies the URI of the applet which is executed when
 			none is specified by a request's URI. If this value is not specified
 			or set to <tt>(builtin)</tt>, a very simple status handler is called
 			instead (<a
 			  href="http://dev.rubycrafters.com/html/classes/Arrow/Broker.html#M000086"
-			  >Arrow::Broker#runDefaultApp</a>).</dd>
+			  >Arrow::Broker#runDefaultApplet</a>).</dd>
 
-		  <dt>noSuchAppHandler</dt>
-		  <dd>Specifies the URI of an application which should be executed when
+		  <dt>noSuchAppletHandler</dt>
+		  <dd>Specifies the URI of an applet which should be executed when
 			the one specified by the request's URI does not exist. If this value
 			is not specified or set to <tt>(builtin)</tt>, Arrow will decline
 			the request and pass it on to the next Apache handler.</dd>
@@ -204,24 +204,24 @@ applications:
 			</dl>
 		  </dd>
 
-		  <dt>applications</dt>
-		  <dd>This has options controlling how application files are loaded
+		  <dt>applets</dt>
+		  <dd>This has options controlling how applet files are loaded
 			into Arrow.</dd>
 		  <dd>
 			<dl class="linelist config-subitems">
 			  <dt>pollInterval</dt>
 			  <dd>The number of seconds between checks for new and
-				altered applications. If this is set to <tt>0</tt>, applications
+				altered applets. If this is set to <tt>0</tt>, applets
 				are only loaded once, and never checked for updates.</dd>
 			  
 			  <dt>pattern</dt>
-			  <dd>Glob pattern used to find application files.</dd>
+			  <dd>Glob pattern used to find applet files.</dd>
 
 			  <dt>path</dt>
 
 			  <dd>A list of directories which Arrow searches for
-				applications.  Arrow will monitor these locations, looking for
-				new/updated/removed applications, and doing a full recursive
+				applets.  Arrow will monitor these locations, looking for
+				new/updated/removed applets, and doing a full recursive
 				search into their subdirectories in the process.</dd>
 			</dl>
 		  </dd>

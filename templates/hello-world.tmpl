@@ -3,7 +3,7 @@
 
 <!--
 
-  Arrow "Hello World" App Template
+  Arrow "Hello World" Applet Template
 
   -->
 
@@ -17,21 +17,21 @@
 
 	<h1>Hello World</h1>
 
-	<p>This is a minimal demo app that just loads and prints a template. You can
+	<p>This is a minimal demo applet that just loads and prints a template. You can
 	  see the source code for it by running the <a href="[?call
 		txn.action?]/printsource">printsource action</a>. There's also <a
-		href="[?call txn.action?]/display">a simpler version</a> of this app
+		href="[?call txn.action?]/display">a simpler version</a> of this applet
 	  that outputs plain text (i.e., no templates).<p>
 
 <?if txn.session? ?>
 	  <!-- Session found -->
   <?if txn.session[:delegations] ?>
 	<p>This is apparently being run in a session that has executed the counted
-	  version of the <tt>Hello World</tt> app <strong><?call
+	  version of the <tt>Hello World</tt> applet <strong><?call
 		txn.session[:delegations] ?></strong> times.</p>
 
 	<p>This is the same template used by the regular <tt>Hello World</tt>
-	  app.</p>
+	  applet.</p>
 
   <?else?>
 	<!-- But no delegations in it, apparently. -->
@@ -39,9 +39,9 @@
 
   <?if txn.session[:user] ?>
 	<p>Since you're logged in as '<?call txn.session[:user]?>', you can also <a
-		href="[?call txn.appRoot?]/[?call txn.appPath.split(%r{/})[0]
+		href="[?call txn.appRoot?]/[?call txn.appletPath.split(%r{/})[0]
 		?]/logout">log out</a> to test the protectedness
-	  of the app chain.</p>
+	  of the applet chain.</p>
   <?end?>
 
 <?end if ?>

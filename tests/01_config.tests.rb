@@ -3,7 +3,7 @@
 # Unit test for the Arrow::Config class
 # $Id: 01_config.tests.rb,v 1.4 2003/11/09 22:44:50 deveiant Exp $
 #
-# Copyright (c) 2003 RubyCrafters, LLC. Most rights reserved.
+# Copyright (c) 2003, 2004 RubyCrafters, LLC. Most rights reserved.
 # 
 # This work is licensed under the Creative Commons Attribution-ShareAlike
 # License. To view a copy of this license, visit
@@ -49,8 +49,7 @@ class Arrow::ConfigTestCase < Arrow::TestCase
 	# The name of the testing configuration file
 	TestConfigFilename = File::join( File::dirname(__FILE__), "testconfig.conf" )
 
-	### Compare +expected+ config value to +actual+. If +convertedHashes+ is
-	### +true+, auto-convert +expected+ Hashes to ConfigStructs.
+	### Compare +expected+ config value to +actual+.
 	def assert_config_equal( expected, actual, msg=nil )
 		case expected
 		when Hash, Arrow::Config::ConfigStruct
@@ -68,11 +67,27 @@ class Arrow::ConfigTestCase < Arrow::TestCase
 			assert_equal expected, actual, msg
 		end
 	rescue Test::Unit::AssertionFailedError => err
-		cutframe = err.backtrace.reverse.find {|frame|
+		bt = err.backtrace
+		debugMsg "Unaltered backtrace is:\n  ", bt.join("\n  ")
+		cutframe = bt.reverse.find {|frame|
 			/assert_config_equal/ =~ frame
 		}
-		firstIdx = (err.backtrace.rindex( cutframe )||0) + 1
-		Kernel::raise( err, err.message, err.backtrace[firstIdx..-1] )
+		debugMsg "Found frame #{cutframe}"
+		firstIdx = bt.rindex( cutframe ) || 0
+		#firstIdx += 1
+		
+		$stderr.puts "Backtrace (frame #{firstIdx}): "
+		bt.each_with_index do |frame,i|
+			if i < firstIdx
+				debugMsg "  %s (elided)" % frame
+			elsif i == firstIdx
+				debugMsg "--- cutframe ------\n", frame, "\n--------------------"
+			else
+				debugMsg "  %s" % frame
+			end
+		end
+
+		Kernel::raise( err, err.message, bt[firstIdx..-1] )
 	end
 
 	def setup

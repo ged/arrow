@@ -1,8 +1,8 @@
 #!/usr/bin/ruby
 # 
 # This file contains the Arrow::Transaction class, a derivative of
-# Arrow::Object. Instances of this class encapsulate a transaction within the
-# Arrow application server.
+# Arrow::Object. Instances of this class encapsulate a transaction within a web
+# application implemented using the Arrow application framework.
 # 
 # == Rcsid
 # 
@@ -27,8 +27,7 @@ require 'arrow/object'
 
 module Arrow
 
-### Instances of this class encapsulate a transaction with the application
-### server of an Arrow handler.
+### The transaction class for Arrow web applications.
 class Transaction < Arrow::Object
 	extend Forwardable
 
@@ -75,8 +74,8 @@ class Transaction < Arrow::Object
 
 		# Stuff that may be filled in later
 		@session		= nil # Lazily-instantiated
-		@appPath		= nil # Added by the broker
-		@templates		= nil # Filled in by the app
+		@appletPath		= nil # Added by the broker
+		@templates		= nil # Filled in by the applet
 		@vargs			= nil #          "
 		@status			= Apache::OK
 
@@ -97,23 +96,23 @@ class Transaction < Arrow::Object
 	# The Apache::Request that initiated this transaction
 	attr_reader :request
 
-	# The Arrow::Config object for the instance of the Arrow appserver that
-	# created this transaction.
+	# The Arrow::Config object for the Arrow application that created this
+	# transaction.
 	attr_reader :config
 
 	# The Arrow::Broker that is responsible for delegating the Transaction
-	# to one or more Arrow::Application objects.
+	# to one or more Arrow::Applet objects.
 	attr_reader :broker
 
-	# The hash of templates used by the application this transaction is
+	# The hash of templates used by the applet this transaction is
 	# bound for.
 	attr_accessor :templates
 
 	# The argument validator (a FormValidator object)
 	attr_accessor :vargs
 
-	# The application portion of the path_info
-	attr_accessor :appPath
+	# The applet portion of the path_info
+	attr_accessor :appletPath
 
 	# The transaction's unique id in the context of the system.
 	attr_reader :serial
@@ -147,8 +146,9 @@ class Transaction < Arrow::Object
 	end
 
 
-	### Return the application server root for the server the receiver
-	### belongs to.
+	### Return the portion of the request's URI that serves as the base URI for
+	### the application. All self-referential URLs created by the application
+	### should include this.
 	def appRoot
 		uri = @request.uri
 		uri.sub!( Regexp::new(@request.path_info), '' )
@@ -158,10 +158,10 @@ class Transaction < Arrow::Object
 	end
 
 
-	### Return an absolute uri that refers back to the application the
-	### transaction is being run in
+	### Return an absolute uri that refers back to the applet the transaction is
+	### being run in
 	def action
-		return [ self.appRoot, self.appPath ].join("/")
+		return [ self.appRoot, self.appletPath ].join("/")
 	end
 
 

@@ -30,6 +30,9 @@ module Arrow
 	# CVS id tag
 	Rcsid = %q$Id: arrow.rb,v 1.5 2003/11/09 19:49:24 deveiant Exp $
 
+	# Yaml stuff
+	YamlDomain = "rubycrafters.com,2003-10-22"
+
 	require 'arrow/exceptions'
 	require 'arrow/mixins'
 	require 'arrow/logger'
@@ -37,7 +40,7 @@ module Arrow
 
 	require 'arrow/broker'
 	require 'arrow/dispatcher'
-	require 'arrow/application'
+	require 'arrow/applet'
 	require 'arrow/datasource'
 	require 'arrow/monitor'
 	require 'arrow/template'

@@ -42,8 +42,20 @@ class DataSourceTestCase < Arrow::TestCase
 	testsdir = File::dirname( File::expand_path(__FILE__) )
 	InitFile = "#{testsdir}/test_data.sql"
 	TestSource = "#{Type}://#{User}:#{Password}@#{Host}/#{Database}/#{Table}"
+
 	### :MC: Initialize the database
-	`#{Command} -p#{Password} -u#{User} -h#{Host} #{Database} < #{InitFile}`
+	### :MG: Ick.
+	if ENV['USER'] == 'stillflame'
+		`#{Command} -p#{Password} -u#{User} -h#{Host} #{Database} < #{InitFile}`
+	end
+
+	### :MG: Since only Martin can run these tests, skip all of them if the
+	### person running them isn't him.
+	def setup
+		skip( "These tests only work if you're Martin" ) unless 
+			ENV['USER'] == 'stillflame'
+	end
+
 
 	#################################################################
 	###	T E S T S

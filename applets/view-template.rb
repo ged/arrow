@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 # 
 # This file contains the TemplateViewer class, a derivative of
-# Arrow::Application. It is an introspection application that displays
+# Arrow::Applet. It is an introspection applet that displays
 # information about Arrow templates.
 # 
 # == Rcsid
@@ -13,11 +13,11 @@
 # * Michael Granger <ged@FaerieMUD.org>
 # 
 
-require 'arrow/application'
+require 'arrow/applet'
 require 'arrow/htmltokenizer'
 
-### An Arrow appserver status application.
-class TemplateViewer < Arrow::Application
+### A template viewer applet
+class TemplateViewer < Arrow::Applet
 
 	# CVS version tag
 	Version = /([\d\.]+)/.match( %q{$Revision: 1.3 $} )[1]
@@ -25,10 +25,10 @@ class TemplateViewer < Arrow::Application
 	# CVS id tag
 	Rcsid = %q$Id: view-template.rb,v 1.3 2003/12/24 09:04:56 deveiant Exp $
 
-	# Application signature
+	# Applet signature
 	Signature = {
 		:name => "Template Viewer",
-		:description => "It is an introspection application that displays "\
+		:description => "It is an introspection applet that displays "\
 			"Arrow templates with syntax highlighting.",
 		:uri => "view-template",
 		:maintainer => "ged@FaerieMUD.org",
@@ -60,12 +60,12 @@ class TemplateViewer < Arrow::Application
 	#################################################################
 	
 	action( 'display' ) {|txn, *args|
-		self.log.debug "In the 'display' action of the '%s' app." %
+		self.log.debug "In the 'display' action of the '%s' applet." %
 			self.signature.name 
 
 		templ = txn.templates[:display]
 		templ.txn = txn
-		templ.app = self
+		templ.applet = self
 
 		if txn.vargs && txn.vargs[:template]
 			args.replace( txn.vargs[:template].split(%r{/}) )

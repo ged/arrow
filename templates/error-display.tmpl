@@ -8,16 +8,16 @@
   -->
 
   <head>
-	<title>Arrow Error Handler</title>
+	<title>Error</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Script-Type" content="text/javascript" />
 	<link rel="stylesheet" type="text/css" href="/stylesheets/arrow.css" />
   </head>
   <body>
 
-	<h1>Arrow Application Server: Error</h1>
+	<h1>Error</h1>
 	<p>An error (<?call err.class.name?>) occurred in the '<?call
-	  re.signature.name ?>' application.</p>
+	  re.signature.name ?>' applet.</p>
 
 	<h2><strong><?escape err.message?></strong></h2>
 	<pre><?escape err.backtrace.join("\n") ?></pre>
@@ -38,8 +38,8 @@
 		  <td><tt><?escape txn.action.inspect ?></tt></td>
 		</tr>
 		<tr class="even-row">
-		  <th class="row-title">appPath</th>
-		  <td><tt><?escape txn.appPath.inspect ?></tt></td>
+		  <th class="row-title">appletPath</th>
+		  <td><tt><?escape txn.appletPath.inspect ?></tt></td>
 		</tr>
 		<tr class="odd-row">
 		  <th class="row-title">vargs</th>
