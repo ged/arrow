@@ -458,8 +458,11 @@ class Applet < Arrow::Object
 		# of all the actions.
 		self.prepTransaction( txn )
 
+		action ||= @signature.defaultAction or
+			raise AppletError, "Missing default handler '#{default}'"
+
 		# Look up the Method object that needs to be called
-		if ( !action.nil? && (match = @actionsRe.match( action )) )
+		if (( match = @actionsRe.match(action) ))
 			action = match.captures[0]
 			action.untaint
 			self.log.debug "Matched action = #{action}"
@@ -473,10 +476,7 @@ class Applet < Arrow::Object
 
 		# Make a FormValidator object and add it to the transaction
 		txn.vargs = self.makeValidator( action, txn )
-		self.log.debug "Done making validator."
 		
-		@edgecount = 0
-
 		# Now either pass control to the block, if given, or invoke the
 		# action
 		if block_given?
@@ -488,26 +488,15 @@ class Applet < Arrow::Object
 
 			# Invoke the action with the right number of arguments.
 			if meth.arity < 0
-				@edgecount += 1
-				self.log.debug "Calling negative-arity action method."
 				rval = meth.call( txn, *args )
-				self.log.debug "Back from negative-arity action method."
-				@edgecount -= 1
 			elsif meth.arity >= 1
-				@edgecount += 1
-				self.log.debug "Calling positive-arity action method."
 				args.unshift( txn )
 				rval = meth.call( *(args[0, meth.arity]) )
-				self.log.debug "Back from positive-arity action method."
-				@edgecount -= 1
 			else
 				raise AppletError,
 					"Malformed action: Must accept at least a transaction argument"
 			end
 		end
-
-		self.log.debug "About to calculate process times [pid: %d/thr: %p]" %
-			[ Process::pid, Thread.current ]
 
 		# Calculate CPU times
 		runtimes = Process::times
@@ -515,8 +504,8 @@ class Applet < Arrow::Object
 		@totalUtime += utime = (runtimes.utime - starttimes.utime)
 		@totalStime += stime = (runtimes.stime - starttimes.stime)
 		self.log.debug \
-			"[PID %d] Runcount: %d, User: %0.2f, System: %0.2f" %
-			[ Process::pid, @runCount, utime, stime ]
+			"[PID %d] Runcount: %d, User: %0.2f/%0.2f, System: %0.2f/%0.2f" %
+			[ Process::pid, @runCount, utime, @totalUtime, stime, @totalStime ]
 
 		return rval
 	end
@@ -529,7 +518,8 @@ class Applet < Arrow::Object
 
 
 	### The action invoked if the specified action is not explicitly
-	### defined. The default implementation will 
+	### defined. The default implementation will look for a template with the
+	### same key as the action, and if found, will load that and return it.
 	def action_missing_action( txn, raction, *args )
 		self.log.debug "In action_missing_action with: raction = %p, args = %p" %
 			[ raction, args ]
@@ -540,13 +530,8 @@ class Applet < Arrow::Object
 			tmpl = txn.templates[ raction.intern ]
 			tmpl.txn = txn
 			return tmpl
-		end
-
-		default = @signature.defaultAction
-		unless default == raction
-			self.run( txn, default, *args )
 		else
-			raise AppletError, "Missing default handler '#{default}'"
+			raise AppletError, "No such action '#{raction}'"
 		end
 	end
 
