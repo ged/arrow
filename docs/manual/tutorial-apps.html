@@ -170,43 +170,17 @@ action( :display ) {|txn|
 
 		<p>The two declarations are equivalent.</p>
 
-		<h3>Action Signature Proxy</h3>
-
-		<p>For convenience, the <tt>action</tt> shortcut also returns an
-		  object that can be used to add templates and/or validation profiles to
-		  the Signature, but keep them together with the action they are used
-		  by:</p>
-
-<pre>
-formaction = action( :form ) {|txn|
-    templ = self.loadTemplate( :form )
-    templ.txn = txn
-    return templ
-}
-
-formaction.template = "form.tmpl"
-</pre>
-
-
 		<h3>Action Execution</h3>
 
-		<p>When the <tt>Broker</tt> runs the applet, it does so by calling
-		  <tt>Applet#run</tt> with the <tt>Arrow::Transaction</tt> object, the
-		  name of the action to invoke, and any additional arguments passed in
-		  the URI.</p>
-
-		<p>The applet's <tt>#run</tt> method looks up the appropriate action
-		  method, creates an argument validator, then calls the action
-		  method.</p>
-
-		<p>The action method should do the necessary processing to build the
-		  response data and return it as an object. This object will then be
-		  converted to a <tt class="class-name">String</tt> (via <tt
-		  class="method-name">#to_s</tt>) and sent to the client after doing the
-		  necessary header setting and Apache housekeeping. Returning a non-true
-		  value causes a <tt>DECLINED</tt> status to be sent back to
-		  Apache. This can be used to pass control to a further handler if the
-		  action determines it cannot handle the request.</p>
+		<p>When an action method is called, it should do the necessary
+		processing to build the response data and return it to its caller. This
+		return value will then be converted to a <tt
+		class="class-name">String</tt> (via <tt class="method-name">#to_s</tt>)
+		and sent to the client after doing the necessary header setting and
+		Apache housekeeping. Returning a non-true value causes a
+		<tt>DECLINED</tt> status to be sent back to Apache. This can be used to
+		pass control to a further handler if the action determines it cannot
+		handle the request.</p>
 	  </div>
 
 	  <!-- Example -->
@@ -261,19 +235,50 @@ applets:
 </pre>
 
         <p>After the config has been loaded, requests for
-        <code>/&lt;arrow-root&gt;/hello</code> and
-        <code>/&lt;arrow-root&gt;/hello/greet</code> will return something that
-        looks like:</p>
+        <code>/&lt;arrow-root&gt;/hello/greet</code> (and simply
+        <code>/&lt;arrow-root&gt;/hello</code>, because <tt>greet</tt> is the
+        default action) will return something that looks like:</p>
 
 		<div class="screenshot">
-		  <img src="hello-world-sshot.png" alt="screenshot" height="405" width="563" />
+		  <img src="hello-world-sshot.png" alt="screenshot" height="324" width="460" />
 		</div>
-
-        <p>, while <code>/&lt;arrow-root&gt;/hello/text</code> will return
-        the plain-text version.</p>
 
 	  </div>
 
+	  <div class="section">
+		<h2><a href="#arguments" id="arguments">Passing REST-style Arguments</a></h2>
+
+		<p>Now let's add a bit of personalization to the applet. Perhaps it
+		should be able to generate customizable messages in addition to greeting
+		the entire world. To do this, we can make the <tt>greet</tt> action take
+		an additional argument specified in the URL:</p>
+
+<pre>
+  # Define the 'greet' (default) action
+  action( :greet ) {|txn<strong>, name</strong>|
+    <strong>name ||= "world"</strong>
+
+    return &lt;&lt;-EOF
+	&lt;html&gt;
+	  &lt;head&gt;&lt;title&gt;Hello&lt;/title&gt;&lt;/head&gt;
+	  &lt;body&gt;&lt;p&gt;Hello, <strong>#{name}</strong>.&lt;/p&gt;&lt;/body&gt;
+	&lt;/html&gt;
+    EOF
+  }
+
+end
+</pre>
+
+		<p>Calling the applet with a URL like <code>/hello/greet/Dave</code>
+		will now cause it to greet only Dave instead:</p>
+
+		<div class="screenshot">
+		  <img src="hello-dave-sshot.png" alt="screenshot" height="324" width="464" />
+		</div>
+
+		<p>Note that we're required to call the action </p>
+
+	  </div>
 
 	  <div class="section">
 		<h2><a href="#chaining" id="chaining">Applet Chaining</a></h2>
@@ -293,6 +298,25 @@ applets:
 		<p></p>
 		<h3>?(example)?</h3>
 		<p></p>
+
+		<h3>Action Signature Proxy</h3>
+
+		<p>For convenience, the <tt>action</tt> shortcut also returns an
+		  object that can be used to add templates and/or validation profiles to
+		  the Signature, but keep them together with the action they are used
+		  by:</p>
+
+<pre>
+formaction = action( :form ) {|txn|
+    templ = self.loadTemplate( :form )
+    templ.txn = txn
+    return templ
+}
+
+formaction.template = "form.tmpl"
+</pre>
+
+
 	  </div>
 
 	  <div class="section">
