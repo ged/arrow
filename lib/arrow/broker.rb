@@ -281,7 +281,7 @@ module Arrow
 				if appletchain.empty?
 					rval = self.runMissingAppletHandler( txn, handlerUri )
 				else
-					rval = self.runAppletChain( txn, appletchain, *args )
+					rval = self.runAppletChain( txn, appletchain )
 				end
 			else
 				rval = self.builtinDefaultHandler( txn )
@@ -318,7 +318,7 @@ module Arrow
 			# If the user-configured handler maps to one or more handlers, run
 			# them. Otherwise, run the build-in handler.
 			unless appletchain.nil? || appletchain.empty?
-				rval = self.runAppletChain( txn, appletchain, *args )
+				rval = self.runAppletChain( txn, appletchain )
 			else
 				rval = self.builtinMissingHandler( txn, *args )
 			end
