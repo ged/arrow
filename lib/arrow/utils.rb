@@ -203,7 +203,13 @@ module Arrow
 			@valid_dirs = @dirs.find_all {|dir|
 				begin
 					stat = File::stat(dir)
-					stat.directory? && stat.readable?
+					if stat.directory? && stat.readable?
+						true
+					else
+						self.log.debug "Discarded unreadable or non-directory %s" %
+							dir
+						false
+					end
 				rescue Errno::ENOENT, ::SecurityError => err
 					self.log.debug "Discarded invalid directory %p: %s" %
 						[ dir, err.message ]
