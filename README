@@ -12,7 +12,8 @@ A Ruby web application framework for Apache.
 
 == General Information
 
-This is a web application framework for Apache+mod_ruby, based loosely on J2EE.
+Arrow is a web application framework for Apache+mod_ruby, inspired by J2EE,
+Zope/Plone, Quixote, and other web frameworks.
 
 :TODO: This obviously needs more work.
 
