@@ -80,6 +80,30 @@ class Template
 		attr_reader :patterns
 
 
+		### Add the imported attributes when this node is rendered.
+		def render( template, scope )
+			imports = []
+
+			if (( st = template._superTemplate ))
+				@imports.each {|source,dest|
+					imports << "%s as %s (%p)" %
+						[ source, dest, st._attributes[source] ]
+					template._attributes[dest] = st._attributes[source]
+				}
+			end
+
+			if template._config[:debuggingComments]
+				return template.renderComment( "Importing: " + imports.join(", ") )
+			else
+				return ''
+			end
+		end
+
+
+		#########
+		protected
+		#########
+
 		### Parse the contents of the directive.
 		def parseDirectiveContents( parser, state )
 			super
@@ -108,26 +132,6 @@ class Template
 			}
 
 			return true
-		end
-
-
-		### Add the imported attributes when this node is rendered.
-		def render( template, scope )
-			imports = []
-
-			if (( st = template._superTemplate ))
-				@imports.each {|source,dest|
-					imports << "%s as %s (%p)" %
-						[ source, dest, st._attributes[source] ]
-					template._attributes[dest] = st._attributes[source]
-				}
-			end
-
-			if template._config[:debuggingComments]
-				return template.renderComment( "Importing: " + imports.join(", ") )
-			else
-				return ''
-			end
 		end
 
 	end # class ImportDirective
