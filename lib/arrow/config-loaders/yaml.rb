@@ -1,0 +1,76 @@
+#!/usr/bin/ruby
+# 
+# This file contains the Arrow::Config::YamlLoader class, a derivative of
+# Arrow::Config::Loader. It is used to load configuration files written in YAML
+# for the Arrow web application framework.
+# 
+# == Rcsid
+# 
+# $Id: yaml.rb,v 1.3 2003/10/25 11:42:09 deveiant Exp $
+# 
+# == Authors
+# 
+# * Michael Granger <ged@FaerieMUD.org>
+# 
+#:include: COPYRIGHT
+#
+#---
+#
+# Please see the file COPYRIGHT in the 'docs' directory for licensing details.
+#
+
+require 'yaml'
+require 'arrow/config'
+
+module Arrow
+class Config
+
+	### It is used to load configuration files written in YAML for the Arrow web
+	### application framework.
+	class YamlLoader < Arrow::Config::Loader
+
+		# CVS version tag
+		Version = /([\d\.]+)/.match( %q{$Revision: 1.3 $} )[1]
+
+		# CVS id tag
+		Rcsid = %q$Id: yaml.rb,v 1.3 2003/10/25 11:42:09 deveiant Exp $
+
+
+		######
+		public
+		######
+
+		### Load and return configuration values from the YAML +file+
+		### specified.
+		def load( filename )
+			self.log.info "Loading YAML-format configuration from '%s'" % filename
+			return YAML::load( File::read(filename) )
+		end
+
+
+		### Save configuration values to the YAML +file+ specified.
+		def save( confighash, filename )
+			self.log.info "Saving YAML-format configuration to '%s'" % filename
+			File::open( filename, File::WRONLY|File::CREAT ) {|ofh|
+				ofh.print( confighash.to_yaml )
+			}
+		end
+
+
+		### Return +true+ if the specified +file+ is newer than the given
+		### +time+.
+		def isNewer?( file, time )
+			return false unless File::exists?( file )
+			st = File::stat( file )
+			self.log.debug "File mtime is: %s, comparison time is: %s" %
+				[ st.mtime, time ]
+			return st.mtime > time
+		end
+
+
+	end # class YamlLoader
+
+end # class Config
+end # module Arrow
+
+

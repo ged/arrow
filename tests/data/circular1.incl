@@ -1,0 +1,3 @@
+<!-- Template for circular include test -->
+circular1
+<?include circular2.incl?>

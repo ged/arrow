@@ -1,0 +1,30 @@
+This is a header section that will be trimmed from output via the 'cut'
+below. You can set variables, inheritance, etc:
+
+<?set foo=""?>
+
+<?cut?>
+<?xml version="1.0" encoding="utf8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<!--
+  
+		<?method title?>
+		$Id: example-template.tmpl,v 1.1 2003/07/27 07:56:38 deveiant Exp $
+		Time-stamp: <?timestamp?>
+
+  -->
+
+<head>
+	<title><?method title?></title>
+
+	<meta http-equiv="Content-Type" content="text/html; charset=|?method charset?|" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+</head>
+<body>
+
+	<?method body?>
+
+</body>
+</html>

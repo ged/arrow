@@ -1,0 +1,2357 @@
+2004-01-19 22:21  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/include.rb (1.6, SNAPSHOT_20040119):
+
+	- Removed some extra debugging.
+	
+2004-01-18 21:08  Michael Granger <ged@FaerieMUD.org>
+
+	* tests/data/subdir/include.incl (1.1, SNAPSHOT_20040119):
+
+	Initial checkin.
+	
+2004-01-18 21:08  Michael Granger <ged@FaerieMUD.org>
+
+	* tests/lib/arrowtestcase.rb (1.7, SNAPSHOT_20040119):
+
+	- Added new assertion: assert_not_match().
+	
+2004-01-18 21:07  Michael Granger <ged@FaerieMUD.org>
+
+	* tests/: 05_template.tests.rb (1.10),
+	06_template_iterator.tests.rb (1.3) (utags: SNAPSHOT_20040119):
+
+	- Modified/expanded tests to incorporate recent changes/bugfixes.
+	
+2004-01-18 20:56  Michael Granger <ged@FaerieMUD.org>
+
+	* experiments/rdoc-constifbug.rb (1.1, SNAPSHOT_20040119):
+
+	Initial checkin.
+	
+2004-01-18 20:35  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/status.tmpl (1.8, SNAPSHOT_20040119):
+
+	- Added a diagnostic to help track down the best way to bind the Arrow
+	  dispatcher to '/'.
+	
+	- Don't link to apps with _underscored uris (internal-only).
+	
+2004-01-18 20:29  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/set.rb (1.6, SNAPSHOT_20040119):
+
+	- Unified attributes and definitions to fix inconsistencies in how the directive
+	  works.
+	
+2004-01-18 20:28  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/parser.rb (1.11, SNAPSHOT_20040119):
+
+	- Made the template being rendered part of the ParseState instead of the parser
+	  to not only make it easier for directives to access it, but also to make the
+	  parser more re-entrant.
+	
+2004-01-18 20:26  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/nodes.rb (1.12, SNAPSHOT_20040119):
+
+	- Did away with the confusing __item crap in the rendering Procs.
+	
+2004-01-18 20:25  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/iterator.rb (1.2, SNAPSHOT_20040119):
+
+	- Changed to support multiple arguments.
+	
+	- Changes to support any Enumerable.
+	
+2004-01-18 20:22  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/include.rb (1.5):
+
+	- Modifications to reflect changes in the structure of the parser/parse state.
+	
+2004-01-18 20:21  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/: if.rb (1.7), yield.rb (1.4) (utags:
+	SNAPSHOT_20040119):
+
+	- Added some more documentation.
+	
+2004-01-18 20:20  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/for.rb (1.3, SNAPSHOT_20040119):
+
+	- Added some more documentation.
+	
+	- Modified to take an argumentlist like <?yield?>.
+	
+2004-01-18 14:07  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template.rb (1.13, SNAPSHOT_20040119):
+
+	- Fixed the exception renderer to handle the strange exception (e.backtrace ==
+	  nil) thrown by the callback bug.
+	
+	- Unified definitions and attributes, as there was no real reason to keep them
+	  separate.
+	
+	- Modified interaction with the parser to reflect changes in its API.
+	
+2004-01-18 14:04  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/: mixins.rb (1.14), object.rb (1.6) (utags:
+	SNAPSHOT_20040119):
+
+	- Broke logging out into a mixin so classes which don't inherit from
+	  Arrow::Object can still use its logger via the #log interface.
+	
+2004-01-18 14:03  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/broker.rb (1.11, SNAPSHOT_20040119):
+
+	- Fixed app delegation to allow chained apps to be the defaultApp or the
+	  noSuchAppHandler.
+	
+2004-01-18 12:17  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/application.rb (1.12, SNAPSHOT_20040119):
+
+	- Added a Kluge for RDoc, which apparently gets befuddled when you have a
+	  conditional inside the expression for assignment to a constant. See
+	  experiments/rdoc-constifbug.rb for a minimal test case.
+	
+2004-01-18 12:15  Michael Granger <ged@FaerieMUD.org>
+
+	* utils.rb (1.5, SNAPSHOT_20040119):
+
+	- Killed the YAML output for try(), as it wasn't nearly as informative for most
+	  cases as #inspect.
+	
+2004-01-18 12:13  Michael Granger <ged@FaerieMUD.org>
+
+	* TODO (1.3, SNAPSHOT_20040119):
+
+	- Updated the list.
+	
+2004-01-18 12:12  Michael Granger <ged@FaerieMUD.org>
+
+	* experiments/dumptokens.rb (1.2, SNAPSHOT_20040119):
+
+	- Changed to report all tokens, despite a segfault for some code.
+	
+2004-01-18 12:09  Michael Granger <ged@FaerieMUD.org>
+
+	* experiments/: callback-bug.rb (1.1), doubleYield.rb (1.1),
+	expression-parser.diff (1.1), generic-iterator-tests.rb (1.1),
+	generic-iterator.rb (1.1), yield-with-iterator.rb (1.1) (utags:
+	SNAPSHOT_20040119):
+
+	Initial checkin.
+	
+2004-01-12 19:48  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/broker.rb (1.10):
+
+	- Factored out code for building the app chain into a separate method.
+	
+2004-01-08 20:14  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/rubytokenreactor.rb (1.1, SNAPSHOT_20040119),
+	tests/07_rubytokenparser.tests.rb (1.1, SNAPSHOT_20040119),
+	experiments/dumptokens.rb (1.1):
+
+	Initial checkin.
+	
+2004-01-04 22:22  Martin Chase <stillflame@FaerieMUD.org>
+
+	* docs/manual/install.html (1.4, SNAPSHOT_20040119):
+
+	noted option criteria dependency
+	
+2003-12-30 10:55  Michael Granger <ged@FaerieMUD.org>
+
+	* tests/05_template.tests.rb (1.9):
+
+	- Added tests for includes with subdirectories in them. Thanks to Martin Chase
+	  for pointing this out.
+	
+2003-12-30 10:54  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/parser.rb (1.10):
+
+	- Fixed the PATHNAME regex to match paths with subdirs (D'oh). Thanks to Martin
+	  Chase for pointing this out.
+	
+2003-12-30 10:41  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/dispatcher.rb (1.9, SNAPSHOT_20040119):
+
+	- Fixed the annoying bug where the headers would sometimes show up after the
+	  content.
+	
+2003-12-30 10:39  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/config.rb (1.12), default.cfg (1.3) (utags:
+	SNAPSHOT_20040119):
+
+	- Added new config item 'noSuchAppHandler'.
+	
+2003-12-30 02:30  Martin Chase <stillflame@FaerieMUD.org>
+
+	* templates/templateviewer.tmpl (1.1, SNAPSHOT_20040119):
+
+	initial import
+	
+2003-12-29 18:08  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/error-display.tmpl (1.6, SNAPSHOT_20040119):
+
+	- Stole some of Martin's debugging template code to inspect the Transaction
+	  object in a bit more useful detail.
+	
+2003-12-28 17:33  Martin Chase <stillflame@FaerieMUD.org>
+
+	* docs/stillflame.notes (1.3, SNAPSHOT_20040119):
+
+	adding more notes about datasources
+	
+2003-12-28 17:08  Martin Chase <stillflame@FaerieMUD.org>
+
+	* docs/stillflame.notes (1.2):
+
+	adding notes about datasources
+	
+2003-12-24 02:06  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/application.rb (1.11):
+
+	- Unmuddled #action_missing_action a bit.
+	
+2003-12-24 02:04  Michael Granger <ged@FaerieMUD.org>
+
+	* apps/view-template.rb (1.3, SNAPSHOT_20040119):
+
+	- Added the ability to view a template with a template=name argument.
+	
+2003-12-24 02:03  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/app-status.tmpl (1.6, SNAPSHOT_20040119):
+
+	- Fixed path to template-viewer display action.
+	
+2003-12-24 00:47  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/myloginform.tmpl (1.2):
+
+	- Accidentally committed.
+	
+2003-12-24 00:40  Michael Granger <ged@FaerieMUD.org>
+
+	* apps/rcr.rb (1.2):
+
+	- Removed from the Arrow distro, as I don't have the motivation necessary to
+	  finish it.
+	
+2003-12-22 16:40  Michael Granger <ged@FaerieMUD.org>
+
+	* apps/protected.rb (1.3, SNAPSHOT_20040119):
+
+	- Removed the 'default' action to test the template-displaying implementation of
+	  the new action_missing_action.
+	
+2003-12-22 16:39  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/: logout.tmpl (1.1, SNAPSHOT_20040119),
+	myloginform.tmpl (1.1), printsource.tmpl (1.1, SNAPSHOT_20040119),
+	protected.tmpl (1.1, SNAPSHOT_20040119):
+
+	Initial commit.
+	
+2003-12-22 16:38  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/hello-world.tmpl (1.3, SNAPSHOT_20040119):
+
+	- Added a link to the 'logout' action of apps that are chained before the hello
+	  world one.
+	
+2003-12-22 16:37  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/error-display.tmpl (1.5):
+
+	- Clarified the message that shows when the transaction's session hasn't been
+	  loaded at the point of error.
+	
+2003-12-22 16:36  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/nodes.rb (1.11):
+
+	- Added some code to facilitate the retrieval of a flattened array of nodes for
+	  a template to allow easy traversal.
+	
+	- Added a #rendering? alias for #isRenderingNode?
+	
+2003-12-22 16:35  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/session/store.rb (1.6, SNAPSHOT_20040119):
+
+	- Added many more delegators to the @data hash.
+	
+	- Removed the useless #restoreHash method, which is no longer necessary because
+	  the @data hash no longer has an auto-vivifying default_proc.
+	
+2003-12-22 16:33  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template.rb (1.12):
+
+	- Added a node-traverser that implements the :elideDirectiveLines configuration
+	  item.
+	
+2003-12-22 16:32  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/session.rb (1.4, SNAPSHOT_20040119):
+
+	- Added many more delegators to the Hash interface of the session store.
+	
+2003-12-22 16:31  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/application.rb (1.10):
+
+	- Added action_missing handler to make overriding the default behaviour easier
+	  for both application authors and Application subclassers.
+	
+	- Rearranged the key-value list for the signature docs to list the
+	  more-important items first.
+	
+2003-12-22 15:10  Michael Granger <ged@FaerieMUD.org>
+
+	* docs/manual/tutorial.html (1.6, SNAPSHOT_20040119):
+
+	- Added an intro paragraph and an Introduction section to the TOC.
+	
+2003-12-22 15:09  Michael Granger <ged@FaerieMUD.org>
+
+	* docs/manual/tutorial-intro.html (1.1, SNAPSHOT_20040119):
+
+	Initial checkin.
+	
+2003-12-22 15:00  Michael Granger <ged@FaerieMUD.org>
+
+	* docs/manual/tutorial-apps.html (1.3, SNAPSHOT_20040119):
+
+	- Filled in some of the signature descriptions.
+	
+	- Added a little preamble to the top of the document.
+	
+2003-12-22 14:53  Michael Granger <ged@FaerieMUD.org>
+
+	* apps/protected.rb (1.2):
+
+	- Added logout and a default content-ish action.
+	
+2003-12-20 15:49  Martin Chase <stillflame@FaerieMUD.org>
+
+	* docs/manual/: tutorial-apps.html (1.2), tutorial-monitors.html
+	(1.2, SNAPSHOT_20040119), tutorial-sessions.html (1.2,
+	SNAPSHOT_20040119), tutorial-sources.html (1.2, SNAPSHOT_20040119),
+	tutorial-templates.html (1.2, SNAPSHOT_20040119),
+	tutorial-validation.html (1.2, SNAPSHOT_20040119), tutorial.html
+	(1.5):
+
+	reformatting and some content additions
+	
+2003-12-20 15:49  Martin Chase <stillflame@FaerieMUD.org>
+
+	* docs/manual/manual.css (1.6, SNAPSHOT_20040119):
+
+	added signature-items formatting
+	
+2003-12-20 14:07  Michael Granger <ged@FaerieMUD.org>
+
+	* docs/manual/manual.css (1.5):
+
+	- Some changes to the layout to widen the content column a bit.
+	
+2003-12-20 13:54  Michael Granger <ged@FaerieMUD.org>
+
+	* docs/manual/manual.css (1.4):
+
+	- Added style classes for configuration-item lists.
+	
+	- Added overflow: auto to the PRE element at stillflame's suggestion.
+	
+2003-12-20 13:53  Michael Granger <ged@FaerieMUD.org>
+
+	* docs/manual/config.html (1.5, SNAPSHOT_20040119):
+
+	- Converted the config values list into a DL to make styling easier.
+	
+	- Fixed a line-wrap in the httpd.conf config example.
+	
+	- Added some info about adding mod_ruby module directives.
+	
+2003-12-20 13:50  Martin Chase <stillflame@FaerieMUD.org>
+
+	* docs/manual/: tutorial-apps.html~ (1.2), tutorial-monitors.html~
+	(1.2), tutorial-sessions.html~ (1.2), tutorial-sources.html~ (1.2),
+	tutorial-templates.html~ (1.2), tutorial-validation.html~ (1.2):
+
+	bad add corrected
+	
+2003-12-20 13:20  Martin Chase <stillflame@FaerieMUD.org>
+
+	* docs/manual/: tutorial-apps.html (1.1), tutorial-apps.html~
+	(1.1), tutorial-monitors.html (1.1), tutorial-monitors.html~ (1.1),
+	tutorial-sessions.html (1.1), tutorial-sessions.html~ (1.1),
+	tutorial-sources.html (1.1), tutorial-sources.html~ (1.1),
+	tutorial-templates.html (1.1), tutorial-templates.html~ (1.1),
+	tutorial-validation.html (1.1), tutorial-validation.html~ (1.1):
+
+	initial import - split out of tutorial.html
+	
+2003-12-20 13:20  Martin Chase <stillflame@FaerieMUD.org>
+
+	* docs/manual/tutorial.html (1.4):
+
+	split out each tutorial into its own page
+	
+2003-12-20 13:19  Martin Chase <stillflame@FaerieMUD.org>
+
+	* docs/manual/TEMPLATE.html.tpl (1.3, SNAPSHOT_20040119):
+
+	made nav-bar an include
+	
+2003-12-20 06:30  Martin Chase <stillflame@FaerieMUD.org>
+
+	* docs/manual/config.html (1.4):
+
+	put some more content in, but will need research or expert input to fill in others
+	
+2003-12-20 06:00  Martin Chase <stillflame@FaerieMUD.org>
+
+	* docs/manual/tutorial.html (1.3):
+
+	added more stubs for content
+	
+2003-12-20 05:16  Martin Chase <stillflame@FaerieMUD.org>
+
+	* docs/manual/config.html (1.3):
+
+	added required/sample configuration, stubs for detailed explaination
+	
+2003-12-13 14:06  Michael Granger <ged@FaerieMUD.org>
+
+	* docs/manual/: config.html (1.2), download.html (1.3,
+	SNAPSHOT_20040119), index.html (1.5, SNAPSHOT_20040119),
+	install.html (1.3), manual.css (1.3), tutorial.html (1.2),
+	whatis.html (1.3, SNAPSHOT_20040119):
+
+	- Snapshot 20031213.
+	
+2003-12-13 14:01  Michael Granger <ged@FaerieMUD.org>
+
+	* docs/manual/linkbox.incl (1.1, SNAPSHOT_20040119):
+
+	Initial checkin.
+	
+2003-12-12 11:18  Michael Granger <ged@FaerieMUD.org>
+
+	* docs/manual/TEMPLATE.html.tpl (1.2):
+
+	- Added some prettifying structure.
+	
+	- Added some of stillflame's markup.
+	
+2003-12-11 01:52  Martin Chase <stillflame@FaerieMUD.org>
+
+	* docs/manual/index.html (1.4):
+
+	added "An Overview" to "What is Arrow" subheaders
+	
+2003-12-11 01:51  Martin Chase <stillflame@FaerieMUD.org>
+
+	* docs/manual/download.html (1.2):
+
+	link to snapshot goes nowhere still...
+	
+2003-12-11 01:51  Martin Chase <stillflame@FaerieMUD.org>
+
+	* docs/manual/install.html (1.2):
+
+	filling in more dependencies
+	
+2003-12-11 01:08  Martin Chase <stillflame@FaerieMUD.org>
+
+	* docs/manual/manual.css (1.2):
+
+	nothing changed but my mind
+	
+2003-12-11 01:08  Martin Chase <stillflame@FaerieMUD.org>
+
+	* docs/manual/whatis.html (1.2):
+
+	ged worked on this, filled in bunches
+	
+2003-12-11 01:06  Martin Chase <stillflame@FaerieMUD.org>
+
+	* manual.css (1.2):
+
+	wrong dir...
+	
+2003-12-11 01:04  Martin Chase <stillflame@FaerieMUD.org>
+
+	* manual.css (1.1), docs/manual/manual.css (1.1):
+
+	initial import
+	
+2003-12-10 12:10  Michael Granger <ged@FaerieMUD.org>
+
+	* tests/05_template.tests.rb (1.8):
+
+	- Added tests for the 'import' directive.
+	
+2003-12-10 11:52  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/navbar.incl (1.3, SNAPSHOT_20040119):
+
+	- Linked RubyCrafters.com in the copyright statement.
+	
+2003-12-10 11:51  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/parser.rb (1.9):
+
+	- Fixed docs for #scanForArgList.
+	
+2003-12-10 11:51  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/nodes.rb (1.10):
+
+	- Overrode AttributeDirective#inspect for more useful output.
+	
+2003-12-10 11:50  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/import.rb (1.1, SNAPSHOT_20040119):
+
+	Initial checkin.
+	
+2003-12-10 11:49  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template.rb (1.11):
+
+	- Added missing comments to A::T::RenderingScope.
+	
+	- Streamlined/finished DefaultRenderers.
+	
+	- COMPAT: Changed #renderObject to #renderObjects to avoid the first recursion
+	  for most cases.
+	
+	- Added a @superTemplate attribute which holds the container template during
+	  rendering for introspection by directives up the containment tree.
+	
+2003-12-10 11:46  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/htmltokenizer.rb (1.2, SNAPSHOT_20040119):
+
+	- <span>ned [? foo ?]-style directives inside tag attributes.
+	
+2003-12-09 02:35  Martin Chase <stillflame@FaerieMUD.org>
+
+	* docs/manual/index.html (1.3):
+
+	linked to documentation stubs
+	
+2003-12-09 02:29  Martin Chase <stillflame@FaerieMUD.org>
+
+	* docs/manual/: config.html (1.1), download.html (1.1),
+	install.html (1.1), tutorial.html (1.1), whatis.html (1.1):
+
+	made doc stubs
+	
+2003-12-08 13:37  Michael Granger <ged@FaerieMUD.org>
+
+	* docs/stillflame.notes (1.1), apps/subclassed-hello.rb (1.1,
+	SNAPSHOT_20040119), apps/superhello.rb (1.1, SNAPSHOT_20040119):
+
+	Initial checkin.
+	
+2003-12-08 13:32  Michael Granger <ged@FaerieMUD.org>
+
+	* default.cfg (1.2):
+
+	- Updated items and added some more-reasonable defaults.
+	
+2003-12-08 13:19  Michael Granger <ged@FaerieMUD.org>
+
+	* TODO (1.2):
+
+	- Updated the list.
+	
+2003-12-08 13:12  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/utils.rb (1.6, SNAPSHOT_20040119):
+
+	- Protect against SecurityErrors in the stat for Path objects.
+	
+2003-12-08 13:02  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/config.rb (1.11):
+
+	- Added command-line override for dumped file.
+	
+2003-12-08 12:41  Michael Granger <ged@FaerieMUD.org>
+
+	* tests/05_template.tests.rb (1.7):
+
+	- Added tests for more exotic methodchains in a 'call'.
+	
+	- Killed tests of esoteric conditional syntax and replaced them with pure-Ruby
+	  versions.
+	
+	- Added some free-form conditional tests.
+	
+2003-12-08 12:36  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/status.tmpl (1.7):
+
+	- Changed 'Source' column to 'Class'.
+	
+2003-12-08 12:35  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/hello-world.tmpl (1.2):
+
+	- Added conditional sections for running under subclassed and chained Hello
+	  apps.
+	
+2003-12-08 12:34  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/app-status.tmpl (1.5):
+
+	- Added chained-app description.
+	
+2003-12-08 12:27  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/dispatcher.rb (1.8):
+
+	- Fixed test for non-libapreq-enabled mod_ruby for pre-libapreq mod_rubys.
+	
+2003-12-08 12:23  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/: nodes.rb (1.9), parser.rb (1.8):
+
+	- Modified conditionals to read the directive contents as-is, without trying to
+	  parse matchspec, etc.
+	
+2003-12-08 12:22  Michael Granger <ged@FaerieMUD.org>
+
+	* redist/hashslice.rb (1.1, SNAPSHOT_20040119):
+
+	Imported from Ruby-HashSlice
+	
+2003-12-08 12:19  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/broker.rb (1.8):
+
+	- Changed to skip loading apps with no :uri in their signature.
+	
+2003-12-08 12:18  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/application.rb (1.9):
+
+	- Unindented to shrink the left-column whitespace.
+	
+	- Modifications to support suclassing of apps.
+	
+2003-12-08 11:57  Michael Granger <ged@FaerieMUD.org>
+
+	* docs/manual/index.html (1.2):
+
+	- Fixed content-encoding setting.
+	
+	- Brought in line with the template.
+	
+2003-12-08 11:50  Michael Granger <ged@FaerieMUD.org>
+
+	* docs/manual/: index.html (1.1), TEMPLATE.html.tpl (1.1):
+
+	Initial checkin.
+	
+2003-12-04 23:28  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/session/store.rb (1.5):
+
+	- Added #has_key? to the list of methods delegated to the data hash.
+	
+2003-12-04 23:28  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template.rb (1.10):
+
+	- Converted rendering scope into a regular object for greater control,
+	  overriding values for blocks, etc.
+	
+	- Factored out the rendering scope creation into a separate method.
+	
+	- Started on a #getPreppedNodes method to filter nodes for the
+	  :elideDirectiveLines config value, and possible more in the future.
+	
+2003-12-04 23:19  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/session.rb (1.3):
+
+	- Added the #has_key? predicate method and the #key? alias for it.
+	
+2003-12-04 22:55  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/mixins.rb (1.13):
+
+	- Fixed a bug that caused the #requireDerivatives() method to silently fail if a
+	  module's name was all lowercase. Thanks to scotus at FaerieMUD dot org for
+	  pointing this out.
+	
+2003-12-04 22:16  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/dispatcher.rb (1.7):
+
+	- Cleaned up logging
+	
+2003-12-04 22:15  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/broker.rb (1.7):
+
+	- Cleaned up logging
+	
+	- Added the transaction to the arguments for the block given to
+	  Application#delegate.
+	
+2003-12-04 18:20  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/application.rb (1.8):
+
+	- Cleaned up diagnostics in ::load()
+	
+	- Put re-merge of already-loaded apps in an ensure.
+	
+2003-12-04 18:02  Michael Granger <ged@FaerieMUD.org>
+
+	* apps/status.rb (1.5, SNAPSHOT_20040119):
+
+	- Fixed app-status action to account for chained apps.
+	
+2003-12-04 17:45  Michael Granger <ged@FaerieMUD.org>
+
+	* apps/hello.rb (1.4, SNAPSHOT_20040119):
+
+	- Added a source view action.
+	
+	- Made the templated action the default.
+	
+	- Modified to run in the content-as-return-value model.
+	
+2003-12-04 17:39  Michael Granger <ged@FaerieMUD.org>
+
+	* apps/counter.rb (1.3, SNAPSHOT_20040119):
+
+	- Added delegation to demonstrate how chaining apps work.
+	
+2003-12-04 17:36  Michael Granger <ged@FaerieMUD.org>
+
+	* makedist.rb (1.1, SNAPSHOT_20040119), apps/counted-hello.rb (1.1,
+	SNAPSHOT_20040119), apps/protected-hello.rb (1.1,
+	SNAPSHOT_20040119), apps/protected.rb (1.1), apps/rcr.rb (1.1),
+	apps/timeclock.rb (1.1, SNAPSHOT_20040119),
+	templates/hello-world-src.tmpl (1.1, SNAPSHOT_20040119),
+	templates/loginform.tmpl (1.1, SNAPSHOT_20040119):
+
+	Initial checkin.
+	
+2003-12-02 00:23  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/htmltokenizer.rb (1.1):
+
+	Initial checkin.
+	
+2003-12-02 00:23  Michael Granger <ged@FaerieMUD.org>
+
+	* tests/05_template.tests.rb (1.6):
+
+	- Changed tested output to reflect changes to the way comments are rendered by
+	  Arrow::Template.
+	
+2003-12-02 00:22  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/view-template.tmpl (1.2, SNAPSHOT_20040119):
+
+	- Added syntax-highlighted XML source section.
+	
+	- Added some descriptive paragraph/s to each section.
+	
+2003-12-02 00:21  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/status.tmpl (1.6):
+
+	- Removed templates link now that the template-viewer renders the XML, too.
+	
+	- Added some more informational links to the RubyCrafters.com section.
+	
+2003-12-02 00:20  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/counter.tmpl (1.5, SNAPSHOT_20040119):
+
+	- Fixed link.
+	
+2003-12-02 00:20  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/counter-deleted.tmpl (1.3, SNAPSHOT_20040119):
+
+	- Fixed links/wording.
+	
+2003-12-02 00:20  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/app-status.tmpl (1.4):
+
+	- Added 'config' section.
+	
+	- Removed the '(default)' part of the action list.
+	
+2003-12-02 00:19  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/nodes.rb (1.8):
+
+	- Added #isRenderingNode? predicate method in preparation for doing
+	  directive-line eliding in the template's node tree.
+	
+2003-12-02 00:18  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/include.rb (1.4):
+
+	- Fixed sub-template HTML introspection code.
+	
+2003-12-02 00:17  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/session/store.rb (1.4):
+
+	- Method call renaming (warn -> warning) to reflect changes in the logger's API.
+	
+2003-12-02 00:17  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/session/filelock.rb (1.3, SNAPSHOT_20040119):
+
+	- Fixed use of tainted data bug.
+	
+	- Method call renaming (warn -> warning) to reflect changes in the logger's API.
+	
+2003-12-02 00:16  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/logger/outputter.rb (1.3, SNAPSHOT_20040119):
+
+	- Renamed 'formatter' attribute to 'format'.
+	
+2003-12-02 00:15  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/transaction.rb (1.5, SNAPSHOT_20040119):
+
+	- Removed stale 'response' code.
+	
+	- Removed subrequest code in deference to app-chaining.
+	
+2003-12-02 00:13  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/object.rb (1.5):
+
+	- Renamed Arrow::Logger#warn calls to #warning to reflect changes in the API.
+	
+2003-12-02 00:12  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/mixins.rb (1.12):
+
+	- Turned off load-error message at 'warn' level.
+	
+2003-12-02 00:12  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/logger.rb (1.5, SNAPSHOT_20040119):
+
+	- Renamed #warn method to #warning to avoid collision with Kernel::warn.
+	
+2003-12-02 00:11  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/dispatcher.rb (1.6):
+
+	- Changed primary execution path to support chaining apps via their URI.
+	
+2003-12-02 00:10  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/config.rb (1.10):
+
+	- Added a new item: uriCollisionFatal
+	
+	- Added a #reload method to support configuration-reload.
+	
+2003-12-02 00:09  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/broker.rb (1.6):
+
+	- Changed primary execution path to support chaining apps via their URI.
+	
+	- Improved URI-collision code.
+	
+2003-12-02 00:09  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/application.rb (1.7):
+
+	- Fixed the app-reload code somewhat. There's still a problem when an app
+	  specifies a leading namespace (e.g., Arrow::Status) that's caused by
+	  Kernel::load.
+	
+	- Lots of changes to reflect change in API for chained apps.
+	
+2003-12-02 00:06  Michael Granger <ged@FaerieMUD.org>
+
+	* docs/Arrow Diagrams.graffle (1.1, SNAPSHOT_20040119):
+
+	Initial checkin.
+	
+2003-12-02 00:05  Michael Granger <ged@FaerieMUD.org>
+
+	* apps/view-template.rb (1.2):
+
+	- Added syntax-highlighted XML source output.
+	
+2003-12-02 00:05  Michael Granger <ged@FaerieMUD.org>
+
+	* apps/status.rb (1.4):
+
+	- Changed to behave under chained execution.
+	
+2003-12-02 00:04  Michael Granger <ged@FaerieMUD.org>
+
+	* apps/hello.rb (1.3):
+
+	- Fixed quoting problem.
+	
+2003-12-02 00:03  Michael Granger <ged@FaerieMUD.org>
+
+	* utils.rb (1.4):
+
+	- Fixed the 'TEMPLATE' antimanifest pattern.
+	
+2003-12-02 00:03  Michael Granger <ged@FaerieMUD.org>
+
+	* rBuild.rb (1.2, SNAPSHOT_20040119):
+
+	- Updated URLs.
+	
+2003-12-01 23:09  Michael Granger <ged@FaerieMUD.org>
+
+	* tests/10_logger.tests.rb (1.1, SNAPSHOT_20040119):
+
+	Initial checkin.
+	
+2003-11-29 07:58  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template.rb (1.9):
+
+	- Simplified the copy initializer, as the supermethod does most of it itself.
+	
+	- Integrated code for customizable renderers.
+	
+2003-11-17 22:50  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/status.tmpl (1.5):
+
+	- Sort apps by URI.
+	
+2003-11-17 22:50  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/navbar.incl (1.2):
+
+	- Added copyright.
+	
+2003-11-17 22:50  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/hello-world.tmpl (1.1):
+
+	Initial checkin.
+	
+2003-11-17 22:49  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/error-display.tmpl (1.4):
+
+	- Added navbar include.
+	
+2003-11-17 22:49  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/counter.tmpl (1.4):
+
+	- Split navbar links and main explanation.
+	
+2003-11-17 22:48  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/app-status.tmpl (1.3):
+
+	- Added list of actions
+	
+2003-11-17 22:48  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/set.rb (1.5):
+
+	- Cleaned up
+	
+	- Fixed to use new APIs.
+	
+2003-11-17 22:45  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/transaction.rb (1.4):
+
+	- Added appPath and action.
+	
+2003-11-17 22:45  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/: template.rb (1.8), template/for.rb (1.2),
+	template/include.rb (1.3), template/nodes.rb (1.7),
+	template/parser.rb (1.7), template/yield.rb (1.3):
+
+	- Commented out most debugging statements.
+	
+2003-11-17 22:44  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/mixins.rb (1.11):
+
+	- Added docs to correct RDoc's generated output.
+	
+2003-11-17 22:40  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/factories.rb (1.3, SNAPSHOT_20040119):
+
+	- Added logging for template reloads.
+	
+2003-11-17 22:39  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/: config.rb (1.9), dispatcher.rb (1.5):
+
+	- Added 'templateLogLevel' to allow setting template log level via config.
+	
+2003-11-17 22:39  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/broker.rb (1.5):
+
+	- Renamed transaction to 'txn' for consistency in some methods.
+	
+2003-11-17 22:37  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/application.rb (1.6):
+
+	- Added action introspection.
+	
+	- Added yield() to callback in #run.
+	
+2003-11-17 22:36  Michael Granger <ged@FaerieMUD.org>
+
+	* apps/hello.rb (1.2):
+
+	- Added a templated action.
+	
+2003-11-09 15:46  Michael Granger <ged@FaerieMUD.org>
+
+	* tests/lib/arrowtestcase.rb (1.6):
+
+	- Added #assert_not_tainted assertion
+	
+	- Overrode #default_test to silence empty-test errors
+	
+2003-11-09 15:44  Michael Granger <ged@FaerieMUD.org>
+
+	* tests/: 01_config.tests.rb (1.4, SNAPSHOT_20040119),
+	06_template_iterator.tests.rb (1.2), 20_session.tests.rb (1.3,
+	SNAPSHOT_20040119), 21_session_id.tests.rb (1.3,
+	SNAPSHOT_20040119):
+
+	- Added more tests
+	
+	- Propagated changes in the API
+	
+2003-11-09 15:44  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/status.tmpl (1.4):
+
+	- Swapped actions on the invocation/inspection link/button.
+	
+2003-11-09 15:43  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/error-display.tmpl (1.3):
+
+	- Added error class to message.
+	
+2003-11-09 15:43  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/counter.tmpl (1.3):
+
+	- Added session inspection section.
+	
+	- Modified counter to be a bit more obvious as to what changes between requests.
+	
+2003-11-09 15:34  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/app-status.tmpl (1.2):
+
+	- Added template inspection hooks (calls into view-template).
+	
+2003-11-09 15:31  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/nodes.rb (1.6):
+
+	- Moved more logic from specific conditional directives into the
+	  ConditionalDirective mixin.
+	
+	- Implemented #to_html HTML inspection methods for base node classes.
+	
+2003-11-09 15:30  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/include.rb (1.2):
+
+	- Implemented #to_html HTML inspection method.
+	
+2003-11-09 15:29  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/escape.rb (1.2, SNAPSHOT_20040119):
+
+	- Renamed class EscapeDirective for similarity with other directive classes.
+	
+2003-11-09 15:28  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/: elsif.rb (1.2, SNAPSHOT_20040119), if.rb
+	(1.6):
+
+	- Moved more logic into the Conditional mixin.
+	
+2003-11-09 15:27  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/session/store.rb (1.3):
+
+	- Fixed "Marshal data too short" bug.
+	
+2003-11-09 15:26  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/session/: id.rb (1.3), md5id.rb (1.3), usertrackid.rb
+	(1.2) (utags: SNAPSHOT_20040119):
+
+	- Moved id generation/validation logic into class methods.
+	
+2003-11-09 15:25  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/session/filelock.rb (1.2):
+
+	- Remove lockfile after close.
+	
+2003-11-09 15:23  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/: logger/fileoutputter.rb (1.3, SNAPSHOT_20040119),
+	template/set.rb (1.4):
+
+	- Added require.
+	
+2003-11-09 15:18  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/utils.rb (1.5):
+
+	- Fixed a typo bug
+	
+	- Changed the stringification method to return the valid dirs in an Arrow::Path
+	  instead of all of them.
+	
+2003-11-09 15:16  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template.rb (1.7):
+
+	- Fixed bug in which the template would fail silently when told to load a path
+	  that was a directory. Fix thanks to Martin Chase <stillflame@FaerieMUD.org>.
+	
+	- Fixed the message of the exception raised when a template could not be found
+	  (stringifies the template path instead of inspecting it).
+	
+2003-11-09 12:59  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/dispatcher.rb (1.4):
+
+	- Fixed bug in reconfiguration code.
+	
+2003-11-09 12:58  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/config.rb (1.8):
+
+	- Added initial modification-checking to the config object to allow dynamic
+	  reconfiguration.
+	
+2003-11-09 12:56  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/broker.rb (1.4):
+
+	- Moved template-loading via the factory into the application object to reduce
+	  coupling between the Arrow::Broker and Arrow::Application.
+	
+	- Fixed log message for DECLINED requests.
+	
+	- Changed call to custom error-handler to match the changes in the calls to
+	  regular applications.
+	
+2003-11-09 12:53  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/application.rb (1.5):
+
+	- Changed #[] and #[]= from delegated methods to explicitly-defined ones to
+	  so both Strings and Symbols can be used as keys to validation object's valid
+	  args.
+	
+	- Moved template-loading via the factory into the application object to reduce
+	  coupling between the Arrow::Broker and Arrow::Application.
+	
+	- Fixed validator code to make a Hash of all arguments from the libapreq
+	  paramtable, as FormValidator expects to be able to modify the arglist, and the
+	  ParamTable is immutable.
+	
+2003-11-09 12:49  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow.rb (1.5, SNAPSHOT_20040119):
+
+	- Added module documentation.
+	
+2003-11-09 12:49  Michael Granger <ged@FaerieMUD.org>
+
+	* docs/CATALOG (1.3, SNAPSHOT_20040119):
+
+	- Modified upload path to reflect changes in RubyCrafter site layout.
+	
+2003-11-09 12:48  Michael Granger <ged@FaerieMUD.org>
+
+	* apps/.cvsignore (1.1, SNAPSHOT_20040119), apps/view-template.rb
+	(1.1), templates/.cvsignore (1.1, SNAPSHOT_20040119),
+	templates/TEMPLATE.tmpl.tpl (1.1, SNAPSHOT_20040119),
+	templates/view-template.tmpl (1.1):
+
+	Initial checkin.
+	
+2003-11-09 12:47  Michael Granger <ged@FaerieMUD.org>
+
+	* apps/errorHandler.rb (1.2, SNAPSHOT_20040119):
+
+	- Updated action signature to match the changes made in Arrow::Application.
+	
+2003-11-09 12:46  Michael Granger <ged@FaerieMUD.org>
+
+	* apps/counter.rb (1.2):
+
+	- Added a :lastChild key to the session to track child PIDs.
+	
+2003-11-01 15:02  Michael Granger <ged@FaerieMUD.org>
+
+	* tests/lib/arrowtestcase.rb (1.5):
+
+	- Added new assertions assert_has_ivar(), assert_ivar_equal(),
+	  assert_not_respond_to(), and assert_include().
+	
+2003-11-01 15:01  Michael Granger <ged@FaerieMUD.org>
+
+	* tests/05_template.tests.rb (1.5):
+
+	- Added test-generation for invalid templates.
+	
+	- Better coverage; new tests for new directives.
+	
+	- Added test for loadPath.
+	
+2003-11-01 14:59  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/status.tmpl (1.3):
+
+	- Fixed content-type charset.
+	
+	- Changed inline stylesheet to external one.
+	
+	- Switched link to call individual app introspection action; added 'execute'
+	  button.
+	
+	- Cleaned up tables.
+	
+	- Added a source links section.
+	
+2003-11-01 14:57  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/: counter-deleted.tmpl (1.2), counter.tmpl (1.2),
+	error-display.tmpl (1.2):
+
+	- Fixed content-type charset.
+	
+	- Changed inline stylesheet to external one.
+	
+2003-11-01 14:57  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/yield.rb (1.2):
+
+	- Modified to reflect changes in the base node classes.
+	
+2003-11-01 14:56  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/parser.rb (1.6):
+
+	- Fixed QUOTEDSTRING pattern.
+	
+	- Added PATHNAME pattern.
+	
+	- Added additional directive-settable parse state hash to Parser::State.
+	
+	- Added the controlling template to the parser object.
+	
+	- Hooked up the "unknown PI"-handling code.
+	
+	- New method: #scanForPathname
+	
+2003-11-01 14:50  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/nodes.rb (1.5):
+
+	- Added CommentNode that renders with the template's #renderComment method.
+	
+	- Cleaned up the plain nodes' constructors to make subclassing easier.
+	
+	- Separated methodchain and node semantics to make overriding one or the other
+	  easier in subclasses.
+	
+	- Nodes which don't have methodchains no longer bother to build Procs for
+	  rendering.
+	
+2003-11-01 14:48  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/if.rb (1.5):
+
+	- Fixed conditionals with matchspecs
+	
+	- Fixed bug that caused only an attribute to be evaluated logically, and not the
+	  return value of its methodchain if it has one.
+	
+2003-11-01 14:45  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/utils.rb (1.4):
+
+	- Added an explicit #inspect to Path.
+	
+2003-11-01 14:44  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/transaction.rb (1.3):
+
+	- Aesthetic changes.
+	
+2003-11-01 14:44  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template.rb (1.6):
+
+	- Major reworking of the instantiation/load code to support subtemplates in
+	  directives that need them (eg., include).
+	
+	- Fixed some tainting issues with paths fetched for subtemplates.
+	
+	- Separated the source and file attributes.
+	
+	- Added a #memsize method to support Arrow::Cache.
+	
+	- Simplified and added fix for installation of nameless nodes to #installNode.
+	
+2003-11-01 13:14  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/factories.rb (1.2):
+
+	- Set load path on template class to allow directives to use it for
+	  reloading. This should only be an interim fix.
+	
+2003-11-01 13:13  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/exceptions.rb (1.8, SNAPSHOT_20040119):
+
+	- Fixed redundant message-aggregation.
+	
+2003-11-01 13:13  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/dispatcher.rb (1.3):
+
+	- Fixed bug that caused the dispatcher to be re-instantiated with every request.
+	
+2003-11-01 13:10  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/config.rb (1.7):
+
+	- Documented format.
+	
+	- Added two new 'applications' keys: 'pattern' and 'pollInterval'.
+	
+	- Added 'maxObjSize' and 'expiration' keys to the templates.cacheConfig section.
+	
+2003-11-01 13:08  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/cache.rb (1.2, SNAPSHOT_20040119):
+
+	- Put size-checking back in, but uses an alternative method (#memsize) to
+	  determine object size, if available.
+	
+2003-11-01 13:05  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/broker.rb (1.3):
+
+	- Made the app file pattern a config item.
+	
+	- Reworked registry loading to do polling of app directories for
+	  new/modified/removed applications.
+	
+2003-11-01 13:03  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/application.rb (1.4):
+
+	- Corrected docs to reflect changes in signature structure.
+	
+	- Added benchmarking/run statistics
+	
+	- Fixed bug in validator construction.
+	
+2003-11-01 12:48  Michael Granger <ged@FaerieMUD.org>
+
+	* apps/status.rb (1.3):
+
+	- Added individual application introspection view.
+	
+2003-11-01 12:46  Michael Granger <ged@FaerieMUD.org>
+
+	* apps/error.rb (1.2, SNAPSHOT_20040119):
+
+	- Fixed class name.
+	
+2003-11-01 12:42  Michael Granger <ged@FaerieMUD.org>
+
+	* apps/TEMPLATE.rb.tpl (1.1, SNAPSHOT_20040119), apps/hello.rb
+	(1.1), lib/arrow/template/include.rb (1.1),
+	templates/app-status.tmpl (1.1), templates/navbar.incl (1.1),
+	tests/data/circular1.incl (1.1, SNAPSHOT_20040119),
+	tests/data/circular2.incl (1.1, SNAPSHOT_20040119),
+	tests/data/outerTest.incl (1.1, SNAPSHOT_20040119),
+	tests/data/subtemplate.incl (1.1, SNAPSHOT_20040119),
+	tests/data/test.incl (1.1, SNAPSHOT_20040119):
+
+	Initial checkin.
+	
+2003-10-25 06:20  Michael Granger <ged@FaerieMUD.org>
+
+	* tests/: 05_template.tests.rb (1.4), 20_session.tests.rb (1.2),
+	21_session_id.tests.rb (1.2), 23_session_store.tests.rb (1.2,
+	SNAPSHOT_20040119):
+
+	- Updated for changes, added new tests.
+	
+2003-10-25 06:19  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/status.tmpl (1.2):
+
+	- Changed table borders to semi-3d effect.
+	
+	- Fixed app URI.
+	
+	- Added server-info table.
+	
+2003-10-25 06:18  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/parser.rb (1.5):
+
+	- Added a few more Regexp constants to Parser::Patterns.
+	
+	- Added new method #scanForArgList.
+	
+2003-10-25 06:17  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/nodes.rb (1.4):
+
+	- Changed format-parsing code in AttributeDirective to look for a class
+	  attribute 'allowsFormat'.
+	
+	- Modified yield-callback strategy for BracketingDirective to be a bit more
+	  graceful.
+	
+	- Fixed bug in BracketingDirective#renderContents.
+	
+2003-10-25 06:09  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/if.rb (1.4):
+
+	- Fixed stupid bug that returned the selected nodes instead of rendering them.
+	
+2003-10-25 06:08  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/session/store.rb (1.2):
+
+	- Added factory-support methods.
+	
+	- Finished locking/delegation code.
+	
+2003-10-25 05:46  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/session/md5id.rb (1.2):
+
+	- Hoisted #to_s.
+	
+	- Added untainting to #validate.
+	
+2003-10-25 05:45  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/session/id.rb (1.2):
+
+	- Fixed ::create to take a previously-created id string.
+	
+	- Added #to_s and error-raising implementations of #generate and #validate.
+	
+2003-10-25 05:42  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/logger/fileoutputter.rb (1.2):
+
+	- Added defaults for initializer.
+	
+2003-10-25 05:42  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/config-loaders/yaml.rb (1.3, SNAPSHOT_20040119):
+
+	- Unindented.
+	
+2003-10-25 05:41  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/transaction.rb (1.2):
+
+	- Added #inspect and #appRoot methods.
+	
+	- Added session predicate method to test for already-loaded sessions.
+	
+2003-10-25 05:37  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template.rb (1.5):
+
+	- Fixed exception-handling bug (Exception vs. ::Exception).
+	
+2003-10-25 05:37  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/session.rb (1.2):
+
+	- First working commit.
+	
+2003-10-25 05:35  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/dispatcher.rb (1.2):
+
+	- Fixed multiple log outputter bug.
+	
+	- Fixed exception-handling bug (Exception vs. ::Exception).
+	
+	- Added session-saving to the handler.
+	
+2003-10-25 05:31  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/broker.rb (1.2):
+
+	- Modified to disallow calling _preunderbarred handlers from the URL. This
+	  allows an app to be purely internal without having to maintain separate lists
+	  of apps.
+	
+	- Pass the arglist around as an Array instead of a list.
+	
+	- Added error-handler code.
+	
+	- Fixed rescue bug (Exception vs ::Exception).
+	
+2003-10-25 05:25  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/application.rb (1.3):
+
+	- Changed argument-handling in #action to allow different argument sets than the
+	  broker provides by default.
+	
+2003-10-25 04:39  Michael Granger <ged@FaerieMUD.org>
+
+	* apps/status.rb (1.2):
+
+	- Brought arglist into line with application call signature.
+	
+	- Added some more items to the template.
+	
+2003-10-25 04:38  Michael Granger <ged@FaerieMUD.org>
+
+	* test.rb (1.8, SNAPSHOT_20040119):
+
+	- Fixed logging code to use new Factory-ified log outputters.
+	
+2003-10-25 04:37  Michael Granger <ged@FaerieMUD.org>
+
+	* docs/makesitedocs.rb (1.2):
+
+	- Factored out site-specific stuff into the CATALOG system.
+	
+2003-10-25 04:36  Michael Granger <ged@FaerieMUD.org>
+
+	* TODO (1.1), apps/counter.rb (1.1), apps/error.rb (1.1),
+	apps/errorHandler.rb (1.1), lib/arrow/session/filestore.rb (1.1,
+	SNAPSHOT_20040119), lib/arrow/template/escape.rb (1.1),
+	lib/arrow/template/yield.rb (1.1),
+	redist/formvalidator-0.1.3.tar.gz (1.1, SNAPSHOT_20040119),
+	templates/counter-deleted.tmpl (1.1), templates/counter.tmpl (1.1),
+	templates/error-display.tmpl (1.1):
+
+	Initial commit.
+	
+2003-10-25 04:34  Michael Granger <ged@FaerieMUD.org>
+
+	* README (1.2, SNAPSHOT_20040119):
+
+	- Moved to-do list to TODO file.
+	
+2003-10-25 04:32  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/config.rb (1.6):
+
+	- Added some new config items to the toplevel and :session config.
+	
+2003-10-13 09:25  Michael Granger <ged@FaerieMUD.org>
+
+	* templates/status.tmpl (1.1):
+
+	Initial checkin
+	
+2003-10-13 00:52  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/apprunner.rb (1.2):
+
+	Removed in favor of arrow/dispatcher
+	
+2003-10-12 22:42  Michael Granger <ged@FaerieMUD.org>
+
+	* tests/: 01_config.tests.rb (1.3), 05_template.tests.rb (1.3),
+	11_path.tests.rb (1.3, SNAPSHOT_20040119):
+
+	- Expanded and modified to match library changes.
+	
+2003-10-12 22:41  Michael Granger <ged@FaerieMUD.org>
+
+	* tests/.cvsignore (1.2, SNAPSHOT_20040119):
+
+	- Added temporary session-testing directory
+	
+2003-10-12 22:41  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/set.rb (1.3):
+
+	- Fixed naming to match name change in node classes.
+	
+2003-10-12 22:40  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/parser.rb (1.4):
+
+	- Moved parsing regexp patterns out into a module so they can be included and
+	  used in directives.
+	
+	- Added branch node introspection to Arrow::Parser::State
+	
+2003-10-12 22:38  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/nodes.rb (1.3):
+
+	- Changed container-based philosophy to an attribute-based one.
+	
+	- Added a ConditionalDirective mixin.
+	
+	- Added a 'type' attribute to Node.
+	
+	- Fixed tainting issues to run under $SAFE = 1
+	
+	- Split functionality more sensibly between rendering of contents and rendering
+	  of subnodes.
+	
+2003-10-12 22:35  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/if.rb (1.3):
+
+	- Fleshed out; first working version commit
+	
+2003-10-12 22:35  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/container.rb (1.2, SNAPSHOT_20040119):
+
+	- Hacked on for a bit, but decided to deprecate this class. Intend to remove
+	  this soonish.
+	
+2003-10-12 22:34  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/attr.rb (1.2, SNAPSHOT_20040119):
+
+	- Fixed docs.
+	
+	- Added requires for dependencies.
+	
+2003-10-12 22:33  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/logger/outputter.rb (1.2):
+
+	- Moved file-specific functionality into arrow/logger/fileoutputter
+	
+	- Made #write take an optional block that is yielded to for the actual writing
+	  functionality.
+	
+2003-10-12 22:31  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/config-loaders/yaml.rb (1.2):
+
+	- Changed serialized value to a simple hash.
+	
+	- Added new method #isNewer? to support template reloading.
+	
+2003-10-12 22:30  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/utils.rb (1.3):
+
+	- Added Arrow::Path handler for HashMergeFunction.
+	
+2003-10-12 22:29  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template.rb (1.4):
+
+	- Dropped 'container' idea in favor of simpler values with a more intelligent
+	  strategy for looping.
+	
+	- Moved file-reading to the ::load class method.
+	
+	- Renamed most builtin methods with an leading underscore to keep them from
+	  colliding with template attributes.
+	
+	- Added copy constructor
+	
+	- Added creation time ivar and accessor
+	
+2003-10-12 22:24  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/object.rb (1.4):
+
+	- Added inherited() hook to add the name of the loading sourcefile as an
+	  instance var and an accessor for it to inheriting classes for introspection.
+	
+2003-10-12 22:22  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/logger.rb (1.4):
+
+	- Several bugfixes
+	
+	- Modified default log levels to match Apache's
+	
+2003-10-12 22:21  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/exceptions.rb (1.7):
+
+	- Added Arrow::SessionError.
+	
+2003-10-12 22:13  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/: application.rb (1.2), config.rb (1.5):
+
+	- Fleshed out; first working version commit
+	
+2003-10-12 22:13  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow.rb (1.4):
+
+	- Added 'arrow/session' to the list of requirements.
+	
+2003-10-12 22:11  Michael Granger <ged@FaerieMUD.org>
+
+	* utils.rb (1.3):
+
+	- Modified try()'s message to be a bit more intelligent about creating a useful
+	  message.
+	
+2003-10-12 22:11  Michael Granger <ged@FaerieMUD.org>
+
+	* notes.txt (1.3, SNAPSHOT_20040119):
+
+	- Updated to match implementation.
+	
+2003-10-12 22:10  Michael Granger <ged@FaerieMUD.org>
+
+	* default.cfg (1.1), apps/status.rb (1.1),
+	experiments/fileOfClass.rb (1.1, SNAPSHOT_20040119),
+	experiments/ftok.rb (1.1, SNAPSHOT_20040119),
+	experiments/sysv_msgcreate.rb (1.1, SNAPSHOT_20040119),
+	experiments/sysv_msgrcv.rb (1.1, SNAPSHOT_20040119),
+	experiments/sysv_msgrmid.rb (1.1, SNAPSHOT_20040119),
+	experiments/sysv_msgsnd.rb (1.1, SNAPSHOT_20040119),
+	experiments/sysv_slot.rb (1.1, SNAPSHOT_20040119), lib/.cvsignore
+	(1.1, SNAPSHOT_20040119), lib/arrow/broker.rb (1.1),
+	lib/arrow/cache.rb (1.1), lib/arrow/dispatcher.rb (1.1),
+	lib/arrow/factories.rb (1.1), lib/arrow/response.rb (1.1,
+	SNAPSHOT_20040119), lib/arrow/session.rb (1.1),
+	lib/arrow/transaction.rb (1.1), lib/arrow/logger/apacheoutputter.rb
+	(1.1, SNAPSHOT_20040119), lib/arrow/logger/fileoutputter.rb (1.1),
+	lib/arrow/monitor/subjects.rb (1.1, SNAPSHOT_20040119),
+	lib/arrow/session/filelock.rb (1.1), lib/arrow/session/id.rb (1.1),
+	lib/arrow/session/lock.rb (1.1, SNAPSHOT_20040119),
+	lib/arrow/session/md5id.rb (1.1), lib/arrow/session/store.rb (1.1),
+	lib/arrow/session/usertrackid.rb (1.1), lib/arrow/template/call.rb
+	(1.1, SNAPSHOT_20040119), lib/arrow/template/else.rb (1.1,
+	SNAPSHOT_20040119), lib/arrow/template/elsif.rb (1.1),
+	lib/arrow/template/for.rb (1.1), lib/arrow/template/iterator.rb
+	(1.1), tests/06_template_iterator.tests.rb (1.1),
+	tests/15_factory.tests.rb (1.1, SNAPSHOT_20040119),
+	tests/20_session.tests.rb (1.1), tests/21_session_id.tests.rb
+	(1.1), tests/22_session_lock.tests.rb (1.1, SNAPSHOT_20040119),
+	tests/23_session_store.tests.rb (1.1):
+
+	Initial checkin.
+	
+2003-10-12 22:10  Michael Granger <ged@FaerieMUD.org>
+
+	* TEMPLATE.rb.tpl (1.5, SNAPSHOT_20040119):
+
+	- Unindented inner block to save horizontal space.
+	
+2003-10-04 21:31  Michael Granger <ged@FaerieMUD.org>
+
+	* tests/lib/arrowtestcase.rb (1.4):
+
+	- Added instance-level aliases for the class methods .addSetupBlock and
+	  .addTeardownBlock.
+	
+	- Added new assertions assert_hash_equal and assert_not_nil (to rectify the
+	  stupid deprecation of it in Test::Unit coming in Ruby >= 1.8.1).
+	
+	- Added more apache-disabled support code.
+	
+2003-10-01 15:37  Michael Granger <ged@FaerieMUD.org>
+
+	* test.rb (1.7):
+
+	- Added a --no-apache option
+	
+2003-09-22 21:07  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/mixins.rb (1.10):
+
+	- Moved requires back to the bottom to eliminate dependency loop; made a note at
+	  the top to prevent musical requires from happening again.
+	
+2003-09-22 20:50  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/mixins.rb (1.9):
+
+	- Fully-qualified FactoryError exceptions.
+	
+	- Moved requires to the top.
+	
+2003-09-22 20:46  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/mixins.rb (1.8):
+
+	- Added require of exceptions module.
+	
+2003-09-22 20:29  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/exceptions.rb (1.6):
+
+	- Added FactoryError class.
+	
+2003-09-20 16:57  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/mixins.rb (1.7):
+
+	- Removed beforeCreate and afterCreation from Factory::create.
+	
+2003-09-17 16:30  Michael Granger <ged@FaerieMUD.org>
+
+	* tests/TEMPLATE.rb.tpl (1.3, SNAPSHOT_20040119):
+
+	- Modified the require block to eliminate redundant requires and keep the
+	  $LOAD_PATH free of duplicates.
+	
+2003-09-08 14:01  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/exceptions.rb (1.5):
+
+	- New exception class: LockingError.
+	
+2003-09-08 14:01  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/config.rb (1.4):
+
+	- Updated session defaults to use URI-style config.
+	
+2003-09-08 13:57  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/mixins.rb (1.6):
+
+	- Cleaned up backtraces for errors that propagate through a Factory.
+	
+	- Modified Factory#requireDerivative to search for module files with the factory
+	  name appended (ie., a factory called Adapter trying to ::create a variant
+	  called 'Foo' will look for module files called 'Foo', 'foo', 'FooAdapter', and
+	  'fooadapter').
+	
+2003-09-03 18:27  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/mixins.rb (1.5):
+
+	- Fixed bug in getModuleName() spotted by dmccorkhill@RubyCrafters.com.
+	
+2003-08-28 08:07  Michael Granger <ged@FaerieMUD.org>
+
+	* tests/lib/filewhich.rb (1.2, SNAPSHOT_20040119):
+
+	- Corrected return value when no executable is found.
+	
+2003-08-24 16:12  Michael Granger <ged@FaerieMUD.org>
+
+	* experiments/: TEMPLATE.rb.tpl (1.2), delimscanrcreate.rb (1.3),
+	hashMultimerge.rb (1.2), loader.rb (1.2), namespaceDup.rb (1.2),
+	substruct.rb (1.2) (utags: SNAPSHOT_20040119):
+
+	- Modified START block to fully-qualify LOAD_PATH entries to allow experiments
+	  to be run from anywhere.
+	
+2003-08-19 12:54  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/: if.rb (1.2), nodes.rb (1.2), parser.rb
+	(1.3), set.rb (1.2):
+
+	- Updated to match changes in template parsing/rendering process.
+	
+2003-08-19 12:53  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template.rb (1.3):
+
+	- Hide attribute methods to prevent collisions with template container
+	  directives.
+	
+	- Changed content-handling to use a dedicated Container class instead of trying
+	  to use directives so that multiple instances of an identifier can appear in a
+	  single template.
+	
+	- Added :strictContainers config item.
+	
+2003-08-19 12:47  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/mixins.rb (1.4):
+
+	- Added error-niceifying to Factory::create.
+	
+	- Elaborated error message.
+	
+2003-08-19 12:44  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/container.rb (1.1),
+	experiments/namespaceDup.rb (1.1):
+
+	Initial checkin.
+	
+2003-08-19 12:43  Michael Granger <ged@FaerieMUD.org>
+
+	* tests/05_template.tests.rb (1.2):
+
+	- Cleaned up test data parsing.
+	
+	- Added pattern-generation function for matching template render output.
+	
+	- Changes to reflect the change from Directive to Container.
+	
+	- Added matching conditionals.
+	
+2003-08-15 07:30  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/parser.rb (1.2):
+
+	- Bugfix for missing scanner variable in refactored directive parsing code.
+	
+2003-08-13 06:49  Michael Granger <ged@FaerieMUD.org>
+
+	* tests/lib/arrowtestcase.rb (1.3):
+
+	- Added hruleSection() function
+	
+	- Changed writeLine() to hrule() and modified it to return the line as a String
+	  instead of outputting.
+	
+2003-08-13 06:47  Michael Granger <ged@FaerieMUD.org>
+
+	* tests/TEMPLATE.rb.tpl (1.2):
+
+	- Modified scope of TestCase to reflect changes in arrowtestcase.
+	
+2003-08-13 06:46  Michael Granger <ged@FaerieMUD.org>
+
+	* tests/01_config.tests.rb (1.2):
+
+	- Removed AbstractClass test.
+	
+2003-08-13 06:44  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/config.rb (1.3):
+
+	- Moved hash merge function out into utils.rb to make reuse from other places
+	  easier.
+	
+	- Removed AbstractClass mixin.
+	
+2003-08-13 06:42  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template/TEMPLATE.rb.tpl (1.1, SNAPSHOT_20040119),
+	lib/arrow/template/attr.rb (1.1), lib/arrow/template/if.rb (1.1),
+	lib/arrow/template/nodes.rb (1.1), lib/arrow/template/parser.rb
+	(1.1), lib/arrow/template/set.rb (1.1), redist/crosscase.rb (1.1,
+	SNAPSHOT_20040119), lib/arrow/logger/TEMPLATE.tb.tpl (1.1,
+	SNAPSHOT_20040119), lib/arrow/logger/outputter.rb (1.1),
+	tests/05_template.tests.rb (1.1):
+
+	Initial checkin.
+	
+2003-08-13 06:42  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/template.rb (1.2):
+
+	- Moved parser into separate file.
+	
+	- Added configuration items.
+	
+	- Fixed split load/new.
+	
+	- Added object-rendering system.
+	
+	- Added configurable comment-renderer.
+	
+2003-08-13 06:39  Michael Granger <ged@FaerieMUD.org>
+
+	* docs/makedocs.rb (1.2, SNAPSHOT_20040119):
+
+	- Made more generic, integrated changes to CATALOG-reading functions.
+	
+	- Fixed bug in invocation of makeDocs().
+	
+2003-08-13 06:38  Michael Granger <ged@FaerieMUD.org>
+
+	* docs/CATALOG (1.2):
+
+	- Aesthetic changes.
+	
+2003-08-13 06:37  Michael Granger <ged@FaerieMUD.org>
+
+	* test.rb (1.6):
+
+	- Further changes for new logging classes.
+	
+2003-08-09 19:40  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/exceptions.rb (1.4):
+
+	- Added VirtualMethodError and InstantiationError exception classes.
+	
+2003-08-09 19:39  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/object.rb (1.3):
+
+	- Removed AbstractClass include.
+	
+	- Documented constants.
+	
+2003-08-09 19:35  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/mixins.rb (1.3):
+
+	- Removed AbstractClass (for now), as there were very wierd errors happening:
+	  apparently AbstractClass was being applied to classes exponentially with each
+	  successive derivative, which caused it to show up in stacktraces sometimes 15
+	  times. It's mostly just a politeness thing, anyway.
+	
+	- Changed name of FactoryMethods to just Factory, as the Methods part was
+	  somewhat confusing.
+	
+	- Moved requires to the tail of the file to solve circular dependency issues.
+	
+2003-08-09 19:29  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/logger.rb (1.3):
+
+	- Massive internals change, though the API is mostly compatible. No longer
+	  depends on Log4r, which didn't work under 1.8, and hasn't been updated in a
+	  year.
+	
+2003-08-09 19:19  Michael Granger <ged@FaerieMUD.org>
+
+	* test.rb (1.5):
+
+	- Made changeover to use Arrow::Logger instead of Log4r.
+	
+2003-08-09 19:16  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/utils.rb (1.2):
+
+	- Added some backtrace-rewriting to String#interpolate to make errors more
+	  straightforward.
+	
+	- Moved requires to the bottom of the file to solve circular dependency issues.
+	
+2003-08-06 17:08  Michael Granger <ged@FaerieMUD.org>
+
+	* TEMPLATE.rb.tpl (1.4):
+
+	- Added constant docs because RDoc groks them now.
+	
+	- Indentation fix.
+	
+	- Clarified class prompt a bit.
+	
+2003-08-05 15:23  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/utils.rb (1.1):
+
+	Initial checkin.
+	
+2003-08-05 13:45  Michael Granger <ged@FaerieMUD.org>
+
+	* redist/delimscanner.rb (1.1, SNAPSHOT_20040119):
+
+	Initial checkin.
+	
+2003-08-02 19:11  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow.rb (1.3):
+
+	- Updated documentation for constants, as RDoc groks them now.
+	
+2003-08-02 19:10  Michael Granger <ged@FaerieMUD.org>
+
+	* utils.rb (1.2):
+
+	- Added new functions for parsing CATALOGs: findRdocTitle(), findRDocMain(),
+	  findRDocUpload(), findRdocCvsURL(), and findCatalogKeyword().
+	
+2003-08-02 19:08  Michael Granger <ged@FaerieMUD.org>
+
+	* test.rb (1.4):
+
+	- Added redist/ to $LOAD_PATH.
+	
+2003-08-02 19:07  Michael Granger <ged@FaerieMUD.org>
+
+	* README (1.1), docs/CATALOG (1.1), docs/TemplatingSystemDesign.txt
+	(1.1, SNAPSHOT_20040119), docs/makedocs.rb (1.1),
+	docs/makesitedocs.rb (1.1), docs/.cvsignore (1.1,
+	SNAPSHOT_20040119):
+
+	Initial checkin.
+	
+2003-07-31 18:55  Michael Granger <ged@FaerieMUD.org>
+
+	* experiments/delimscanrcreate.rb (1.2):
+
+	- Stupid spelling error in the comment.
+	
+2003-07-31 18:54  Michael Granger <ged@FaerieMUD.org>
+
+	* experiments/delimscanrcreate.rb (1.1):
+
+	Initial checkin.
+	
+2003-07-27 14:07  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/exceptions.rb (1.3):
+
+	- Aesthetic changes.
+	
+	- Added AppError exception class.
+	
+2003-07-27 14:06  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow.rb (1.2):
+
+	- Added some new requires.
+	
+	- Fixed authors list.
+	
+2003-07-27 14:05  Michael Granger <ged@FaerieMUD.org>
+
+	* tests/.cvsignore (1.1):
+
+	Initial checkin.
+	
+2003-07-27 14:04  Michael Granger <ged@FaerieMUD.org>
+
+	* redist/ruby-cache-0.3.tar.gz (1.1, SNAPSHOT_20040119):
+
+	Imported version 0.3 from http://www.nongnu.org/pupa/ruby-cache.html
+	
+2003-07-27 14:01  Michael Granger <ged@FaerieMUD.org>
+
+	* test.rb (1.3):
+
+	- Propagated fixes/improvements from Lingustics test script.
+	
+2003-07-27 13:59  Michael Granger <ged@FaerieMUD.org>
+
+	* notes.txt (1.2):
+
+	- Added theoretical example application code.
+	
+2003-07-27 13:57  Michael Granger <ged@FaerieMUD.org>
+
+	* tests/lib/arrowtestcase.rb (1.2):
+
+	- Propagated fixes from the mod_ruby test case class.
+	
+2003-07-27 13:56  Michael Granger <ged@FaerieMUD.org>
+
+	* tests/11_path.tests.rb (1.2):
+
+	- Modified to reflect changes in the scoping of the base test case class.
+	
+2003-07-27 13:55  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/config-loaders/yaml.rb (1.1), tests/01_config.tests.rb
+	(1.1), tests/lib/apacheconfig.rb (1.1, SNAPSHOT_20040119),
+	tests/lib/apacheserver.rb (1.1, SNAPSHOT_20040119),
+	tests/lib/filewhich.rb (1.1), docs/CoreServer.xmi (1.1,
+	SNAPSHOT_20040119):
+
+	Initial checkin.
+	
+2003-07-27 13:54  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/object.rb (1.2):
+
+	- Removed StrongTyping dependency in favor of TypeCheckFunctions mixin.
+	
+2003-07-27 13:53  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/mixins.rb (1.2):
+
+	- Added TypeCheckFunctions mixin.
+	
+	- Fixed FactoryMethods to use standard ruby module naming conventions.
+	
+	- Propagated fixes from MUES's FactoryMethods. Further evidence FactoryMethods
+	  should be a separate module.
+	
+2003-07-27 13:51  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/logger.rb (1.2):
+
+	- Removed StrongTyping dependency in favor of TypeCheckingFunctions.
+	
+2003-07-27 13:50  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/config.rb (1.2):
+
+	- Refactored load/save into the Arrow::Config::Loader class; removed dependency
+	  on YAML.
+	
+	- Added configuration-dumping direct invocation block.
+	
+2003-07-27 01:59  Michael Granger <ged@FaerieMUD.org>
+
+	* test.rb (1.2):
+
+	- Fixed misnamed base test class.
+	
+2003-07-27 01:57  Michael Granger <ged@FaerieMUD.org>
+
+	* docs/COPYRIGHT (1.2, SNAPSHOT_20040119):
+
+	- Changed to the Attribution-ShareAlike license.
+	
+2003-07-27 01:56  Michael Granger <ged@FaerieMUD.org>
+
+	* experiments/TEMPLATE.rb.tpl (1.1),
+	experiments/example-template.tmpl (1.1, SNAPSHOT_20040119),
+	experiments/hashMultimerge.rb (1.1), experiments/loader.rb (1.1),
+	experiments/loadme.rb (1.1, SNAPSHOT_20040119),
+	experiments/modivar.rb (1.1, SNAPSHOT_20040119),
+	experiments/substruct.rb (1.1), tests/11_path.tests.rb (1.1),
+	utils.rb (1.1):
+
+	Initial checkin.
+	
+2003-07-27 01:56  Michael Granger <ged@FaerieMUD.org>
+
+	* TEMPLATE.rb.tpl (1.3):
+
+	- Fixed formatting, added superclass stuff.
+	
+2003-07-27 01:35  Michael Granger <ged@FaerieMUD.org>
+
+	* tests/arrowtestcase.rb (1.2):
+
+	- Moved into tests/lib.
+	
+2003-07-27 01:25  Michael Granger <ged@FaerieMUD.org>
+
+	* tests/TEMPLATE.rb.tpl (1.1):
+
+	Initial checkin.
+	
+2003-02-19 16:35  Martin Chase <stillflame@FaerieMUD.org>
+
+	* lib/arrow/datasource.rb (1.2, SNAPSHOT_20040119):
+
+	cleaned up some edges
+	
+2003-02-18 22:31  Michael Granger <ged@FaerieMUD.org>
+
+	* test.rb (1.1):
+
+	Initial commit.
+	
+2003-02-18 22:30  Michael Granger <ged@FaerieMUD.org>
+
+	* docs/COPYRIGHT (1.1), lib/arrow.rb (1.1),
+	lib/arrow/application.rb (1.1), lib/arrow/apprunner.rb (1.1),
+	lib/arrow/config.rb (1.1), lib/arrow/logger.rb (1.1),
+	lib/arrow/mixins.rb (1.1), lib/arrow/monitor.rb (1.1,
+	SNAPSHOT_20040119), lib/arrow/object.rb (1.1),
+	lib/arrow/template.rb (1.1), tests/arrowtestcase.rb (1.1),
+	tests/lib/arrowtestcase.rb (1.1):
+
+	Initial (skeletal) commit.
+	
+2003-02-18 22:29  Martin Chase <stillflame@FaerieMUD.org>
+
+	* lib/arrow/exceptions.rb (1.2):
+
+	corrected default superclass
+	
+2003-02-18 22:27  Michael Granger <ged@FaerieMUD.org>
+
+	* TEMPLATE.rb.tpl (1.2):
+
+	- Fixed typo.
+	
+2003-02-18 21:43  Martin Chase <stillflame@FaerieMUD.org>
+
+	* lib/arrow/datasource.rb (1.1):
+
+	initial import
+	
+2003-02-18 21:42  Michael Granger <ged@FaerieMUD.org>
+
+	* lib/arrow/exceptions.rb (1.1):
+
+	Initial commit.
+	
+2003-02-18 20:33  Michael Granger <ged@FaerieMUD.org>
+
+	* TEMPLATE.rb.tpl (1.1):
+
+	Initial commit
+	
+2003-02-18 20:15  Michael Granger <ged@FaerieMUD.org>
+
+	* notes.txt (1.1), rBuild.rb (1.1):
+
+	Initial revision
+	
+2003-02-18 20:15  Michael Granger <ged@FaerieMUD.org>
+
+	* notes.txt (1.1.1.1), rBuild.rb (1.1.1.1) (utags: ALPHA):
+
+	Initial import of directory structure
+	

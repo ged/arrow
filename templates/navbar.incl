@@ -1,0 +1,23 @@
+	<div id="navbar" class="dashbox">
+	  &lt;
+<?if txn?>
+	  <a href="[?call txn.appRoot ?]">Top</a> |
+	  <a href="[?call txn.appRoot ?]/status/app/[?call txn.appPath?]">App Status</a> |
+<?else?>
+	  <!-- Cannot build top links without a transaction object called 'txn'. -->
+<?end if?>
+	  <a href="http://validator.w3.org/check/referer">Validate</a>
+	  &gt;
+	</div>
+
+	<div id="copyright">
+	  <p>Copyright &copy; 2003, 2004, <a
+		  href="http://www.rubycrafters.com/">RubyCrafters, LLC</a>. Most rights
+		reserved.</p>
+
+	  <p>This work is licensed under the Creative Commons Attribution-ShareAlike
+		License. To view a copy of this license, visit <a
+		href="http://creativecommons.org/licenses/by-sa/1.0/">http://creativecommons.org/licenses/by-sa/1.0/</a>
+		or send a letter to Creative Commons, 559 Nathan Abbott Way, Stanford,
+		California 94305, USA.</p>
+	</div>

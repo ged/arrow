@@ -1,0 +1,305 @@
+/* 
+ *	Arrow Manual Stylesheet
+ *	$Id: manual.css,v 1.9 2004/02/14 23:14:23 deveiant Exp $
+ *	Time-stamp: <14-Feb-2004 15:12:33 ged>
+ */
+
+body {
+    margin: 3em;
+    background: #efefef;
+    color: #333;
+    font: 12px "Lucida Grande", Skia, Tahoma, sans-serif;
+}
+
+h1,h2,h3,h4,h5,h6 {
+    text-align: left;
+    color: #663333;
+    background: transparent;
+    font-family:  "Lucida Grande", Tahoma, sans-serif;
+}
+
+h1 { font: bold 170%; text-shadow: #666 2px 2px 2px; }
+h2 { font: bold 150%; text-shadow: #666 1px 1px 2px; }
+h3 { font: bold 125%; text-shadow: #666 1px 1px 2px; }
+h4 { font: bold 110%; }
+h5 { font: bold small-caps; }
+h6 { font-weight: bold; font-style: italic; }
+
+p,td,th {
+	font-family:	"Lucida Grande", Verdana, sans-serif;
+	font-weight:	normal;
+	font-style:		normal;
+	color:			#333;
+}
+
+a {
+	background:		#FFE;
+	color:			#933;
+	text-decoration: none;
+}
+
+a:hover {
+	border-bottom: 1px dotted #900;
+}
+a[id] { background: inherit; color: inherit; text-decoration: inherit; }
+
+table {
+    background: #fefefe;
+    color: black;
+    border-left: 1px solid #333;
+    border-top: 1px solid #333;
+    border-right: 2px solid black;
+    border-bottom: 2px solid black;
+}
+
+th {
+    background: white;
+    color: black;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: bottom;
+}
+
+th.row-title {
+    background: white;
+    color: black;
+    font-weight: bold;
+    text-align: right;
+    vertical-align: top;
+}
+
+td { padding: 1px 3px; }
+
+pre {
+    margin: 5px;
+    background: #ccc;
+    color: black;
+    border: 1px dotted black;
+    padding: 10px;
+    overflow: auto;
+}
+
+ul > li,
+ol > li {
+    margin-bottom: 5px;
+}
+
+fieldset { border: 0; padding: 0; margin: 5px 0; }
+
+button {
+    background: #fe9;
+    color: #900;
+    border: 1px solid black;
+    display: inline;
+}
+
+kbd {
+    font-family: "Andale Mono", "Monotype.com", "Vera Sans Mono", fixed;
+    font-weight: bold;
+    color: #900;
+    background: inherit;
+}
+
+/* IDed entities */
+
+#content {
+    margin: 0.2em 0.3em 1em;
+    padding: 3px 15px 25px;
+    border: 1px dotted #999;
+    background: white;
+    color: inherit;
+}
+
+#badges { text-align: center; }
+
+#version { font-size: 10px; margin-top: 3em; margin-bottom: 0; }
+
+#footer { font-size: 10px; margin: 3em; }
+
+#copyright {
+	font-size: 80%;
+	text-align: right;
+}
+
+#navbar {
+	text-align: center;
+}
+
+#linkbox {
+    margin: 4px auto;
+    padding: 2px 4px;
+    border-top: 1px solid #633;
+    border-bottom: 1px solid #633;
+    background: #eed;
+}
+
+#linkbox-head {
+    font-weight: bold;
+    font-size: 105%;
+}
+
+#linkbox-body { list-style-type: none; }
+#linkbox-body ul { display: inline; }
+#linkbox-body li { display: inline; }
+
+/* Style classes */
+
+div.section {
+    margin-bottom: 2em;
+}
+
+ol.toc {}
+ol.toc > li {
+    font-size: 120%;
+    line-height: 125%;
+    letter-spacing: 0.1em;
+    margin-bottom: 1em;
+    font-weight: bold;
+}
+ol.toc > li > ol {
+    font-size: 80%;
+    letter-spacing: normal;
+    line-height: 100%;
+    font-weight: normal;
+}
+
+
+.whiteblock {
+    margin: 2em;
+    border: 1px solid #ddd;
+    background: #fefefe;
+    padding: 2em;
+}
+
+.dashbox {
+    margin: 10px 0;
+    border-top: 1px dotted #666;
+    border-left: 1px dotted #666;
+    border-right: 1px dotted black;
+    border-bottom: 1px dotted black;
+    padding: 1px 5px;
+}
+
+tr.odd-row { background: #bbb; color: inherit; }
+tr.even-row { background: #ddd; color: black; }
+
+table.kvlist {
+    margin: 5px;
+    background: #ccc;
+    border: 1px dotted black;
+    color: black;
+    caption-side: bottom;
+}
+
+table.kvlist th { text-align: right; vertical-align: top; }
+table.kvlist td { text-align: left; }
+
+table.clear {
+    border: 0;
+    background: inherit;
+}
+
+.no-display { display: none; }
+.reddish { color: #900; background: inherit; }
+ul.flattened li { display: inline; }
+
+dl.linelist { }
+dl.linelist > dt {
+    color: #633;
+    background: transparent;
+    font: bold 110% fixed;
+    border-bottom: 1px dotted #633;
+}
+dl.linelist > dd {
+    margin: 0 15px 7px 20px;
+}
+
+
+
+/* Template node-display classes */
+.node-tree {
+    border: 1px dotted #333;
+    margin: 2px;
+    padding: 4px;
+    background: #999;
+}
+
+.node-subtree {
+    border: 1px dotted #666;
+    padding: 4px 8px;
+    margin: 1px 4px;
+    background: #CCC;
+}
+
+.node-subtree-head {
+    color: #333;
+}
+
+.node {
+    border: 1px solid black;
+    margin-bottom: 4px;
+}
+
+.node-head {
+    border-bottom: 1px solid black;
+    font-weight: bold;
+    font-variant: small-caps;
+    padding: 2px;
+    color: black;
+    background: #f3f3f3;
+}
+
+.node-body {
+    background: #e3e3e3;
+    padding: 2px 4px 4px 4px;
+}
+
+.node-subtemplate {
+    background: #999;
+    border: 1px dotted #333;
+    margin: 2px;
+    padding: 4px;
+}
+
+.text-node-body {
+    background: #CCC;
+    font-family: "Andale Mono", "ProFont", "Monotype.com", fixed;
+}
+.call-directive-node-body,
+.attr-directive-node-body { background: #CDC; }
+.escape-directive-node-body { background: #DCC; }
+.yield-directive-node-body { background: #DDC; }
+.if-directive-node-body,
+.else-directive-node-body,
+.elsif-directive-node-body { background: #BCD; }
+
+
+/* Template syntax-highlighted html classes */
+.highlighted-source {
+    border: 1px dotted #333;
+    margin: 2px;
+    padding: 10px;
+    background: #ccc;
+}
+
+.token {
+    font-family: "Vera Sans Mono", "Andale Mono", fixed;
+    color: #333;
+}
+
+.text-token { color: #666; }
+.comment-token { color: #666; background: #cdc; }
+.doc-type-token { color: #226; background: #ccd; }
+
+.tag-token { color: #242; background: #b9b9b9; }
+.tag-token-name { color: #272; }
+.tag-token-attr-name { color: #262; }
+.tag-token-attr-value { color: #333; }
+
+.processing-instruction-token,
+.tag-attr-directive {
+    color: #933;
+    background: #dcc;
+    font-weight: bold;
+}
+

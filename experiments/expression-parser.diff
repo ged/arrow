@@ -1,0 +1,254 @@
+Index: template.rb
+===================================================================
+RCS file: /www/rubycrafters.com/cvs/Arrow/lib/arrow/template.rb,v
+retrieving revision 1.12
+diff -u -3 -p -u -r1.12 template.rb
+--- template.rb	22 Dec 2003 23:33:32 -0000	1.12
++++ template.rb	10 Jan 2004 16:57:05 -0000
+@@ -321,7 +321,7 @@ module Arrow
+ 		### nodes into the template's syntaxTree.
+ 		def parse( source )
+ 			parserClass = @config[:parserClass]
+-			@syntaxTree = parserClass::new( self, @config ).parse( source )
++			@syntaxTree = parserClass::new( self, @config ).parse( source, self )
+ 
+ 			#self.log.debug( "Parse complete: syntax tree is: #{@syntaxTree.inspect}" )
+ 
+Index: template/parser.rb
+===================================================================
+RCS file: /www/rubycrafters.com/cvs/Arrow/lib/arrow/template/parser.rb,v
+retrieving revision 1.10
+diff -u -3 -p -u -r1.10 parser.rb
+--- template/parser.rb	30 Dec 2003 17:54:48 -0000	1.10
++++ template/parser.rb	10 Jan 2004 16:57:05 -0000
+@@ -28,6 +28,7 @@ require 'arrow/mixins'
+ require 'arrow/exceptions'
+ require 'arrow/template'
+ require 'arrow/utils'
++require 'arrow/rubytokenreactor'
+ 
+ module Arrow
+ class Template
+@@ -126,8 +127,9 @@ class Template
+ 			### Create and return a new parse state for the specified
+ 			### +text+. The +initialData+ is used to propagate directive
+ 			### bookkeeping state through recursive parses.
+-			def initialize( text, initialData={} )
++			def initialize( text, template, initialData={} )
+ 				@scanner = StringScanner::new( text )
++				@template = template
+ 				@tagMiddle = nil
+ 				@tagClose = nil
+ 				@currentBranch = []
+@@ -144,8 +146,8 @@ class Template
+ 			# Delegate the index operators to the @data hash
+ 			def_delegators :@data, :[], :[]=
+ 
+-			# The name of the file which the parser is reading for this parse.
+-			attr_reader :file
++			# The template that corresponds to the parse state
++			attr_reader :template
+ 
+ 			# The StringScanner object which is scanning the text being parsed.
+ 			attr_reader :scanner
+@@ -169,8 +171,8 @@ class Template
+ 			# the parse of a directive.
+ 			attr_accessor :tagClose
+ 
+-			# A miscellaneous data hash to allow directives to keep state for a
+-			# parse.
++			# A miscellaneous data hash to allow directives to keep their own
++			# state for a parse.
+ 			attr_reader :data
+ 
+ 
+@@ -244,9 +246,8 @@ class Template
+ 		###	I N S T A N C E   M E T H O D S
+ 		#############################################################
+ 
+-		### Create a new parser for the given +template+ using the specified
+-		### +config+. The +config+ can contain one or more of the following
+-		### keys:
++		### Create a new parser using the specified +config+. The +config+ can
++		### contain one or more of the following keys:
+ 		###
+ 		### [<b>:strictEndTags</b>]
+ 		###   Raise an error if the optional name associated with an <?end?> tag
+@@ -256,8 +257,7 @@ class Template
+ 		###   template that don't parse will be kept as-is in the output. If
+ 		###   this is +false+, unrecognized PIs will raise an error at parse
+ 		###   time. Defaults to +true+.
+-		def initialize( template, config={} )
+-			@template = template
++		def initialize( config={} )
+ 			@config = Defaults.merge( config, &Arrow::HashMergeFunction )
+ 		end
+ 
+@@ -265,7 +265,6 @@ class Template
+ 		### Initialize a duplicate of the +original+ parser.
+ 		def initialize_copy( original )
+ 			super
+-			@template = original.template.dup
+ 			@config = original.config.dup
+ 		end
+ 
+@@ -274,20 +273,16 @@ class Template
+ 		public
+ 		######
+ 
+-		# The template object which is the parser's current owner.
+-		attr_reader :template
+-
+ 		# The configuration object which contains the parser's config.
+ 		attr_reader :config
+ 
+ 
+ 		### Parse and return a template syntax tree from the given +string+.
+-		def parse( string, initialData={} )
+-			checkType( string, String )
++		def parse( string, template, initialData={} )
+ 
+ 			# Create a new parse state and build the parse tree with it.
+ 			begin
+-				state = State::new( string, initialData )
++				state = State::new( string, template, initialData )
+ 				syntaxTree = self.scanForNodes( state )
+ 			
+ 			rescue TemplateError => err
+@@ -443,6 +438,48 @@ class Template
+ 		end
+ 
+ 
++		### Scan for a complete Ruby expression, returning the code followed by
++		### any variable references contained therein.
++		def scanForExpression( state )
++			code = self.scanForDirectiveBody( state ) or return nil
++			
++			self.log.debug "Parsing expression %p with RubyTokenReactor" % code
++			vars = []
++
++			tr = Arrow::RubyTokenReactor::new( code )
++			tr.onEvents( :var_ref ) {|r, ev, sym|
++				vars << sym
++			}
++			tr.onEvents( :parse_error ) {|r, ev|
++				emsg = "Error while parsing Ruby expression: %s[%s]" % [
++					code[0 ... r.column],
++					code[r.column .. -1],
++				]
++				self.log.error emsg
++				raise ParseError, emsg
++			}
++			tr.parse
++
++			return code, *(vars.uniq)
++		end
++
++
++		### Given the specified +state+ (an Arrow::Template::Parser::State
++		### object), scan for and return the text from the parser's current
++		### position to the end of the current directive. If the parser is not
++		### currently inside a directive, this will return everything up to the
++		### end of the next directive in the template source. Returns
++		### <code>nil</code> if no directive end can be found.
++		def scanForDirectiveBody( state )
++			ending = state.tagClose
++			pat = Regexp::new( "(?=" + ending + ")" )
++			rval = self.scan( pat ) or return nil
++
++			self.log.debug "Found directive body %p" % rval
++			return rval
++		end
++
++
+ 		### Given the specified +state+ (an Arrow::Template::Parser::State
+ 		### object), scan for and return a quoted string, including the
+ 		### quotes. If +skipWhitespace+ is +true+, any leading whitespace
+Index: template/nodes.rb
+===================================================================
+RCS file: /www/rubycrafters.com/cvs/Arrow/lib/arrow/template/nodes.rb,v
+retrieving revision 1.11
+diff -u -3 -p -u -r1.11 nodes.rb
+--- template/nodes.rb	22 Dec 2003 23:36:36 -0000	1.11
++++ template/nodes.rb	10 Jan 2004 16:57:05 -0000
+@@ -427,9 +427,8 @@ class Template
+ 		### Initialize a new AttributeDirective with the given tag +name+,
+ 		### template +parser+, and parser +state+.
+ 		def initialize( type, parser, state ) # :notnew:
+-			@name = nil
+-			@format = nil
+-			@methodchain = nil
++			@expression = nil
++			@vars = []
+ 			super
+ 		end
+ 
+@@ -438,16 +437,11 @@ class Template
+ 		public
+ 		######
+ 
+-		# The source code for the methodchain that will be used to render the
+-		# attribute.
+-		attr_accessor :methodchain
+-
+-		# The format string that was specified with the directive, if any
+-		attr_accessor :format
+-
+-		# The name of the directive, which is used to associate it with a
+-		# attribute in the template the node belongs to.
+-		attr_reader :name
++		# The Ruby expression that makes up the body of the directive.
++		attr_accessor :expression
++
++		# The indentifiers of any variable references in the expression
++		attr_accessor :vars
+ 
+ 
+ 		### Returns +true+ for nodes which generate output themselves (as
+@@ -483,14 +477,7 @@ class Template
+ 		### Return an HTML fragment that can be used to represent the node
+ 		### symbolically in a web-based introspection interface.
+ 		def to_html
+-			html = ''
+-			if @format
+-				html << %q{"%s" %% } % self.escapeHTML( @format )
+-			end
+-			html << %q{<strong>#%s</strong>} % @name
+-			if @methodchain
+-				html << self.escapeHTML( @methodchain )
+-			end
++			html = self.escapeHTML( @expression )
+ 
+ 			if block_given?
+ 				html << " " << yield
+@@ -525,14 +512,8 @@ class Template
+ 				end
+ 			end
+ 
+-			# Look for the identifier
+-			@name = parser.scanForIdentifier( state ) or
+-				raise ParseError, "missing or malformed indentifier"
+-			#self.log.debug "Set name of %s to %p" %
+-			#	[ self.class.name, @name ]
+-
+-			# Now pick up the methodchain if there is one
+-			@methodchain = parser.scanForMethodChain( state )
++			@expression, *@vars = parser.scanForExpression( state ) or
++				raise ParseError, "missing or malformed expression"
+ 
+ 			return true
+ 		end
+@@ -549,12 +530,7 @@ class Template
+ 		def buildRenderingProc( template, scope )
+ 			return nil if self.format.nil? && self.methodchain.nil?
+ 
+-			if self.format
+-				code = %(Proc::new {|__item| "%s" %% __item%s}) % 
+-					[ self.format, self.methodchain ]
+-			else
+-				code = "Proc::new {|__item| __item%s}" % self.methodchain
+-			end
++			code = %(Proc::new { %s }) % self.expression
+ 			code.untaint
+ 
+ 			#self.log.debug "Rendering proc code is: %p" % code

@@ -1,0 +1,97 @@
+
+
+Data Abstraction Layer
+----------------------
+
+URL specifiers:
+
+   dbi://mysql@localhost/username:password/db/table
+   soap://api.google.com/search
+   test://soap%3A%2F%2Fapi.google.com%2Fsearch%3Fq%3Dfoo%3Blang%3Den/20030227.001
+
+Example code:
+
+   data = DataSource::new( url )
+   template.meows = data.size
+     - or -
+   template.meows = data["size"]
+
+
+
+Application Example/Prototype
+-----------------------------
+
+    require 'arrow/monitor'
+    require 'arrow/monitor/subjects'
+    require 'arrow/application'
+
+    class MyApp < Arrow::Application
+
+        Signature = {
+            :name               => 'My App',
+            :description        => 'Displays a block of whatever character is passed as argument',
+            :maintainer         => 'Michael Granger <mgranger@rubycrafters.com>',
+            :version            => '1.01',
+            :uri                => 'myapp',
+            :config             => {
+                :page_width     => {
+                    :default    => 80,
+                    :type       => [Integer],
+                    :constraint => 0..200,
+                },
+                :page_height    => {
+                    :default    => 120,
+                    :type       => [Integer],
+                    :constraint => 0..340,
+                },
+            },
+			:defaultAction		=> 'display',
+            :templates          => {
+                :main => 'main.templ',
+            },
+            :vargs				=> {
+                :__default__      => {
+					:optional		=> [:char],
+					:constraints	=> {
+						:char => {
+							:name		=> "single non-whitespace character",
+							:constraint	=> /^\S$/,
+						},
+					},
+                },
+
+				:                
+            },
+            :monitors           => {
+                :averageExecutionTimer => {
+                    :description =>
+                        "Average execution time of each application method.",
+                    :type => AverageTimerTable,
+                },
+                :cumulativeRuntime => {
+                    :description =>
+                        "Total time used by this application.",
+                    :type => TotalTimer,
+                }
+            }
+        }
+
+
+        action( 'display' ) {|tr|
+            Monitor[self].cumulativeRuntime.time do
+                char = tr.vargs[:char] || 'x'
+                char_page = self.make_character_page( char )
+                tr.templates[:main].char_page = char_page
+
+                tr.request << tr.templates[:main]
+            end
+        }
+
+
+        def make_character_page( char )
+            Monitor[self].averageExecutionTimer.time( :make_character_page ) do
+                page = (char * 80)
+            end
+        end
+
+    end

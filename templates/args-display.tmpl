@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<!--
+
+  Argument Validation/Untainting/Testing app
+
+  -->
+
+  <head>
+	<title>Argument Validation/Untainting/Testing app</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+	<link rel="stylesheet" type="text/css" href="/stylesheets/arrow.css" />
+  </head>
+  <body>
+
+	<h1>Argument Validation/Untainting/Testing app</h1>
+
+	<p>This is an app to test argument validation.</p>
+
+	<form action="[?call txn.action?]" method="get">
+
+	  <fieldset>
+		<table>
+		  <tbody>
+			<tr class="odd-row">
+			  <th><label for="name-field">Name</label></th>
+			  <td>
+				<input id="name-field" type="text" name="name" 
+				  value="[?call txn.request.param('name') ?]" size="20"/><br/>
+				<small>Required field</small>
+			  </td>
+			</tr>
+
+			<tr class="even-row">
+			  <th><label for="email-field">Email</label></th>
+			  <td>
+				<input id="email-field" type="text" name="email"
+				  value="[?call txn.request.param('email') ?]" size="35"/><br/>
+				<small>Tested via an <tt>:email</tt> constraint.</small>
+			  </td>
+			</tr>
+
+			<tr class="odd-row">
+			  <th><label for="description-field">Description</label></th>
+			  <td>
+				<input id="description-field" type="text" name="description"
+				  value="[?call txn.request.param('description') ?]" size="55"/><br/>
+				<small>Constraint: <tt>/^[\x20-\x7f]+$/</tt></small>
+			  </td>
+			</tr>
+
+			<tr class="even-row">
+			  <th><label for="other-field">Other</label></th>
+			  <td>
+				<input id="other-field" type="text" name="other"
+				  value="[?call txn.request.param('other') ?]" size="55" /><br/>
+				<small>No constraints, not in the field list.</small>
+			  </td>
+			</tr>
+		  </tbody>
+		</table>
+	  </fieldset>
+	  <fieldset><input type="submit" name=" Inspect " value=" Inspect "/></fieldset>
+	</form>
+
+<?if txn.request.paramtable.keys.empty? ?>
+	<p>Submitting the form above will dump the validation structure that is
+	  built from the args.
+<?else?>
+	<h2>Valid Args</h2>
+
+	<p>Fetched via: <tt>txn.args.valid</tt>:</p>
+	<div class="dotbox"><tt><?escape txn.vargs.valid.inspect ?></tt></div>
+
+	<h2>Missing Args</h2>
+
+	<p>Fetched via: <tt>txn.args.missing</tt>:</p>
+	<div class="dotbox"><tt><?escape txn.vargs.missing.inspect ?></tt></div>
+
+	<h2>Invalid Args</h2>
+
+	<p>Fetched via: <tt>txn.args.invalid</tt>:</p>
+	<div class="dotbox"><tt><?escape txn.vargs.invalid.inspect ?></tt></div>
+
+	<h2>Unknown Args</h2>
+
+	<p>Fetched via: <tt>txn.args.unknown</tt>:</p>
+	<div class="dotbox"><tt><?escape txn.vargs.unknown.inspect ?></tt></div>
+
+	
+<?end if?>
+
+	<?include navbar.incl?>
+
+  </body>
+</html>
+
+
+<!--
+  Local Variables:
+  mode: xml
+ -->
+

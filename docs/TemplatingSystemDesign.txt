@@ -1,0 +1,74 @@
+= Directives
+
+This is a tentative list of directives supported by the Arrow templating system,
+as well as example of their usage.
+
+Configuration
+  <?config <var> [=] <value>?>
+  Ex:
+	<?config elide_directive_lines = true ?>
+
+Set
+  <?set <var> [=] <value>?>
+  <?set <var> [=] <value>.<methodchain>?>
+  Ex:
+	<?set version = $Version$ ?>
+  Code:
+	template.version
+	# => '$Version$'
+
+Attributes
+  <?attr <name>?>
+  <?attr <name> <format>?>
+  <?attr <name>.<methodchain>?>
+  <?attr <name>.<methodchain> <format>?>
+  Ex:
+	<title><?attr title?></title>
+	<p>Amount: <?attr dollar_amount "$%0.2f"?></p>
+	<p>Address: <?attr customer.order[0].shipping_address?></p>
+	<p>Amount: <?attr customer.order[0].amount_paid "$%0.2f"?></p>
+  Code:
+	template.title = "Order Form"
+	# => "<title>Order Form</title>"
+	template.dollar_amount = 2.34
+	# => "<p>Amount: $2.34</p>"
+	template.customer = Customer::lookup( 'Babbage, Charles' )
+	# => "<p>Address: 1234 Fake Address Ave., Bridgemont, NW 10010</p>"
+	#    "<p>Amount: $4014.03</p>"
+
+Conditionals
+  <?if <name>?>...<?end if?>
+  <?if <name>.<methodchain>?>...<?end if?>
+  <?if <name> (matches|=~) <regex>?>...<?end if?>
+  <?if <name>.<methodchain> (matches|=~) <regex>?>...<?end if?>
+  Ex:
+	<?if authenticated?>...<?end if?>
+	<?if user.account_current? ?>...<?end if?>
+	<?if username matches /(admin|root)/?>...<?end if?>
+	<?if request.headers['user-agent'] matches /MSIE/ ?>...<?end if?>
+  Code:
+	template.authenticated = false
+	template.user = userObject
+	template.username = "foo"
+	template.request = requestObj
+
+Iterators
+  <?for <obj> [in] <name>?>...<?end for?>
+  <?for <obj> [in] <name>.<methodchain>?>...<?end for?>
+  Ex:
+	<?for user in userlist?>...<?end for?>
+  Code:
+	template.userlist = ["foo", "admin", "bar", "dirk"]
+
+Subobjects
+  <?insert table.tmpl [as] table1?>
+
+Truncator
+  <?maxlength <length>?>...<?end maxlength?>
+  Ex:
+	<?maxlength 8?><?attr password?><?end maxlength?>
+  Code:
+	template.password = "foolZgold12"
+    # => "foolZgol"
+
+

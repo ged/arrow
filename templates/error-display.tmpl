@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<!--
+
+  Arrow Example Error Handler: Display Template
+
+  -->
+
+  <head>
+	<title>Arrow Error Handler</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+	<link rel="stylesheet" type="text/css" href="/stylesheets/arrow.css" />
+  </head>
+  <body>
+
+	<h1>Arrow Application Server: Error</h1>
+	<p>An error (<?call err.class.name?>) occurred in the '<?call
+	  re.signature.name ?>' application.</p>
+
+	<h2><strong><?escape err.message?></strong></h2>
+	<pre><?escape err.backtrace.join("\n") ?></pre>
+
+	<h3>Transaction Dump:</h3>
+	<table id="transaction-dump" class="kvlist">
+	  <tbody>
+		<tr class="odd-row">
+		  <th class="row-title">inspect</th>
+		  <td><tt><?escape txn.inspect ?></tt></td>
+		</tr>
+		<tr class="even-row">
+		  <th class="row-title">appRoot</th>
+		  <td><tt><?escape txn.appRoot.inspect ?></tt></td>
+		</tr>
+		<tr class="odd-row">
+		  <th class="row-title">action</th>
+		  <td><tt><?escape txn.action.inspect ?></tt></td>
+		</tr>
+		<tr class="even-row">
+		  <th class="row-title">appPath</th>
+		  <td><tt><?escape txn.appPath.inspect ?></tt></td>
+		</tr>
+		<tr class="odd-row">
+		  <th class="row-title">vargs</th>
+		  <td><tt><?escape txn.vargs.inspect ?></tt></td>
+		</tr>
+		<tr class="even-row">
+		  <th class="row-title">serial</th>
+		  <td><?call txn.serial ?></td>
+		</tr>
+	  </tbody>
+	</table>
+
+	<h3>Request Dump:</h3>
+	<table id="request-headers" class="kvlist">
+	  <tbody>
+<?yield header, val from txn.request.headers_in.each?>
+		<tr>
+		  <th><?call header ?>: </th>
+		  <td><tt><?call val.chomp ?></tt></td>
+		</tr>
+<?end?>
+	  </tbody>
+	</table>
+
+	<h3>Session Dump:</h3>
+<?if txn.session? ?>
+	<table id="session-dump" class="kvlist">
+	  <tbody>
+  <?yield key, val from txn.session.each ?>
+		<tr>
+		  <th><?call key ?>: </th>
+		  <td><tt><?escape val.inspect ?></tt></td>
+		</tr>
+  <?end yield?>
+	  </tbody>
+	</table>
+<?else?>
+	<p>No session loaded when the error occurred.</p>
+<?end if?>
+
+<?include navbar.incl?>
+
+  </body>
+</html>
+
+
+<!--
+  Local Variables:
+  mode: xml
+ -->

@@ -1,0 +1,240 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<!--
+
+		Arrow Manual: Configuration
+		$Id: config.html,v 1.9 2004/02/14 03:28:05 deveiant Exp $
+
+		Author:		Michael Granger
+		Time-stamp: <23-Apr-2001 19:58:12 deveiant>
+
+  -->
+
+  <head>
+	<title>Arrow Manual: Configuration</title>
+
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+
+    <meta name="authors" content="Michael Granger (ged@FaerieMUD.org)>" />
+	<link rel="stylesheet" href="manual.css" type="text/css" />
+  </head>
+  <body>
+
+	<!--#include virtual="linkbox.incl" -->
+
+	<div id="content">
+	  <h1>Arrow: Configuration</h1>
+
+	  <div class="section">
+		<h2><a href="#apache" id="apache">Apache</a></h2>
+
+		<p>You'll need to add mod_ruby to the configuration file for Apache,
+		  typically named httpd.conf if you haven't done so already. For
+		  example, assuming your <tt>mod_ruby.so</tt> is installed in
+		  <kbd>$WEBROOT/libexec/mod_ruby.so</kbd>:</p>
+
+<pre>
+LoadModule ruby_module libexec/mod_ruby.so
+AddModule mod_ruby.c
+</pre>
+
+		<p>To associate an Arrow instance with a location in your web space:</p>
+
+<pre>
+RubyAddPath /path/to/your/Arrow/lib
+RubyRequire arrow
+&lt;Location /your/desired/arrow/url&gt;
+  SetHandler ruby-object
+  RubyHandler "Arrow::Dispatcher::create('/your/arrow.conf')"
+&lt;/Location&gt;
+</pre>
+
+		<p>Arrow currently has problems when it's associated with the
+		  <tt>'/'</tt> location, or a location that maps to a real directory
+		  under the <tt>DocumentRoot</tt>. This is due to the way mod_ruby
+		  interacts with Apache, and it's something we're very interested in
+		  fixing. Ideas welcomed.</p>
+
+		<p>For more information on Apache configuration files, see the <a
+			href="http://httpd.apache.org/docs/configuring.html">Apache
+			documentation</a>, as well as the <a
+			href="http://www.modruby.net/doc/install.en.html">mod_ruby
+			documentation</a>.</p>
+	  </div>
+
+	  <div class="section">
+		<h2><a href="#arrow" id="arrow">Arrow</a></h2>
+		<p>Arrow's config file is written in <a href="http://www.yaml.org/">
+		YAML </a>, and has a very clean and readable format.  The following is
+		an example of what information it should contain:</p>
+
+		<pre>
+--- 
+errorHandler: "_errorHandler"
+defaultApp: "status"
+logLevel: debug
+templateLogLevel: debug
+templates: 
+  loader: Arrow::Template
+  cache: true
+  cacheConfig: 
+    maxNum: 20
+    maxObjSize: 131072
+    expiration: 36
+    maxSize: 2621440
+  path: 
+    - /Users/ged/Documents/source/ruby/Arrow/templates
+    - /Library/WebServer/templates
+session: 
+  expires: "+48h"
+  lockType: file:/tmp
+  rewriteUrls: true
+  storeType: file:/tmp
+  idType: md5:.
+  idName: arrow-session
+applications: 
+  pollInterval: 5
+  pattern: "*.rb"
+  path:
+    - /Users/ged/Documents/source/ruby/Arrow/apps
+    - /Library/WebServer/apps</pre>
+
+		<p>Taken apart, we have...</p>
+		<dl class="linelist">
+		  <dt>errorHandler</dt>
+		  <dd>This is the URI of the application to which uncaught exceptions
+			are sent. If this value is not specified, a generic handler is used
+			instead (<a
+			  href="http://dev.rubycrafters.com/html/classes/Arrow/Broker.html#M000088"
+			  >Arrow::Broker#defaultErrorHandler</a>).</dd>
+
+		  <dt>defaultApp</dt>
+		  <dd>This specifies the URI of the application which is executed when
+			none is specified by a request's URI. If this value is not specified
+			or set to <tt>(builtin)</tt>, a very simple status handler is called
+			instead (<a
+			  href="http://dev.rubycrafters.com/html/classes/Arrow/Broker.html#M000086"
+			  >Arrow::Broker#runDefaultApp</a>).</dd>
+
+		  <dt>noSuchAppHandler</dt>
+		  <dd>Specifies the URI of an application which should be executed when
+			the one specified by the request's URI does not exist. If this value
+			is not specified or set to <tt>(builtin)</tt>, Arrow will decline
+			the request and pass it on to the next Apache handler.</dd>
+
+		  <dt>logLevel</dt>
+		  <dd>This is related to the Apache log level; only messages at or
+			above the specified level will be output to the log. However, this
+			setting not only affects the output to Apache's ErrorLog, but also
+			any other logging outputters you might have attached to the global
+			logger.</dd>
+
+		  <dt>templateLogLevel</dt>
+		  <dd>Again similar to Apache's log level, but only applicable to the
+			templating system, and likely only useful with the templating that
+			comes with Arrow.</dd>
+
+		  <dt>templates</dt>
+		  <dd>The configuration concerning the operation of the templating
+			system.</dd>
+
+		  <dd>
+			<dl class="linelist config-subitems">
+			  <dt>loader</dt>
+			  <dd>This is the loader class for the templating system you are
+				using.  For more information on how to use this, see the <a
+				  href="tutorial-templates.html"> templating
+				  tutorial</a>.</dd>
+
+			  <dt>cache</dt>
+			  <dd>Whether or not to cache templates.</dd>
+
+			  <dt>cacheConfig</dt>
+			  <dd>These determine how the caching operates.</p>
+
+			  <dd>
+				<dl class="linelist config-subitems">
+				  <dt>maxNum</dt>
+				  <dd>This sets the number of templates that can be cached.</dd>
+				  <dt>maxObjSize</dt>
+				  <dd>This is the largest any one template is allowed to be and
+				  still get cached.</dd>
+				  <dt>expiration</dt>
+				  <dd>This sets a time limit on unused templates staying in the cache.</dd>
+				  <dt>maxSize</dt>
+				  <dd>This sets the number of bytes the cache is allowed to consume.</dd>
+				</dl>
+			  </dd>
+
+			  <dt>path</dt>
+			  <dd>This takes a list of the paths that will be searched for
+				templates.</dd>
+
+			</dl>
+		  </dd>
+
+		  <dt>session</dt>
+		  <dd>This defines how sessions are implemented, stored, etc.</dd>
+		  <dd>
+			<dl class="linelist config-subitems">
+			  <dt>expires</dt>
+			  <dd>This sets the default length of time that a session will
+				remain active without use.</dd>
+
+			  <dt>idType</dt>
+			  <dd>The URI of the type of session id to use.</dd>
+
+			  <dt>storeType</dt>
+			  <dd>The URI of the type of session store to use.</dd>
+
+			  <dt>lockType</dt>
+			  <dd>The URI of the type of lock to use. If it is set to
+				<tt>'recommended'</tt>, the session store's recommended lock is
+				used.</dd>
+
+			  <dt>rewriteUrls</dt>
+			  <dd>Rewrite URLs in links in outgoing content to include the
+				session key.</dd>
+
+			  <dt>idName</dt>
+			  <dd>The name of the cookie/parameter that contains the
+				session key.</dd>
+			</dl>
+		  </dd>
+
+		  <dt>applications</dt>
+		  <dd>This has options controlling how application files are loaded
+			into Arrow.</dd>
+		  <dd>
+			<dl class="linelist config-subitems">
+			  <dt>pollInterval</dt>
+			  <dd>The number of seconds between checks for new and
+				altered applications. If this is set to <tt>0</tt>, applications
+				are only loaded once, and never checked for updates.</dd>
+			  
+			  <dt>pattern</dt>
+			  <dd>Glob pattern used to find application files.</dd>
+
+			  <dt>path</dt>
+
+			  <dd>A list of directories which Arrow searches for
+				applications.  Arrow will monitor these locations, looking for
+				new/updated/removed applications, and doing a full recursive
+				search into their subdirectories in the process.</dd>
+			</dl>
+		  </dd>
+		</dl>
+
+	  </div>
+	</div>
+
+  </body>
+</html>
+
+
+<!--
+  Local Variables:
+  mode: xml
+ -->

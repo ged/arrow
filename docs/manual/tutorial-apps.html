@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<!--
+
+		Arrow Manual: Applications Tutorial
+		$Id: tutorial-apps.html,v 1.5 2004/02/14 03:17:47 deveiant Exp $
+
+		Author:		Michael Granger
+		Time-stamp: <23-Apr-2001 19:58:12 deveiant>
+
+  -->
+
+  <head>
+	<title>Arrow Manual: Applications Tutorial</title>
+
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+
+    <meta name="authors" content="Michael Granger (ged@FaerieMUD.org)>" />
+	<link rel="stylesheet" href="manual.css" type="text/css" />
+  </head>
+  <body>
+
+	<!--#include virtual="linkbox.incl" -->
+
+	<div id="content">
+	  <h1>Arrow: Applications Tutorial</h1>
+
+	  <div class="section">
+		<h2><a href="#overview" id="overview">Overview</a></h2>
+
+		<p>The <tt>Arrow::Application</tt> class is the main workhorse of the
+		  Arrow framework; it, in concert with <tt>Arrow::Transaction</tt>,
+		  provides most of the functionality that application developers will be
+		  concerned with.</p>
+
+		<p>Because of this, nearly anything mentioned below can be overridden by
+		  subclassing Arrow::Application to provide different behaviour.</p>
+
+		<p>An Arrow application is made up of <strong>a signature</strong>, an
+		  optional <strong>delegator method</strong>, and one or more
+		  <string>actions</string>.</p>
+	  </div>
+
+	  <div class="section">
+		<h2><a href="#example" id="example">A simple application - Hello World</a></h2>
+
+		<p>We'll start with a dead-simple application that doesn't really do
+		  much of anything useful. To keep up with tradition, of course, this
+		  application will be yet another 'Hello World'.</p>
+	  </div>
+
+	  <div class="section">
+		<h2><a href="#signature" id="signature">The Signature</a></h2>
+
+		<p>The first part of an Arrow application is its signature. This is a
+		  hash of values which tells the <a
+			href="tutorial-intro.html#classes-broker">Broker</a> where to
+			install it in relation to the rest of the hierarchy of applications,
+			and configures some of the logic and functionality provided by the
+			<tt>Arrow::Application</tt> class itself.</p>
+
+		<pre>
+# Application signature
+Signature = {
+    :uri => "hello",
+    :name => "Hello World",
+    :description => "This is yet another implementation of Hello World",
+    :maintainer => "ged@FaerieMUD.org",
+    :defaultAction => 'hello',
+}</pre>
+
+		<h3>Signature Values</h3>
+		<dl class="linelist signature-items">
+		  <dt>uri (required)</dt>
+		  <dd>A relative URI string which will be used to refer to the
+			application in relation to the appserver's base URL. This is the
+			only required element of the application's signature. This value can
+			also be used to specify one or more other applications which should
+			be called before it itself is run, which is called <a
+			href="#chaining">application chaining</a>.</dd>
+
+		  <dd>This is the only mandatory element of the signature -- the rest of
+			the elements will be given reasonable defaults if they are
+			unspecified.</dd>
+
+		  <dt>name</dt>
+		  <dd>The name of the application, used for display purposes in
+			introspection. Defaults to the name of the Application class.</dd>
+
+		  <dt>description</dt>
+		  <dd>A brief explaination of what the application does or is for; used
+			in introspection utilities. Defaults to <tt>"(none)"</tt>.</dd>
+
+		  <dt>maintainer</dt>
+		  <dd>The RFC822-formatted email address of the person to praise and/or
+			blame for the functioning of the application. This is intended to be
+			used in introspection utilities and also for automated bug or error
+			reporting. Defaults to whatever the <tt>ServerAdmin</tt> of Apache
+			is set to, or the empty string if the <tt>ServerAdmin</tt> setting
+			is not available.</dd>
+
+		  <dt>defaultAction</dt>
+		  <dd>When no action is specified, this determines which one will be
+			used. Defaults to '_default'.</dd>
+
+		  <dt>templates</dt>
+		  <dd>This should be set to a hash filled with file names of the
+			templates that will be used by this application.  We recommend
+			keying the hash with either symbols or strings, for easy
+			reference. Defaults to an empty hash.</dd>
+
+		  <dt>version</dt>
+		  <dd>The version of the application. If the application defines any of
+			the <tt>Version</tt>, <tt>Revision</tt>, or <tt>Rcsid</tt>
+			constants, the value it contains is used as a default. Otherwise the
+			mtime of the file which contains the application is used.</dd>
+
+		  <dt>config</dt>
+		  <dd>A hash of application configuration values which can be tuned from
+			the application server's introspection interfaces.</dd>
+
+		  <dt>vargs</dt>
+		  <dd>A hash containing profiles for the built in form validator, one
+			per action. See the <a href="tutorial-validation.html">input
+			validation section</a> of the tutorial for more.</dd>
+
+		  <dt>monitors</dt>
+		  <dd>A hash of monitor objects that can be used for introspection,
+			debugging, profiling, and tuning the application. The keys are
+			symbol identifiers which will be used later when using the
+			configured monitors. See the <a
+			href="tutorial-monitors.html">"monitors" section</a> of the tutorial
+			for more.</dd>
+		</dl>
+	  </div>
+
+	  <div class="section">
+		<h2><a href="#actions" id="actions">Actions</a></h2>
+
+		<p>Actions provide the actual functionality of the application. The
+		  action is just a method which corresponds to a part of the URI the
+		  client requests, and represents a step or phase of the application's
+		  execution.</p>
+	  </div>
+
+	  <div class="section">
+		<h2><a href="#subclass" id="subclass">Subclassing Arrow::Application</a></h2>
+		<p></p>
+		<h3>#run</h3>
+		<p></p>
+		<h3>#delegate</h3>
+		<p></p>
+	  </div>
+
+	  <div class="section">
+		<h2><a href="#chaining" id="chaining">Application Chaining</a></h2>
+		<p></p>
+		<h3>?(example)?</h3>
+		<p></p>
+	  </div>
+
+	  <div class="section">
+		<h2><a href="#special" id="special">Special Applications</a></h2>
+		<p></p>
+		<h3>Internal-only Applications</h3>
+		<p></p>
+		<h3>Error Handlers</h3>
+		<p></p>
+		<h3>Status/Introspection Applications</h3>
+		<p></p>
+	  </div>
+
+	</div>
+
+  </body>
+</html>
+
+
+<!--
+  Local Variables:
+  mode: xml
+ -->

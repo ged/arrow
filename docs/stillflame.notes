@@ -1,0 +1,249 @@
+if you see a '*' way over to the left, that means that something interesting is
+being said, like decisions being made or something.  an exclaimation in the same
+place generally means for me (the author) to look at the line and work on it
+more.
+
+
+---------------------------------
+Notes on datasources and criteria
+---------------------------------
+
+arg!  this problem isn't fitting into my head yet.  i need to discuss this with
+someone...
+
+a datasource is an interface into a source of data, be it soap, mysql, dbi, csv,
+a hash... whatever.  it will use URIs to specify what source the data is coming
+from.  it should have a universally useful interface.  what should that
+interface be?  Start with getting a record out, knowing the key:
+
+  ds = Datasource.new( my_uri )
+  record = ds[key]
+
+although really, it might be better to have:
+
+  MyData = Datasource.new( my_uri )
+  record = MyData[key]
+  record = MyData.new(key)
+
+Datasource should act like a factory, making classes out of...
+
+Out of what?  Full databases, or tables?  Mirroring tableadapter, each table
+could be a source, which is also more compatable with csv's and hashes (and
+others, i'm sure).  This means the uri's will have to go all the way down to
+table...
+
+If they don't?  Well, Datasource.new( database_uri ) could return *all* the
+factory made classes, one per table, or it could raise an error: "source not
+specific enough".  So i should really make a strong decision about what level
+the datasource objects play at.
+
+Well, seeing as i don't have a way to deal with csv's or hashes otherwise, i'll
+make the decision that all uri's should specify a table level entity; something
+that has records (not necessarily keyed?).  If it doesn't, it can either return         *
+nil or error, depending on some setting somewhere.
+
+That makes the interface pretty well known: Datasource.new returns a
+factory-made class.  instances of that class are just records: attr's for each
+field.  extra functionality thrown in somewhere to seamlessly handle creating,
+updating, deleting.
+
+Now, what about foreign keys?  when they exist, they won't always be
+programmatically available.  mysql offers a way to find this out (i think), but
+the less sophisticated definitely won't.  not to mention, it would be wonderful
+to be able to define relationships between disparate sources of data and still          *
+get some functionality out of it.  let's play:
+
+  Person = Datasource.new( "mysql://user:pass@host/Person" )
+  TestData = Datasource.new( "csv://some/test/data.csv?first_row_titles=true" )
+
+  TestData.join!(Person, 'person_id')
+
+  TestData.each {...}
+
+or something more criteria-like:
+
+  query = TestData.person_id == Person.id
+
+  query.each {...}
+
+i don't know yet.                                                                       !
+
+What about data without field names?  data like this wouldn't be very organized,
+but it would still be useful for many (a file listing record numbers?).  well, i
+don't think the user of any such data would be terribly upset at a reduction in
+functionality, but things might get complicated if they try to use criteria over
+data like this.  i'll have to play with it more, determine its feasabilty(sp?).         !
+
+on to criteria, it'd be easy enough to let get a criteria object out of a given
+source, but would there be a way to integrate it with the interface?  the
+criteria objects themselves are meant to be nearly slate clean before you start
+throwing methods at them, so it can make appropriate criterions and come up with
+the query you want.  this is possibly untrue for the mysql one, as it has known
+field names, and so only a few methods should generate criterions.  this could
+be applied to all future criteria with known field names.
+
+now, for getting at the little bugger, i'm worried.  the actual instances of the
+class are going to have attr's for each field, so it may be confusing for the
+table itself to have methods with the same names.  next, criteria doesn't return
+data sources, so i may have to make a criteria extension for this to work.              !
+wrapping the criteria/ons may work too.
+
+okay, so now, we'll look at connection pooling.  J2EE does this, or so i'm told,
+and it is useful for speeding up initial response time.  the concept it:
+transparently to the user, don't actually close database connections, but keep
+it around for a while to see if anybody else wants to use it.  well, seeing as
+this is trasnparent, i won't have to worry about it if i don't want to.  for            !
+now, then, i won't.
+
+same person who talked to me about connection pooling talked about a bunch of
+other database stuff java does that i should look at.  i have a pdf to look
+over, once i get to that stage.  mostly, tho, what he described were
+transparent, so i'm not going to think about them until the rest of this is
+running.
+
+no.  the underlying data type shouldn't surface unless the programmer explicitly
+asks for it.  otherwise, the objects returned should be generic: DataSource's
+and DataRecord's, or whatever.  this class is to make the source of the data
+*interchangable* with any other, so tests can be run transparently, databases
+swapped, &c.  basic use should be simple, intuitive.  criteria should allow
+sophisticated searching without the prerequisite sql interpreter.  what is this
+gunna look like?  this isn't an object relational mapping, except in the
+simplest sense: giving the data an OO interface.
+
+basic interface: mirror structs (this is just a bunch of data types).
+should retrieving be a different method?												!
+
+  data = Table.new(:id => 1234)     #versus
+  data = Table.lookup(:id => 1234)
+
+when individual drivers handle things like autoincrementing, datatype
+conversion, &c., should they raise exceptions or return nil?  that's dependant
+on the situation, but i should write up method contracts on what return values
+are valid, and what exceptions can be raised for what reasons.  driver writers
+can defer to this for behavior.
+
+foreign keys/table relationships.  is this something that should be handled at			!
+this level, or should the application take ownership of this job?  i think a
+crossover-able criteria thing will allow for this to be done easily, but is
+otherwise not something i want to deal with.  this is *just* the data level:
+business objects are one higher.  right?												!
+
+okay.  let's say we use a struct as a base - in fact, let's make the individual
+drivers return a struct describing the data on connect, providing a nice,
+universal interface for DataSource to deal with.  while we're here, we can just
+extend onto that Struct with all our functionality, and return that from
+::create.  should i let individual drivers add "special" functionality to an
+individual source?  i don't think so: users should have to explicitly break out			*
+of the interface, thus encouraging portable usage.
+
+no, i don't like structs any more.  not as much, at least.  interface should
+still mirror them to some extent.
+
+a source needs to let the user know if it is writable, i think.  it should also
+let you know if records are forced-to-be unique.
+
+datatypes.  Strings and Fixnums are easy enough, most of the time.  Dates and
+Times are harder, especially for sources that have little or no datatyping
+capacity.  this is a barrier for interoperability.  how about, for every kind of
+object a record can have other than string, the source must provide to/from				*
+conversion procs.  i hope that this won't be much of a bother for driver
+writers, and that the source interface they're wrapping gives an easy route to
+this (Fx: MyDB::quote( a_date )?).
+
+
+here's a transcript of a conversation between stillflame and oGMo on this
+subject:
+
+ < stillflame> oGMo: you around?
+ < oGMo> stillflame: actually yeah
+ < oGMo> sup
+ < stillflame> criteria
+ < oGMo> ah
+ < oGMo> the svn version has DBI, and i got another DBI module that may supplant it
+ < stillflame> will two different Table types interface?
+ < stillflame> cool!
+ < oGMo> stillflame: hrm, not really, what were you thinking of?
+ < oGMo> i mean, in theory, you could take just the criteria chain from one and use it for another, but
+ < stillflame> presenting a dbi-ish universal interface to data, and being able to do complex searches over unknown data types.
+ < oGMo> stillflame: well, hopefully the interfaces will be somewhat similar as much as possible
+ < oGMo> stillflame: i should come up with a standard interface i guess
+ < oGMo> so everything implements, say, limit, offset, order, order_by, etc.
+ < stillflame> right, +/- db-specific neatnesses
+ < oGMo> stillflame: right
+ < stillflame> okay, i'll play with moving the criteria chain from one to another, see what i can get.
+ < oGMo> DBI should really become unnecessary if you're using criteria, except as a catchall driver i guess
+ < oGMo> stillflame: k
+ < oGMo> stillflame: let me know what sort of thing you're really after
+ < oGMo> because, in your code, if you generate the chain from a parameter or something, you could pass any Table and it should work
+ < oGMo> (within limits, some tables may work differently)
+ < oGMo> def find_blah(tbl); q = (tbl.name == ...); res = q.select...; end; find_blah(sqltable); find_blah(filetable); etc.
+ < stillflame> oGMo: http://dev.rubycrafters.com/manual-arrow/stillflame.notes has what i'm working on.
+ < oGMo> stillflame: hmm, interesting
+ < oGMo> in that case you could probably abstract stuff behind your Datasource
+ < stillflame> yeah, and i think criteria's a perfect interface.  the only other idea i have for searching is query by example.
+ < oGMo> it'd turn into a sort-of DBI-like frontend and you could write a generic Criteria::Table (or whateversx
+ < oGMo> s/x/)/
+ < stillflame> hmm.
+ < oGMo> you could keep it a bit lower-level on the Datasource side perhaps (to keep it easy) and then use the low-levels on the Criteria side (to make it generic)
+ < oGMo> hrmm
+ < stillflame> yeah, i can see how that would make my life easier for many things.
+ < oGMo> the main problem is all of those are so diverse ... a lot of the time you can abstract what you want from the criteria chain and use _that_ in the query
+ < oGMo> i'm not sure the entire functional scope you want to cover with Datasource
+ < oGMo> but you might actually be able to just make a sort of dispatch function/object that parses the URI and returns the correct Table type if you built it right on the Criteria module
+ < oGMo> like, parse, connect, etc.
+ < stillflame> right.
+ < stillflame> for some things, i'd want to give full access to the criteria interface, but i'd also like to have a more orthodox one for those who don't want to use criteria
+ < oGMo> well, you should write up all the stuff Datasource will cover
+ < stillflame> all the data types?
+ < stillflame> all the functionality?
+ < oGMo> i'd love to interface the two, it could supplant dbi ;)
+ < oGMo> stillflame: well, all the functionality; data types aren't really important
+ < stillflame> right, okay.
+ < oGMo> like... you want queries and connections? or other stuff? etc
+ < oGMo> and your target application vision would be probably the most help. you have a bit of that there already, a more fleshed-out example would be cool
+ < oGMo> bedtime
+ < stillflame> oGMo: thanks.  g'night
+ < oGMo> stillflame: night, ttyl
+
+
+
+
+------------------------------------
+Notes on inheritence of applications
+------------------------------------
+
+!!! Ged has solved this. !!!
+
+okay,
+here what i've been doing:
+
+created apps/superhello.rb
+ - subclasses Arrow::Application, has a couple of actions, but doesn't have a
+   signature.
+
+this caused the status app to fail on apps.sort_by {|app| app.signature.uri},
+saying that symbols don't respond to #<=>, leaving an empty table where normally
+apps should be. so i changed the line (which is line 63 of
+templates/status.tmpl) to apps.sort_by {|app| app.signature.uri.to_s}.  this
+filled the table in, but the superhello app had some undesirable default values:
+%w(uri name version &c.).  trying "uri" or "[inspect]" results in explode-y
+arrow:
+  [error] Arrow::Dispatcher : Transaction Manager
+  Error: undefined method `<=>' for :uri:Symbol:
+          /www/RubyCrafters.com/ruby/arrow/broker.rb:86:in `sort'
+          /www/RubyCrafters.com/ruby/arrow/broker.rb:86:in `delegate'
+          /www/RubyCrafters.com/ruby/arrow/broker.rb:77:in `each_index'
+          /www/RubyCrafters.com/ruby/arrow/broker.rb:77:in `delegate'
+          /www/RubyCrafters.com/ruby/arrow/dispatcher.rb:162:in `handler'
+so it looks like other things depend on the uri being a string, not a symbol, so
+i'm think that it may be a better idea to try to prevent uri-less apps from
+getting in as a "normal" app.  i do still kinda want them to get loaded, but it
+wouldn't be necessary, as i can require it into the subclass on my own.
+
+i changed the templates/status.tmpl back, and moved superhello.rb to
+superhello.rb_not, so things work as before...
+
+what am i trying for here?  when i noticed that the only difference between the
+various hello apps was their signature and class name, i decided to try to find
+a way to make a distinction between apps types and their incarnations, and to do
+so via subclassing.

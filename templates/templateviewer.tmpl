@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<!--
+
+  Template Viewer app
+
+  -->
+
+  <head>
+	<title>Template Viewer app</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+	<link rel="stylesheet" type="text/css" href="/stylesheets/arrow.css" />
+  </head>
+  <body>
+
+	<h1>Template Viewer app</h1>
+
+	<p>This is an introspection application designed to display Arrow
+	  templates. It's used mostly from the <a href="[?call
+	  txn.appRoot?]/status">status</a> application, but you can also plug in a
+	  template name to view without it being loaded by an application:</p>
+
+	<form action="[?call txn.action?]/display" method="get">
+	  <fieldset>
+		<label for="template-name-field">Template Name:</label>
+		<input id="template-name-field" type="text" name="template" value=""/>
+	  </fieldset>
+	  <fieldset><input type="submit" name="View" value="View"/></fieldset>
+	</form>
+
+	<?include navbar.incl?>
+
+  </body>
+</html>
+
+
+<!--
+  Local Variables:
+  mode: xml
+ -->
+

@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<!--
+
+  Arrow Session Access Counter Template
+
+  -->
+
+  <head>
+	<title>Session Access Counter</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+	<link rel="stylesheet" type="text/css" href="/stylesheets/arrow.css" />
+  </head>
+  <body>
+
+	<h1>Arrow Session Access Counter</h1>
+
+	<p>This session (id: <strong><?call session.id ?></strong>) has been
+	  accessed <strong><?call session[:counter] ?></strong> time/s.</p>
+
+	<p>You can <a href="[?call txn.uri ?]">reload this page</a> to observe the counter
+	  incrementing. You can also <a href="[?call txn.action
+		?]/delete">delete the current session</a> and start over.</p>
+
+	<h2>Session object:</h2>
+	<table>
+	  <tbody>
+		<tr class="odd-row">
+		  <th class="row-title">Id</th>
+		  <td><tt><?escape session.id.inspect ?></tt></td>
+		</tr>
+		<tr class="even-row">
+		  <th class="row-title">Store</th>
+		  <td><tt><?escape session.store.inspect ?></tt></td>
+		</tr>
+		<tr class="odd-row">
+		  <th class="row-title">Lock</th>
+		  <td><tt><?escape session.lock.inspect ?></tt></td>
+		</tr>
+	  </tbody>
+	</table>
+
+	<h2>Session state:</h2>
+	<div class="dotbox">
+	  <tt><?escape session.store.data.inspect ?></tt>
+	</div>
+
+	<?include navbar.incl?>
+
+  </body>
+</html>
+
+
+<!--
+  Local Variables:
+  mode: xml
+ -->

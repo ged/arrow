@@ -1,0 +1,23 @@
+
+= Arrow To-do List
+
+Time-stamp: <18-Jan-2004 12:13:48 deveiant>
+
+
+== Before Release
+
+* Add URL-rewriting filter for sessions.
+
+* Better test coverage
+
+* Template directives: 'config'
+
+* Finish tutorial
+
+
+== Next Release
+
+* Monitors
+
+* More session {id,store,lock} types
+

@@ -1,0 +1,225 @@
+#!/usr/bin/ruby
+# 
+# This file contains various utility classes, modules, and functions that don't
+# really fit anywhere else. It also adds some stuff to several built-in classes.
+# 
+# The following classes will be available after requiring 'arrow/utils':
+#
+# [<tt>Arrow::Path</tt>]
+#   A class for representing directory search paths.
+#
+# == Rcsid
+# 
+# $Id: utils.rb,v 1.6 2003/12/08 20:12:01 deveiant Exp $
+# 
+# == Authors
+# 
+# * Michael Granger <ged@FaerieMUD.org>
+# 
+#:include: COPYRIGHT
+#
+#---
+#
+# Please see the file COPYRIGHT in the 'docs' directory for licensing details.
+#
+
+require 'forwardable'
+
+### Add some operator methods to regular expression objects for catenation,
+### union, etc.
+class Regexp #:nodoc:
+
+	### Append the given +other+ Regexp (or String) onto a copy of the receiving
+	### one and return it.
+	def +( other ) 
+		return self.class.new( self.to_s + other.to_s )
+	end
+
+	### Create and return a new Regexp that is an alternation between the
+	### receiver and the +other+ Regexp.
+	def |( other )
+		return Regexp::new( "(?:%s|%s)" % [self.to_s, other.to_s] )
+	end
+end
+
+
+### Add some stuff to the String class to allow easy transformation to Regexp
+### and in-place interpolation.
+class String
+	def to_re( casefold=false, extended=false )
+		return Regexp::new( self.dup )
+	end
+
+	### Ideas for String-interpolation stuff courtesy of Hal E. Fulton
+	### <hal9000@hypermetrics.com> via ruby-talk
+
+	### Interpolate any '#{...}' placeholders in the string within the given
+	### +scope+ (a Binding object).
+    def interpolate( scope )
+        unless scope.is_a?( Binding )
+            raise TypeError, "Argument to interpolate must be a Binding, not "\
+                "a #{scope.class.name}"
+        end
+
+		# $stderr.puts ">>> Interpolating '#{self}'..."
+
+        copy = self.gsub( /"/, %q:\": )
+        eval( '"' + copy + '"', scope )
+	rescue Exception => err
+		nicetrace = err.backtrace.find_all {|frame|
+			/in `(interpolate|eval)'/i !~ frame
+		}
+		Kernel::raise( err, err.message, nicetrace )
+    end
+
+end
+
+
+
+require 'arrow/mixins'
+require 'arrow/exceptions'
+
+module Arrow
+
+	# Recursive hash-merge function
+	HashMergeFunction = Proc::new {|key, oldval, newval|
+		#debugMsg "Merging '%s': %s -> %s" %
+		#	[ key.inspect, oldval.inspect, newval.inspect ]
+		case oldval
+		when Hash
+			case newval
+			when Hash
+				#debugMsg "Hash/Hash merge"
+				oldval.merge( newval, &HashMergeFunction )
+			else
+				newval
+			end
+
+		when Array
+			case newval
+			when Array
+				#debugMsg "Array/Array union"
+				oldval | newval
+			else
+				newval
+			end
+
+		when Arrow::Path
+			Arrow::Path::new( newval )
+
+		else
+			newval
+		end
+	}
+
+
+	### A class for representing directory search paths.
+	class Path
+		include Enumerable
+		extend Forwardable
+
+		# CVS version tag
+		Version = /([\d\.]+)/.match( %q{$Revision: 1.6 $} )[1]
+
+		# CVS id tag
+		Rcsid = %q$Id: utils.rb,v 1.6 2003/12/08 20:12:01 deveiant Exp $
+
+		# The character to split path Strings on, and join on when
+		# converting back to a String.
+		Separator = File::PATH_SEPARATOR
+
+		# How many seconds to cache directory stat information, in seconds.
+		DefaultCacheLifespan = 1.5
+
+		### Create a new Arrow::Path object for the specified +path+, which can
+		### be either a String containing directory names separated by
+		### File::PATH_SEPARATOR, an Array of directory names, or an object
+		### which returns such an Array when #to_a is called on it. If
+		### +cache_lifespan+ is non-zero, the Array of valid directories will be
+		### cached for +cache_lifespan+ seconds to save calls to stat().
+		def initialize( path=[], cache_lifespan=DefaultCacheLifespan )
+			@dirs = case path
+					when Array
+						path.flatten
+					when String
+						path.split(Separator)
+					else
+						path.to_a.flatten
+					end
+
+			@valid_dirs = []
+			@cache_lifespan = cache_lifespan
+			@last_stat = Time::at(0)
+		end
+
+
+		######
+		public
+		######
+
+		# The raw list of directories contained in the path, including invalid
+		# (non-existent or unreadable) ones.
+		attr_accessor :dirs
+
+		# How long (in seconds) to cache the list of good
+		# directories. Setting this to 0 turns off caching.
+		attr_accessor :cache_lifespan
+
+
+		### Fetch the list of directories in the search path, vetted to only
+		### contain existent and readable ones. All the enumeration methods
+		### use this list.
+		def valid_dirs
+			if ( @cache_lifespan.nonzero? &&
+				 ((Time::now - @last_stat) < @cache_lifespan) )
+				return @valid_dirs
+			end
+
+			@valid_dirs = @dirs.find_all {|dir|
+				begin
+					stat = File::stat(dir)
+					stat.directory? && stat.readable?
+				rescue Errno::ENOENT, ::SecurityError
+					false
+				end
+			}
+			@last_stat = Time::now
+
+			return @valid_dirs
+		end
+
+		# Generate Array-ish methods that delegate to self.dirs
+		def_delegators :@dirs,
+			*(Array::instance_methods(false) -
+			Enumerable::instance_methods(false) -
+			[:to_yaml, :inspect, :to_s])
+				
+
+		### Enumerable interface method. Iterate over the list of valid dirs
+		### in this path, calling the specified block for each.
+		def each( &block )
+			self.valid_dirs.each( &block )
+		end
+
+
+		### Return the path as a <tt>PathSeparator</tt>-separated String.
+		def to_s
+			return self.valid_dirs.join( Separator )
+		end
+
+
+		### Override the inspection method
+		def inspect
+			res = super
+			return "#<%s:%0x %s>" % [
+				self.class.name,
+				self.object_id * 2,
+				res,
+			]
+		end
+
+	end # class Path
+
+end # module Arrow
+
+

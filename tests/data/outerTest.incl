@@ -1,0 +1,3 @@
+<!-- A test of chained includes. -->
+Outer.
+<?include test.incl ?>

@@ -1,0 +1,116 @@
+#!/usr/bin/ruby
+# 
+# This file contains the Arrow::Session::Id class, a derivative of
+# Arrow::Object. Instances of concrete derivatives of this class are used as
+# session IDs in Arrow::Session objects.
+# 
+# == Rcsid
+# 
+# $Id: id.rb,v 1.3 2003/11/09 22:26:27 deveiant Exp $
+# 
+# == Authors
+# 
+# * Michael Granger <ged@FaerieMUD.org>
+# 
+#:include: COPYRIGHT
+#
+#---
+#
+# Please see the file COPYRIGHT in the 'docs' directory for licensing details.
+#
+
+require 'arrow/object'
+require 'arrow/mixins'
+
+module Arrow
+class Session
+
+	### Session ID class for in Arrow::Session objects.
+	class Id < Arrow::Object
+		include Factory
+
+		# CVS version tag
+		Version = /([\d\.]+)/.match( %q{$Revision: 1.3 $} )[1]
+
+		# CVS id tag
+		Rcsid = %q$Id: id.rb,v 1.3 2003/11/09 22:26:27 deveiant Exp $
+
+
+		#############################################################
+		###	C L A S S   M E T H O D S
+		#############################################################
+
+		### Returns the Array of directories to search for derivatives; part of
+		### the Arrow::Factory interface.
+		def self::derivativeDirs
+			[ 'arrow/session', 'arrow/session/id' ]
+		end
+
+
+		### Create a new Arrow::Session::Id object for the given +request+ (an
+		### Apache::Request) of the type specified by +uri+.
+		def self::create( uri, request, idstring=nil )
+			uri = Arrow::Session::parseUri( uri ) if uri.is_a?( String )
+			super( uri.scheme.dup, uri, request, idstring )
+		end
+
+
+		### Generate a new id string for the given +request+.
+		def self::generate( uri, request )
+			raise NotImplementedError, "%s does not implement #generate" %
+				self.name
+		end
+
+
+		### Validate the given +idstring+, returning an untainted copy of it if
+		### it's valid, or +nil+ if it's not.
+		def self::validate( uri, idstring )
+			raise NotImplementedError, "%s does not implement #validate" %
+				self.name
+		end
+
+
+
+		#############################################################
+		###	I N S T A N C E   M E T H O D S
+		#############################################################
+		
+		### Create a new Arrow::Session::Id object. If the +idstring+ is given, it
+		### will be used as the unique key for this session. If it is not
+		### specified, a new one will be generated.
+		def initialize( uri, request, idstring=nil )
+			@new = true
+
+			if idstring
+				@str = self.class.validate( uri, idstring )
+				@new = false
+			end
+			
+			@str ||= self.class.generate( uri, request )
+			super()
+		end
+
+
+		######
+		public
+		######
+
+
+		### Return the id as a String.
+		def to_s
+			return @str
+		end
+
+
+		### Returns +true+ if the id was generated for this request as opposed
+		### to being fetched from a cookie or the URL.
+		def new?
+			@new ? true : false
+		end
+
+	end # class Id
+
+end # class Session
+end # module Arrow
+
+

@@ -1,0 +1,162 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<!--
+
+		Arrow Manual: Installation
+		$Id: install.html,v 1.7 2004/03/14 01:47:23 stillflame Exp $
+
+		Author:		Michael Granger
+		Time-stamp: <23-Apr-2001 19:58:12 deveiant>
+
+  -->
+
+  <head>
+	<title>Arrow Manual: Installation</title>
+
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+
+    <meta name="authors" content="Michael Granger (ged@FaerieMUD.org)>" />
+	<link rel="stylesheet" href="manual.css" type="text/css" />
+  </head>
+  <body>
+
+	<!--#include virtual="linkbox.incl" -->
+	
+	<div id="content">
+	  <h1>Arrow: Installation</h1>
+
+	  <div class="section">
+		<h2><a id="apache">Apache</a></h2>
+
+		<p>All development and testing is done using the <a
+			href="http://httpd.apache.org/">Apache 1.3.x series</a> webserver on
+		  Linux and MacOS X, though you should be able to run it under other
+		  platforms and/or Apache 2.0.x. We'd love to hear about you experiences
+		  under other configurations, and patches for portability are of course
+		  always welcomed.</p>
+	  </div>
+
+	  <div class="section">
+		<h2><a id="libapreq">The Generic Apache Request Library (libapreq)</a></h2>
+
+		<p>Arrow requires the libapreq extensions to mod_ruby, which in turn
+		  requires that you install the <a
+		  href="http://httpd.apache.org/apreq/">Generic Apache Request
+		  Library</a>, or <tt>libapreq</tt>.</p>
+	  </div>
+
+	  <div class="section">
+		<h2><a id="ruby">Ruby</a></h2>
+		<p><a href="http://www.ruby-lang.org/en/20020102.html">Ruby (1.8.1)</a>
+		  is strongly urged, as the majority of our work has been done under the <a
+			href="http://www.ruby-lang.org/en/20020106.html">development</a>
+		  version of ruby.</p>
+
+		<p>Arrow has also been tested and seems to work under the 1.8.0 release,
+		  but that version of Ruby has some known bugs which are fixed in later
+		  versions, so if you're having trouble, try a more recent Ruby.</p>
+	  </div>
+
+	  <div class="section">
+		<h2><a id="mod_ruby">mod_ruby</a></h2>
+
+		<p>The <tt>mod_ruby</tt> Apache module embeds a Ruby interpreter into
+		  Apache, much like <tt>mod_perl</tt> and <tt>mod_python</tt> do for
+		  their respective interpreters.</p>
+
+		<p>Arrow depends on the libapreq extensions to mod_ruby, which at the
+		  time of this writing (Jan 22, 2004) is only built in to the <a
+			href="http://modruby.net/archive/mod_ruby-1.1.1.tar.gz">development</a>
+		  version of mod_ruby.  It might also work with the <a
+			href="http://modruby.net/archive/mod_ruby-1.0.7.tar.gz">stable
+			release</a> (1.0.7) with the following <a
+			href="../code/mod_ruby-20030701.patch.gz">patch</a> applied.</p>
+	  </div>
+
+	  <div class="section">
+		<h2><a id="ruby_libs">Ruby Library Dependencies</a></h2>
+
+		<p>These are the various ruby libraries you will need to install in
+		  addition to the standard distributed ones. Known good versions of each
+		  one are in the distribution in the <tt>redist/</tt> directory, but you
+		  may wish to install newer or customized versions.</p>
+
+		<ul>
+		  <li><a href="http://raa.ruby-lang.org/list.rhtml?name=ruby-cache">
+			  Ruby-Cache (0.3)</a></li>
+		  <li><a href="http://raa.ruby-lang.org/list.rhtml?name=formvalidator">
+			  FormValidator (0.1.3)</a></li>
+		  <li><a href="http://raa.ruby-lang.org/list.rhtml?name=hashslice">
+			  HashSlice (1.03)</a></li>
+		  <li><a href="http://raa.ruby-lang.org/list.rhtml?name=pluginfactory">
+			  PluginFactory (0.01)</a></li>
+		</ul>
+
+		<p>Here also are some standard libraries that are used but may not be
+		  included with your ruby distribution (debian, for instance).</p>
+
+		<ul>
+		  <li><a href="http://raa.ruby-lang.org/list.rhtml?name=strscan">strscan
+			  (0.6.7)</a></li>
+		</ul>
+
+        <p>Optionally, you can include the following libraries (with a word on
+        what added functionality they bring in).</p>
+
+        <ul>
+          <li><a
+          href="http://raa.ruby-lang.org/list.rhtml?name=criteria">criteria
+			  (1.1a)</a> - adds in the ability for DataSources to use this
+			interesting interface to querying.</li>
+        </ul>
+
+	  </div>
+
+	  <div class="section">
+		<h2><a id="arrow_install">Installing the Arrow Libraries</a></h2>
+
+		<p>Once all of the dependencies are installed, you can test Arrow by
+		  running the included unit tests:</p>
+
+		<p><tt>$ </tt><kbd>./test.rb</kbd></p>
+
+<pre>
+0 patterns given on the command line
+Required 11 files.
+Loaded suite Arrow Web Application Test Suite
+Started
+........................................................................
+.....................
+Finished in 1.167613 seconds.
+
+93 tests, 2168 assertions, 0 failures, 0 errors
+</pre>
+
+		<p>Install the Arrow ruby libraries with the installer (you may need
+		  root privileges to do this):</p>
+
+		<p><tt>$ </tt><kbd>./install.rb</kbd></p>
+
+<pre>
+Arrow Installer Revision: 1.2 
+Testing for the Ruby-Cache library...found.
+Testing for the FormValidator library...found.
+Testing for the HashSlice library...found.
+Testing for the Strscan library...found.
+Installing...done.
+</pre>
+
+	  </div>
+
+	</div>
+
+  </body>
+</html>
+
+
+<!--
+  Local Variables:
+  mode: xml
+ -->

@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<!--
+
+  Default Arrow Status Page
+
+  -->
+
+  <head>
+	<title>Arrow Status Page</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+	<link rel="stylesheet" type="text/css" href="/stylesheets/arrow.css" />
+
+	<script type="text/javascript">
+	  /* <![CDATA[ */
+	  function runapp( uri ) {
+		window.location = '[?call transaction.appRoot ?]/' + uri;
+		return true;
+	  }
+	  /* ]]> */
+	</script>
+  </head>
+  <body>
+
+	<h1>Arrow Application Server: Status</h1>
+
+	<!-- Display the filename and path_info to try to figure out what a
+	     consistent way of fetching the part of the URI after the Location to
+	     which Arrow is bound. -->
+
+	<p>Running from: <tt><?call transaction.request.filename?> (<?call
+		transaction.request.path_info?>)</tt>.</p>
+
+	<h2>Applications</h2>
+	<table id="applications">
+	  <caption><?call apps.length ?> Loaded Applications</caption>
+	  <thead>
+		<tr>
+		  <th>URI</th>
+		  <th>Name</th>
+		  <th>Version</th>
+		  <th>Class</th>
+		  <th>&nbsp;</th>
+		</tr>
+	  </thead>
+	  <tbody>
+		<?for app in apps.sort_by {|app| app.signature.uri}?>
+		<tr class="[?if iterator.even? ?]even-row[?else?]odd-row[?end if?]">
+		  <td class="app-uri">
+			<?if app.signature.uri =~ /_/ ?>
+			<span title="[?call 
+			  app.signature.description?] (internal only)"><?call
+			  app.signature.uri ?></span>
+			<?else?>
+			<a title="[?call app.signature.description?]"
+			  href="[?call transaction.appRoot ?]/[?call
+			  app.signature.uri ?]"><?call app.signature.uri ?></a>
+			<?end if?>
+		  </td>
+		  <td class="app-name"><?call app.signature.name ?></td>
+		  <td class="app-version"><?call app.signature.version ?></td>
+		  <td class="app-source"><?escape app.class.name ?></td>
+		  <td class="app-run"><button onclick="runapp('status/app/[?call app.signature.uri ?]')">Inspect</button></td>
+		</tr>
+		<?end for?>
+	  </tbody>
+	</table>
+
+	<h2>Server Info</h2>
+	<table id="server">
+	  <tbody>
+		<tr class="odd-row">
+		  <th><?if transaction.request.server.virtual? ?>Virtualhost<?else?>Host<?end?></th>
+		  <td><?call transaction.request.server.hostname ?></td>
+		</tr>
+
+		<tr class="even-row">
+		  <th class="row-title">PID</th>
+		  <td><?attr pid ?></td>
+		</tr>
+
+		<tr class="odd-row">
+		  <th class="row-title">Parent PID</th>
+		  <td><?attr ppid ?></td>
+		</tr>
+
+		<tr class="even-row">
+		  <th class="row-title">Log Level</th>
+		  <td><?call transaction.request.server.loglevel ?></td>
+		</tr>
+
+		<tr class="odd-row">
+		  <th class="row-title">UID</th>
+		  <td><?call transaction.request.server.uid ?></td>
+		</tr>
+	  </tbody>
+	</table>
+
+<?if transaction.server.hostname.match(/dev\.rubycrafters/i) ?>
+	<div id="source-links">
+	  <h2>Source</h2>
+
+	  <p>The source code for the applications which are currently running are
+		available for inspection from here until I get the status app to do its
+		own display:</p>
+
+	  <ul>
+		<li>Apps: &lt;<a
+			href="http://dev.rubycrafters.com/apps/">http://dev.rubycrafters.com/apps/</a>&gt;</li>
+	  </ul>
+
+	  <p>The individual app status pages now link to the template
+		viewer. Clicking the 'Inspect' button for the app in question will take
+		you there.</p>
+
+	  <p>You can also find more information about Arrow, including downloadable
+		snapshots at the <a
+		  href="http://www.RubyCrafters.com/projects/Arrow/">Arrow project
+		  page</a>.</p>
+	</div>
+<?end if?>
+
+	<?include navbar.incl?>
+
+  </body>
+</html>
+
+
+<!--
+  Local Variables:
+  mode: xml
+ -->

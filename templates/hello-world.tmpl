@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<!--
+
+  Arrow "Hello World" App Template
+
+  -->
+
+  <head>
+	<title>Arrow: Hello World</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+	<link rel="stylesheet" type="text/css" href="/stylesheets/arrow.css" />
+  </head>
+  <body>
+
+	<h1>Hello World</h1>
+
+	<p>This is a minimal demo app that just loads and prints a template. You can
+	  see the source code for it by running the <a href="[?call
+		txn.action?]/printsource">printsource action</a>. There's also <a
+		href="[?call txn.action?]/display">a simpler version</a> of this app
+	  that outputs plain text (i.e., no templates).<p>
+
+<?if txn.session? ?>
+	  <!-- Session found -->
+  <?if txn.session[:delegations] ?>
+	<p>This is apparently being run in a session that has executed the counted
+	  version of the <tt>Hello World</tt> app <strong><?call
+		txn.session[:delegations] ?></strong> times.</p>
+
+	<p>This is the same template used by the regular <tt>Hello World</tt>
+	  app.</p>
+
+  <?else?>
+	<!-- But no delegations in it, apparently. -->
+  <?end if ?>
+
+  <?if txn.session[:user] ?>
+	<p>Since you're logged in as '<?call txn.session[:user]?>', you can also <a
+		href="[?call txn.appRoot?]/[?call txn.appPath.split(%r{/})[0]
+		?]/logout">log out</a> to test the protectedness
+	  of the app chain.</p>
+  <?end?>
+
+<?end if ?>
+
+	<?include navbar.incl?>
+
+  </body>
+</html>
+
+
+<!--
+  Local Variables:
+  mode: xml
+ -->
