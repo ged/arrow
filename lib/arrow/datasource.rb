@@ -84,7 +84,7 @@ class Arrow::DataSource < Arrow::Object
 
 
 	### Locally-stored mock data to be used for testing purposes.
-	class TestData < DataSource
+	class TestData < Arrow::DataSource
 
 		### Class methods for TestData.
 		class << self
