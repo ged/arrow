@@ -8,7 +8,7 @@
 #
 #   <?call 1+1?>
 #   <?call foo.to_html?>
-#   <?call arbitrary(Ruby.code)?>
+#   <?call var.any(other_var.method).chain?>
 #
 # == Subversion Id
 #

@@ -63,28 +63,59 @@
 		<h2>The Directives</h2>
 		<p></p>
         <h3>attr</h3>
-		<p></p>
+		<p><strong>&lt;?attr var?&gt;</strong> A simple directive, this
+		replaces itself with the stringified contents of the template variable
+		specified.</p>
         <h3>call</h3>
-		<p></p>
-        <h3>escape</h3>
-		<p></p>
+		<p><strong>&lt;?call var.method(args)?&gt;</strong> This allows method
+		calls on a variable to be evaluated, including arguments taken from the
+		template variables or some basic ruby (such as numbers and strings).</p>
         <h3>set</h3>
-		<p></p>
+		<p><strong>&lt;?set var value?&gt;</strong> Sets a template variable to
+		the specified value, which will then be accessible through the rest of
+		the template.</p>
+        <h3>escape</h3>
+		<p><strong>&lt;?escape statement?&gt;</strong> Entity-ifies the return
+		of the statement (so turns all &lt;'s, &gt;'s and &amp;'s into their
+		corresponding &amp;blah;'s).</p>
         <h3>if/elsif/else</h3>
-		<p></p>
-        <h3>yield</h3>
-		<p></p>
+		<p><strong>&lt;?if statement?&gt;...&lt;?elsif
+		statement?&gt;...&lt;?else?&gt;...&lt;?end if?&gt;</strong> Your run of
+		the mill conditional flow control.  The 'else' is optional, the 'elsif's
+		can be repeated any number of times (including zero), and the
+		'statement' can be any template variable, method chain off a template
+		variable, or regular expression match of a template variable (like
+		&lt;?if var.method =~ /regex/?&gt;).</p>
         <h3>for</h3>
-		<p></p>
+		<p><strong>&lt;?for arglist in iterable?&gt;...&lt;?end for?&gt;</strong>
+		For each element of the Enumerable object, the element is assigned to a
+		template variable (or multiple, if appropriate), and the enclosed
+		segment of XHTML is evaluated.  The arglist can have default values (as
+		in: &lt;?for a,b=1 in a_hash?&gt;), array-slurping arguments (*args) and
+		hashified arguments.  This will call Enumerable#each on the iterable.</p>
+        <h3>yield</h3>
+		<p><strong>&lt;?yield args from var.block_accepting_method?&gt;</strong>
+		For calling any general method that takes a block, the yield directive
+		will assign the args in the same fasion as with &lt;?for, then pass in
+		the contained XHTML to be evaluated at any call of yield within the
+		method's body.  This can behave exactly like &lt;?for (&lt;yield args
+		from var.each?&gt;), can be used to call alternate iteration methods
+		(such as #each_with_index), or used in other general case block
+		situations (like Regex#match).</p>
         <h3>import</h3>
-		<p></p>
+		<!-- <p><strong>&lt;?import foo as superfoo, bar, baz as
+		bazish?&gt;</strong> Loads in template variables, either named the same
+		as the variable, or renamed to match the 'as name' name.</p> -->
         <h3>include</h3>
-		<p></p>
+		<p><strong>&lt;?include other_template.tmpl as name?&gt;</strong> This
+		directive is replaced with the contents of the template specified, and
+		then evaluated in either the present template's namespace, or in a
+		subspace specified by 'name'.</p>
 	  </div>
 	  <div class="section">
 		<h2><a href="#example" id="example">Templated Applets - Hello World (templated)</a></h2>
 		<p>
-		  The Signature of an app has room for mention of the templates it uses
+		  The Signature of an app has room for mention of the templates it uses.
 		</p>
 	  </div>
 	  <div class="section">
