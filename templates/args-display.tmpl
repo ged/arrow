@@ -12,6 +12,11 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Script-Type" content="text/javascript" />
 	<link rel="stylesheet" type="text/css" href="/stylesheets/arrow.css" />
+	<style type="text/css" media="screen">
+	  <!-- 
+		#form-table th { text-align: right; vertical-align: top; }
+	  -->
+	</style>
   </head>
   <body>
 
@@ -22,11 +27,11 @@
 	<form action="[?call txn.action?]" method="get">
 
 	  <fieldset>
-		<legend></legend>
-		<table>
+		<legend>Customer Info</legend>
+		<table id="form-table">
 		  <tbody>
 			<tr class="odd-row">
-			  <th><label for="name-field">Name</label></th>
+			  <th><label for="name-field">Customer<br/>Name</label></th>
 			  <td>
 				<input id="name-field" type="text" name="name" 
 				  value="[?call txn.request.param('name') ?]" size="20"/><br/>
@@ -35,7 +40,7 @@
 			</tr>
 
 			<tr class="even-row">
-			  <th><label for="email-field">Email</label></th>
+			  <th><label for="email-field">Customer<br/>Email</label></th>
 			  <td>
 				<input id="email-field" type="text" name="email"
 				  value="[?call txn.request.param('email') ?]" size="35"/><br/>
@@ -44,7 +49,7 @@
 			</tr>
 
 			<tr class="odd-row">
-			  <th><label for="description-field">Description</label></th>
+			  <th><label for="description-field">Issue<br/>Description</label></th>
 			  <td>
 				<input id="description-field" type="text" name="description"
 				  value="[?call txn.request.param('description') ?]" size="55"/><br/>
@@ -76,23 +81,29 @@
 <?else?>
 	<h2>Valid Args</h2>
 
-	<p>Fetched via: <tt>txn.vargs.valid</tt>:</p>
-	<div class="dotbox"><tt><?escape txn.vargs.valid.inspect ?></tt></div>
+	<p>Fetched via: <code>txn.vargs.valid</code>:</p>
+	<div class="dotbox"><code><?escape txn.vargs.valid.inspect ?></code></div>
 
 	<h2>Missing Args</h2>
 
-	<p>Fetched via: <tt>txn.vargs.missing</tt>:</p>
-	<div class="dotbox"><tt><?escape txn.vargs.missing.inspect ?></tt></div>
+	<p>Fetched via: <code>txn.vargs.missing</code>:</p>
+	<div class="dotbox"><code><?escape txn.vargs.missing.inspect ?></code></div>
 
 	<h2>Invalid Args</h2>
 
-	<p>Fetched via: <tt>txn.vargs.invalid</tt>:</p>
-	<div class="dotbox"><tt><?escape txn.vargs.invalid.inspect ?></tt></div>
+	<p>Fetched via: <code>txn.vargs.invalid</code>:</p>
+	<div class="dotbox"><code><?escape txn.vargs.invalid.inspect ?></code></div>
 
 	<h2>Unknown Args</h2>
 
-	<p>Fetched via: <tt>txn.vargs.unknown</tt>:</p>
-	<div class="dotbox"><tt><?escape txn.vargs.unknown.inspect ?></tt></div>
+	<p>Fetched via: <code>txn.vargs.unknown</code>:</p>
+	<div class="dotbox"><code><?escape txn.vargs.unknown.inspect ?></code></div>
+
+	<h2>Error Messages</h2>
+
+	<p>Fetched via: <code>txn.vargs.errorMessages</code>:</p>
+	<div class="dotbox"><code><?escape txn.vargs.errorMessages.inspect ?></code></div>
+
 <?end if?>
 	</div>
 
