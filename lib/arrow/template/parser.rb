@@ -129,6 +129,7 @@ class Template
 			def initialize( text, template, initialData={} )
 				@scanner = StringScanner::new( text )
 				@template = template
+				@tagOpen = nil
 				@tagMiddle = nil
 				@tagClose = nil
 				@currentBranch = []
@@ -165,6 +166,10 @@ class Template
 			# The pointer into the syntax tree for the current node
 			attr_reader :currentNode
 
+			# The string that contains the opening string of the current tag, if
+			# any.
+			attr_reader :tagOpen
+
 			# The pattern that will match the middle of the current tag during
 			# the parse of a directive.
 			attr_accessor :tagMiddle
@@ -188,6 +193,7 @@ class Template
 			### Set the middle and closing tag patterns from the given matched
 			### opening string.
 			def setTagPatterns( opening )
+				@tagOpen = opening
 				@tagClose = TAGCLOSE[ opening ]
 				@tagMiddle = TAGMIDDLE[ @tagClose ]
 			end
@@ -365,12 +371,11 @@ class Template
 			unless (( tag = scanner.scan( IDENTIFIER ) ))
 				#self.log.debug "No identifier at '%s...'" % scanner.rest[0,20]
 
-				# If the tagClose pattern is ?>, then this is a PI that
-				# we don't grok. The reaction to this is configurable,
-				# so decide what to do.
-				if state.tagClose === '?>'
-					state << handleUnknownPI( state )
-					next
+				# If the tagOpen is <?, then this is a PI that we don't
+				# grok. The reaction to this is configurable, so decide what to
+				# do.
+				if state.tagOpen == '<?'
+					return handleUnknownPI( state )
 
 				# ...otherwise, it's just a malformed non-PI tag, which
 				# is always an error.
@@ -384,7 +389,7 @@ class Template
 				begin
 					node = Directive::create( tag, self, state )
 				rescue FactoryError => err
-					node = self.handleUnknownPI( state )
+					return self.handleUnknownPI( state, tag )
 				end
 
 			# If it's an 'end', 
@@ -554,16 +559,20 @@ class Template
 		#########
 
 		### Handle an unknown ProcessingInstruction.
-		def handleUnknownPI( state )
-			unless @config[:ignoreUnknownPIs]
-				raise ParseError, "unknown processing instruction at line %d" %
-					state.scanner.line
+		def handleUnknownPI( state, tag="" )
+			
+			# If the configuration doesn't say to ignore unknown PIs or it's an
+			# [?alternate-synax?] directive, raise an error.
+			if state.tagOpen == '[?' || !@config[:ignoreUnknownPIs]
+				raise ParseError, "unknown directive"
 			end
 
-			remainder = state.scanner.scan( %r{((?:[^?]|\?(?![>]))*)\?>} ) or
+			remainder = state.scanner.scan( %r{(?:[^?]|\?(?!>))*\?>} ) or
 				raise ParseError, "failed to skip unknown PI"
-			self.log.info( "Ignoring unknown PI '<?#{remainder}'" )
-			return TextNode::new( "<?" + remainder )
+
+			pi = state.tagOpen + tag + remainder
+			#self.log.info( "Ignoring unknown PI (to = #{state.tagOpen.inspect}) '#{pi}'" )
+			return TextNode::new( pi )
 		end
 
 
