@@ -66,6 +66,7 @@ class ServerStatus < Arrow::Applet
 		templ.ppid = Process::ppid
 		templ.currentApplet = self
 
+		self.log.debug "About to return from the 'display' action."
 		return templ
 	}
 
