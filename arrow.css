@@ -1,7 +1,7 @@
 /* 
  * Arrow Appserver Default Apps Stylesheet
  * $Id$
- * Time-stamp: <24-Jan-2004 22:11:39 deveiant>
+ * Time-stamp: <21-May-2004 23:36:31 ged>
  */
 
 @import url("http://www.RubyCrafters.com/stylesheets/base.css");
@@ -210,3 +210,30 @@ table.clear {
     font-weight: bold;
 }
 
+/* Filemap applet classes */
+div.filemap-entry {
+    border: 1px dotted #999;
+    margin-bottom: 6px;
+    background: #ddd;
+}
+
+h3.filemap-filename {
+    margin-bottom: 2px;
+    margin-top: 1px;
+}
+
+div.filemap-exception-content {
+    background: #edd;
+}
+
+div.filemap-exception-backtrace {
+    display: none;
+}
+
+.toggle-button {
+    font-size: smaller;
+    cursor: pointer;
+    background: #666;
+    color: white;
+    border: 1px solid black;
+}
