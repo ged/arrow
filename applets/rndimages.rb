@@ -48,7 +48,7 @@ class RandomImages < Arrow::Applet
 	}x
 
 	# Image struct
-	Image = Struct::new( "RandomImage", :src, :href )
+	Image = Struct::new( :src, :href )
 
 	# Default number of images to display from the feed at a time
 	DefaultImageCount = 15
