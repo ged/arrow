@@ -23,23 +23,23 @@ sacrificing the power of being able to access the native Apache API.
 We chose to write this framework despite the existance of several interesting
 and excellent frameworks already written in Ruby for several reasons:
 
-  * mod_ruby: No existing frameworks (that we know of) run under mod_ruby, or at
-    least not with the same kind of access as a first-order handler.
+* mod_ruby: No existing frameworks (that we know of) run under mod_ruby, or at
+  least not with the same kind of access as a first-order handler.
 
-  * Apache: Some current frameworks are very compelling but for one thing: they
-    run using their own webserver written in Ruby. While this is fine for some
-    lighter applications, our experience showed that this strategy does not
-    scale as well as Apache, nor does it allow the application developer to
-    leverage all of the other functionality already built in to Apache or
-    available as modules.
+* Apache: Some current frameworks are very compelling but for one thing: they
+  run using their own webserver written in Ruby. While this is fine for some
+  lighter applications, our experience showed that this strategy does not
+  scale as well as Apache, nor does it allow the application developer to
+  leverage all of the other functionality already built in to Apache or
+  available as modules.
 
-  * Advanced features: While there are some current frameworks that provide some
-    of the features we desired for application development, there were none that
-    supported them all.
+* Advanced features: While there are some current frameworks that provide some
+  of the features we desired for application development, there were none that
+  supported them all.
 
-  * Extensibility/customizability: Many of the current frameworks make it
-    difficult to override or extend their built-in features. We wanted something
-    that would allow us to adapt to any situation.
+* Extensibility/customizability: Many of the current frameworks make it
+  difficult to override or extend their built-in features. We wanted something
+  that would allow us to adapt to any situation.
 
 
 === Design Goals
@@ -48,19 +48,19 @@ Our primary intent when creating Arrow was to make development of applications
 under mod_ruby easier without sacrificing power. To that end, we started with
 four major goals:
 
- 1. Apache API: The developer should still have access to most or all of the
-    Apache API, but without being required to know or care about most of it if
-    she does not want to.
+1. Apache API: The developer should still have access to most or all of the
+   Apache API, but without being required to know or care about most of it if
+   she does not want to.
 
- 2. Persistant resources: Applications should be able to take advantage of
-    persistant resources like cached database handles, connection pools, etc.
+2. Persistant resources: Applications should be able to take advantage of
+   persistant resources like cached database handles, connection pools, etc.
 
- 3. No fork overhead: Like with native mod_ruby handlers or registry CGIs, the
-    overhead of the fork and compile phase should be minimized.
+3. No fork overhead: Like with native mod_ruby handlers or registry CGIs, the
+   overhead of the fork and compile phase should be minimized.
 
- 4. Automatic reload: Maintain the immediacy of CGI with auto-reloaded
-    applications, configuration, and templates to avoid the server-restart cycle
-    that is required with every change in programming with mod_ruby handlers.
+4. Automatic reload: Maintain the immediacy of CGI with auto-reloaded
+   applications, configuration, and templates to avoid the server-restart cycle
+   that is required with every change in programming with mod_ruby handlers.
 
 
 === Features
@@ -68,57 +68,77 @@ four major goals:
 We also wanted to add some features which are useful in most all web application
 programming:
 
-  * Templating: To separate presentation HTML from application logic, we decided
-    to provide an integrated templating system that uses valid XHTML documents
-    (or document fragments) for templates. We also realized that there are
-    already many excellent templating systems available for Ruby, and so we
-    tried to make it as easy as possible to use your own preferred templating
-    library instead of ours if you should so choose.
+* Templating: To separate presentation HTML from application logic, we decided
+  to provide an integrated templating system that uses valid XHTML documents (or
+  document fragments) for templates. We also realized that there are already
+  many excellent templating systems available for Ruby, and so we tried to make
+  it as easy as possible to use your own preferred templating library instead of
+  ours if you should so choose.
 
-  * Sessions: Many web application developers find it necessary to maintain
-    state between connections in their applications, so Arrow includes sessions
-    that are very easy to use, but can be configured to use one of a number of
-    different configurable strategies on the back end for storage, locking, and
-    key generation.
+* Sessions: Many web application developers find it necessary to maintain state
+  between connections in their applications, so Arrow includes sessions that are
+  very easy to use, but can be configured to use one of a number of different
+  configurable strategies on the back end for storage, locking, and key
+  generation.
 
-  * Argument validation/untainting: Web applications need to handle input from
-    end users which needs to be untainted and validated against a definition of
-    what constitutes legal data. Fortunately, Travis Whitton already wrote an
-    excellent Ruby data-validation library called FormValidator, which is built
-    into Arrow.
+* Argument validation/untainting: Web applications need to handle input from end
+  users which needs to be untainted and validated against a definition of what
+  constitutes legal data. Fortunately, Travis Whitton already wrote an excellent
+  Ruby data-validation library called FormValidator, which is built into Arrow.
 
-  * Modular applications: Very often, web applications need to share several
-    subsystems (e.g., authentication/authorization, state checkpointing and
-    validation, etc.) which are orthogonal to the main application logic but
-    still necessary. Arrow allows some apps to act as delegators, providing some
-    functionality for all apps which are chained through it.
+* Modular applications: Very often, web applications need to share several
+  subsystems (e.g., authentication/authorization, state checkpointing and
+  validation, etc.) which are orthogonal to the main application logic but still
+  necessary. Arrow allows some apps to act as delegators, providing some
+  functionality for all apps which are chained through it.
 
-  * Graceful error-handling: Sometimes applications fall on their face, and
-    there is little more frustrating than having to track down an error trace
-    from within the bowels of your app. Arrow provides a customizable
-    error-handling mechanism that can be used to speed development and act on
-    errors intelligently.
+* Graceful error-handling: Sometimes applications fall on their face, and there
+  is little more frustrating than having to track down an error trace from
+  within the bowels of your app. Arrow provides a customizable error-handling
+  mechanism that can be used to speed development and act on errors
+  intelligently.
 
-  * Strong introspection: One of Ruby's strengths is its strong introspection
-    features, and we wanted to build on those strengths. Arrow has some powerful
-    introspection facilities that let the developer examine the state of
-    applications, templates, sessions, etc.
+* Strong introspection: One of Ruby's strengths is its strong introspection
+  features, and we wanted to build on those strengths. Arrow has some powerful
+  introspection facilities that let the developer examine the state of
+  applications, templates, sessions, etc.
 
-  * Data source abstraction layer: Database connections, SOAP interfaces,
-    testing datasets, etc.
 
-  * Syndication: RSS, Atom, etc.
+== Installation
+
+=== Requirements
+
+* Apache (1.3 or 2.0) - http://httpd.apache.org/
+* Apache Request Library (libapreq) - http://httpd.apache.org/apreq/
+* mod_ruby (>= 1.2.0) - http://modruby.net/
+
+==== (Non-Standard) Ruby Library Dependencies
+
+Ruby-Cache::    http://raa.ruby-lang.org/project/ruby-cache
+FormValidator:: http://raa.ruby-lang.org/project/formvalidator
+PluginFactory:: http://raa.ruby-lang.org/project/pluginfactory
+HashSlice::     http://raa.ruby-lang.org/project/hashslice
+
+
+==== Quickstart
+
+Install:
+
+  $ install.rb
 
 
 == Current Status
 
-This is a beta release. Things will probably break, but that's what beta is
-for. If you do find something broken, please let us know.
+This is a beta release. Things will probably break, but the APIs are fairly
+fixed and it's feature-complete for the 1.0.0 release. If you do find something
+broken, please let us know.
 
 
 == Contact
 
-  http://arrow.rubyforge.org/
+Project Page: http://www.rubycrafters.com/projects/Arrow/
+
+Tracker: http://rubyforge.org/tracker/?group_id=231
 
 
 == Legal
