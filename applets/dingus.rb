@@ -71,6 +71,8 @@ class BlueClothDingus < Arrow::Applet
 
 		templ.txn = txn
 		templ.app = self
+		templ.bcmod = BlueCloth
+
 		return templ
 	}
 
