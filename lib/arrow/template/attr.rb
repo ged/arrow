@@ -28,25 +28,19 @@ require 'arrow/exceptions'
 require 'arrow/utils'
 require 'arrow/template/nodes'
 
-module Arrow
-class Template
+### The class which defines the behaviour of the 'attr' template directive. This
+### is just the AttributeDirective plus some behaviours for interaction with the
+### template.
+class Arrow::Template::AttrDirective < Arrow::Template::AttributeDirective
 
-	### The class which defines the behaviour of the 'attr' template
-	### directive. This is just the AttributeDirective plus some behaviours for
-	### interaction with the template.
-	class AttrDirective < Arrow::Template::AttributeDirective
+	# SVN Revision
+	SVNRev = %q$Rev$
+	
+	# SVN Id
+	SVNId = %q$Id$
+	
+	# SVN URL
+	SVNURL = %q$URL$
 
-		# SVN Revision
-		SVNRev = %q$Rev$
-		
-		# SVN Id
-		SVNId = %q$Id$
-		
-		# SVN URL
-		SVNURL = %q$URL$
-
-	end # class AttrDirective
-
-end # class Template
-end # module Arrow
+end # class Arrow::Template::AttrDirective
 
