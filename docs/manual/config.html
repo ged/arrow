@@ -1,13 +1,13 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 
-<!--
+  <!--
 
-		Arrow Manual: Configuration
-		$Id$
+	Arrow Manual: Configuration
+	$Id$
 
-		Author:		Michael Granger
-		Time-stamp: <23-Apr-2001 19:58:12 deveiant>
+	Author:		Michael Granger
+	Time-stamp: <23-Apr-2001 19:58:12 deveiant>
 
   -->
 
@@ -17,7 +17,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Script-Type" content="text/javascript" />
 
-    <meta name="authors" content="Michael Granger (ged@FaerieMUD.org)>" />
+	<meta name="authors" content="Michael Granger (ged@FaerieMUD.org)>" />
 	<link rel="stylesheet" href="manual.css" type="text/css" />
   </head>
   <body>
@@ -31,146 +31,220 @@
 		<h2><a href="#apache" id="apache">Apache</a></h2>
 
 		<p>You'll need to add mod_ruby to the configuration file for Apache,
-		  typically named httpd.conf if you haven't done so already. For
-		  example, assuming your <tt>mod_ruby.so</tt> is installed in
-		  <kbd>$WEBROOT/libexec/mod_ruby.so</kbd>:</p>
+		typically named httpd.conf if you haven't done so already. For
+		example, assuming your <tt>mod_ruby.so</tt> is installed in
+		<kbd>$WEBROOT/libexec/mod_ruby.so</kbd>:</p>
 
-<pre>
+		<pre>
 LoadModule ruby_module libexec/mod_ruby.so
 AddModule mod_ruby.c
-</pre>
+		</pre>
 
 		<p>To associate an Arrow instance with a location in your web space:</p>
 
-<pre>
+		<pre>
 RubyAddPath /path/to/your/Arrow/lib
 RubyRequire arrow
 &lt;Location /your/desired/arrow/url&gt;
-  SetHandler ruby-object
-  RubyHandler "Arrow::Dispatcher::create('/your/arrow.conf')"
+    SetHandler ruby-object
+    RubyHandler "Arrow::Dispatcher::create('/your/arrow.conf')"
 &lt;/Location&gt;
-</pre>
+		</pre>
 
 		<p>Arrow currently has problems when it's associated with the
-		  <tt>'/'</tt> location, or a location that maps to a real directory
-		  under the <tt>DocumentRoot</tt>. This is due to the way mod_ruby
-		  interacts with Apache, and it's something we're very interested in
-		  fixing. Ideas welcomed.</p>
+		<tt>'/'</tt> location, or a location that maps to a real directory
+		under the <tt>DocumentRoot</tt>. This is due to the way mod_ruby
+		interacts with Apache, and it's something we're very interested in
+		fixing. Ideas welcomed.</p>
 
 		<p>For more information on Apache configuration files, see the <a
-			href="http://httpd.apache.org/docs/configuring.html">Apache
-			documentation</a>, as well as the <a
-			href="http://www.modruby.net/doc/install.en.html">mod_ruby
-			documentation</a>.</p>
+		href="http://httpd.apache.org/docs/configuring.html">Apache
+		documentation</a>, as well as the <a
+		href="http://www.modruby.net/doc/install.en.html">mod_ruby
+		documentation</a>.</p>
 	  </div>
 
 	  <div class="section">
 		<h2><a href="#arrow" id="arrow">Arrow</a></h2>
 		<p>Arrow's config file is written in <a href="http://www.yaml.org/">
-		YAML </a>, and has a very clean and readable format.  The following is
-		an example of what information it should contain:</p>
+		YAML </a>, and looks something like this:</p>
 
 		<pre>
 --- 
-errorHandler: "_errorHandler"
-defaultApplet: "status"
+<!-- [Not yet implemented:] startMonitor: true -->
 logLevel: debug
-templateLogLevel: debug
-templates: 
-  loader: Arrow::Template
-  cache: true
-  cacheConfig: 
-    maxNum: 20
-    maxObjSize: 131072
-    expiration: 36
-    maxSize: 2621440
-  path: 
-    - /Users/ged/Documents/source/ruby/Arrow/templates
-    - /Library/WebServer/templates
-session: 
-  expires: "+48h"
-  lockType: file:/tmp
-  rewriteUrls: true
-  storeType: file:/tmp
-  idType: md5:.
-  idName: arrow-session
+templateLogLevel: info
 applets: 
-  pollInterval: 5
+  defaultApplet: "/status"
+  missingApplet: "/missing"
+  errorApplet: "/error"
   pattern: "*.rb"
   path:
-    - /Users/ged/Documents/source/ruby/Arrow/applets
-    - /Library/WebServer/applets</pre>
+    - "/usr/local/apache/applets"
+    - "/www/applets"
+  pollInterval: 5
+  config: {}
+  layout: 
+    "/args": ArgumentTester
+    "/hello": HelloWorld
+    "/missing": NoSuchAppletHandler
+    "/status": ServerStatus
+    "/error": ErrorHandler
+    "/raiseError": ErrorDemo
+    "/view-template": TemplateViewer
+    "/count": AccessCounter
+    "/count/hello": HelloWorld
+    "/protected": ProtectedDelegator
+    "/protected/hello": HelloWorld
+    "/files": LoadedFiles
+templates: 
+  loader: Arrow::Template
+  path:
+    - "/usr/local/apache/templates"
+    - "/www/templates"
+  cache: true
+  cacheConfig: 
+    maxObjSize: 131072
+    maxNum: 20
+    expiration: 36
+    maxSize: 2621440
+session: 
+  idName: arrow-session
+  expires: "+48h"
+  idType: md5:.
+  storeType: file:/usr/local/apache/sessions
+  lockType: file:/usr/local/apache/sessions
+<!-- [Not yet implemented:] rewriteUrls: true -->
+		</pre>
 
-		<p>Taken apart, we have...</p>
+		<p>All items in the configuration are optional; default values are
+		provided by the Hash in <tt>Arrow::Config::Defaults</tt>. Here's what
+		each item of the config means:</p>
+
 		<dl class="linelist">
-		  <dt>errorHandler</dt>
-		  <dd>This is the URI of the applet to which uncaught exceptions
-			are sent. If this value is not specified, a generic handler is used
-			instead (<a
-			  href="http://dev.rubycrafters.com/html/classes/Arrow/Broker.html#M000088"
-			  >Arrow::Broker#defaultErrorHandler</a>).</dd>
-
-		  <dt>defaultApplet</dt>
-		  <dd>This specifies the URI of the applet which is executed when
-			none is specified by a request's URI. If this value is not specified
-			or set to <tt>(builtin)</tt>, a very simple status handler is called
-			instead (<a
-			  href="http://dev.rubycrafters.com/html/classes/Arrow/Broker.html#M000086"
-			  >Arrow::Broker#runDefaultApplet</a>).</dd>
-
-		  <dt>noSuchAppletHandler</dt>
-		  <dd>Specifies the URI of an applet which should be executed when
-			the one specified by the request's URI does not exist. If this value
-			is not specified or set to <tt>(builtin)</tt>, Arrow will decline
-			the request and pass it on to the next Apache handler.</dd>
-
+<!-- Not yet implemented:
+		  <dt>startMonitor</dt>
+		  <dd>If this is set to <tt>true</tt>, a monitoring process will be
+		  started that can be attached to for debugging, profiling, testing,
+		  etc.</dd>
+  -->
 		  <dt>logLevel</dt>
 		  <dd>This is related to the Apache log level; only messages at or
-			above the specified level will be output to the log. However, this
-			setting not only affects the output to Apache's ErrorLog, but also
-			any other logging outputters you might have attached to the global
-			logger.</dd>
+		  above the specified level will be output to the log. However, this
+		  setting not only affects the output to Apache's ErrorLog, but also
+		  any other logging outputters you might have attached to the global
+		  logger.</dd>
 
 		  <dt>templateLogLevel</dt>
 		  <dd>Again similar to Apache's log level, but only applicable to the
-			templating system, and likely only useful with the templating that
-			comes with Arrow.</dd>
+		  templating system, and likely only useful with the templating that
+		  comes with Arrow.</dd>
+
+		  <dt>applets</dt>
+		  <dd>This has options controlling how applet files are loaded
+		  into Arrow and how they are accessed after loading.</dd>
+		  <dd>
+			<dl class="linelist config-subitems">
+			  <dt>defaultApplet</dt>
+			  <dd>This specifies the URI of the applet which is executed when
+			  none is specified by a request's URI. If this value is not
+			  specified or set to <tt>(builtin)</tt>, a very simple status
+			  handler is called instead (<a
+			  href="http://dev.rubycrafters.com/html/classes/Arrow/Broker.html#M000086"
+			  >Arrow::Broker#runDefaultApplet</a>).</dd>
+
+			  <dt>missingApplet</dt>
+			  <dd>Specifies the URI of an applet which should be executed when
+			  the one specified by the request's URI does not exist. If this
+			  value is not specified or set to <tt>(builtin)</tt>, Arrow will
+			  decline the request and pass it on to the next Apache
+			  handler.</dd>
+
+			  <dt>errorApplet</dt>
+			  <dd>This is the URI of the applet to which uncaught exceptions are
+			  sent. If this value is not specified, a generic handler is used
+			  instead (Arrow::Broker#defaultErrorHandler).</dd>
+
+			  <dt>pattern</dt>
+			  <dd>Glob pattern used to find applet files. This value is appended
+			  to each directory listed in the <tt>path</tt> config item, and the
+			  files which match are loaded.</dd>
+
+			  <dt>path</dt>
+			  <dd>A Array of directories which Arrow searches for applets. Arrow
+			  maintains a list of the files in these directories or any
+			  subdirectories for files which match the <tt>pattern</tt>,
+			  reloading, removing, and updating them as they change.</dd>
+
+			  <dt>pollInterval</dt>
+			  <dd>The number of seconds between checks for new and altered
+			  applets. If this is set to <tt>0</tt>, applets are only loaded
+			  once, and never checked for updates.</dd>
+			  
+			  <dt>config</dt>
+			  <dd>This is a freeform Hash value that can be used to provide
+			  key/value-pair type configuration for any of the applets. For more
+			  complex configurations, you can add members to the arrow config
+			  file itself should you so desire.</dd>
+
+			  <dt>layout</dt>
+			  <dd>A Hash of URIs to applet class. Each entry maps a sub-URI
+			  (relative to the Arrow URI) to an instance of the given applet
+			  class. URIs can be stacked on one another (e.g., <tt>/count</tt>
+			  and <tt>/count/hello</tt> in the above example) to chain applets
+			  together. See the <a href="tutorial-apps.html">Applications and
+			  Applets</a> for more information about this section.</dd>
+			</dl>
+		  </dd>
 
 		  <dt>templates</dt>
-		  <dd>The configuration concerning the operation of the templating
-			system.</dd>
+		  <dd>The configuration of the templating system used by Arrow (if
+		  any).</dd>
 
 		  <dd>
 			<dl class="linelist config-subitems">
 			  <dt>loader</dt>
-			  <dd>This is the loader class for the templating system you are
-				using.  For more information on how to use this, see the <a
-				  href="tutorial-templates.html"> templating
-				  tutorial</a>.</dd>
+			  <dd>This is the name of the loader class for the templating system
+			  you are using.  For more information on how to use this, see the
+			  <a href="tutorial-templates.html">Templating Tutorial
+			  section</a>.</dd>
+
+			  <dt>path</dt>
+			  <dd>An Array of the paths that will be searched for
+			  templates. This path, in contrast to the <tt>applets/path</tt>
+			  setting, will not be searched, but you can still keep templates in
+			  other than the topmost directory by referring to them with
+			  relative paths.</dd>
 
 			  <dt>cache</dt>
-			  <dd>Whether or not to cache templates.</dd>
+			  <dd>Whether or not to cache templates. This setting is only
+			  guaranteed to have an effect on the built-in templating system;
+			  other systems may wish to provide their own caching via their
+			  loader class (i.e., the one in <tt>templates/loader</tt>). </dd>
 
 			  <dt>cacheConfig</dt>
-			  <dd>These determine how the caching operates.</p>
+			  <dd>Setting which configure template caching.</dd>
 
 			  <dd>
 				<dl class="linelist config-subitems">
 				  <dt>maxNum</dt>
-				  <dd>This sets the number of templates that can be cached.</dd>
-				  <dt>maxObjSize</dt>
-				  <dd>This is the largest any one template is allowed to be and
-				  still get cached.</dd>
-				  <dt>expiration</dt>
-				  <dd>This sets a time limit on unused templates staying in the cache.</dd>
+				  <dd>This sets the number of templates that will be
+				  cached. Templates beyond this number will expire in LRU
+				  order.</dd>
+
 				  <dt>maxSize</dt>
-				  <dd>This sets the number of bytes the cache is allowed to consume.</dd>
+				  <dd>The maximum number of bytes allowed in the cache before it
+				  begins expiring items.</dd>
+
+				  <dt>maxObjSize</dt>
+				  <dd>The size (in bytes) of the largest single cacheable
+				  template. Templates larger than this will not be cached.</dd>
+
+				  <dt>expiration</dt>
+				  <dd>The maximum number of seconds an object can stay in the
+				  cache after its last access.</dd>
 				</dl>
 			  </dd>
-
-			  <dt>path</dt>
-			  <dd>This takes a list of the paths that will be searched for
-				templates.</dd>
 
 			</dl>
 		  </dd>
@@ -179,53 +253,44 @@ applets:
 		  <dd>This defines how sessions are implemented, stored, etc.</dd>
 		  <dd>
 			<dl class="linelist config-subitems">
-			  <dt>expires</dt>
-			  <dd>This sets the default length of time that a session will
-				remain active without use.</dd>
-
-			  <dt>idType</dt>
-			  <dd>The URI of the type of session id to use.</dd>
-
-			  <dt>storeType</dt>
-			  <dd>The URI of the type of session store to use.</dd>
-
-			  <dt>lockType</dt>
-			  <dd>The URI of the type of lock to use. If it is set to
-				<tt>'recommended'</tt>, the session store's recommended lock is
-				used.</dd>
-
-			  <dt>rewriteUrls</dt>
-			  <dd>Rewrite URLs in links in outgoing content to include the
-				session key.</dd>
-
 			  <dt>idName</dt>
 			  <dd>The name of the cookie/parameter that contains the
-				session key.</dd>
-			</dl>
-		  </dd>
+			  session key.</dd>
 
-		  <dt>applets</dt>
-		  <dd>This has options controlling how applet files are loaded
-			into Arrow.</dd>
-		  <dd>
-			<dl class="linelist config-subitems">
-			  <dt>pollInterval</dt>
-			  <dd>The number of seconds between checks for new and
-				altered applets. If this is set to <tt>0</tt>, applets
-				are only loaded once, and never checked for updates.</dd>
-			  
-			  <dt>pattern</dt>
-			  <dd>Glob pattern used to find applet files.</dd>
+			  <dt>expires</dt>
+			  <dd>The expiration time to set on session cookies, in the format
+			  given to Apache::Cookie.</dd>
 
-			  <dt>path</dt>
+			  <dt>idType</dt>
+			  <dd>The URI containing the type and configuration of the
+			  id-generation part of the session. The URI's scheme specifies the
+			  type, and the path and/or query string can be used for further
+			  configuration. See the documentation for the session id class for
+			  more.</dd>
 
-			  <dd>A list of directories which Arrow searches for
-				applets.  Arrow will monitor these locations, looking for
-				new/updated/removed applets, and doing a full recursive
-				search into their subdirectories in the process.</dd>
+			  <dt>storeType</dt>
+			  <dd>The URI of the type of session store to use; the URI for this
+			  is used similarly to the one for idType.</dd>
+
+			  <dt>lockType</dt>
+			  <dd>The URI of the type of lock to use, or <tt>'recommended'</tt>,
+			  which will consult the the session store for its recommended
+			  locking strategy.</dd>
+
+<!-- Not yet implemented:
+			  <dt>rewriteUrls</dt>
+			  <dd>Rewrite URLs in links in outgoing content to include the
+			  session key.</dd>
+  -->
 			</dl>
 		  </dd>
 		</dl>
+
+		<p>The YAML format is fairly forgiving of some things, but not so of
+		indentation. Make sure your indentation is consistent (i.e., if one line
+		uses tabs, then all lines at the same indent should also use tabs,
+		etc.), or server startup might fail or certain parts of your config
+		might be silently ignored.</p>
 
 	  </div>
 	</div>

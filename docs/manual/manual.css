@@ -1,7 +1,7 @@
 /* 
  *	Arrow Manual Stylesheet
  *	$Id$
- *	Time-stamp: <22-Mar-2004 23:29:33 ged>
+ *	Time-stamp: <26-Jun-2004 17:51:00 ged>
  */
 
 body {
@@ -205,6 +205,8 @@ ol.toc > li > ol {
     border-bottom: 1px dotted black;
     padding: 1px 5px;
 }
+
+.caution { color: #900; background: inherit; }
 
 tr.odd-row { background: #bbb; color: inherit; }
 tr.even-row { background: #ddd; color: black; }
