@@ -3,7 +3,7 @@
 # Unit test for the Arrow::FormValidator class
 # $Id$
 #
-# Copyright (c) 2004 RubyCrafters, LLC. Most rights reserved.
+# Copyright (c) 2004, 2005 RubyCrafters, LLC. Most rights reserved.
 # 
 # This work is licensed under the Creative Commons Attribution-ShareAlike
 # License. To view a copy of this license, visit
@@ -28,11 +28,15 @@ end
 class Arrow::FormValidatorTestCase < Arrow::TestCase
 
 	TestProfile = {
-		:required                => [ :required ],
-		:optional                => %w{optional number alpha},
-		:constraints             => {
-			:number		=> /^(\d+)$/,
-			:alpha		=> /^(\w+)$/,
+		:required		=> [ :required ],
+		:optional		=> %w{optional number alpha},
+		:descriptions	=> {
+			:required		=> "Required Field",
+			:numeric		=> "Numeric Field",
+		},
+		:constraints	=> {
+			:number	=> /^(\d+)$/,
+			:alpha	=> /^(\w+)$/,
 		},
 		:untaint_all_constraints => true
 	}
