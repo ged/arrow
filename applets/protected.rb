@@ -71,7 +71,7 @@ class ProtectedDelegator < Arrow::Applet
 	action( 'logout' ) {|txn, *args|
 		txn.session.delete( :user )
 
-		templ = txn.templates[:logout]
+		templ = self.loadTemplate( :logout )
 		templ.txn = txn
 
 		return templ
@@ -99,7 +99,7 @@ class ProtectedDelegator < Arrow::Applet
 			end
 		end
 
-		templ = txn.templates[:loginform]
+		templ = self.loadTemplate( :loginform )
 		templ.txn = txn
 		templ.errors = errors unless errors.empty?
 

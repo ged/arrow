@@ -65,7 +65,7 @@ class TemplateViewer < Arrow::Applet
 		self.log.debug "In the 'display' action of the '%s' applet." %
 			self.signature.name 
 
-		templ = txn.templates[:display]
+		templ = self.loadTemplate( :display )
 		templ.txn = txn
 		templ.applet = self
 
@@ -84,7 +84,7 @@ class TemplateViewer < Arrow::Applet
 
 		unless tpath.empty?
 			begin
-				dtempl = self.templateFactory.getTemplate( tpath )
+				dtempl = self.getTemplate( tpath )
 			rescue Arrow::TemplateError => err
 				templ.error = err
 			else

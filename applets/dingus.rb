@@ -59,7 +59,7 @@ class BlueClothDingus < Arrow::Applet
 	######
 
 	action( 'display' ) {|txn, *args|
-		templ = txn.templates[:display]
+		templ = self.loadTemplate( :display )
 
 		if (( source = txn.vargs.valid["source"] ))
 			self.log.debug "Got valid source argument: %s" % source

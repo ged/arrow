@@ -80,7 +80,7 @@ class AccessCounter < Arrow::Applet
 		self.log.debug "In the 'display' action of the '%s' applet." %
 			self.signature.name 
 
-		templ = txn.templates[:counter]
+		templ = self.loadTemplate( :counter )
 		txn.session[:counter] ||= 0
 		txn.session[:counter] += 1
 
@@ -99,7 +99,7 @@ class AccessCounter < Arrow::Applet
 		self.log.debug "In the 'delete' action of the '%s' applet." %
 			self.signature.name 
 
-		templ = txn.templates[:deleted]
+		templ = self.loadTemplate( :deleted )
 		txn.session.remove
 
 		templ.txn = txn

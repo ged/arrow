@@ -59,7 +59,7 @@ class SuperHello < Arrow::Applet
 		self.log.debug "In the 'templated' action of the %s applet." %
 			self.signature.name
 			
-		templ = txn.templates[:templated]
+		templ = self.loadTemplate( :templated )
 		templ.txn = txn
 		templ.applet = self
 
@@ -73,7 +73,7 @@ class SuperHello < Arrow::Applet
 
 		src = File::read( __FILE__ ).gsub(/\t/, '    ')
 
-		templ = txn.templates[:printsource]
+		templ = self.loadTemplate( :printsource )
 		templ.txn = txn
 		templ.applet = self
 		templ.source = src

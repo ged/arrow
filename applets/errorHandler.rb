@@ -63,7 +63,7 @@ class ErrorHandler < Arrow::Applet
 
 	def report_error_action( txn, re, err )
 		self.log.debug "Loading 'display' template"
-		template = txn.templates[:display]
+		template = self.loadTemplate( :display )
 		self.log.debug "'display' template: %p" % template
 
 		template.re = re

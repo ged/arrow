@@ -46,7 +46,7 @@ class LoadedFiles < Arrow::Applet
 	######
 
 	action( 'filemap' ) {|txn, *args|
-		templ = txn.templates[:filemap]
+		templ = self.loadTemplate( :filemap )
 		templ.txn = txn
 
 		return templ

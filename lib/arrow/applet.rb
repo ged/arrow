@@ -50,7 +50,7 @@
 #            Monitor[self].cumulativeRuntime.time do
 #                char = txn.vargs[:char] || 'x'
 #                char_page = self.make_character_page( char )
-#                templ = txn.templates[:main]
+#                templ = self.loadTemplate( :main )
 #                templ.char_page = char_page
 #
 #                return templ
@@ -63,7 +63,7 @@
 #        # the related signature values can be set.
 #        formaction = action( :form ) {|txn|
 #            Monitor[self].cumulativeRuntime.time do
-#                templ = txn.templates[:form]
+#                templ = self.loadTemplate( :form )
 #                templ.txn = txn
 #                return templ
 #            end
@@ -532,10 +532,10 @@ class Applet < Arrow::Object
 		self.log.debug "In action_missing_action with: raction = %p, args = %p" %
 			[ raction, args ]
 
-		if raction && txn.templates.key?( raction.intern )
+		if raction && @signature.templates.key?( raction.intern )
 			self.log.debug "Using template sender default action for %s" % raction
 			txn.vargs = self.makeValidator( raction, txn )
-			tmpl = txn.templates[ raction.intern ]
+			tmpl = self.loadTemplate( raction.intern )
 			tmpl.txn = txn
 			return tmpl
 		else
@@ -575,29 +575,22 @@ class Applet < Arrow::Object
 		txn.request.content_type = "text/html"
 		txn.request.sync_header = true
 
-		# Load the applet's templates and add them to the transaction
-		txn.templates = self.loadTemplates( @signature.templates )
+		# Backward-compatibility hack. Relies on the fact that Method#[] works just
+		# like a Hash accessor. Mmmm... hacquery.
+		txn.templates = method( :loadTemplate )
 	end
 
 
-	### Load the templates specified in the given +hash+. The +hash+ should
-	### be in the same form as the ':templates' key of the
-	### Arrow::Applet::SignatureStruct specification. The returned hash
-	### will be a duplicate of the original with the template paths replaced
-	### with the corresponding template objects.
-	def loadTemplates( hash )
-		rhash = hash.dup
-		self.log.debug "Loading applet templates: %p" % hash
+	### Load and return the template associated with the given +key+ according
+	### to the applet's signature. Returns +nil+ if no such template exists.
+	def loadTemplate( key )
+		
+		tname = @signature.templates[key] or return nil
+		tname.untaint
 
-		rhash.each_key {|key|
-			self.log.debug "Loading template for '%p'" % key
-			tname = rhash[key]
-			tname.untaint
-			rhash[ key ] = @templateFactory.getTemplate( tname )
-		}
-
-		return rhash
+		return @templateFactory.getTemplate( tname )
 	end
+	alias_method :template, :loadTemplate
 
 
 	### Create a FormValidator object for the specified +action+ which has

@@ -73,7 +73,7 @@ class TimeClock < Arrow::Applet
 	### they return in a container 'main' template.
 	def run( txn, *rest )
 		super {|meth, txn, *rest|
-			template = txn.templates[:main]
+			template = self.loadTemplate( :main )
 			
 			template.body = meth.call( txn, *rest )
 			template.txn = txn

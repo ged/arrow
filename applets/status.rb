@@ -59,7 +59,7 @@ class ServerStatus < Arrow::Applet
 		self.log.debug "In the 'display' action of the '%s' applet." %
 			self.signature.name 
 
-		templ = txn.templates[:status]
+		templ = self.loadTemplate( :status )
 		templ.registry = txn.broker.registry
 		templ.transaction = txn
 		templ.pid = Process::pid
@@ -84,7 +84,7 @@ class ServerStatus < Arrow::Applet
 
 		targetapp = re.object
 
-		templ = txn.templates[:applet]
+		templ = self.loadTemplate( :applet )
 		templ.uri = args.join("/")
 		templ.applet = targetapp
 		templ.re = re
