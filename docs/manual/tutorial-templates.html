@@ -153,12 +153,13 @@
 			</samp>
 		  </dd>
 
-		  <dd>Your run-of-the-mill conditional flow control.  The <code>else</code>
-		  is optional, the <code>elsif</code>s can be repeated any number of times
-		  (including zero), and the <var>statement</var> can be any template
-		  variable, method chain off a template variable, or regular expression
-		  match of a template variable (like
-		  <code>&lt;?if var.method =~ /regex/ ?&gt;</code>).</dd>
+		  <dd>Your run-of-the-mill conditional flow control.  The
+		  <code>else</code> and <code>elsif</code>s are optional, the
+		  <code>elsif</code>s can be repeated any number of times (including
+		  zero), and the <var>statement</var> can be any template variable,
+		  method chain off a template variable, or regular expression match of a
+		  template variable (like <code>&lt;?if var.method =~ /regex/
+		  ?&gt;</code>).</dd>
 
 		  <dt>for</dt>
 		  <dd class="format">
@@ -205,8 +206,9 @@
 			<samp>
 			  &lt;?import <var>attribute</var> ?&gt;<br/>
 			  &lt;?import <var>attribute</var> as <var>altname</var> ?&gt;<br/>
-			  &lt;?import <var>attribute</var>, <var>var2</var> ?&gt;<br/>
-			  &lt;?import <var>attribute</var> as <var>altname</var>, <var>var2</var> ?&gt;
+			  &lt;?import <var>attribute</var>, <var>attr2</var> ?&gt;<br/>
+			  &lt;?import <var>attribute</var> as <var>altname</var>,
+			  <var>attr2</var> as <var>altname2</var> ?&gt;
 			</samp>
 		  </dd>
 
@@ -242,7 +244,7 @@
 The times for this race were:&lt;br/&gt;
 &lt;?include <var>table.tmpl</var> as <var>thisrace</var> ?&gt;
 
-Total times:
+Total times:&lt;br/&gt;
 &lt;?include <var>table.tmpl</var> as <var>totals</var> ?&gt;
 </code></pre>
 
