@@ -49,6 +49,31 @@ class Arrow::ConfigTestCase < Arrow::TestCase
 	# The name of the testing configuration file
 	TestConfigFilename = File::join( File::dirname(__FILE__), "testconfig.conf" )
 
+	# Testing Config::Loader class
+	class TestLoader < Arrow::Config::Loader
+		def initialize( *args )
+			super
+			@savedConfig = nil
+		end
+
+		def load( name )
+			return @savedConfig || TestConfig
+		end
+
+		def save( hash, name )
+			@savedConfig = hash
+		end
+
+		def isNewer?( name, time )
+			false
+		end
+	end
+
+
+	#################################################################
+	###	M E T H O D S
+	#################################################################
+	
 	### Compare +expected+ config value to +actual+.
 	def assert_config_equal( expected, actual, msg=nil )
 		case expected
@@ -131,6 +156,8 @@ class Arrow::ConfigTestCase < Arrow::TestCase
 		}
 		assert_instance_of Arrow::Config::ConfigStruct, struct
 
+		assert_respond_to struct, :[]
+
 		# :TODO: This whole block should really be factored into something that
 		# can traverse the whole TestConfig recursively to test more then 2-deep
 		# methods.
@@ -146,6 +173,10 @@ class Arrow::ConfigTestCase < Arrow::TestCase
 
 			# Get
 			assert_nothing_raised { rval = struct.send(key) }
+			assert_config_equal val, rval, "#{key}"
+
+			# Get via index operator
+			assert_nothing_raised { rval = struct[key] }
 			assert_config_equal val, rval, "#{key}"
 			
 			# Predicate
@@ -223,13 +254,22 @@ class Arrow::ConfigTestCase < Arrow::TestCase
 	### Test the abstract Config::Loader class.
 	def test_30_Loader
 		printTestHeader "Arrow::Config: Loader base class"
+		rval = loader = nil
+		createTime = Time::now
 
-# Removed until I figure out the weird doubling bug with AbstractClass [MG]
-#		assert_raises( Arrow::InstantiationError ) {
-#			Arrow::Config::Loader::new
-#		}
+		assert_nothing_raised { loader = Arrow::Config::Loader::create('test') }
+		assert_kind_of Arrow::Config::Loader, loader
 
-		assert_respond_to Arrow::Config::Loader, :create
+		# The #load method
+		assert_respond_to loader, :load
+		assert_nothing_raised { rval = loader.load("foo") }
+		assert_instance_of Hash, rval
+		assert rval.key?( :applets ), "Loaded hash has an :applets key"
+		assert rval.key?( :templates ), "Loaded hash has a :templates key"
+
+		# The #save method
+		assert_respond_to loader, :save
+		assert_nothing_raised { loader.save(rval, "foo") }
 	end
 
 
