@@ -68,9 +68,11 @@
 		  </td>
 		</tr>
 
+		<!-- [?call applet.method(:delegate).to_s ?] -->
+
 		<tr class="odd-row">
 		  <th class="row-title">Chainable?</th>
-		  <td><strong><?if applet.respond_to?(:delegate) ?>Yes.<?else?>No.<?end if?></strong></td>
+		  <td><strong><?if applet.delegable? ?>Yes.<?else?>No.<?end if?></strong></td>
 		</tr>
 
 		<tr class="even-row">

@@ -512,9 +512,17 @@ class Applet < Arrow::Object
 
 
 	### Wrapper method for a delegation (chained) request.
-	#def delegate( txn, *args )
-	#	yield( txn, *args )
-	#end
+	def delegate( txn, *args )
+		yield( txn, *args )
+	end
+
+
+	### Returns +true+ if the receiver has a #delegate method that is inherited
+	### from somewhere other than the base Arrow::Applet class.
+	def delegable?
+		return self.method(:delegate).to_s !~ /\(Arrow::Applet\)/
+	end
+	alias_method :chainable?, :delegable?
 
 
 	### The action invoked if the specified action is not explicitly
