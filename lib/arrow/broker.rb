@@ -148,9 +148,9 @@ module Arrow
 
 			self.log.debug "Searching for appletchain for %p" % [uriParts]
 			if allowInternal
-				identPat = /^\w[-\w]+/
+				identPat = /^\w[-\w]*/
 			else
-				identPat = /^[a-zA-Z][-\w]+/
+				identPat = /^[a-zA-Z][-\w]*/
 			end
 
 			# Map uri fragments onto registry entries
