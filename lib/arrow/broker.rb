@@ -140,7 +140,7 @@ module Arrow
 		### Find the chain of applets indicated by the given +uri+ and return an
 		### Array of tuples describing the chain. The format of the chain will
 		### be:
-		###   [ [RegistryEntry1, URI, Array[*uriparts]], ... ]
+		###   [ [RegistryEntry, URI, Array[*uriparts]], ... ]
 		def findAppletChain( uri, allowInternal=false )
 			uriParts = uri.sub(%r{^/}, '').split(%r{/})
 			appletchain = []
@@ -190,30 +190,60 @@ module Arrow
 		### Given a chain of applets built from a URI, run the +index+th one with
 		### the specified transaction (+txn+). Applets before the last get called
 		### via their #delegate method, while the last one is called via #run.
-		def runAppletChain( txn, chain, index=0, *args )
-			re = chain[index][0]
-			txn.appletPath = chain[index][1]
-			args.replace( chain[index][2] ) if args.empty?
+		def runAppletChain( txn, chain )
+			self.log.debug "Running applet chain: #{chain.inspect}"
+			raise AppletError, "Malformed applet chain" if
+				chain.empty? || !chain.first.is_a?( Array )
+
+			re, txn.appletPath, args = self.unwrapChainLink( chain.first )
 
 			# Run the final applet in the chain
-			if index == chain.nitems - 1
+			if chain.nitems == 1
 				self.log.debug "Running final applet in chain"
 				return self.runApplet( re, txn, args )
 			else
-				self.log.debug "Running applet %d in chain of %d" %
-					[ index + 1, chain.nitems ]
-				return re.object.delegate( txn, *args ) {|*args|
-					self.runAppletChain( txn, chain, index+1, *args )
+				dchain = chain[ 1..-1 ]
+				self.log.debug "Running applet %s in chain of %d; chain = %p" %
+					[ re.object.signature.name, chain.nitems, dchain ]
+			
+				return re.object.delegate( txn, dchain, *args ) {|subchain|
+					subchain = dchain if subchain.nil?
+					self.log.debug "Delegated call to appletchain %p" % [ subchain ]
+					self.runAppletChain( txn, subchain )
 				}
 			end
 		rescue ::Exception => err
-			self.log.error "Error while executing applet chain: %s (%s): %s:\n\t%s" % [
-				re.appletclass.signature.name,
-				chain[index][1],
+			self.log.error "Error while executing applet chain: %p (%s): %s:\n\t%s" % [
+				re,
+				chain.first[1],
 				err.message,
 				err.backtrace.join("\n\t"),
 			]
 			return self.runErrorHandler( re, txn, err )
+		end
+
+		
+		### Check the specified +link+ of an applet chain for sanity and return
+		### its constituent bits for assignment. This is necessary to provide
+		### sensible errors if a delegating app screws up a chain somehow.
+		def unwrapChainLink( link )
+			re = link[0] or raise AppletChainError, "Null registry entry"
+
+			unless re.is_a?( RegistryEntry )
+				emsg = "Registry entry is a %s: Expected a RegistryEntry" %
+					re.class.name
+				raise AppletChainError, emsg
+			end
+			
+			path = link[1] or raise AppletChainError, "Null path"
+			args = link[2] or raise AppletChainError, "Null argument list"
+			unless args.is_a?( Array )
+				emsg = "Argument list is a %s: expected an Array" %
+					args.class.name
+				raise AppletChainError, emsg
+			end					
+
+			return re, path, args
 		end
 
 
@@ -251,7 +281,7 @@ module Arrow
 				if appletchain.empty?
 					rval = self.runMissingAppletHandler( txn, handlerUri )
 				else
-					rval = self.runAppletChain( txn, appletchain, 0, *args )
+					rval = self.runAppletChain( txn, appletchain, *args )
 				end
 			else
 				rval = self.builtinDefaultHandler( txn )
@@ -288,7 +318,7 @@ module Arrow
 			# If the user-configured handler maps to one or more handlers, run
 			# them. Otherwise, run the build-in handler.
 			unless appletchain.nil? || appletchain.empty?
-				rval = self.runAppletChain( txn, appletchain, 0, *args )
+				rval = self.runAppletChain( txn, appletchain, *args )
 			else
 				rval = self.builtinMissingHandler( txn, *args )
 			end
