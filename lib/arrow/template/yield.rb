@@ -145,7 +145,7 @@ class Template
 					attributes[ pair[1] ] = pair[0]
 				}
 				#self.log.debug "  override attributes are: %p" % [ attributes ]
-				template.withOverriddenAttributes( attributes ) {|template|
+				template.withOverriddenAttributes( scope, attributes ) {|template|
 					res << template.render( @subnodes, scope )
 				}
 
