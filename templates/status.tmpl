@@ -54,7 +54,7 @@
 		  </td>
 		  <td class="applet-name"><?call re.object.signature.name ?></td>
 		  <td class="applet-version"><?call re.object.signature.version ?></td>
-		  <td class="applet-source"><?escape re.object.class.name ?></td>
+		  <td class="applet-source"><?escape re.object.class.name.gsub(/.*>::/,'') ?></td>
 		  <td class="applet-run"><button onclick="statApplet('[?attr uri ?]')">Inspect</button></td>
 		</tr>
 		<?end for?>
