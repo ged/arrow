@@ -478,22 +478,30 @@ module Arrow
 			# file
 			begin
 				self.loadAppletClasses( appletfile ) {|klass|
+
+					# Trim the Module serving as private namespace from the
+					# class name, then add the class to the filemap so we can
+					# keep track of which classes came from which files for
+					# reloading later.
 					klassname = klass.name.sub( /#<Module:0x\w+>::/, '' )
 					@filemap[ appletfile ].classes << klass
-					self.log.debug "Looking for a mapped %p" % klassname
 
+					self.log.debug "Looking for a mapped %p" % klassname
 					if urimap.key?( klassname )
 						self.log.info "Found one or more uris for '%s'" % klassname
 
-						# Install a distinct instance of the applet at each uri
-						# it's registered under.
+						# Create a new instance of the applet for each uri it's
+						# registered under, then wrap that in a RegistryEntry
+						# and put it in the entries hash we'll return later.
 						urimap[ klassname ].each do |uri|
-							applet = klass.new( @config, @templateFactory )
+							applet = klass.new( @config, @templateFactory, uri )
 							timestamp = Time::now
 							re = RegistryEntry::new( klass, appletfile, timestamp, applet )
 							self.log.info "Registered %p (%s) at '%s'" %
 								[ applet, klassname, uri ]
 
+							# Track the uris the applet file affects, and add it
+							# to the registry entries
 							@filemap[ appletfile ].uris << uri
 							entries[ uri ] = re
 						end
