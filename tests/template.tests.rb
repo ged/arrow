@@ -899,3 +899,36 @@ assert_match( pat, rval )
 assert_instance_of Arrow::Template, template
 ===
 
+### Render directive
+=== Simple
+
+<?render foo as bar in simplerender.tmpl ?>
+
+---
+debugMsg "Setting outer template's 'foo' to 'baz'"
+assert_nothing_raised { template.foo = "baz" }
+assert_equal "baz", template.foo
+
+assert_nothing_raised {	rval = template.render }
+debugMsg "\n" + hruleSection( rval, "Rendered" )
+assert_match( templateContentRe('Simple Render: baz'), rval )
+===
+
+=== With import
+
+Something: <?attr something?>
+<?render foo as bar in importrender.tmpl ?>
+
+---
+debugMsg "Setting outer template's 'foo' to 'baz'"
+assert_nothing_raised { template.foo = "baz" }
+assert_equal "baz", template.foo
+
+debugMsg "Setting outer template's 'something' to 'sasquatch'"
+assert_nothing_raised { template.something = "sasquatch" }
+
+assert_nothing_raised { rval = template.render }
+debugMsg "\n" + hruleSection( rval, "Rendered" )
+assert_match( templateContentRe("\nSomething: sasquatch\nBar: baz and sasquatch"), rval )
+===
+
