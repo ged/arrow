@@ -42,6 +42,14 @@
 	<div id="content">
 	  <h1>Arrow: Installation</h1>
 
+	  <p>As with most things, the hardest part of getting Arrow onto your
+		machine is the dependencies.  Depending on your operating system, many
+		of these will have packages for easier installation.  It's worth
+		checking with all of these, but be careful to verify the versions are
+		greater than or equal to what we list as required.  Otherwise, we
+		provide here links to what we believe to be the most authoritative
+		source of each.</p>
+
 	  <div class="section">
 		<h2><a id="apache">Apache</a></h2>
 
@@ -64,10 +72,11 @@
 
 	  <div class="section">
 		<h2><a id="ruby">Ruby</a></h2>
-		<p><a href="http://www.ruby-lang.org/en/20020102.html">Ruby (1.8.1)</a>
-		  is strongly urged, as the majority of our work has been done under the <a
-			href="http://www.ruby-lang.org/en/20020106.html">development</a>
-		  version of ruby.</p>
+		<p>Using <a href="http://ruby-lang.org/en/20020102.html">Ruby
+			(1.8.1)</a> is strongly urged, as the majority of our work has been
+			done under the <a
+			href="http://ruby-lang.org/en/20020106.html">development</a> version
+			of ruby.</p>
 
 		<p>Arrow has also been tested and seems to work under the 1.8.0 release,
 		  but that version of Ruby has some known bugs which are fixed in later
@@ -128,7 +137,7 @@
           <li><a
           href="http://raa.ruby-lang.org/list.rhtml?name=criteria">criteria
 			  (1.1a)</a> - adds in the ability for DataSources to use this
-			interesting interface to querying.</li>
+			interesting interface to querying (not presently implemented).</li>
         </ul>
 
 	  </div>
@@ -136,8 +145,10 @@
 	  <div class="section">
 		<h2><a id="arrow_install">Installing the Arrow Libraries</a></h2>
 
-		<p>Once all of the dependencies are installed, you can test Arrow by
-		  running the included unit tests:</p>
+		<p>Now that all of the dependencies are installed (and you have <a
+			href="download.html">obtained the Arrow sources</a>), you can
+			optionally test Arrow by running the included unit tests (which
+			should all pass...):</p>
 
 		<p><tt>$ </tt><kbd>./test.rb</kbd></p>
 
@@ -150,11 +161,11 @@ Started
 .....................
 Finished in 1.167613 seconds.
 
-93 tests, 2168 assertions, 0 failures, 0 errors
+103 tests, 2276 assertions, 0 failures, 0 errors
 </pre>
 
-		<p>Install the Arrow ruby libraries with the installer (you may need
-		  root privileges to do this):</p>
+		<p>Finally, put the Arrow ruby libraries in place with the provided
+		  installer (you may need root privileges to do this):</p>
 
 		<p><tt>$ </tt><kbd>./install.rb</kbd></p>
 
@@ -166,6 +177,11 @@ Testing for the HashSlice library...found.
 Testing for the Strscan library...found.
 Installing...done.
 </pre>
+
+		<p>This is going to put the Arrow libraries in place, but will not have
+		  set up any default applets, templates or configuration files.  These
+		  will need to be added as we <a href="config.html">configure</a>
+		  things.</p>
 
 	  </div>
 
