@@ -31,30 +31,16 @@
 #                   },
 #                },
 #            },
-#            :monitors           => {
-#                :averageExecutionTimer => {
-#                    :description =>
-#                        "Average execution time of each applet method.",
-#                    :type => AverageTimerTable,
-#                },
-#                :cumulativeRuntime => {
-#                    :description =>
-#                        "Total time used by this applet.",
-#                    :type => TotalTimer,
-#                }
-#            }
 #        }
 #
-#		 # Define the 'display' action
+#        # Define the 'display' action
 #        action( 'display' ) {|txn|
-#            Monitor[self].cumulativeRuntime.time do
-#                char = txn.vargs[:char] || 'x'
-#                char_page = self.make_character_page( char )
-#                templ = self.loadTemplate( :main )
-#                templ.char_page = char_page
+#            char = txn.vargs[:char] || 'x'
+#            char_page = self.make_character_page( char )
+#            templ = self.loadTemplate( :main )
+#            templ.char_page = char_page
 #
-#                return templ
-#            end
+#            return templ
 #        }
 #
 #
@@ -62,17 +48,17 @@
 #        # the character the block is composed of. Save the returned proxy so
 #        # the related signature values can be set.
 #        formaction = action( :form ) {|txn|
-#            Monitor[self].cumulativeRuntime.time do
-#                templ = self.loadTemplate( :form )
-#                templ.txn = txn
-#                return templ
-#            end
+#            templ = self.loadTemplate( :form )
+#            templ.txn = txn
+#            return templ
 #        }
 #        formaction.template = "form.tmpl"
 #
+#        # Make a page full of 
 #        def make_character_page( char )
-#            Monitor[self].averageExecutionTimer.time( :make_character_page ) do
-#                page = (char * 80)
+#            page = ''
+#            40.times do
+#                page << (char * 80) << "\n"
 #            end
 #        end
 #
@@ -403,16 +389,19 @@ class Applet < Arrow::Object
 	#############################################################
 
 
-	### Create a new Arrow::Applet object with the specified +config+
-	### (an Arrow::Config object) and +templateFactory+ (an
-	### Arrow::TemplateFactory object).
-	def initialize( config, templateFactory )
-		@config			 = config
-		@templateFactory = templateFactory
-		@signature		 = self.class.signature
-		@runCount		 = 0
-		@totalUtime		 = 0
-		@totalStime		 = 0
+	### Create a new Arrow::Applet object with the specified +config+ (an
+	### Arrow::Config object), +templateFactory+ (an Arrow::TemplateFactory
+	### object), and the +uri+ the applet will live under in the appserver (a
+	### String).
+	def initialize( config, templateFactory, uri )
+		@config				= config
+		@templateFactory	= templateFactory
+		@uri				= uri
+
+		@signature			= self.class.signature
+		@runCount			= 0
+		@totalUtime			= 0
+		@totalStime			= 0
 
 		# Make a regexp out of all public <something>_action methods
 		@actions		= self.public_methods( false ).
@@ -428,6 +417,9 @@ class Applet < Arrow::Object
 
 	# The Arrow::Config object which contains the system's configuration.
 	attr_accessor :config
+
+	# The URI the applet answers to
+	attr_reader :uri
 
 	# The Struct that contains the configuration values for this applet
 	attr_reader :signature
