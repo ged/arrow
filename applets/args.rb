@@ -51,6 +51,10 @@ class ArgumentTester < Arrow::Applet
 		},
 	}
 
+	### All of the applet's functionality is handled by the default action
+	### (action_missing_action), which loads the 'display' template and renders
+	### it.
+
 end # class ArgumentTester
 
 
