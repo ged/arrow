@@ -126,6 +126,8 @@ class Template
 				end
 			}
 
+			self.log.debug "Returning from Iterator#each"
+
 			return @items
 		ensure
 			@items		= items
