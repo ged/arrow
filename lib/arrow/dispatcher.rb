@@ -5,17 +5,30 @@
 # 
 # == Synopsis
 # 
+# Simple configuration:
+#
 #	RubyRequire 'arrow'
-#   RubyChildInitHandler Arrow::Dispatcher.create( :myapp => "myapp.yml", :help => "help.yml" )
+#   RubyChildInitHandler "Arrow::Dispatcher.create( 'myapp.yaml' )"
+#
+#   <Location /arrow>
+#       Handler ruby-object
+#		RubyHandler Arrow::Dispatcher.instance
+#	</Location>
+#
+# More-complex setup; run two Arrow dispatchers with different configurations
+# from different Locations:
+#
+#	RubyRequire 'arrow'
+#   RubyChildInitHandler "Arrow::Dispatcher.create( :myapp => 'myapp.yml', :help => 'help.yml' )"
 #
 #   <Location /myapp>
-#		Handle ruby-object
-#		RubyHandler Arrow::Dispatcher.instance( :myapp )
+#		Handler ruby-object
+#		RubyHandler Arrow::Dispatcher.instance(:myapp)
 #	</Location>
 # 
 #   <Location /help>
-#		Handle ruby-object
-#		RubyHandler Arrow::Dispatcher.instance( :help )
+#		Handler ruby-object
+#		RubyHandler Arrow::Dispatcher.instance(:help)
 #	</Location>
 # 
 # == Subversion Id
