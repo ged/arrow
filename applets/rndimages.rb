@@ -50,6 +50,8 @@ class RandomImages < Arrow::Applet
 	# Image struct
 	Image = Struct::new( "RandomImage", :src, :href )
 
+	# Default number of images to display from the feed at a time
+	DefaultImageCount = 15
 
 	# Applet signature
 	Signature = {
@@ -71,6 +73,7 @@ class RandomImages < Arrow::Applet
 		if @config.respond_to?( :rndimages )
 			feeduri = @config.rndimages.feedurl
 			@cache_seconds = Integer( @config.rndimages.cacheseconds ) rescue nil
+			@count = Integer( @config.rndimages.displaycount ) rescue nil
 		end
 
 		feeduri ||= DefaultFeedUrl
@@ -78,6 +81,7 @@ class RandomImages < Arrow::Applet
 
 		@cache_seconds ||= DefaultCacheSeconds
 		@cache_expiry = Time::at( 0 )
+		@count ||= DefaultImageCount
 		@images = []
 	end
 
@@ -95,10 +99,16 @@ class RandomImages < Arrow::Applet
 			@cache_expiry = Time::now + @cache_seconds
 		end
 
+		imgslice = []
+		until imgslice.nitems == @count
+			imgslice << rand( @images.nitems )
+			imgslice.uniq!
+		end
+
 		tmpl = self.loadTemplate( :display )
 		tmpl.txn = txn
 		tmpl.app = self
-		tmpl.images = @images
+		tmpl.images = @images.values_at( *imgslice )
 
 		return tmpl
 	}
