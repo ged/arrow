@@ -12,7 +12,7 @@
 # * Michael Granger <ged@FaerieMUD.org>
 # 
 
-InstikiBase = "/Library/Instiki"
+InstikiBase = "/Users/ged/source/ruby/instiki-0.9.1"
 %w[ /libraries/ /app/models /app/controllers ].each do |dir|
 	$LOAD_PATH.unshift( File::join(InstikiBase, dir) )
 end
@@ -25,6 +25,15 @@ require 'arrow/applet'
 ### It's a simple wiki that can serve as a proof of concept
 class WikiApplet < Arrow::Applet
 
+	# SVN Revision
+	SVNRev = %q$Rev$
+
+	# SVN Id
+	SVNId = %q$Id$
+
+	# SVN URL
+	SVNURL = %q$URL$
+
 	# Applet signature
 	Signature = {
 		:name => "Arrow Wiki Toplevel Applet",
@@ -34,18 +43,34 @@ class WikiApplet < Arrow::Applet
 		:templates => {
 			:main		=> 'wiki/main.tmpl',
 			:new_system => 'wiki/new_system.tmpl',
+			:show		=> 'wiki/show.tmpl',
+			:new		=> 'wiki/new.tmpl',
+			:save		=> 'wiki/save.tmpl',
+			:formerror	=> 'wiki/formerror.tmpl',
 		},
 
-		:vargs => {
+		:validatorProfiles => {
+
+			# Target for the form in /new_system
 			:create_system => {
 				:untaint_all_constraints => true,
 				:required       => [:password, :web_name, :web_address],
                 :constraints    => {
-                    :password		=> /^([\x20-\x7e]+)$/,
-                    :web_name		=> /^([\x20-\x7f]+)$/,
+                    :password		=> /^([\x20-\xff]+)$/,
+                    :web_name		=> /^([\x20-\xff]+)$/,
 					:web_address	=> /^([a-z0-9]+)$/i,
                 },
-			}
+			},
+
+			# Target for the forms in /edit and /new
+			:save => {
+				:untaint_all_constraints => true,
+				:required       => [:author, :content],
+                :constraints    => {
+                    :author			=> /^([\x20-\xff]+)$/,
+					:content		=> /^([\r\n\t\x20-\xff]+)$/,
+                },
+			},
 		},
 	}
 
@@ -137,29 +162,91 @@ class WikiApplet < Arrow::Applet
 			vargs = txn.vargs
 			self.log.info "Creating new web with args: %p" % [ vargs.valid.to_a ]
 
-			self.wiki.setup( vargs[:password], vargs[:web_name], vargs[:web_address] ) unless
+			self.wiki.setup(
+				vargs[:password],
+				vargs[:web_name],
+				vargs[:web_address] ) unless
 				self.wiki.setup?
 
-			return txn.redirect( txn.action + "/new/" + vargs[:web_address] + "/HomePage" )
+			return txn.redirect( txn.action + "/new/" + vargs[:web_address] +
+				"/HomePage" )
 		end
 	end
 
 
+	### /new/+web+/+topic+ -- create a new topic on the specified +web+ called
+	### +topic+.
 	def new_action( txn, web=nil, topic=nil, *args )
-		txn.redirect( txn.action ) unless web
-		txn.redirect( txn.action + "/show/" + web ) unless topic
+		return txn.redirect( txn.action ) unless web
+		return txn.redirect( txn.action + "/show/" + web ) unless topic
 
-		txn.content_type = "text/plain"
-		return "Would be creating the '%s' topic of the '%s' web." % [ topic, web ]
+		templ = self.loadTemplate( :new )
+
+		templ.txn = txn
+		templ.topic = topic
+		templ.web = web
+		templ.author = txn.session[:author] || "AnonymousCoward"
+
+		return templ
 	end
 
+
+	### /show/+web+/+topic+ -- Show the specified +topic+ from the given +web+.
 	def show_action( txn, web=nil, topic="HomePage", *args )
-		txn.redirect( txn.action ) unless web
+		return txn.redirect( txn.action ) unless web
 
-		txn.content_type = "text/plain"
-		return "Would be showing the '%s' topic of the '%s' web." % [ topic, web ]
+		self.log.debug "Showing '#{web}/#{topic}'"
+
+		if page = self.wiki.read_page( web, topic )
+			templ = self.loadTemplate( :show )
+			templ.txn = txn
+			templ.web = web
+			templ.page = page
+
+			return templ
+		else
+			return txn.redirect( txn.applet + "/new/" + topic )
+		end
 	end
 
+
+	### /save/+web+/+topic+ -- Save the values for the specified +topic+ to the
+	### given +web+, creating it if it didn't already exist.
+	def save_action( txn, web=nil, topic=nil, *args )
+		self.log.debug "Save: web: %p, topic: %p" % [web, topic]
+		return txn.redirect( txn.applet ) unless web
+		return txn.redirect( txn.applet + "/show/" + web ) unless topic
+
+		templ = nil
+		txn.session[:wiki_author] = txn.vargs[:author] if txn.vargs.key?( :author )
+
+		# If the arguments don't validate, fetch the template from the referring
+		# action again and inject explanatory errors into it.
+		return self.report_form_errors( txn, web, topic ) if txn.vargs.errors?
+
+		webobj = self.wiki.webs[ web ] or return txn.redirect( txn.applet )
+		author = Author::new( txn.vargs[:author], txn.remote_ip )
+		self.log.debug "Save for web: %p, author: %p" % [webobj, author]
+		
+		# If it already exists, add a revision to the page
+		if webobj.pages[ topic ]
+			self.log.debug "Revising page '#{topic}'"
+			page = self.wiki.
+				revise_page( web, topic, txn.params[:content], Time::now, author )
+			page.unlock
+
+		# Otherwise it's a new page
+		else
+			self.log.debug "Creating page '#{topic}'"
+			page = self.wiki.
+				write_page( web, topic, txn.params[:content], Time::now, author )
+		end
+
+		return txn.redirect( txn.applet + "/" + ["show", web, topic].join("/") )
+	end
+
+
+	### /web_list -- List the webs that are available
 	def web_list_action( txn, *args )
 		txn.content_type = "text/plain"
 		return "Would be listing the available webs"
@@ -170,6 +257,26 @@ class WikiApplet < Arrow::Applet
 	protected
 	#########
 
+
+	### Call the referring action again, but add any validator error messages to
+	### the returned template's 'formerrors' field.
+	def report_form_errors( txn, web, topic, *args )
+		templ = nil
+		refaction = txn.referringAction
+				
+		if refaction && self.actions[ refaction ]
+			templ = self.subrun( refaction, txn, web, topic, *args )
+		else
+			templ = self.loadTemplate( :formerror )
+
+			templ.txn = txn
+			templ.applet = self
+		end			
+
+		templ.formerrors = txn.vargs.errorMessages
+		return templ
+	end
+	
 
 	### Return the WikiService instance
 	def wiki

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<!--
+
+  New Topic Template
+  $Id$
+
+  -->
+
+  <head>
+	<title>New Topic: <?escape topic ?></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+	<link rel="stylesheet" type="text/css" href="/stylesheets/arrow.css" />
+  </head>
+  <body>
+
+	<h1>New Topic: <?escape topic ?></h1>
+
+	<?include wiki/markup_help.incl as markup_help ?>
+
+	<?if formerrors ?>
+	<div id="form-errors">
+	  <ul class="error-list">
+		<?for error in formerrors ?>
+		<li><?attr error ?></li>
+		<?end for?>
+	  </ul>
+	</div>
+	<?end if?>
+
+	<form action="[?call txn.applet ?]/save/[?urlencode topic ?]" method="post">
+	  <p>
+		<textarea name="content" cols="80" rows="20"></textarea>
+	  </p>
+
+	  <p>
+		<input type="submit" value="Create" /> as 
+		<input type="text" name="author" id="authorName" value="[?call author ?]"
+			   onclick="this.value == 'AnonymousCoward' ? this.value = '' : true" />
+	  </p>
+	</form>
+
+	<?include navbar.incl ?>
+
+  </body>
+</html>
+
+
+<!--
+  Local Variables:
+  mode: nxml
+ -->
+

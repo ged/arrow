@@ -1,0 +1,6 @@
+<?inherit web ?>
+
+<div style="text-size: 80%; border: 1px dotted #333; background: #dedede;">
+{Markup help goes here}
+</div>
+
