@@ -25,11 +25,14 @@ module Arrow
 	### (>>>description<<<).
 	class (>>>class<<<) < (>>>superclass<<<)
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id$
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 
 		### Create a new Arrow::(>>>class<<<) object.
