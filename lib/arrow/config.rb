@@ -139,8 +139,8 @@ module Arrow
 		Defaults = {
 			:startMonitor			=> false,
 
-			:logLevel				=> :info,
-			:templateLogLevel		=> :notice,
+			:logLevel				=> "info",
+			:templateLogLevel		=> "notice",
 
 			:applets => {
 				:path			=> Arrow::Path::new( "applets:/www/applets" ),
