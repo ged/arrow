@@ -3,6 +3,7 @@
 <?if txn?>
 	  <a href="[?call txn.appRoot ?]">Top</a> |
 	  <a href="[?call txn.appRoot ?]/status/applet/[?call txn.appletPath?]">Applet Status</a> |
+	  <a href="[?call txn.appRoot ?]/view-applet/[?call txn.appletPath?]">Applet Source</a> |
 <?else?>
 	  <!-- Cannot build top links without a transaction object called 'txn'. -->
 <?end if?>
