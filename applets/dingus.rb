@@ -44,11 +44,11 @@ class BlueClothDingus < Arrow::Applet
 		:validatorProfiles => {
 			:display => {
 				:required	=> :source,
-				:filters	=> [:strip],
 				:constraints	=> {
-					:source	=> /^[\x20-\x7f]+$/,
+					:source	=> /^[\x20-\x7f\r\n]+$/,
 				},
 			},
+
 		}
 	}
 
@@ -61,11 +61,16 @@ class BlueClothDingus < Arrow::Applet
 	action( 'display' ) {|txn, *args|
 		templ = txn.templates[:display]
 
-		if (( source = txn.vargs.valid[:source] ))
-			templ.source = BlueCloth::new( source )
-			templ.output = source.to_html
+		if (( source = txn.vargs.valid["source"] ))
+			self.log.debug "Got valid source argument: %s" % source
+			templ.source = source
+			templ.output = BlueCloth::new( source ).to_html
+		else
+			self.log.debug "No valid source argument: %p" % txn.vargs
 		end
 
+		templ.txn = txn
+		templ.app = self
 		return templ
 	}
 
