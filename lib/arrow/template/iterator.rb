@@ -90,7 +90,7 @@ class Template
 			@items = @items.entries
 			raise LocalJumpError, "no block given" unless block_given?
 
-			self.log.debug "Iterating over @items = %p" % [ @items ]
+			#self.log.debug "Iterating over @items = %p" % [ @items ]
 
 			# Save this point so #restart can jump back here later. This is in a
 			# loop because it needs to be remade after it's used the first time.
@@ -126,7 +126,7 @@ class Template
 				end
 			}
 
-			self.log.debug "Returning from Iterator#each"
+			#self.log.debug "Returning from Iterator#each"
 
 			return @items
 		ensure
