@@ -31,28 +31,24 @@ require 'arrow/mixins'
 require 'arrow/exceptions'
 require 'arrow/object'
 
-module Arrow
+### An abstract base class for monitor "subjects", which are datapoints
+### which may be subscribed to by monitoring applications.
+class Arrow::Subject < Arrow::Object
+	include Observable
 
-	### An abstract base class for monitor "subjects", which are datapoints
-	### which may be subscribed to by monitoring applications.
-	class Subject < Arrow::Object
-		include Observable
+	# SVN Revision
+	SVNRev = %q$Rev$
 
-		### Class constants
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
-		Rcsid = %q$Id$
+	# SVN Id
+	SVNId = %q$Id$
 
-
-		### Initialize a new Arrow::Subject (should be called from derivatives).
-		def initialize( description ) # :notnew:
-			@description = description
-		end
-		
-	end # class Subject
+	# SVN URL
+	SVNURL = %q$URL$
 
 
-	###
-
-
-end # module Arrow
-
+	### Initialize a new Arrow::Subject (should be called from derivatives).
+	def initialize( description ) # :notnew:
+		@description = description
+	end
+	
+end # class Arrow::Subject

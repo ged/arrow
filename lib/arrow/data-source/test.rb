@@ -22,53 +22,54 @@
 
 
 
-module Arrow
+### Locally-stored mock data source class to be used for testing purposes.
+class Arrow::TestDataSource < Arrow::DataSource
 
-	### Locally-stored mock data source class to be used for testing purposes.
-	class TestDataSource < Arrow::DataSource
+	# SVN Revision
+	SVNRev = %q$Rev$
 
-		### Class constants
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
-		Rcsid = %q$Id$
+	# SVN Id
+	SVNId = %q$Id$
 
-
-		#############################################################
-		###	C L A S S   M E T H O D S
-		#############################################################
-		private_class_method :new
-
-		### The identifier string for the data being copied.
-		@real_source
-		class << self
-			attr_reader :real_source
-		end
+	# SVN URL
+	SVNURL = %q$URL$
 
 
-		#############################################################
-		###	I N S T A N C E   M E T H O D S
-		#############################################################
-
-		### Creates a new TestData object with the given identifier, and
-		### either loads the pre-existing data from disk, or creates it.
-		def initialize( uri, source )
-			@source = source + "/" + name
-		end
+	#############################################################
+	###	C L A S S   M E T H O D S
+	#############################################################
+	private_class_method :new
 
 
-		######
-		public
-		######
+	### The identifier string for the data being copied.
+	@real_source
+	class << self
+		attr_reader :real_source
+	end
 
-		### Saves the test data to the data directory.
-		def save 
-			name = File.join(TestData.data_path,@source)
-			File.new(name, "w") {|file|
-				file.write(@data.to_yaml)
-			}
-		end
 
-	end # class TestDataSource
+	#############################################################
+	###	I N S T A N C E   M E T H O D S
+	#############################################################
 
-end # module Arrow
+	### Creates a new TestData object with the given identifier, and
+	### either loads the pre-existing data from disk, or creates it.
+	def initialize( uri, source )
+		@source = source + "/" + name
+	end
 
+
+	######
+	public
+	######
+
+	### Saves the test data to the data directory.
+	def save 
+		name = File.join(TestData.data_path,@source)
+		File.new(name, "w") {|file|
+			file.write(@data.to_yaml)
+		}
+	end
+
+end # class Arrow::TestDataSource
 

@@ -28,11 +28,14 @@ require 'criteria'
 ### The visitor patterned criteria extension to the Arrow::DataSource class.
 class Arrow::DataSource
 
-    # CVS version tag
-    CriteriaVersion = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
+	# SVN Revision
+	SVNRev = %q$Rev$
 
-	# CVS id tag
-	CriteriaRcsid = %q$Id$
+	# SVN Id
+	SVNId = %q$Id$
+
+	# SVN URL
+	SVNURL = %q$URL$
 
 
 	######

@@ -58,80 +58,80 @@ require 'arrow/mixins'
 require 'arrow/exceptions'
 require 'arrow/object'
 
-module Arrow
+### Instance of this class are used to monitor activity within an Arrow system..
+class Arrow::Monitor < Object
 
-	### Instance of this class are used to monitor activity within an Arrow system..
-	class Monitor < Object
+	require 'arrow/monitor/subjects'
 
-		require 'arrow/monitor/subjects'
+	# SVN Revision
+	SVNRev = %q$Rev$
 
-		### Class constants, instance variables, and methods
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
-		Rcsid = %q$Id$
+	# SVN Id
+	SVNId = %q$Id$
 
-		# The monitor instances that have been registered, keyed by the Modules
-		# that registered them.
-		@instances = {}
+	# SVN URL
+	SVNURL = %q$URL$
 
-
-		#############################################################
-		###	C L A S S   M E T H O D S
-		#############################################################
-
-		# Hide the 'new' method -- instantiation should be done through the
-		# register method.
-		private_class_method :new
-
-		# Accessor for the instances hash
-		class << self
-			attr_accessor :instances
-			protected :instances=
-		end
-
-		
-		### Start the backend monitor server
-		def self::startBackend( config )
-			# No-op currently
-			return false
-		end
+	# The monitor instances that have been registered, keyed by the Modules
+	# that registered them.
+	@instances = {}
 
 
-		### Register a +module+ with the monitoring system, specifying the
-		### available monitoring subjects in the +subjectHash+.
-		def self::register( mod, subjectHash )
-			@instances[ mod ] = new( subjectHash )
-		end
+	#############################################################
+	###	C L A S S   M E T H O D S
+	#############################################################
+
+	# Hide the 'new' method -- instantiation should be done through the
+	# register method.
+	private_class_method :new
+
+	# Accessor for the instances hash
+	class << self
+		attr_accessor :instances
+		protected :instances=
+	end
+
+	
+	### Start the backend monitor server
+	def self::startBackend( config )
+		# No-op currently
+		return false
+	end
 
 
-		#############################################################
-		###	I N S T A N C E   M E T H O D S
-		#############################################################
-
-		### Initialize an Arrow::Monitor object for the specified +mod+ and
-		### +subjectHash+.
-		def initialize( mod, subjectHash )
-			@module = mod
-			@subjects = {}
-
-			subjectHash.each {|sym,config|
-				subject = Monitor::Subject::create( config )
-				@subjects[ sym ] = subject
-			}
-		end
+	### Register a +module+ with the monitoring system, specifying the
+	### available monitoring subjects in the +subjectHash+.
+	def self::register( mod, subjectHash )
+		@instances[ mod ] = new( subjectHash )
+	end
 
 
-		######
-		public
-		######
+	#############################################################
+	###	I N S T A N C E   M E T H O D S
+	#############################################################
 
-		
+	### Initialize an Arrow::Monitor object for the specified +mod+ and
+	### +subjectHash+.
+	def initialize( mod, subjectHash )
+		@module = mod
+		@subjects = {}
 
-		#########
-		protected
-		#########
+		subjectHash.each {|sym,config|
+			subject = Monitor::Subject::create( config )
+			@subjects[ sym ] = subject
+		}
+	end
 
 
-	end # class monitor
+	######
+	public
+	######
 
-end # module Arrow
+	
 
+	#########
+	protected
+	#########
+
+
+end # class Arrow::Monitor
