@@ -1,0 +1,212 @@
+/* 
+ * Arrow Appserver Default Apps Stylesheet
+ * $Id$
+ * Time-stamp: <24-Jan-2004 22:11:39 deveiant>
+ */
+
+@import url("http://www.RubyCrafters.com/stylesheets/base.css");
+
+body {
+    margin: 3em 5em;
+    background: #efefef;
+    color: #333;
+    font: 12px "Lucida Grande", Skia, Tahoma, Verdana, sans-serif;
+}
+
+table {
+    background: #fefefe;
+    color: black;
+    border-left: 1px solid #333;
+    border-top: 1px solid #333;
+    border-right: 2px solid black;
+    border-bottom: 2px solid black;
+}
+
+th {
+    background: white;
+    color: black;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: bottom;
+}
+
+th.row-title {
+    background: white;
+    color: black;
+    font-weight: bold;
+    text-align: right;
+    vertical-align: top;
+}
+
+td { padding: 1px 3px; }
+
+pre, .dotbox {
+    margin: 5px;
+    background: #ccc;
+    color: black;
+    border: 1px dotted black;
+}
+
+ul {
+    margin: 2px;
+    padding: 0 15px;
+}
+
+ul > li {
+    margin: 1px 4px;
+}
+
+h1 { text-shadow: #666 2px 2px 2px; }
+h2, h3 { text-shadow: #666 1px 1px 2px; }
+
+fieldset { border: 0; padding: 0; margin: 5px 0; }
+
+button {
+    background: #fe9;
+    color: #900;
+    border: 1px solid black;
+    display: inline;
+}
+
+/* IDed elements */
+#copyright {
+	font-size: 80%;
+	text-align: right;
+}
+
+#navbar {
+	text-align: center;
+}
+
+
+/* Classes */
+.dashbox {
+    margin: 10px 0;
+    border-top: 1px dotted #666;
+    border-left: 1px dotted #666;
+    border-right: 1px dotted black;
+    border-bottom: 1px dotted black;
+    padding: 1px 5px;
+}
+
+tr.odd-row { background: #bbb; color: inherit; }
+tr.even-row { background: #ddd; color: black; }
+
+table.kvlist {
+    margin: 5px;
+    background: #ccc;
+    border: 1px dotted black;
+    color: black;
+    caption-side: bottom;
+}
+
+table.kvlist th { text-align: right; vertical-align: top; }
+table.kvlist td { text-align: left; }
+
+table.clear {
+    border: 0;
+    background: inherit;
+}
+
+.roundedbox {
+}
+
+.roundedbox-head {
+}
+
+.roundedbox-head h2 {
+}
+
+.roundedbox-body {
+}
+
+.no-display { display: none; }
+.reddish { color: #900; background: inherit; }
+
+/* Template node-display classes */
+.node-tree {
+    border: 1px dotted #333;
+    margin: 2px;
+    padding: 4px;
+    background: #999;
+}
+
+.node-subtree {
+    border: 1px dotted #666;
+    padding: 4px 8px;
+    margin: 1px 4px;
+    background: #CCC;
+}
+
+.node-subtree-head {
+    color: #333;
+}
+
+.node {
+    border: 1px solid black;
+    margin-bottom: 4px;
+}
+
+.node-head {
+    border-bottom: 1px solid black;
+    font-weight: bold;
+    font-variant: small-caps;
+    padding: 2px;
+    color: black;
+    background: #f3f3f3;
+}
+
+.node-body {
+    background: #e3e3e3;
+    padding: 2px 4px 4px 4px;
+}
+
+.node-subtemplate {
+    background: #999;
+    border: 1px dotted #333;
+    margin: 2px;
+    padding: 4px;
+}
+
+.text-node-body {
+    background: #CCC;
+    font-family: "Andale Mono", "ProFont", "Monotype.com", fixed;
+}
+.call-directive-node-body,
+.attr-directive-node-body { background: #CDC; }
+.escape-directive-node-body { background: #DCC; }
+.yield-directive-node-body { background: #DDC; }
+.if-directive-node-body,
+.else-directive-node-body,
+.elsif-directive-node-body { background: #BCD; }
+
+
+/* Template syntax-highlighted html classes */
+.highlighted-source {
+    border: 1px dotted #333;
+    margin: 2px;
+    padding: 10px;
+    background: #ccc;
+}
+
+.token {
+    font-family: "Vera Sans Mono", "Andale Mono", fixed;
+    color: #333;
+}
+
+.text-token { color: #666; }
+.comment-token { color: #666; background: #cdc; }
+.doc-type-token { color: #226; background: #ccd; }
+
+.tag-token { color: #242; background: #b9b9b9; }
+.tag-token-name { color: #272; }
+.tag-token-attr-name { color: #262; }
+.tag-token-attr-value { color: #333; }
+
+.processing-instruction-token,
+.tag-attr-directive {
+    color: #933;
+    background: #dcc;
+    font-weight: bold;
+}
+
