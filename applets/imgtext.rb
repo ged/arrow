@@ -18,11 +18,14 @@ require 'arrow/applet'
 ### It is an applet which generates an image from one or more characters of text.
 class ImageText < Arrow::Applet
 
-	# CVS version tag
-	Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
+	# SVN Revision
+	SVNRev = %q$Rev$
 
-	# CVS id tag
-	Rcsid = %q$Id$
+	# SVN Id
+	SVNId = %q$Id$
+
+	# SVN URL
+	SVNURL = %q$URL$
 
 	# Applet signature
 	Signature = {
@@ -43,6 +46,7 @@ class ImageText < Arrow::Applet
 	public
 	######
 
+	# PNG-creation action
 	action( 'png' ) {|txn,*rest|
 		text = $1 if /([\x20-\x7e]+)/.match( rest.first )
 		text ||= "No text specified."
@@ -53,6 +57,7 @@ class ImageText < Arrow::Applet
 		return img.pngStr
 	}
 
+	# JPEG-creation action
 	action( 'jpeg' ) {|txn,*rest|
 		text = $1 if /([\x20-\x7e]+)/.match( rest.first )
 		text ||= "No text specified."
