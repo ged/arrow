@@ -84,7 +84,7 @@ class TemplateViewer < Arrow::Applet
 
 		unless tpath.empty?
 			begin
-				dtempl = self.getTemplate( tpath )
+				dtempl = self.templateFactory.getTemplate( tpath )
 			rescue Arrow::TemplateError => err
 				templ.error = err
 			else
