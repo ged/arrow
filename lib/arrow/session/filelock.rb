@@ -49,7 +49,7 @@ class Session
 		LockfileFormat = "arrow-session-%s.lock"
 
 		# The mode to open the lockfile in
-		FileMode = File::APPEND|File::CREAT|File::TRUNC
+		FileMode = File::RDWR|File::CREAT
 
 
 		#############################################################
@@ -104,6 +104,14 @@ class Session
 
 		# The path to the directory where session lockfiles are kept.
 		attr_accessor :lockDir
+
+
+		### Indicate to the lock that the caller will no longer be using it, and
+		### it may free any resources it had been using.
+		def finish
+			super
+			self.closeLockfile
+		end
 
 
 		#########
