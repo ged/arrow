@@ -19,17 +19,13 @@
 
 	<p><?call applet.signature.description ?></p>
 
-	<p>It is currently assigned to the '/<?call applet.signature.uri ?>' URI in
+	<p>It is currently assigned to the '/<?attr uri ?>' URI in
 	  the demo application.</p>
 
-	  <?if applet.signature.uri.match(/^_/) ?><p>Because its URI has a
-	  preceeding underscore, this applet can only be called from inside the
-	  application or from another applet.</p><?end if?>
-
-	<?if applet.signature.uri =~ %r{/} ?><p>This also could (possibly) be a chained
+	<?if uri =~ %r{/} ?><p>This could (possibly) be a chained
 	  applet -- an applet which is delegated to by applets with URIs that are a prefix of
 	  its own. If, for example, an applet is installed at <tt>/<?call
-	  applet.signature.uri.sub(%r{(.*)/.*}) {|m| $1} ?></tt>, it would be run via its
+	  uri.sub(%r{(.*)/.*}) {|m| $1} ?></tt>, it would be run via its
 	  <tt>#delegate</tt> method <em>before</em> this one, and could call this
 	  applet by calling <tt>yield</tt>.</p><?end if?>
 	  
@@ -52,20 +48,20 @@
 
 		<tr class="even-row">
 		  <th class="row-title">Validator Profiles</th>
-		  <td><tt><?escape applet.signature.vargs.inspect ?></tt></td>
+		  <td><tt><?escape applet.signature.validatorProfiles.inspect ?></tt></td>
 		</tr>
 
 		<tr class="odd-row">
 		  <th class="row-title">Source File</th>
-		  <td><?call applet.object.class.sourcefile ?></td>
+		  <td><?call applet.class.sourcefile ?></td>
 		</tr>
 
 		<tr class="even-row">
 		  <th class="row-title">Actions</th>
 		  <td>
 			<ul>
-<?yield name from applet.object.actions.each ?>
-			  <li><a href="[?call txn.appRoot?]/[?call applet.signature.uri?]/[?call name?]"><?call name ?></a>
+<?yield name from applet.actions.each ?>
+			  <li><a href="[?call txn.appRoot?]/[?call uri?]/[?call name?]"><?call name ?></a>
 			  </li>
 <?end for?>
 			</ul>
@@ -74,7 +70,7 @@
 
 		<tr class="odd-row">
 		  <th class="row-title">Chainable?</th>
-		  <td><strong><?if applet.object.respond_to?(:delegate) ?>Yes.<?else?>No.<?end if?></strong></td>
+		  <td><strong><?if applet.respond_to?(:delegate) ?>Yes.<?else?>No.<?end if?></strong></td>
 		</tr>
 
 		<tr class="even-row">
@@ -109,7 +105,7 @@
 
 		<tr class="even-row">
 		  <th class="row-title">Timestamp</th>
-		  <td><?call applet.timestamp.ctime ?></td>
+		  <td><?call re.timestamp.ctime ?></td>
 		</tr>
 
 		<tr class="odd-row">
@@ -121,19 +117,19 @@
 			  <tbody>
 				<tr>
 				  <th class="row-title">Total Runs</th>
-				  <td><?call applet.object.runCount ?></td>
+				  <td><?call applet.runCount ?></td>
 				</tr>
 				<tr>
 				  <th class="row-title">Total User</th>
-				  <td><?call "%0.2f" % applet.object.totalUtime ?> s</td>
+				  <td><?call "%0.2f" % applet.totalUtime ?> s</td>
 				</tr>
 				<tr>
 				  <th class="row-title">Total System</th>
-				  <td><?call "%0.2f" % applet.object.totalStime ?> s</td>
+				  <td><?call "%0.2f" % applet.totalStime ?> s</td>
 				</tr>
 				<tr>
 				  <th class="row-title">Average Usage</th>
-				  <td><?call "%0.3f" % applet.object.averageUsage ?></td>
+				  <td><?call "%0.3f" % applet.averageUsage ?></td>
 				</tr>
 			  </tbody>
 			</table>

@@ -35,7 +35,7 @@
 
 	<h2>Applets</h2>
 	<table id="applets">
-	  <caption><?call applets.length ?> Loaded Applets</caption>
+	  <caption><?call registry.length ?> Loaded Applets</caption>
 	  <thead>
 		<tr>
 		  <th>URI</th>
@@ -46,23 +46,16 @@
 		</tr>
 	  </thead>
 	  <tbody>
-		<?for applet in applets.sort_by {|applet| applet.signature.uri}?>
+		<?for uri,re in registry.sort_by {|uri,a| uri} ?>
 		<tr class="[?if iterator.even? ?]even-row[?else?]odd-row[?end if?]">
 		  <td class="applet-uri">
-			<?if applet.signature.uri =~ /_/ ?>
-			<span title="[?call 
-			  applet.signature.description?] (internal only)"><?call
-			  applet.signature.uri ?></span>
-			<?else?>
-			<a title="[?call applet.signature.description?]"
-			  href="[?call transaction.appRoot ?]/[?call
-			  applet.signature.uri ?]"><?call applet.signature.uri ?></a>
-			<?end if?>
+			<a title="[?call re.object.signature.description?]"
+			  href="[?call transaction.appRoot ?]/[?attr uri ?]"><?attr uri ?></a>
 		  </td>
-		  <td class="applet-name"><?call applet.signature.name ?></td>
-		  <td class="applet-version"><?call applet.signature.version ?></td>
-		  <td class="applet-source"><?escape applet.class.name ?></td>
-		  <td class="applet-run"><button onclick="statApplet('[?call applet.signature.uri ?]')">Inspect</button></td>
+		  <td class="applet-name"><?call re.object.signature.name ?></td>
+		  <td class="applet-version"><?call re.object.signature.version ?></td>
+		  <td class="applet-source"><?escape re.object.class.name ?></td>
+		  <td class="applet-run"><button onclick="statApplet('[?attr uri ?]')">Inspect</button></td>
 		</tr>
 		<?end for?>
 	  </tbody>
