@@ -19,7 +19,7 @@
 
 	<dl>
 <?for name,font in fonts.sort_by {|k,v| [k, v[:family], v[:style]]} ?>
-		<dt><a href="[?call txn.action ?]/[?attr name ?]/18/[?urlencode font[:family] ?].png"><?attr name ?></a></dt>
+		<dt><a href="[?call txn.action ?]/[?attr name ?]/72/72%20Pt.%20[?urlencode font[:family] ?].png"><?attr name ?></a></dt>
 		<dd><?call font[:family] ?> <?call font[:style] ?></dd>
 <?end?>
 	</dl>
