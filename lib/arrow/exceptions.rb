@@ -73,7 +73,7 @@ module Arrow
 
 	# Applet errors
 	def_exception :AppletError,				"Applet error"
-	def_exception :AppletChainError,		"Applet chain error"
+	def_exception :AppletChainError,		"Malformed applet chain"
 
 end # module Arrow
 
