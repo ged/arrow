@@ -512,8 +512,8 @@ class Applet < Arrow::Object
 
 
 	### Wrapper method for a delegation (chained) request.
-	def delegate( txn, *args )
-		yield( txn, *args )
+	def delegate( txn, chain, *args )
+		yield( chain )
 	end
 
 
