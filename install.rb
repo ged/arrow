@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 #
-#	Linguistics Module Install Script
+#	Module Install Script
 #	$Id$
 #
 #	Thanks to Masatoshi SEKI for ideas found in his install.rb.
@@ -20,7 +20,7 @@ include Config
 
 require 'find'
 require 'ftools'
-
+require 'optparse'
 
 $version	= %q$Revision: 1.4 $
 $rcsId		= %q$Id$
@@ -146,8 +146,30 @@ if $0 == __FILE__
 		testForRequiredLibrary( *lib )
 	end
 
-	viewOnly = ARGV.include? '-n'
-	verbose = ARGV.include? '-v'
+	dryrun = false
+
+	# Parse command-line switches
+	ARGV.options {|oparser|
+		oparser.banner = "Usage: #$0 [options]\n"
+
+		oparser.on( "--verbose", "-v", TrueClass, "Make progress verbose" ) {
+			$VERBOSE = true
+			debugMsg "Turned verbose on."
+		}
+
+		oparser.on( "--dry-run", "-n", TrueClass, "Don't really install anything" ) {
+			debugMsg "Turned dry-run on."
+			dryrun = true
+		}
+
+		# Handle the 'help' option
+		oparser.on( "--help", "-h", "Display this text." ) {
+			$stderr.puts oparser
+			exit!(0)
+		}
+
+		oparser.parse!
+	}
 
 	debugMsg "Sitelibdir = '#{CONFIG['sitelibdir']}'"
 	sitelibdir = CONFIG['sitelibdir']
@@ -155,9 +177,9 @@ if $0 == __FILE__
 	sitearchdir = CONFIG['sitearchdir']
 
 	message "Installing..."
-	i = Installer.new( viewOnly )
+	i = Installer.new( dryrun )
 	#i.installFiles( "redist", sitelibdir, 0444, verbose )
-	i.installFiles( "lib", sitelibdir, 0444, verbose )
+	i.installFiles( "lib", sitelibdir, 0444, $VERBOSE )
 
 	message "done.\n"
 end
