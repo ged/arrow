@@ -1,7 +1,7 @@
 /* 
  * Arrow Appserver Default Apps Stylesheet
  * $Id$
- * Time-stamp: <21-May-2004 23:36:31 ged>
+ * Time-stamp: <26-Jun-2004 17:48:08 ged>
  */
 
 @import url("http://www.RubyCrafters.com/stylesheets/base.css");
@@ -108,20 +108,8 @@ table.clear {
     background: inherit;
 }
 
-.roundedbox {
-}
-
-.roundedbox-head {
-}
-
-.roundedbox-head h2 {
-}
-
-.roundedbox-body {
-}
-
 .no-display { display: none; }
-.reddish { color: #900; background: inherit; }
+.caution { color: #900; background: inherit; }
 
 /* Template node-display classes */
 .node-tree {
@@ -237,3 +225,4 @@ div.filemap-exception-backtrace {
     color: white;
     border: 1px solid black;
 }
+
