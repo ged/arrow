@@ -30,8 +30,7 @@ require 'arrow/exceptions'
 require 'arrow/template'
 require 'arrow/utils'
 
-module Arrow
-class Template
+class Arrow::Template
 
 	### Default parser object class -- parses template source into template
 	### objects.
@@ -296,7 +295,7 @@ class Template
 				state = State::new( string, template, initialData )
 				syntaxTree = self.scanForNodes( state )
 			
-			rescue TemplateError => err
+			rescue Arrow::TemplateError => err
 				Kernel::raise( err ) unless defined? state
 				state.scanner.unscan if state.scanner.matched? #<- segfaults
 				
@@ -388,7 +387,7 @@ class Template
 			unless tag == 'end'
 				begin
 					node = Directive::create( tag, self, state )
-				rescue FactoryError => err
+				rescue ::FactoryError => err
 					return self.handleUnknownPI( state, tag )
 				end
 
@@ -571,14 +570,13 @@ class Template
 				raise ParseError, "failed to skip unknown PI"
 
 			pi = state.tagOpen + tag + remainder
-			#self.log.info( "Ignoring unknown PI (to = #{state.tagOpen.inspect}) '#{pi}'" )
+			self.log.info( "Ignoring unknown PI (to = #{state.tagOpen.inspect}) '#{pi}'" )
 			return TextNode::new( pi )
 		end
 
 
 	end # class Parser
 
-end # class Template
-end # module Arrow
-
+end # class Arrow::Template
+ 
 
