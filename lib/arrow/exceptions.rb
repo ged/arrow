@@ -66,6 +66,8 @@ module Arrow
 	def_exception :TemplateError,			"Error in templating system"
 	def_exception :ParseError,				"Error while parsing",
 		TemplateError
+	def_exception :ScopeError,				"Error in rendering scope",
+		TemplateError
 
 	# Signal exceptions
 	def_exception :Reload,					"Configuration out of date"
