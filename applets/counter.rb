@@ -58,14 +58,24 @@ class AccessCounter < Arrow::Applet
 
 	### When called as a chained applet, just increment two session counters and
 	### hand off control to the next applet in the chain.
-	def delegate( txn, *args )
-		txn.session[:counter] ||= 0
-		txn.session[:counter] += 1
+	def delegate( txn, chain, *args )
+		self.log.debug "In delegation method."
 
-		txn.session[:delegations] ||= 0
-		txn.session[:delegations] += 1
+		begin
+			self.log.debug "Setting up counter item."
+			txn.session[:counter] ||= 0
+			txn.session[:counter] += 1
+			
+			self.log.debug "Setting up delegation counter item."
+			txn.session[:delegations] ||= 0
+			txn.session[:delegations] += 1
+		rescue ::Exception => err
+			self.log.error "Error while setting up session: #{err.message}"
+		end
 
-		yield
+		self.log.debug "Yielding to next app in the chain"
+
+		yield( chain, *args )
 	end
 
 
