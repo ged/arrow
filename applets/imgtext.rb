@@ -5,7 +5,7 @@
 # 
 # == Rcsid
 # 
-# $Id: TEMPLATE.rb.tpl,v 1.1 2003/11/01 19:42:05 deveiant Exp $
+# $Id$
 # 
 # == Authors
 # 
@@ -22,7 +22,7 @@ class ImageText < Arrow::Applet
 	Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
 
 	# CVS id tag
-	Rcsid = %q$Id: TEMPLATE.rb.tpl,v 1.1 2003/11/01 19:42:05 deveiant Exp $
+	Rcsid = %q$Id$
 
 	# Applet signature
 	Signature = {
