@@ -14,8 +14,13 @@
 # 
 
 require 'arrow/applet'
-#require 'test/unit/ui/testrunnermediator'
-#require 'test/unit/ui/testrunnerutilities'
+
+require 'bdb'
+require 'test/unit'
+
+# Prevent Test::Unit from autorunning from its own at_exit
+at_exit { Test::Unit::run = true }
+
 
 ### The UnitTest applet can be used to define and run tests for another applet
 ### by chaining through it.
@@ -30,6 +35,16 @@ class UnitTester < Arrow::Applet
 	# SVN URL
 	SVNURL = %q$URL$
 
+	# Default options for the BDB::Env object
+	EnvOptions = {
+		:set_timeout	=> 50,
+		:set_lk_detect	=> 1,
+		:set_verbose	=> true,
+	}
+
+	# Default flags for the BDB::Env object
+	EnvFlags = BDB::CREATE|BDB::INIT_TRANSACTION|BDB::RECOVER
+
 	# Applet signature
 	Signature = {
 		:name => "Unit testing applet",
@@ -39,10 +54,42 @@ class UnitTester < Arrow::Applet
 		:maintainer => "ged@FaerieMUD.org",
 		:defaultAction => 'list',
 		:templates => {
-			:list			=> 'test-list.tmpl',
-			:testharness	=> "test-harness.tmpl",
+			:list			=> 'test/list.tmpl',
+			:testharness	=> "test/harness.tmpl",
+			:problem		=> "test/problem.tmpl",
 		},
 	}
+
+
+	### Create a new instance of the UnitTester applet with the specified
+	### +config+. It will look for its configuration values in the top-level
+	### 'unittester' key if there is one.
+	def initialize( *args )
+		super
+
+		@dbenv = nil
+		@initError = nil
+
+		# If the app is configured in the config file, then load the database.
+		if @config.respond_to?( :unittester ) && false
+			begin
+				envdir = @config.unittester.dbenv
+				Dir::mkdir( envdir, 0755 ) if !File::exists?( envdir )
+				@dbenv = BDB::Env::create( envdir, EnvFlags, EnvOptions )
+			rescue Exception => err
+				@initError = err
+			end
+		else
+			@initError = [
+				"Not Configured",
+				"The 'unittester' section was not present or malformed in " +
+				@config.name + ". It should contain, at a minimum, a 'dbenv' item " +
+				"which specifies the path to the test database."
+			]
+		end
+
+	end
+
 
 
 	######
@@ -51,23 +98,48 @@ class UnitTester < Arrow::Applet
 
 	# Run tests for the applet/s next in the chain
 	def delegate( txn, chain, *args )
-		templ = txn.template[ :testharness ]
+		return reportProblem( txn ) unless @dbenv
 
+		app = chain.last
+		tests = @dbenv.open_db( BDB::Hash, app[0].signature.name.gsub(/\W+/, '_'), nil, BDB::CREATE )
+
+		templ = self.loadTemplate( :testharness )
 		templ.txn = txn
+		templ.tests = tests
+
 		return templ
 	end
 
 
 	# List the applets for which tests have been defined so far.
 	action( 'list' ) {|txn, *args|
-		templ = txn.templates[ :list ]
+		return reportProblem( txn ) unless @dbenv
 
+		templ = self.loadTemplate( :list )
 		templ.txn = txn
 		return templ
 	}
 
+	
+	# Auxilliary action: report a problem while loading the test harness.
+	def reportProblem( txn )
+		templ = self.loadTemplate( :problem )
+		templ.err = @initErr
+
+		return templ
+	end
+
+
+
+	#################################################################
+	###	T E S T   H A R N E S S   C L A S S E S
+	#################################################################
+
+	class TestRunner
+		extend Test::Unit::UI::TestRunnerUtilities
+
+		
+	end
 
 end # class UnitTester
 
-
-#Test::Unit::run = false

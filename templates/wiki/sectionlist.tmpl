@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<!--
+
+  [?call installation.name ?]
+
+  -->
+
+  <head>
+	<title>[? ?]</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+	<link rel="stylesheet" type="text/css" href="/stylesheets/arrow.css" />
+  </head>
+  <body>
+
+	<h1><?attr installation.name ?></h1>
+
+	<p>The list of sections in this Wiki are as follows:</p>
+
+	<ul>
+	<?for section in sections?>
+	  <li><a href="[?call txn.action ?]/view/[?call section.name?]"><?call
+	    section.name ?></a></li>
+	<?end for?>
+	</ul>
+
+	<p>You can also <a href="[?call txn.action ?]/new">create a new section</a>
+	if you like.</p>
+
+	<?include navbar.incl?>
+
+  </body>
+</html>
+
+
+<!--
+  Local Variables:
+  mode: xml
+ -->
+
