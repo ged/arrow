@@ -188,13 +188,13 @@ class Transaction < Arrow::Object
 
 	### Return an absolute uri that refers back to the applet the transaction is
 	### being run in
-	def action
+	def applet
 		return [ self.appRoot, self.appletPath ].join("/")
 	end
+	deprecate_method :action, :applet
 
 
 	### Redirection methods
-
 
 	### Return a minimal HTML doc for representing a given status_code
 	def statusDoc( status_code, uri=nil )
