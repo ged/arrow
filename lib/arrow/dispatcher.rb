@@ -6,10 +6,16 @@
 # == Synopsis
 # 
 #	RubyRequire 'arrow'
+#   RubyChildInitHandler Arrow::Dispatcher.create( :myapp => "myapp.yml", :help => "help.yml" )
 #
 #   <Location /myapp>
 #		Handle ruby-object
-#		RubyHandler Arrow::Dispatcher::create( 'myapp.yaml' )
+#		RubyHandler Arrow::Dispatcher.instance( :myapp )
+#	</Location>
+# 
+#   <Location /help>
+#		Handle ruby-object
+#		RubyHandler Arrow::Dispatcher.instance( :help )
 #	</Location>
 # 
 # == Subversion Id
@@ -42,35 +48,60 @@ module Arrow
 	### application.
 	class Dispatcher < Arrow::Object
 
-		@@Instance = nil
+		@@Instance = {}
 
-		### Class constants
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.10 $} )[1]
-		Rcsid = %q$Id: dispatcher.rb,v 1.10 2004/01/26 05:46:50 deveiant Exp $
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		### Create a new Arrow::Dispatcher object.
-		def self::create( configfile=nil )
-			return @@Instance unless @@Instance.nil?
+		# SVN Id
+		SVNId = %q$Id$
 
-			# Set up logging
-			if Arrow::Logger::global.outputters.empty?
-				outputter = Arrow::Logger::Outputter::create( 'apache' )
-				Arrow::Logger::global.outputters << outputter
-				Arrow::Logger::global.level = :notice
-				Arrow::Logger[Arrow::Template].level = :notice
+		# SVN URL
+		SVNURL = %q$URL$
+
+		private_class_method :new
+
+
+		### Create a new Arrow::Dispatcher object. The +configspec+ argument can
+		### either be the path to a config file, or a hash of config files. See
+		### the ::instance method for more about how to use this method.
+		def self::create( configspec )
+
+			# Handle simple config style
+			if configspec.is_a?( String )
+				configspec = { :__default__ => configspec }
 			end
+			raise ArgumentError, "Invalid config hash %p" % configspec unless
+				configspec.is_a?( Hash )
 
-			# If a config file is given, load it. If it's not, just use the
-			# default config.
-			Arrow::Logger.notice "Arrow config file is %p" % configfile
-			if configfile
-				config = Arrow::Config::load( configfile )
-			else
-				config = Arrow::Config::new
-			end
+			# Load a dispatcher for each config
+			configspec.each {|key, configfile|
 
-			# Create and return the dispatcher
- 			@@Instance = new( config )
+				configfile = File::expand_path( configfile )
+				return @@Instance[ configfile ] if @@Instance.key?( configfile )
+
+				# Set up logging
+				if Arrow::Logger::global.outputters.empty?
+					outputter = Arrow::Logger::Outputter::create( 'apache' )
+					Arrow::Logger::global.outputters << outputter
+					Arrow::Logger::global.level = :notice
+					Arrow::Logger[Arrow::Template].level = :notice
+				end
+
+				# If a config file is given, load it. If it's not, just use the
+				# default config.
+				Arrow::Logger.notice "Arrow config file is %p" % configfile
+				if configfile
+					config = Arrow::Config::load( configfile )
+				else
+					config = Arrow::Config::new
+				end
+
+				# Create and return the dispatcher
+				@@Instance[ key ] = new( config )
+			}
+
+			@@Instance.values.first
 		rescue ::Exception => err
 			Apache::request.server.log_crit( "%s failed to start (%s): %s: %s",
 				self.name,
@@ -80,6 +111,17 @@ module Arrow
 			Kernel::raise( err )
 		end
 
+
+		### Get the instance of the Dispatcher set up under the given +key+. If
+		### only one config file was specified, no key should be passed.
+		def self::instance( key=:__default__ )
+			@@Instance[ key ]
+		end
+
+
+		#############################################################
+		###	I N S T A N C E   M E T H O D S
+		#############################################################
 
 		### Set up an Arrow::Dispatcher object based on the specified +config+
 		### (an Arrow::Config object).
@@ -123,9 +165,8 @@ module Arrow
 			# Set up the logging level
 			self.log.notice "Setting global log level to %p" %
 				config.logLevel.to_s.intern
-			Arrow::Logger.global.level = config.logLevel.to_s.intern
-			Arrow::Logger[ Arrow::Template ].level =
-				config.templateLogLevel.to_s.intern
+			Arrow::Logger.global.level = config.logLevel
+			Arrow::Logger[ Arrow::Template ].level = config.templateLogLevel
 
 			# Set up the session class
 			self.log.notice "Configuring the Session class with %p" % config
@@ -134,6 +175,15 @@ module Arrow
 			# Create a new broker to handle applets
 			self.log.notice "Creating request broker"
 			@broker = Arrow::Broker::new( config )
+		end
+
+
+		### mod_ruby Handlers
+
+		### ChildInitHandler -- called once per child when it first starts up.
+		def child_init( req )
+			self.log.notice "Child #{Process::pid} starting up."
+			return Apache::OK
 		end
 
 
