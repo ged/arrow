@@ -43,6 +43,11 @@ class ArgumentTester < Arrow::Applet
 				:optional		=> [:email, :description],
 				:filters		=> [:strip, :squeeze],
 				:untaint_all_constraints => true,
+				:descriptions	=> {
+					:email			=> "Customer Email",
+					:description	=> "Issue Description",
+					:name			=> "Customer Name",
+				},
 				:constraints	=> {
 					:email	=> :email,
 					:name	=> /^[\x20-\x7f]+$/,
