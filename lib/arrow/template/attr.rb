@@ -6,7 +6,8 @@
 # 
 # == Syntax
 #
-#   <?attr foo?>
+#   <?attr foo ?>
+#   <?attr "%0.2f" % foo ?>
 #
 # == Subversion Id
 #

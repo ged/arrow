@@ -6,6 +6,25 @@
 # Lots of the ideas for this class were stolen/influenced in no small way by Hal
 # Fulton's "super-iterator" post to the Ruby-talk ML [ruby-talk: 46337].
 #
+# == Examples
+#
+#   ### Render the directive's bracketed nodes once for each item in the
+#   ### iterated content.
+#   def renderSubnodes( attribute, template, scope )
+#       res = []
+#   
+#       iterator = Arrow::Template::Iterator::new( attribute )
+#       iterator.each {|iter,*blockArgs|
+#   
+#           # Process the nodes
+#           template.withOverriddenAttributes( scope, 'iterator' => iter ) {|template|
+#               res << template.render( @subnodes, scope )
+#           }
+#       }
+#   
+#       return *res
+#   end
+#
 # == Subversion Id
 #
 #  $Id$

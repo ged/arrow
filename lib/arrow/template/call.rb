@@ -6,9 +6,9 @@
 # 
 # == Syntax
 #
-#   <?call 1+1?>
-#   <?call foo.to_html?>
-#   <?call var.any(other_var.method).chain?>
+#   <?call foo.to_html ?>
+#   <?call var.any(other_var.method).chain ?>
+#   <?call "$%0.2f" % var.any(other_var.method).chain ?>
 #
 # == Subversion Id
 #
