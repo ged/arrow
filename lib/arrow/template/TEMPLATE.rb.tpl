@@ -3,8 +3,12 @@
 # This file contains the Arrow::Template::(>>>class<<<) class, a derivative of
 # Arrow::Template::(>>>superclass<<<). This is the class which defines the
 # behaviour of the '(>>>directive<<<)' template directive.
-# 
-# == Rcsid
+#
+# == Syntax
+#
+#	(>>>POINT<<<)
+#
+# == Subversion Id
 # 
 # $Id: TEMPLATE.rb.tpl,v 1.1 2003/08/13 12:42:57 deveiant Exp $
 # 
@@ -30,11 +34,16 @@ class Template
 	### template directive.
 	class (>>>class<<<) < Arrow::Template::(>>>superclass<<<)
 
-		# CVS version string
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev: 183 $
+		
+		# SVN Id
+		SVNId = %q$Id: import.rb 183 2004-08-23 06:10:32Z ged $
+		
+		# SVN URL
+		SVNURL = %q$URL: svn+ssh://svn.FaerieMUD.org/usr/local/svn/Arrow/trunk/lib/arrow/template/import.rb $
 
-		# CVS Id string
-		Rcsid = %q$Id: TEMPLATE.rb.tpl,v 1.1 2003/08/13 12:42:57 deveiant Exp $
+		(>>>MARK<<<)
 
 	end # class (>>>class<<<)
 
