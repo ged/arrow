@@ -6,9 +6,9 @@
 # Lots of the ideas for this class were stolen/influenced in no small way by Hal
 # Fulton's "super-iterator" post to the Ruby-talk ML [ruby-talk: 46337].
 #
-# == Rcsid
-# 
-# $Id: iterator.rb,v 1.3 2004/01/23 16:23:51 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 

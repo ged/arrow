@@ -25,9 +25,9 @@
 #   argle
 #   bargle
 #
-# == Rcsid
-# 
-# $Id: include.rb,v 1.6 2004/01/20 05:21:05 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 

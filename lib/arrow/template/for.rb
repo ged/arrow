@@ -50,9 +50,9 @@
 #  	<?attr word?>: <?attr length?>
 #  <?end for?>
 #
-# == Rcsid
-# 
-# $Id: for.rb,v 1.3 2004/01/19 03:20:51 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 

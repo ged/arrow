@@ -4,9 +4,9 @@
 # Arrow::Template::Directive. This is the class which defines the behaviour of
 # the 'elsif' template directive.
 # 
-# == Rcsid
-# 
-# $Id: elsif.rb,v 1.2 2003/11/09 22:28:35 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 

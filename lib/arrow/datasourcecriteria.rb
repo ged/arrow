@@ -3,9 +3,9 @@
 # This file contains the visitor patterned criteria extension to the
 # Arrow::DataSource class
 # 
-# == Rcsid
-# 
-# $Id: datasourcecriteria.rb,v 1.1 2004/02/29 02:58:21 stillflame Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 

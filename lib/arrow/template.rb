@@ -7,9 +7,9 @@
 # 
 #   
 # 
-# == Rcsid
-# 
-# $Id: template.rb,v 1.14 2004/01/20 07:57:17 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -39,11 +39,14 @@ module Arrow
 		require 'arrow/template/nodes'
 		require 'arrow/template/iterator'
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.14 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: template.rb,v 1.14 2004/01/20 07:57:17 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 		# Configuration defaults. Valid members are the same as those listed for
 		# the +config+ item of the #new method.

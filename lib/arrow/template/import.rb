@@ -11,9 +11,9 @@
 #	<?import foo, bar?>
 #	<?import foo as superfoo, bar, baz as bazish?>
 # 
-# == Rcsid
-# 
-# $Id: import.rb,v 1.1 2003/12/10 18:50:24 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 

@@ -5,9 +5,9 @@
 # Arrow::Transaction a little easier. It is not certain whether this class will
 # be part of the release of Arrow. Suggestions welcomed.
 # 
-# == Rcsid
-# 
-# $Id: response.rb,v 1.1 2003/10/13 04:20:13 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -33,11 +33,14 @@ module Arrow
 	class Response < Arrow::Object
 		extend Forwardable
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: response.rb,v 1.1 2003/10/13 04:20:13 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 		# The Array of method names to delegate to the request object
 		DelegatedMethods = %w{

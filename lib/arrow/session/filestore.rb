@@ -4,9 +4,9 @@
 # Arrow::Session::Store. Instances of this class store a session object as a
 # marshalled hash on disk.
 # 
-# == Rcsid
-# 
-# $Id: filestore.rb,v 1.1 2003/10/25 10:36:12 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -29,11 +29,14 @@ class Session
 	### disk.
 	class FileStore < Arrow::Session::Store
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: filestore.rb,v 1.1 2003/10/25 10:36:12 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 		# The default flags to use when opening the backing store file
 		DefaultIoFlags = File::RDWR|File::CREAT

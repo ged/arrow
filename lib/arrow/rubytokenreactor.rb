@@ -4,9 +4,9 @@
 # Arrow::Object. Instances of this class can be used to parse a Ruby program
 # into an Array of tokens suitable for parsing.
 # 
-# == Rcsid
-# 
-# $Id: rubytokenreactor.rb,v 1.1 2004/01/09 03:14:54 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -43,11 +43,14 @@ module Arrow
 
 		include Arrow::Loggable
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: rubytokenreactor.rb,v 1.1 2004/01/09 03:14:54 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 
 		#############################################################

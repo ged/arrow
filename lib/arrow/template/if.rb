@@ -15,9 +15,9 @@
 # conditional, and must have a valid associated identifier (the <em>name</em>
 # bit).
 #
-# == Rcsid
-# 
-# $Id: if.rb,v 1.7 2004/01/19 03:21:08 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -43,11 +43,14 @@ class Template
 		require 'arrow/template/else'
 		require 'arrow/template/elsif'
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.7 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: if.rb,v 1.7 2004/01/19 03:21:08 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 
 		#############################################################

@@ -12,9 +12,9 @@
 #		RubyHandler Arrow::Dispatcher::create( 'myapp.yaml' )
 #	</Location>
 # 
-# == Rcsid
-# 
-# $Id: dispatcher.rb,v 1.10 2004/01/26 05:46:50 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 

@@ -5,9 +5,9 @@
 # Arrow sessions using the flock(2) system call.  It (obviously) won't work on
 # platforms which don't support flock(2).
 # 
-# == Rcsid
-# 
-# $Id: filelock.rb,v 1.3 2003/12/02 07:17:11 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -31,11 +31,14 @@ class Session
 	### call.
 	class FileLock < Arrow::Session::Lock
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.3 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: filelock.rb,v 1.3 2003/12/02 07:17:11 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 		# The path to the default lockdir
 		DefaultLockDir = '/tmp'

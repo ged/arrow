@@ -4,9 +4,9 @@
 # Arrow::Object. Instances of this class are stateful containers for
 # ContainerDirective nodes .
 # 
-# == Rcsid
-# 
-# $Id: container.rb,v 1.2 2003/10/13 04:35:07 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 

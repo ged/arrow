@@ -10,9 +10,9 @@
 # == Synopsis
 # 
 # 
-# == Rcsid
-# 
-# $Id: subjects.rb,v 1.1 2003/10/13 04:20:13 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 

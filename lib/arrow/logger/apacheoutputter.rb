@@ -4,9 +4,9 @@
 # Apache::Logger::Outputter. Instances of this class write log messages of the
 # corresponding error level to the Apache log
 # 
-# == Rcsid
-# 
-# $Id: apacheoutputter.rb,v 1.1 2003/10/13 04:20:13 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -30,11 +30,14 @@ class Logger
 	### level to the Apache log.
 	class ApacheOutputter < Arrow::Logger::Outputter
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: apacheoutputter.rb,v 1.1 2003/10/13 04:20:13 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 		# The default description
 		DefaultDescription = "Apache Log Outputter"

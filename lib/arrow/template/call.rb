@@ -4,9 +4,9 @@
 # Arrow::Template::ContainerDirective. This is the class which defines the
 # behaviour of the 'call' template directive.
 # 
-# == Rcsid
-# 
-# $Id: call.rb,v 1.1 2003/10/13 04:20:13 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 

@@ -4,9 +4,9 @@
 # Arrow::Config::Loader. It is used to load configuration files written in YAML
 # for the Arrow web application framework.
 # 
-# == Rcsid
-# 
-# $Id: yaml.rb,v 1.3 2003/10/25 11:42:09 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -32,11 +32,14 @@ class Config
 	### application framework.
 	class YamlLoader < Arrow::Config::Loader
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.3 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: yaml.rb,v 1.3 2003/10/25 11:42:09 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 		# Add YAML domain types for Arrow classes
 

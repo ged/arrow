@@ -5,9 +5,9 @@
 # of the 'escape' template directive., which HTML escapes the stringified
 # version of its associated attribute/s.
 # 
-# == Rcsid
-# 
-# $Id: escape.rb,v 1.2 2003/11/09 22:29:15 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 

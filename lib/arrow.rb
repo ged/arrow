@@ -3,9 +3,9 @@
 # This file contains the Arrow module, a namespace container for classes in the
 # Arrow web application framework.
 # 
-# == Rcsid
+# == Subversion Id
 #
-#  $Id: arrow.rb,v 1.5 2003/11/09 19:49:24 deveiant Exp $
+#  $Id$
 # 
 # == Authors
 # 
@@ -24,11 +24,14 @@
 ### The module that serves as a namespace for all Arrow classes.
 module Arrow
 
-	# CVS version tag
-	Version = /([\d\.]+)/.match( %q{$Revision: 1.5 $} )[1]
+	# SVN Revision
+	SVNRev = %q$Rev$
 
-	# CVS id tag
-	Rcsid = %q$Id: arrow.rb,v 1.5 2003/11/09 19:49:24 deveiant Exp $
+	# SVN Id
+	SVNId = %q$Id$
+
+	# SVN URL
+	SVNURL = %q$URL$
 
 	# Yaml stuff
 	YamlDomain = "rubycrafters.com,2003-10-22"

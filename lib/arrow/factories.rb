@@ -2,9 +2,9 @@
 # 
 # This file contains various factory classes for Arrow.
 # 
-# == Rcsid
-# 
-# $Id: factories.rb,v 1.3 2003/11/18 05:40:32 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -29,11 +29,14 @@ module Arrow
 	### template files.
 	class TemplateFactory < Arrow::Object
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.3 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: factories.rb,v 1.3 2003/11/18 05:40:32 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 
 		#############################################################

@@ -8,9 +8,9 @@
 # [<tt>Arrow::Path</tt>]
 #   A class for representing directory search paths.
 #
-# == Rcsid
-# 
-# $Id: utils.rb,v 1.6 2003/12/08 20:12:01 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -122,11 +122,14 @@ module Arrow
 		include Enumerable
 		extend Forwardable
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.6 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: utils.rb,v 1.6 2003/12/08 20:12:01 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 		# The character to split path Strings on, and join on when
 		# converting back to a String.

@@ -4,9 +4,9 @@
 # Arrow::Template::Directive. This is the class which defines the behaviour of
 # the 'set' template directive.
 # 
-# == Rcsid
-# 
-# $Id: set.rb,v 1.6 2004/01/19 03:29:58 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 

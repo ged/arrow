@@ -3,9 +3,9 @@
 # This file contains the Arrow::Session class, a derivative of
 # Arrow::Object. This provides a container for maintaining state across multiple transactions.
 # 
-# == Rcsid
-# 
-# $Id: session.rb,v 1.6 2004/01/25 05:06:22 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -38,11 +38,14 @@ module Arrow
 		require 'arrow/session/id'
 
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.6 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: session.rb,v 1.6 2004/01/25 05:06:22 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 
 		

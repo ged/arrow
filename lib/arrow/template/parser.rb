@@ -4,9 +4,9 @@
 # Arrow::Object. This is the default parser class for the default Arrow
 # templating system.
 # 
-# == Rcsid
-# 
-# $Id: parser.rb,v 1.11 2004/01/19 03:28:12 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -231,11 +231,14 @@ class Template
 		end # class State
 
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.11 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: parser.rb,v 1.11 2004/01/19 03:28:12 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 		# Default configuration hash
 		Defaults = {

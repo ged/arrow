@@ -5,9 +5,9 @@
 # serialization and semi-permanent storage of session data for Arrow::Session
 # objects.
 # 
-# == Rcsid
-# 
-# $Id: store.rb,v 1.8 2004/01/25 05:06:22 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -35,11 +35,14 @@ class Session
 		include PluginFactory
 		extend Forwardable
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.8 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: store.rb,v 1.8 2004/01/25 05:06:22 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 		# The URI of the lock class recommended for use with this Store.
 		RecommendedLocker = URI::parse( 'file:.' )

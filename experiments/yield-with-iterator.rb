@@ -15,9 +15,9 @@
 #    <?attr name ?>: <?escape value ?>
 #  <?end yield?>
 #
-# == Rcsid
-# 
-# $Id: yield-with-iterator.rb,v 1.1 2004/01/18 19:09:45 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 

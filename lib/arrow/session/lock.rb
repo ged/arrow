@@ -5,9 +5,9 @@
 # the locking interface of Arrow::Session, providing a way of serializing access
 # to session data.
 # 
-# == Rcsid
-# 
-# $Id: lock.rb,v 1.1 2003/10/13 04:20:13 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -34,11 +34,14 @@ class Session
 	class Lock < Arrow::Object
 		include PluginFactory
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: lock.rb,v 1.1 2003/10/13 04:20:13 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 		# Lock status flags
 		UNLOCKED	= 0b00

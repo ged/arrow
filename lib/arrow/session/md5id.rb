@@ -4,9 +4,9 @@
 # Arrow::Session::Id. Instances of this class are session IDs created by
 # MD5-hashing some semi-random data with
 # 
-# == Rcsid
-# 
-# $Id: md5id.rb,v 1.3 2003/11/09 22:26:38 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -29,11 +29,14 @@ class Session
 	### MD5 Session IDs class.
 	class MD5Id < Arrow::Session::Id
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.3 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: md5id.rb,v 1.3 2003/11/09 22:26:38 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 
 		#############################################################

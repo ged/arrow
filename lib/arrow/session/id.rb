@@ -4,9 +4,9 @@
 # Arrow::Object. Instances of concrete derivatives of this class are used as
 # session IDs in Arrow::Session objects.
 # 
-# == Rcsid
-# 
-# $Id: id.rb,v 1.3 2003/11/09 22:26:27 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -31,11 +31,14 @@ class Session
 	class Id < Arrow::Object
 		include PluginFactory
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.3 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: id.rb,v 1.3 2003/11/09 22:26:27 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 
 		#############################################################

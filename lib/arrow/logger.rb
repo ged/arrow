@@ -31,9 +31,9 @@
 #		end
 #	end
 #
-# == Rcsid
-# 
-# $Id: logger.rb,v 1.5 2003/12/02 07:12:19 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -55,11 +55,14 @@ module Arrow
 
 		require 'arrow/logger/outputter'
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.5 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: logger.rb,v 1.5 2003/12/02 07:12:19 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 		# Log levels array (in order of decreasing verbosity)
 		Levels = [

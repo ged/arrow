@@ -4,9 +4,9 @@
 # Apache::Logger::Outputter. This is a logger outputter that writes to a
 # file or other filehandle.
 # 
-# == Rcsid
-# 
-# $Id: fileoutputter.rb,v 1.3 2003/11/09 22:23:43 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -27,11 +27,14 @@ class Logger
 	### This is an Arrow::Logger::Outputter that writes to an IO object.
 	class FileOutputter < Arrow::Logger::Outputter
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.3 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: fileoutputter.rb,v 1.3 2003/11/09 22:23:43 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 		# The default description
 		DefaultDescription = "File Outputter"

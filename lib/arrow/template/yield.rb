@@ -19,9 +19,9 @@
 #  <?end yield?>
 #
 #  
-# == Rcsid
-# 
-# $Id: yield.rb,v 1.4 2004/01/19 03:30:30 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 

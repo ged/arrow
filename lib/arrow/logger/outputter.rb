@@ -4,9 +4,9 @@
 # base class for objects that control where logging output is sent in an
 # Arrow::Logger object. 
 # 
-# == Rcsid
-# 
-# $Id: outputter.rb,v 1.3 2003/12/02 07:16:03 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -34,11 +34,14 @@ class Logger
 	class Outputter < ::Object
 		include PluginFactory
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.3 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: outputter.rb,v 1.3 2003/12/02 07:16:03 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 		# The default description
 		DefaultDescription = "Logging Outputter"

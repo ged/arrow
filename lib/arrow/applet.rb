@@ -79,9 +79,9 @@
 #
 #    end
 # 
-# == Rcsid
-# 
-# $Id: applet.rb,v 1.14 2004/02/14 23:15:03 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -124,11 +124,14 @@ module Arrow
 ### argument-parsing/untainting/validation, and templating.
 class Applet < Arrow::Object
 
-	# CVS version tag
-	Version = /([\d\.]+)/.match( %q{$Revision: 1.14 $} )[1]
+	# SVN Revision
+	SVNRev = %q$Rev$
 
-	# CVS id tag
-	Rcsid = %q$Id: applet.rb,v 1.14 2004/02/14 23:15:03 deveiant Exp $
+	# SVN Id
+	SVNId = %q$Id$
+
+	# SVN URL
+	SVNURL = %q$URL$
 
 	### Applet signature struct. The fields are as follows:
 	### [<b>uri</b>]

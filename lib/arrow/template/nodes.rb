@@ -28,9 +28,9 @@
 #   defining their own behaviour and content. Derivatives of this class are used
 #   to build conditional or iterated parts of a template.
 # 
-# == Rcsid
-# 
-# $Id: nodes.rb,v 1.12 2004/01/19 03:26:17 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -57,11 +57,14 @@ class Template
 	### The abstract base node class.
 	class Node < Arrow::Object
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.12 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: nodes.rb,v 1.12 2004/01/19 03:26:17 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 
 		#############################################################
@@ -188,11 +191,14 @@ class Template
 	### Arrow::Template object.
 	class TextNode < Arrow::Template::Node
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.12 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: nodes.rb,v 1.12 2004/01/19 03:26:17 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 
 		#############################################################
@@ -265,11 +271,14 @@ class Template
 	### debugging.
 	class CommentNode < Arrow::Template::TextNode
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.12 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: nodes.rb,v 1.12 2004/01/19 03:26:17 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 
 		#############################################################
@@ -306,11 +315,14 @@ class Template
 	class Directive < Arrow::Template::Node
 		include PluginFactory
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.12 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: nodes.rb,v 1.12 2004/01/19 03:26:17 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 
 		#############################################################
@@ -403,11 +415,14 @@ class Template
 	### <?config?>, etc.)
 	class AttributeDirective < Arrow::Template::Directive
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.12 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: nodes.rb,v 1.12 2004/01/19 03:26:17 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 
 		#############################################################
@@ -596,11 +611,14 @@ class Template
 	### (e.g., <?foreach?>, <?if?>).
 	class BracketingDirective < AttributeDirective
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.12 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: nodes.rb,v 1.12 2004/01/19 03:26:17 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 
 		#############################################################
@@ -721,11 +739,14 @@ class Template
 	### Mixin which adds the notion of boolean evaluability to a directive.
 	module ConditionalDirective
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.12 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: nodes.rb,v 1.12 2004/01/19 03:26:17 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 
 		#############################################################

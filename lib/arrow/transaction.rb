@@ -4,9 +4,9 @@
 # Arrow::Object. Instances of this class encapsulate a transaction within a web
 # application implemented using the Arrow application framework.
 # 
-# == Rcsid
-# 
-# $Id: transaction.rb,v 1.6 2004/01/23 16:39:42 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -31,11 +31,14 @@ module Arrow
 class Transaction < Arrow::Object
 	extend Forwardable
 
-	# CVS version tag
-	Version = /([\d\.]+)/.match( %q{$Revision: 1.6 $} )[1]
+	# SVN Revision
+	SVNRev = %q$Rev$
 
-	# CVS id tag
-	Rcsid = %q$Id: transaction.rb,v 1.6 2004/01/23 16:39:42 deveiant Exp $
+	# SVN Id
+	SVNId = %q$Id$
+
+	# SVN URL
+	SVNURL = %q$URL$
 
 	# Methods that the transaction delegates to the underlying request
 	# object.

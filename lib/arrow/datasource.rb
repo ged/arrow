@@ -7,9 +7,9 @@
 # 
 #   
 # 
-# == Rcsid
-# 
-# $Id: datasource.rb,v 1.2 2003/02/19 23:35:30 stillflame Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 

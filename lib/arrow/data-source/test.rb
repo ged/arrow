@@ -5,9 +5,9 @@
 # a snapshot of another data source object at a particular moment in time. It's
 # intended to be used mostly for testing.
 # 
-# == Rcsid
-# 
-# $Id: test.rb,v 1.1 2004/02/29 02:48:07 stillflame Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 

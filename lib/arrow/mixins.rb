@@ -14,9 +14,9 @@
 #     include Arrow::Loggable
 #	end
 # 
-# == Rcsid
-# 
-# $Id: mixins.rb,v 1.15 2004/01/25 04:27:13 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 

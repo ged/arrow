@@ -4,9 +4,9 @@
 # derivative of Arrow::Directive. This is the class which defines the behaviour
 # of the 'attr' template directive.
 # 
-# == Rcsid
-# 
-# $Id: attr.rb,v 1.2 2003/10/13 04:34:23 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 

@@ -38,9 +38,9 @@
 #   
 #	end
 # 
-# == Rcsid
-# 
-# $Id: monitor.rb,v 1.1 2003/02/19 05:30:50 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 

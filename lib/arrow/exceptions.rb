@@ -7,9 +7,9 @@
 # 
 #   
 # 
-# == Rcsid
-# 
-# $Id: exceptions.rb,v 1.8 2003/11/01 20:13:30 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 

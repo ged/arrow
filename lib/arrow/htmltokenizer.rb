@@ -7,9 +7,9 @@
 # Some of the code and design were stolen from the excellent HTMLTokenizer
 # library by Ben Giddings <bg@infofiend.com>.
 # 
-# == Rcsid
-# 
-# $Id: htmltokenizer.rb,v 1.2 2003/12/10 18:46:39 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -34,11 +34,14 @@ module Arrow
 	class HTMLTokenizer < Arrow::Object
 		include Enumerable
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.2 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: htmltokenizer.rb,v 1.2 2003/12/10 18:46:39 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 
 		### Create a new Arrow::HtmlTokenizer object.

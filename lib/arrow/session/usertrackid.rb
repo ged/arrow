@@ -4,9 +4,9 @@
 # Arrow::Session::Id. This class creates session id objects which uses Apache's
 # builtin mod_usertrack for the session key.
 # 
-# == Rcsid
-# 
-# $Id: usertrackid.rb,v 1.2 2003/11/09 22:27:47 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -28,11 +28,14 @@ class Session
 	### A session id object which uses Apache's builtin mod_usertrack id..
 	class UserTrackId < Arrow::Session::Id
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.2 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: usertrackid.rb,v 1.2 2003/11/09 22:27:47 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 		#############################################################
 		###	C L A S S   M E T H O D S

@@ -4,9 +4,9 @@
 # from the ruby-cache module. It adds a few convenience and introspection
 # methods to its parent.
 # 
-# == Rcsid
-# 
-# $Id: cache.rb,v 1.2 2003/11/01 20:08:49 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 

@@ -16,9 +16,9 @@
 #     end
 #   end
 # 
-# == Rcsid
-# 
-# $Id: object.rb,v 1.6 2004/01/18 21:04:23 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -67,11 +67,14 @@ module Arrow
 
 		include Loggable
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.6 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: object.rb,v 1.6 2004/01/18 21:04:23 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
 
 
 		### Create a method that warns of deprecation for an instance method. If
