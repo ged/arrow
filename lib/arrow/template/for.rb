@@ -139,7 +139,7 @@ class Template
 
 			iterator = Arrow::Template::Iterator::new( attribute )
 			iterator.each {|iter,*blockArgs|
-				self.log.debug "[FOR] Block args are: %p" % [ blockArgs ]
+				#self.log.debug "[FOR] Block args are: %p" % [ blockArgs ]
 
 				# Make an attributes hash from the pure args of left side of the
 				# 'for'.
@@ -151,8 +151,8 @@ class Template
 
 				# Process the nodes inside the 'for' block with the args being
 				# overridden.
-				self.log.debug "  [FOR] calling into new scope with overridden " +
-					"attributes: %p" % [ attributes ]
+				#self.log.debug "  [FOR] calling into new scope with overridden " +
+				#	"attributes: %p" % [ attributes ]
 				template.withOverriddenAttributes( scope, attributes ) {|template|
 					res << template.render( @subnodes, scope )
 				}
