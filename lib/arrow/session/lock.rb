@@ -185,6 +185,12 @@ class Session
 			self.readUnlock if self.readLocked?
 		end
 
+		
+		### Indicate to the lock that the caller will no longer be using it, and
+		### it may free any resources it had been using.
+		def finish
+			self.releaseAllLocks
+		end
 
 
 		#########
