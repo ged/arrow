@@ -42,7 +42,7 @@ RequiredLibraries = [
 	],
 	[ 'pluginfactory', "PluginFactory", 
 		'http://raa.ruby-lang.org/list.rhtml?name=pluginfactory',
-		'redist/PluginFactory-0.01.tar.gz'
+		'redist/PluginFactory-1.0.0.tar.gz'
 	],
 	[ 'hashslice', "HashSlice", 
 		'http://www.ruby-lang.org/en/raa-list.rhtml?name=hashslice',
@@ -211,13 +211,13 @@ if $0 == __FILE__
 			message "Installing demo applets..."
 			appletdir = File::join( demodir, "applets" )
 			#File::mkpath( appletdir, $Verbose )
-			i.installFiles( "applets", appletdir )
+			i.installFiles( "applets", appletdir, 0644, $VERBOSE )
 			message "done.\n"
 
 			message "Installing demo templates..."
 			templatedir = File::join( demodir, "templates" )
 			#File::mkpath( templatedir, $Verbose )
-			i.installFiles( "templates", templatedir )
+			i.installFiles( "templates", templatedir, 0644, $VERBOSE )
 			message "done.\n"
 		else
 			appletdir = File::join( $basedir, "applets" )
@@ -227,13 +227,18 @@ if $0 == __FILE__
 		# Load the demo config and correct the paths
 		configfile = File::join( $basedir, "demo.cfg" )
 		newconfig = File::join( demodir, "demo.cfg" )
-		config = Arrow::Config::load( configfile )
-		config.applets.path.dirs = [ appletdir ]
-		config.templates.path.dirs = [ templatedir ]
 
-		message "Writing Arrow config file to '#{newconfig}'..."
-		config.write( newconfig ) unless dryrun
-		message "done.\n\n"
+		if File::exists?( newconfig )
+			message "Not replacing existing config '%s'\n" % newconfig
+		else
+			config = Arrow::Config::load( configfile )
+			config.applets.path.dirs = [ appletdir ]
+			config.templates.path.dirs = [ templatedir ]
+
+			message "Writing Arrow config file to '#{newconfig}'..."
+			config.write( newconfig ) unless dryrun
+			message "done.\n\n"
+		end
 
 		# Now show the user what they'll need to put in their httpd.conf.
 		message "Okay, now all you should have to do is put something like ",
