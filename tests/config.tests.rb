@@ -31,7 +31,7 @@ class Arrow::ConfigTestCase < Arrow::TestCase
 
 	# Testing config values
 	TestConfig = {
-		:applications => {
+		:applets => {
 			:path	=> Arrow::Path::new( "apps:/www/apps" ),
 		},
 		:templates => {
