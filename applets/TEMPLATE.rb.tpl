@@ -48,7 +48,7 @@ class (>>>class<<<) < Arrow::Applet
 	}
 
 
-end # class Status
+end # class (>>>class<<<)
 
 
 >>>TEMPLATE-DEFINITION-SECTION<<<
