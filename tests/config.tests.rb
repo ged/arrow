@@ -52,13 +52,16 @@ class Arrow::ConfigTestCase < Arrow::TestCase
 	### Compare +expected+ config value to +actual+.
 	def assert_config_equal( expected, actual, msg=nil )
 		case expected
-		when Hash, Arrow::Config::ConfigStruct
+		when Arrow::Config::ConfigStruct
 			assert_instance_of Arrow::Config::ConfigStruct, actual, msg
 			expected.each {|key,val|
 				rval = nil
-				assert_nothing_raised { rval = actual.send(key) }
+				assert_nothing_raised { rval = actual.__send__(key) }
 				assert_config_equal val, rval, "#{msg}: #{key} member"
 			}
+
+		when Hash
+			assert_hash_equal expected, actual
 
 		when Arrow::Path
 			assert_instance_of Arrow::Path, actual
