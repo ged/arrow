@@ -2,9 +2,9 @@
 # 
 # This file contains the (>>>class<<<) class, a derivative of Arrow::Applet. (>>>desc<<<)
 # 
-# == Rcsid
+# == Subversion Id
 # 
-# $Id: TEMPLATE.rb.tpl,v 1.1 2003/11/01 19:42:05 deveiant Exp $
+# $Id$
 # 
 # == Authors
 # 
@@ -17,11 +17,14 @@ require 'arrow/applet'
 ### (>>>desc<<<)
 class (>>>class<<<) < Arrow::Applet
 
-	# CVS version tag
-	Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
+	# SVN Revision
+	SVNRev = %q$Rev$
 
-	# CVS id tag
-	Rcsid = %q$Id: TEMPLATE.rb.tpl,v 1.1 2003/11/01 19:42:05 deveiant Exp $
+	# SVN Id
+	SVNId = %q$Id$
+
+	# SVN URL
+	SVNURL = %q$URL$
 
 	# Applet signature
 	Signature = {
