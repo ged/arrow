@@ -229,7 +229,7 @@ class Arrow::Template < Arrow::Object
 		filename = path.
 			collect {|dir| File::expand_path(file, dir).untaint }.
 			find {|fn| File::file?(fn) }
-		raise TemplateError,
+		raise Arrow::TemplateError,
 			"Template '%s' not found. Search path was %s" %
 			[ file, path ] unless filename
 
@@ -419,14 +419,14 @@ class Arrow::Template < Arrow::Object
 	end
 
 
-	### Render the template to text and return it as a String. If called
-	### with an Array of +nodes+, the template will render them instead of
-	### its own syntaxTree. If given a scope (a Module object), a
-	### Binding of its internal state it will be used as the context of
-	### evaluation for the render. If not specified, a new anonymous Module
-	### instance is created for the render. Returns the results of each
-	### nodes' render joined together with the default string separator
-	### (+$,+).
+	### Render the template to text and return it as a String. If called with an
+	### Array of +nodes+, the template will render them instead of its own
+	### syntaxTree. If given a scope (a Module object), a Binding of its
+	### internal state it will be used as the context of evaluation for the
+	### render. If not specified, a new anonymous Module instance is created for
+	### the render. If a +superTemplate+ is given, make it available during
+	### rendering for variable-sharing, etc. Returns the results of each nodes'
+	### render joined together with the default string separator (+$,+).
 	def render( nodes=nil, scope=nil, superTemplate=nil )
 		oldSuper = @superTemplate
 		@superTemplate = superTemplate
