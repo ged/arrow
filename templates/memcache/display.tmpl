@@ -19,11 +19,14 @@
 
 	<p>The following servers are visible:</p>
 
-	<ul>
+	<dl>
 	<?for server in memcache.servers ?>
-	<li><?call server.host ?>:<?call server.port?></li>
+	<dt><a href="[?call txn.action ?]/detail/[?call 
+		server.host ?]/[?call server.port ?]"><?call server.host ?>:<?call 
+		server.port?></a></dt>
+	<dd><?call server.status ?>: weight = <?call server.weight ?></dd>
 	<?end?>
-	</ul>
+	</dl>
 
 	<?include navbar.incl?>
 
