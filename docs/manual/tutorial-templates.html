@@ -113,7 +113,7 @@
 		  <dt>call</dt>
 		  <dd class="format">
 		    <samp>&lt;?call <var>attribute</var>.<var>method</var> ?&gt;</samp><br />
-			<samp>&lt;?call "<var>fmtstring</var>" <var>attribute</var>.<var>method</var> ?&gt;</samp><br />
+			<samp>&lt;?call "<var>fmtstring</var>" % <var>attribute</var>.<var>method</var> ?&gt;</samp><br />
 		    <samp>&lt;?call <var>attribute</var>.<var>method</var>(<var>args</var>) ?&gt;</samp>
 		  </dd>
 		  <dd>This directive also defines a method of the template object, but
@@ -121,7 +121,11 @@
 		  inserted objects before replacing the tag.</dd>
 
 		  <dt>set</dt>
-		  <dd class="format"><samp>&lt;?set <var>attribute</var> <var>value</var> ?&gt;</samp></dd>
+		  <dd class="format">
+			<samp>&lt;?set <var>attribute</var> <var>value</var> ?&gt;</samp><br />
+			<samp>&lt;?set <var>attribute</var> <var>value</var>.<var>method</var> ?&gt;</samp><br />
+			<samp>&lt;?set <var>attribute</var> <var>value</var>.<var>method</var>(<var>args</var>) ?&gt;</samp>
+		  </dd>
 
 		  <dd>Sets template variable <var>attribute</var> to the specified
 		  <var>value</var>, which will then be accessible through the rest of
