@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+  <!--
+
+	Arrow Applet Tester: Problem in Setup
+
+  -->
+
+  <head>
+	<title>Arrow Applet Tester: Problem in Setup</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+	<link rel="stylesheet" type="text/css" href="/stylesheets/arrow.css" />
+  </head>
+  <body>
+
+	<h1>Arrow Applet Tester: Problem in Setup</h1>
+
+	<p>There was an error in setup for the tester itself:</p>
+
+	<?if err.is_a?( Exception ) ?>
+	<h2><?escape err.message ?></h2>
+	<pre><?escape err.backtrace.join("\n") ?></pre>
+
+	<?else?>
+	<h2><?call err[0] ?></h2>
+	<p><?escape err[1] ?></p>
+
+	<?end if ?>
+
+	<?include navbar.incl?>
+
+  </body>
+</html>
+
+
+<!--
+Local Variables:
+mode: xml
+-->
+
