@@ -89,8 +89,10 @@ class Session
 		### +false+ if the lock was not able to be acquired.
 		def readLock( blocking=true )
 			return true if self.readLocked?
+			self.log.debug "Acquiring read lock"
 			self.acquireReadLock( blocking ) or return false
 			@status |= READ
+			self.log.debug "Got read lock"
 			return true
 		end
 
@@ -99,8 +101,10 @@ class Session
 		### return +false+ if the lock was not able to be acquired.
 		def writeLock( blocking=true )
 			return true if self.writeLocked?
+			self.log.debug "Acquiring write lock"
 			self.acquireWriteLock( blocking ) or return false
 			@status |= WRITE
+			self.log.debug "Got write lock"
 			return true
 		end
 
@@ -157,6 +161,7 @@ class Session
 		def readUnlock
 			raise LockingError, "No read lock to release" unless
 				self.readLocked?
+			self.log.debug "Releasing read lock"
 			self.releaseReadLock
 			@status &= ( @status ^ READ )
 		end
@@ -167,6 +172,7 @@ class Session
 		def writeUnlock
 			raise LockingError, "No write lock to release" unless
 				self.writeLocked?
+			self.log.debug "Releasing write lock"
 			self.releaseWriteLock
 			@status &= ( @status ^ WRITE )
 		end
