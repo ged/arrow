@@ -139,9 +139,6 @@ module Arrow
 		Defaults = {
 			:startMonitor			=> false,
 
-			:noSuchAppletHandler	=> '/missing',
-			:errorHandler			=> '/error',
-
 			:logLevel				=> :info,
 			:templateLogLevel		=> :notice,
 
@@ -149,16 +146,11 @@ module Arrow
 				:path			=> Arrow::Path::new( "applets:/www/applets" ),
 				:pattern		=> '*.rb',
 				:pollInterval	=> 5,
-				:layout			=> {
-					"/"				=> "Arrow::Status",
-					"/missing"		=> "Arrow::NoSuchAppletHandler",
-					"/error"		=> "Arrow::ErrorHandler",
-					"/status"		=> "Arrow::Status",
-					"/hello"		=> "Arrow::Hello",
-					"/args"			=> "Arrow::ArgumentTester",
-					"/template"		=> "Arrow::TemplateViewer",
-				},
+				:layout			=> {},
 				:config			=> {},
+				:missingApplet	=> '/missing',
+				:errorApplet	=> '/error',
+				:defaultApplet	=> '/',
 			},
 
 			:templates => {
@@ -254,8 +246,8 @@ module Arrow
 		end
 
 
-		### Return a duplicate of the given +hash+ with its keys transformed
-		### into symbols from whatever they were before.
+		### Return a duplicate of the given +hash+ with its identifier-like keys
+		### transformed into symbols from whatever they were before.
 		def self::internifyKeys( hash )
 			newhash = {}
 			hash.each {|key,val|
@@ -295,7 +287,9 @@ module Arrow
 		### +confighash+ will be used instead of the defaults.
 		def initialize( confighash={} )
 			ihash = self.class.internifyKeys( confighash )
+			self.log.debug "Ihash is %p" % ihash
 			mergedhash = Defaults.merge( ihash, &Arrow::HashMergeFunction )
+			self.log.debug "Merged hash is %p" % mergedhash
 			@struct = ConfigStruct::new( mergedhash )
 			@createTime = Time::now
 			@name = nil
@@ -411,6 +405,7 @@ module Arrow
 			# Mask most of Kernel's methods away so they don't collide with
 			# config values.
 			Kernel::methods(false).each {|meth|
+				next unless method_defined?( meth )
 				next if /^(?:__|dup|object_id|inspect|class|raise|method_missing)/.match( meth )
 				undef_method( meth )
 			}
@@ -452,8 +447,11 @@ module Arrow
 					case v
 					when ConfigStruct
 						rhash[k] = v.to_h
-					when NilClass, FalseClass, TrueClass, Numeric, Symbol
+					when NilClass, FalseClass, TrueClass, Numeric
 						# No-op (can't dup)
+						rhash[k] = v
+					when Symbol
+						rhash[k] = v.to_s
 					else
 						rhash[k] = v.dup
 					end
