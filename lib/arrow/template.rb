@@ -113,7 +113,7 @@ module Arrow
 
 			### Add the specified definitions +defs+ to the object.
 			def addDefinitionSet( defs )
-				self.log.debug "adding definition set: %p" % [ defs ]
+				#self.log.debug "adding definition set: %p" % [ defs ]
 				@definitions.push( defs )
 
 				defs.each {|name,val|
@@ -124,12 +124,12 @@ module Arrow
 					# Add accessor and ivar for the definition if it doesn't
 					# already have one.
 					unless self.respond_to?( name.to_s.intern )
-						self.log.debug "Adding accessor for %s" % name
+						#self.log.debug "Adding accessor for %s" % name
 						(class << self; self; end).instance_eval {
 							attr_accessor name.to_s.intern
 						}
 					else
-						self.log.debug "Already have an accessor for '#{name}'"
+						#self.log.debug "Already have an accessor for '#{name}'"
 					end
 
 					self.instance_variable_set( "@#{name}", defs[name] )
@@ -140,11 +140,11 @@ module Arrow
             ### Remove the specified definitions +defs+ from the object. Using
             ### a definition so removed after this point will raise an error.
             def removeDefinitionSet
-				self.log.debug "Removing definition set from stack of %d frames" %
-					@definitions.nitems
+				#self.log.debug "Removing definition set from stack of %d frames" %
+				#	@definitions.nitems
                 defs = @definitions.pop
-				self.log.debug "Removing defs: %p, %d frames left" % 
-					[ defs, @definitions.nitems ]
+				#self.log.debug "Removing defs: %p, %d frames left" % 
+				#	[ defs, @definitions.nitems ]
 
                 defs.keys.each {|name|
 					next if name == 'definitions'
@@ -152,13 +152,13 @@ module Arrow
 					# If there was already a definition in effect with the same
 					# name in a previous scope, fetch it so we can play with it.
 					previousSet = @definitions.reverse.find {|set| set.key?(name)}
-					self.log.debug "Found previousSet %p for %s in scope stack of %d frames" %
-						[ previousSet, name, @definitions.nitems ]
+					#self.log.debug "Found previousSet %p for %s in scope stack of %d frames" %
+					#	[ previousSet, name, @definitions.nitems ]
 
 					# If none of the previous definition sets had a definition
 					# with the same name, remove the accessor and the ivar
 					unless previousSet
-						self.log.debug "Removing definition '%s' entirely" % name
+						#self.log.debug "Removing definition '%s' entirely" % name
 						(class << self; self; end).module_eval {
 							remove_method name.to_s.intern
 						}
@@ -166,7 +166,7 @@ module Arrow
 
 					# Otherwise just reset the ivar to the previous value
 					else
-						self.log.debug "Restoring previous def for '%s'" % name
+						#self.log.debug "Restoring previous def for '%s'" % name
 						self.instance_variable_set( "@#{name}", previousSet[name] )
 					end
 				}
@@ -179,11 +179,11 @@ module Arrow
 			### will be restored.
 			def override( defs ) # :yields: receiver
 				begin
-					self.log.debug "Before adding definitions: %d scope frame/s. Last: %p" %
-						[ @definitions.nitems, @definitions.last.keys ]
+					#self.log.debug "Before adding definitions: %d scope frame/s. Last: %p" %
+					#	[ @definitions.nitems, @definitions.last.keys ]
 					self.addDefinitionSet( defs )
-					self.log.debug "After adding definitions: %d scope frame/s. Last: %p" % 
-						[ @definitions.nitems, @definitions.last.keys ]
+					#self.log.debug "After adding definitions: %d scope frame/s. Last: %p" % 
+					#	[ @definitions.nitems, @definitions.last.keys ]
 					yield( self )
 				ensure
 					self.removeDefinitionSet
