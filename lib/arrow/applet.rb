@@ -79,28 +79,10 @@
 # Please see the file docs/COPYRIGHT for licensing details.
 #
 
-require 'formvalidator'
-require 'forwardable'
-
 require 'arrow/mixins'
 require 'arrow/exceptions'
 require 'arrow/object'
-
-### Add some Hash-ish methods for convenient access to FormValidator#valid.
-class FormValidator
-	unless method_defined?( :[] )
-		extend Forwardable
-		def_delegators :@form, *(Hash::instance_methods(false) - [:[], :[]=])
-
-		def []( key )
-			@form[ key.to_s ]
-		end
-
-		def []=( key, val )
-			@form[ key.to_s ] = val
-		end
-	end
-end
+require 'arrow/formvalidator'
 
 
 module Arrow
@@ -567,6 +549,14 @@ class Applet < Arrow::Object
 	protected
 	#########
 
+	### Run an action with a duped transaction (e.g., from another action)
+	def subrun( action, txn, *args )
+		self.log.debug "Running subordinate action '%s' from '%s'" %
+			[ action, caller ]
+		return self.send( "#{action}_action", txn, *args )
+	end
+
+
 	### Prepares the transaction (+txn+) for applet execution. By default, this
 	### method sets the content type of the response to 'text/html', turns off
 	### buffering for the header, and adds the applet's templates.
@@ -607,7 +597,7 @@ class Applet < Arrow::Object
 		end
 
 		self.log.debug "Creating form validator for profile: %p" % profile
-		validator = FormValidator::new
+		validator = Arrow::FormValidator::new
 		params = {}
 		txn.request.paramtable.each {|key,val|
 			params[key] = val.to_a.length > 1 ? val.to_a : val.to_s
