@@ -285,7 +285,7 @@ class Arrow::TestCase < Test::Unit::TestCase
 
 	### Test Hashes for equivalent content
 	def assert_hash_equal( expected, actual, msg="" )
-		errmsg = "Expected hash <%p> to be equal to <%p>"
+		errmsg = "Expected hash <%p> to be equal to <%p>" % [expected, actual]
 		errmsg += ": #{msg}" unless msg.empty?
 
 		assert_block( errmsg ) {
@@ -329,6 +329,42 @@ class Arrow::TestCase < Test::Unit::TestCase
 		diffs << "extra key/s: #{extraKeys.join(', ')}" unless extraKeys.empty?
 
 		return diffs.flatten
+	end
+
+
+	### Test Hashes (or any other objects with a #keys method) for key set
+	### equality
+	def assert_same_keys( expected, actual, msg="" )
+		errmsg = "Expected keys of <%p> to be equal to those of <%p>" %
+			[ actual, expected ]
+		errmsg += ": #{msg}" unless msg.empty?
+
+		ekeys = expected.keys; akeys = actual.keys
+		assert_block( errmsg ) {
+			diffs = []
+
+			# XOR the arrays and make a diff for each one
+			((ekeys + akeys) - (ekeys & akeys)).each do |key|
+				if ekeys.include?( key )
+					diffs << "missing key %p" % [key]
+				else
+					diffs << "extra key %p" % [key]
+				end
+			end
+
+			unless diffs.empty?
+				errmsg += "\n" + diffs.join("; ")
+				return false
+			else
+				return true
+			end
+		}
+	rescue Test::Unit::AssertionFailedError => err
+		cutframe = err.backtrace.reverse.find {|frame|
+			/assert_hash_equal/ =~ frame
+		}
+		firstIdx = (err.backtrace.rindex( cutframe )||0) + 1
+		Kernel::raise( err, err.message, err.backtrace[firstIdx..-1] )
 	end
 
 	
