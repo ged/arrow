@@ -41,7 +41,7 @@ class Arrow::BrokerTestCase < Arrow::TestCase
 			:defaultApplet	=> '/status',
 
 			:layout			=> {
-				"/"					=> "ServerStatus",
+				"/"					=> "Setup",
 				"/missing"			=> "NoSuchAppletHandler",
 				"/error"			=> "ErrorHandler",
 				"/status"			=> "ServerStatus",
@@ -117,20 +117,46 @@ class Arrow::BrokerTestCase < Arrow::TestCase
 		rval = nil
 
 		{
-			"/"	=> [],
-			"/status"			=> [ [/ServerStatus/, "status", []] ],
-			"/missing"			=> [ [/NoSuchAppletHandler/, "missing", []] ],
-			"/error"			=> [ [/ErrorHandler/, "error", []] ],
-			"/status"			=> [ [/ServerStatus/, "status", []] ],
-			"/hello"			=> [ [/HelloWorld/, "hello", []] ],
-			"/args"				=> [ [/ArgumentTester/, "args", []] ],
-			"/protected"		=> [ [/ProtectedDelegator/, "protected", []] ],
+			"/"					=> [ [/Setup/, "", []] ],
+			"/status"			=> [
+				[/Setup/, "", ["status"]],
+				[/ServerStatus/, "status", []],
+			],
+			"/missing"			=> [
+				[/Setup/, "", ["missing"]],
+				[/NoSuchAppletHandler/, "missing", []],
+			],
+			"/error"			=> [
+				[/Setup/, "", ["error"]],
+				[/ErrorHandler/, "error", []],
+			],
+			"/status"			=> [
+				[/Setup/, "", ["status"]],
+				[/ServerStatus/, "status", []],
+			],
+			"/hello"			=> [
+				[/Setup/, "", ["hello"]],
+				[/HelloWorld/, "hello", []],
+			],
+			"/args"				=> [
+				[/Setup/, "", ["args"]],
+				[/ArgumentTester/, "args", []],
+			],
+			"/protected"		=> [
+				[/Setup/, "", ["protected"]],
+				[/ProtectedDelegator/, "protected", []],
+			],
 			"/protected/hello"	=> [
+				[/Setup/, "", ["protected", "hello"]],
 				[/ProtectedDelegator/, "protected", ["hello"]],
 				[/HelloWorld/, "protected/hello", []],
 			],
-			"/counted"		=> [ [/AccessCounter/, "counted", []] ],
+			"/counted"		=> [
+				[/Setup/, "", ["counted"]],
+				[/AccessCounter/, "counted", []],
+			],
 			"/counted/hello"	=> [
+				[/Setup/, "", ["counted", "hello"]],
 				[/AccessCounter/, "counted", ["hello"]],
 				[/HelloWorld/, "counted/hello", []],
 			],
