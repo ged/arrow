@@ -94,16 +94,19 @@
 		in: &lt;?for a,b=1 in a_hash?&gt;), array-slurping arguments (*args) and
 		hashified arguments.  This will call Enumerable#each on the iterable.</p>
         <h3>yield</h3>
-		<p><strong>&lt;?yield args from var.block_accepting_method?&gt;</strong>
-		For calling any general method that takes a block, the yield directive
-		will assign the args in the same fasion as with &lt;?for, then pass in
-		the contained XHTML to be evaluated at any call of yield within the
-		method's body.  This can behave exactly like &lt;?for (&lt;yield args
-		from var.each?&gt;), can be used to call alternate iteration methods
-		(such as #each_with_index), or used in other general case block
-		situations (like Regex#match).</p>
-        <h3>import</h3>
-		<!-- <p><strong>&lt;?import foo as superfoo, bar, baz as
+		<p><strong>&lt;?yield arglist from var.block_accepting_method?&gt;
+		... &lt;?end yield?&gt;</strong> For calling any general method that
+		takes a block, the yield directive will assign the arglist in the same
+		fasion as with &lt;?for, then pass in the contained XHTML (the '...'
+		above) to be evaluated in the method whenever yield is called (or
+		&block.call, depending on how the method deals with the block argument).
+		This can behave exactly like &lt;?for (&lt;yield arglist in
+		var.each?&gt;), can be used to call alternate iteration methods (such as
+		#each_with_index), or used in other general case block situations (like
+		Regex#match).</p>
+		<!-- :MC: i don't understand what this does enough to document it -->
+        <!-- <h3>import</h3>
+		<p><strong>&lt;?import foo as superfoo, bar, baz as
 		bazish?&gt;</strong> Loads in template variables, either named the same
 		as the variable, or renamed to match the 'as name' name.</p> -->
         <h3>include</h3>
@@ -113,7 +116,8 @@
 		subspace specified by 'name'.</p>
 	  </div>
 	  <div class="section">
-		<h2><a href="#example" id="example">Templated Applets - Hello World (templated)</a></h2>
+		<h2><a href="#example" id="example">Templated Applets - Hello World
+		(templated)</a></h2>
 		<p>
 		  The Signature of an app has room for mention of the templates it uses.
 		</p>
