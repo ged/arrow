@@ -164,16 +164,20 @@ module Arrow
 			output = @broker.delegate( txn )
 			# self.log.debug "Output = %p" % output
 
-			# If the transaction has a session, save it
-			if txn.session?
-				self.log.debug "Saving session state"
-				txn.session.save
-			end
-
 			# If the response succeeded, set up the Apache::Request object, add
 			# headers, add session state, etc. If it failed, just log the failure.
 			if txn.status == Apache::OK
 				self.log.debug "Transaction has OK status"
+
+				# Render the output before anything else, as there might be
+				# session/header manipulation left to be done.
+				outputString = output.to_s if output && output != true
+
+				# If the transaction has a session, save it
+				if txn.session?
+					self.log.debug "Saving session state"
+					txn.session.save
+				end
 
 				#req.header_out( 'Cache-Control', "max-age=5" )
 				#req.header_out( 'Expires', (Time::now + 5).strftime( )
@@ -181,12 +185,13 @@ module Arrow
 
 				req.sync = true
 				req.send_http_header
-				req.print( output.to_s ) if output && output != true
+				req.print( outputString ) if outputString
 			else
 				self.log.notice "Transaction has non-OK status: %d" %
 					txn.status
 			end
 
+			self.log.debug "Returning status %d" % txn.status
 			return txn.status
 		rescue ::Exception => err
 			self.log.error "Transaction Manager Error: %s:\n\t%s" %
