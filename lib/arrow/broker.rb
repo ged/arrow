@@ -142,15 +142,22 @@ module Arrow
 		### be:
 		###   [ [RegistryEntry, URI, Array[*uriparts]], ... ]
 		def findAppletChain( uri, allowInternal=false )
-			uriParts = uri.sub(%r{^/}, '').split(%r{/})
+			self.log.debug "Searching for appletchain for %p" % [uri]
+			uriParts = uri.sub(%r{^/(?=.)}, '').split(%r{/})
 			appletchain = []
 			args = []
 
-			self.log.debug "Searching for appletchain for %p" % [uriParts]
+			self.log.debug "Split URI into parts: %p" % [uriParts]
 			if allowInternal
 				identPat = /^\w[-\w]*/
 			else
 				identPat = /^[a-zA-Z][-\w]*/
+			end
+
+			# If there's an applet installed at the base, prepend it to the
+			# appletchain
+			if @registry.key?( "" )
+				appletchain << [@registry[""], "", uriParts]
 			end
 
 			# Map uri fragments onto registry entries
@@ -213,7 +220,7 @@ module Arrow
 				}
 			end
 		rescue ::Exception => err
-			self.log.error "Error while executing applet chain: %p (%s): %s:\n\t%s" % [
+			self.log.error "Error while executing applet chain: %p (/%s): %s:\n\t%s" % [
 				re,
 				chain.first[1],
 				err.message,
