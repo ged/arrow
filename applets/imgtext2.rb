@@ -35,15 +35,19 @@ class FancyImageText < Arrow::Applet
 	DefaultFontDir.untaint
 
 	# Colors
-	DefaultForegroundColor = "#006600"
-	DefaultBackgroundColor = "#ffffed"
+	DefaultForegroundColor = "#000000"
+	DefaultBackgroundColor = "#ffffff"
+
+	# URLs of the form: /ttf/<fontname>/<size>/<caption>.<fmt>
+	# Stolen shamelessly from Mahlon.
+	FileName = %r{(.*)\.(png|jpg)}i
 
 	# Applet signature
 	Signature = {
 		:name => "imagetext",
 		:description => "Generates an image from one or more characters of text.",
 		:maintainer => "ged@FaerieMUD.org",
-		:defaultAction => 'form',
+		:defaultAction => 'fontlist',
 		:templates => {
 			:form		=> 'imgtext.tmpl',
 			:fontlist	=> 'imgtext-fontlist.tmpl',
@@ -78,8 +82,8 @@ class FancyImageText < Arrow::Applet
 		@fontdir ||= DefaultFontDir
 		@defaultfont ||= DefaultFont
 
-		@background= GD::Image::trueColor( bkgnd )
-		@foreground = GD::Image::trueColor( fgnd )
+		@background= GD::Image::trueColorAlpha( bkgnd, GD::AlphaTransparent )
+		@foreground = GD::Image::trueColorAlpha( fgnd, GD::AlphaTransparent/2 )
 		@fonts = load_fonts( @fontdir )
 
 		self.log.debug "Loaded %d fonts" % @fonts.length
@@ -92,28 +96,31 @@ class FancyImageText < Arrow::Applet
 
 	attr_reader :fontdir, :background, :foreground, :fonts
 
-	action( 'form' ) {|txn,*rest|
-		templ = self.loadTemplate( :form )
-		templ.txn = txn
-		templ.app = self
-		templ.fonts = @fonts
 
-		return templ
-	}
+	action( 'action_missing' ) {|txn, *args|
 
-	action( 'png' ) {|txn,*rest|
-		img = make_image( txn, rest )
-		self.log.debug "Made image."
+		# Fetch the REST arguments and build the image for them
+		fontname, size, imgname = *args
+		caption, fmt = $1, $2 if FileName.match( imgname )
+		img = make_image( txn, fontname, size, caption ) or return false
 
-		txn.content_type = 'image/png'
-		return img.pngStr
-	}
-
-	action( 'jpeg' ) {|txn,*rest|
-		img = make_image( txn, rest )
-
-		txn.content_type = 'image/jpeg'
-		return img.jpegStr( -1 )
+		self.log.debug "Made %s image with font: %s, size: %d, caption: %p" %
+			[ fmt, fontname, size, caption ]
+		
+		# Render the image according to what extension the URI had
+		case fmt
+		when /png/
+			txn.content_type = 'image/png'
+			return img.pngStr
+			
+		when /jpg/
+			txn.content_type = 'image/jpeg'
+			return img.jpegStr( -1 )
+			
+		else
+			self.log.error "Unsupported image extension %p" % fmt
+			return false
+		end
 	}
 
 	action( 'fontlist' ) {|txn, *rest|
@@ -124,6 +131,8 @@ class FancyImageText < Arrow::Applet
 
 		return templ
 	}
+
+
 
 	#########
 	protected
@@ -165,22 +174,22 @@ class FancyImageText < Arrow::Applet
 
 	### Create a GD::Image object from the given +txn+ and +rest+-style
 	### arguments.
-	def make_image( txn, rest )
+	def make_image( txn, fontname, size, caption )
 		# Read the configuration from either the query args or the REST-style
 		# parameters, preferring the former.
-		text = $1 if /([\x20-\x7f]+)/.match( rest[0] )
+		text = $1 if /([\x20-\x7f]+)/.match( caption )
 		text ||= txn.vargs[:imgtext]
 		text ||= "No valid text specified."
 		self.log.debug "Set text to %p" % text
 
 		# Get the face name the same way
-		face = $1 if /(\S+)/.match( rest[1] )
+		face = $1 if /(\S+)/.match( fontname )
 		face ||= txn.vargs[:fontface]
 		face ||= @defaultfont
 		self.log.debug "Set face to %p" % face
 
 		# Get the pointsize the same way
-		pointsize = Integer($1) if /(\d+)/.match( rest[2] )
+		pointsize = Integer($1) if /(\d+)/.match( size )
 		pointsize ||= Integer( txn.vargs[:fontsize] ) rescue nil
 		pointsize = 18 if pointsize.nil? || pointsize.zero?
 		self.log.debug "Set pointsize to %p" % pointsize
@@ -191,21 +200,28 @@ class FancyImageText < Arrow::Applet
 		self.log.debug "Font file is %p" % font
 		err, brect = GD::Image::stringFT( @foreground, font, pointsize, 0, 0, 0, text )
 		raise "Failed to calculate bounding-box for #{font}: #{err}" if err
-		self.log.debug "Bounding rect: %p" % brect
+		self.log.debug "Bounding rect: %p" % [ brect ]
 
 		# Calculate the image size from the bounding rectangle with a 5-pixel
 		# border.
 		width = brect[2] - brect[6] + 10
 		height = brect[3] - brect[7] + 10
+		self.log.debug "Width: %d, height: %d" % [ width, height ]
 
 		# Make the image and colors
 		img = GD::Image::newTrueColor( width, height )
+		self.log.debug "Created image object: %p" % [ img ]
 
 		# Fill the image with the background and draw the text and a border with
 		# the foreground color.
+		img.alphaBlending = false
 		img.fill( 1, 1, @background )
+		img.alphaBlending = true
 		img.stringFT( @foreground, font, pointsize, 0, 5 - brect[6], 5 - brect[7], text )
-		img.rectangle( 0,0, width-1, height-1, @foreground )
+		#img.rectangle( 0,0, width-1, height-1, @foreground )
+		img.transparent( @background )
+		
+		self.log.debug "Filled and set string."
 
 		return img
 	end
