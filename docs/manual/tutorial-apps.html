@@ -246,11 +246,6 @@ class Hello &lt; Arrow::Applet
     EOF
   }
 
-  def text_action( txn )
-    txn.content_type = 'text/plain'
-	return "Hello, world."
-  end
-
 end
 </pre>
 
@@ -267,8 +262,14 @@ applets:
 
         <p>After the config has been loaded, requests for
         <code>/&lt;arrow-root&gt;/hello</code> and
-        <code>/&lt;arrow-root&gt;/hello/greet</code> will return the HTML
-        version, while <code>/&lt;arrow-root&gt;/hello/text</code> will return
+        <code>/&lt;arrow-root&gt;/hello/greet</code> will return something that
+        looks like:</p>
+
+		<div class="screenshot">
+		  <img src="hello-world-sshot.png" alt="screenshot" height="405" width="563" />
+		</div>
+
+        <p>, while <code>/&lt;arrow-root&gt;/hello/text</code> will return
         the plain-text version.</p>
 
 	  </div>
