@@ -91,9 +91,9 @@
 #	  documentation for Apache::Cookie#expires for the format of the string.
 # 
 #
-# == Rcsid
-# 
-# $Id: config.rb,v 1.12 2003/12/30 17:39:52 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -138,17 +138,29 @@ module Arrow
 		# Define the layout and defaults for the underlying structs
 		Defaults = {
 			:startMonitor			=> false,
-			:defaultApplet			=> '(builtin)',
-			:noSuchAppletHandler	=> '(builtin)',
-			:errorHandler			=> '(builtin)',
+
+			:noSuchAppletHandler	=> '/missing',
+			:errorHandler			=> '/error',
+
 			:logLevel				=> :info,
 			:templateLogLevel		=> :notice,
-			:uriCollisionFatal		=> true,
+
 			:applets => {
 				:path			=> Arrow::Path::new( "applets:/www/applets" ),
 				:pattern		=> '*.rb',
 				:pollInterval	=> 5,
+				:layout			=> {
+					"/"				=> "Arrow::Status",
+					"/missing"		=> "Arrow::NoSuchAppletHandler",
+					"/error"		=> "Arrow::ErrorHandler",
+					"/status"		=> "Arrow::Status",
+					"/hello"		=> "Arrow::Hello",
+					"/args"			=> "Arrow::ArgumentTester",
+					"/template"		=> "Arrow::TemplateViewer",
+				},
+				:config			=> {},
 			},
+
 			:templates => {
 				:loader			=> 'Arrow::Template',
 				:path			=> Arrow::Path::new( "templates:/www/templates" ),
@@ -160,6 +172,7 @@ module Arrow
 					:expiration		=> 36
 				},
 			},
+
 			:session => {
 				:idType			=> 'md5:.',
 				:lockType		=> 'recommended',
@@ -216,7 +229,8 @@ module Arrow
 				case val
 				when Hash
 					newhash[ key ] = untaintValues( hash[key] )
-				when NilClass, TrueClass, FalseClass, Numeric
+
+				when NilClass, TrueClass, FalseClass, Numeric, Symbol
 					newhash[ key ] = val
 
 				when Arrow::Path
@@ -392,13 +406,17 @@ module Arrow
 		### hashes.
 		class ConfigStruct < Arrow::Object
 			include Enumerable
+			extend Forwardable
 
 			# Mask most of Kernel's methods away so they don't collide with
 			# config values.
 			Kernel::methods(false).each {|meth|
-				#next if /^(?:__|dup|object_id|inspect|class)/.match( meth )
+				next if /^(?:__|dup|object_id|inspect|class|raise|method_missing)/.match( meth )
 				undef_method( meth )
 			}
+
+			# Forward some methods to the internal hash
+			def_delegators :@hash, :keys, :key?, :values, :value?, :[]
 
 
 			### Create a new ConfigStruct from the given +hash+.
@@ -406,6 +424,7 @@ module Arrow
 				@hash = hash.dup
 				@modified = false
 			end
+
 
 			######
 			public
@@ -424,7 +443,7 @@ module Arrow
 				}
 			end
 
-			
+
 			### Return the receiver's values as a (possibly multi-dimensional)
 			### Hash with String keys.
 			def to_h

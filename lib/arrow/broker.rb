@@ -4,9 +4,9 @@
 # manager. It maintains a registry of applets, and delegates transactions
 # based on the request's URI.
 # 
-# == Rcsid
-# 
-# $Id: broker.rb,v 1.13 2004/01/26 05:46:12 deveiant Exp $
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
 # 
@@ -32,14 +32,19 @@ module Arrow
 
 		### Class constants/methods
 
-		# CVS version tag
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.13 $} )[1]
+		# SVN Revision
+		SVNRev = %q$Rev$
 
-		# CVS id tag
-		Rcsid = %q$Id: broker.rb,v 1.13 2004/01/26 05:46:12 deveiant Exp $
+		# SVN Id
+		SVNId = %q$Id$
+
+		# SVN URL
+		SVNURL = %q$URL$
+
 
 		# Registry entry data structure.
-		RegistryEntry = Struct::new( :signature, :appletclass, :object, :file, :timestamp )
+		RegistryEntry = Struct::new( :appletclass, :file, :timestamp, :object )
+
 
 		### Create a new Arrow::Broker object from the specified +config+ (an
 		### Arrow::Config object).
@@ -327,7 +332,7 @@ module Arrow
 		def checkForUpdates
 			return unless @config.applets.pollInterval.nonzero?
 			if Time::now - @loadTime > @config.applets.pollInterval
-				self.reloadAppletRegistry( @config )
+				self.updateAppletRegistry( @config )
 			end
 		end
 
@@ -354,38 +359,50 @@ module Arrow
 		end
 
 
-		### Load each file in the directories specified by the applets path
-		### in the given config (an Arrow::Config object) into a Hash of
-		### Arrow::Broker::RegistryEntry structs keyed by the path the
-		### applet responds to.
+		### Load each file in the directories specified by the applets path in
+		### the given config (an Arrow::Config object) into a Hash of
+		### Arrow::Broker::RegistryEntry structs keyed by the name of the applet
+		### class.
 		def loadAppletRegistry( config )
 			self.log.debug "Loading applet registry"
 			registry = {}
+			urimap = Hash::new {|ary,k| ary[k] = []}
 
+			# Invert the applet layout into Class => [ uris ] so as classes
+			# load, we know where to put 'em.
+			config.applets.layout.each do |uri, klassname|
+				self.log.debug "Mapping %p to %p" % [ klassname, uri ]
+				urimap[ klassname ] << uri
+			end
+
+			# Now search the applet path for applet files
 			self.findAppletFiles( config ).each do |appletfile|
 				self.log.debug "Found applet file %p" % appletfile
 				appletfile.untaint
 
-				# Add each applet object that successfully loads to the
-				# registry under its uri.
-				self.loadRegistryEntries( appletfile ) {|re|
-					uri = re.signature.uri
+				# Load registry entries for each class contained in the applet
+				# file
+				timestamp = File::mtime( appletfile )
+				self.loadAppletClasses( appletfile ) {|klass|
+					klassname = klass.name.sub( /#<Module:0x\w+>::/, '' )
+					self.log.debug "Looking for a mapped %p" % klassname
 
-					# Handle URI collision
-					if registry.key?( uri )
-						msg = "URI collision for %s: %s vs. %s" %
-							[ uri, re.file, registry[uri].file ]
+					if urimap.key?( klassname )
+						self.log.info "Found one or more uris for '%s'" % klassname
 
-						if @config.uriCollisionFatal
-							raise Arrow::AppletError, msg
-						else
-							self.log.warning msg
+						# Install a distinct instance of the applet at each uri
+						# it's registered under.
+						urimap[ klassname ].each do |uri|
+							applet = klass.new( @config, @templateFactory )
+							re = RegistryEntry::new( klass, appletfile, timestamp, applet )
+							self.log.info "Registered %p (%s) at '%s'" %
+								[ applet, klassname, uri ]
+
+							registry[ uri ] = re
 						end
+					else
+						self.log.info "No uri for '%s': Not instantiated" % klassname
 					end
-
-					self.log.info "Registered %s at '%s'" %
-						[ re.appletclass.name, uri ]
-					registry[ re.signature.uri ] = re
 				}
 			end
 
@@ -393,27 +410,26 @@ module Arrow
 		end
 
 
-		### Reload each file in the directories specified by the applets
-		### path in the given config if it has been modified since it was last
-		### loaded. Also check to see if there are any new files present, and if
-		### so, load them.
-		def reloadAppletRegistry( config )
-
+		### Check for updates for each file in the directories specified by the
+		### applet path in the given config if it has been modified since it was
+		### last loaded. Also check to see if there are any new files present,
+		### and if so, load them.
+		def updateAppletRegistry( config )
 			checkedFiles = []
 
 			# First compare the files corresponding to the loaded applets with
 			# their files on disk, reloading if changed, removing if deleted,
 			# etc.
-			@registry.collect {|uri,re| [re.file, re.timestamp]}.uniq.each {|file, ts|
+			@registry.collect {|name,re| [re.file, re.timestamp]}.uniq.each {|file, ts|
 
 				# Delete registry entries for files that have been deleted.
 				if !File::file?( file )
-					@registry.delete_if {|uri,re| re.file == file}
+					@registry.delete_if {|name,re| re.file == file}
 
 				# Reload registry entries for files that have changed
 				elsif File::mtime( file ) > ts
 					self.loadRegistryEntries( file ) {|re|
-						uri = re.signature.uri
+						klassname = re.signature.uri
 
 						# Handle URI collision
 						if registry.key?( uri ) && registry[uri].file != file
@@ -469,35 +485,27 @@ module Arrow
 		end
 
 
-		### Load the applet classes from the given +appletfile+ (a
-		### fully-qualified pathname), and return a RegistryEntry instance for
-		### each one.
-		def loadRegistryEntries( appletfile )
+		### Load the applet classes from the given +appletfile+ and return them
+		### in an Array. If a block is given, then each loaded class is yielded
+		### to the block in turn, and the return values are used in the Array
+		### instead.
+		def loadAppletClasses( appletfile )
 			self.log.debug "Attempting to load applet objects from %p" % appletfile
-			entries = []
+			classes = []
 	
-			# Get the applet file's timestamp, load any applet classes
-			# in it, then make a registry entry for each one.
-			timestamp = File::mtime( appletfile )
+			# Get the applet file's timestamp, load any applet classes in it,
+			# then yield it to the block or stick it in a return Array.
 			Arrow::Applet::load( appletfile ).each {|appletclass|
-				next unless appletclass.signature? && appletclass.signature.uri
-				sig = appletclass.signature
-				obj = appletclass.new( @config, @templateFactory )
-				re = RegistryEntry::new( sig, appletclass, obj, appletfile, timestamp )
-
-				self.log.debug "Created registry entry for %p (%s)" %
-					[ obj, timestamp ]
-
 				# Handle callback-style invocations
 				if block_given?
-					entries << yield( re )
+					classes << yield( appletclass )
 				else
-					entries << re
+					classes << appletclass
 				end
 			}
 
-			self.log.info "Loaded %d entries." % entries.nitems
-			return *entries
+			self.log.info "Loaded %d classes." % classes.nitems
+			return *classes
 		rescue ::Exception => err
 			self.log.error "%s failed to load: %s\n\t%s" %
 				[ appletfile, err.message, err.backtrace.join("\n\t") ]
