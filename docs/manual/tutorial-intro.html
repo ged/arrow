@@ -1,13 +1,13 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 
-<!--
+  <!--
 
-		Arrow Manual: Tutorial: Introduction
-		$Id$
+	Arrow Manual: Tutorial: Introduction
+	$Id$
 
-		Author:		Michael Granger
-		Time-stamp: <23-Apr-2001 19:58:12 deveiant>
+	Author:		Michael Granger
+	Time-stamp: <23-Apr-2001 19:58:12 deveiant>
 
   -->
 
@@ -17,7 +17,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Script-Type" content="text/javascript" />
 
-    <meta name="authors" content="Michael Granger (ged@FaerieMUD.org)>" />
+	<meta name="authors" content="Michael Granger (ged@FaerieMUD.org)>" />
 	<link rel="stylesheet" href="manual.css" type="text/css" />
   </head>
   <body>
@@ -32,15 +32,20 @@
 	  <div class="section">
 		<h2><a href="#overview" id="overview">Overview</a></h2>
 
-		<p>Arrow is an application server that is designed somewhat like
-		  a J2EE servlet container, but using Ruby as the language of
-		  implementation instead of Java. There are some differences, of course,
-		  but developers familiar with the J2EE servlet specification will
-		  notice some similarities.</p>
+		<p>The term <em>application</em>, used in the Arrow documentation,
+		refers to a overarching group of functionality like a <acronym
+		title="Content Management System">CMS</acronym>, an online customer
+		service interface, online event-management, or something similar. Arrow
+		was created to allow developers to create large generic applications for
+		the web which are easily tailored to a specific installation's
+		requirements. Each application is assembled out of small, mostly
+		orthogonal applets, which can be combined, re-arranged, swapped out, or
+		subclassed to provide branding, custom features, or other customization
+		with a minimum of time and effort.</p>
 
-		<p>In the Arrow framework, applications are made up of four basic parts:
-		  a Dispatcher, a Broker, one or more Applets, and Transactions which
-		  are wrapped around incoming requests.</p>
+		<p>To achieve this componentization, Arrow is made up of four basic
+		parts: a Dispatcher, a Broker, one or more Applets, and Transaction
+		objects which are wrapped around incoming requests.</p>
 	  </div>
 
 	  <div class="section">
@@ -49,38 +54,44 @@
 		<p>An Arrow application looks conceptually something like this:</p>
 
 		<div id="structural-overview-diagram"
-		  style="margin-left: auto; margin-right: auto;">
+			 style="margin-left: auto; margin-right: auto;">
 		  <img src="structural-overview.png" height="250" width="653"
-			alt="[Structural Diagram]"></img>
+		  alt="[Structural Diagram]"></img>
 		</div>
 
 		<dl class="linelist">
 		  <dt>Dispatcher</dt>
-		  <dd>The Dispatcher is the actual mod_ruby request handler that is
-			invoked by Apache; it loads the configuration, sets up the Broker,
-			and reloads the configuration if it has changed since the last time
-			it was read, as well as creating Transaction objects for incoming
-			requests and rendering the resulting output.</dd>
+		  <dd>The Dispatcher is the mod_ruby request handler that is invoked by
+		  Apache; it loads the configuration (or reloads it if it has changed
+		  since the last time it was read), sets up the Broker, creates
+		  Transaction objects for each incoming requests, sends the response
+		  headers, and renders the resulting output.</dd>
 
 		  <dt>Transaction</dt>
-		  <dd>The Transaction is created by the Dispatcher, and then passed to
-			the Broker for handling. It encapsulates the incoming request,
-			providing easy access to request values, configuration values,
-			session data, and validated query arguments.</dd>
+		  <dd>A new Transaction object is created by the Dispatcher for each
+		  request, and then passed to the Broker for handling. It encapsulates
+		  the incoming <tt>Apache::Request</tt> object, providing easy access to
+		  request values, configuration values, session data, and validated
+		  query arguments.</dd>
 
 		  <dt>Broker</dt>
 		  <dd>The Broker decides how Transaction objects get handled by loading
-			and building a registry of Applet objects.</dd>
-
-		  <dt>Registry</dt>
-		  <dd>This is a structure inside the Broker which keeps track of the
-			registered applet objects by associating them with a URI.</dd>
+		  and building a registry of Applet objects. When the transaction calls
+		  its <tt>#delegate</tt> method with a Transaction object, it searches
+		  its Registry for applets which have been mapped to all or part of the
+		  incoming request's URI.</dd>
 
 		  <dt>Applets</dt>
-		  <dd>Applets are objects which handle user requests, and define
-			the basic logic of different parts of the application.
+		  <dd>Applets are objects which handle user requests, and define the
+		  basic logic of different parts of the application. They can also be
+		  combined to run in sequence via delegation (aka chaining).
 		  </dd>
 		</dl>
+
+		<p>The default classes provide enough functionality to create a fairly
+		large number of different kinds of application, but they are all
+		designed with subclassing in mind, so if you don't like the way
+		something behaves, it should be fairly easy to customize.</p>
 
 	  </div>
 	</div>
@@ -90,6 +101,6 @@
 
 
 <!--
-  Local Variables:
-  mode: xml
- -->
+Local Variables:
+mode: nxml
+-->
