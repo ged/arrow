@@ -168,7 +168,8 @@ module Arrow
 			raise ArgumentError, "No lock object" unless lock
 			raise ArgumentError, "No store object" unless store
 
-			self.log.debug "Initializing session with id: %p, lock: %p, store: %p"
+			self.log.debug "Initializing session with id: %p, lock: %p, store: %p" %
+				[ idobj, lock, store ]
 
 			@id = idobj
 			@lock = lock
