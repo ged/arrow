@@ -11,7 +11,7 @@
 
 BEGIN {
 	require 'rbconfig'
-	include Config
+	require 'uri'
 
 	begin
 		require 'readline'
@@ -25,7 +25,9 @@ BEGIN {
 	end
 }
 
+
 module UtilityFunctions
+	include Config
 
 	# The list of regexen that eliminate files from the MANIFEST
 	ANTIMANIFEST = [
@@ -72,7 +74,7 @@ module UtilityFunctions
 
 	# Create a string that contains the ANSI codes specified and return it
 	def ansiCode( *attributes )
-		return '' unless /(?:vt10[03]|xterm(?:-color)?|linux)/i =~ ENV['TERM']
+		return '' unless /(?:vt10[03]|xterm(?:-color)?|linux|screen)/i =~ ENV['TERM']
 		attr = attributes.collect {|a| AnsiAttributes[a] ? AnsiAttributes[a] : nil}.compact.join(';')
 		if attr.empty? 
 			return ''
@@ -84,17 +86,17 @@ module UtilityFunctions
 	# Test for the presence of the specified <tt>library</tt>, and output a
 	# message describing the test using <tt>nicename</tt>. If <tt>nicename</tt>
 	# is <tt>nil</tt>, the value in <tt>library</tt> is used to build a default.
-	def testForLibrary( library, nicename=nil )
+	def testForLibrary( library, nicename=nil, progress=false )
 		nicename ||= library
-		message( "Testing for the #{nicename} library..." )
-		if $:.detect {|dir|
+		message( "Testing for the #{nicename} library..." ) if progress
+		if $LOAD_PATH.detect {|dir|
 				File.exists?(File.join(dir,"#{library}.rb")) ||
 				File.exists?(File.join(dir,"#{library}.#{CONFIG['DLEXT']}"))
 			}
-			message( "found.\n" )
+			message( "found.\n" ) if progress
 			return true
 		else
-			message( "not found.\n" )
+			message( "not found.\n" ) if progress
 			return false
 		end
 	end
@@ -130,9 +132,15 @@ module UtilityFunctions
 	end
 
 	### Output <tt>msg</tt> to STDERR and flush it.
-	def message( msg )
-		$stderr.print ansiCode( 'cyan' ) + msg + ansiCode( 'reset' )
+	def message( *msgs )
+		$stderr.print( msgs.join("\n") )
 		$stderr.flush
+	end
+
+	### Output +msg+ to STDERR and flush it if $VERBOSE is true.
+	def verboseMsg( msg )
+		msg.chomp!
+		message( msg + "\n" ) if $VERBOSE
 	end
 
 	### Output the specified <tt>msg</tt> as an ANSI-colored error message
@@ -163,6 +171,7 @@ module UtilityFunctions
 	end
 	alias :writeLine :divider
 
+
 	### Output the specified <tt>msg</tt> colored in ANSI red and exit with a
 	### status of 1.
 	def abort( msg )
@@ -170,75 +179,199 @@ module UtilityFunctions
 		Kernel.exit!( 1 )
 	end
 
+
 	### Output the specified <tt>promptString</tt> as a prompt (in green) and
-	### return the user's input with leading and trailing spaces removed.
-	def prompt( promptString )
+	### return the user's input with leading and trailing spaces removed.  If a
+	### test is provided, the prompt will repeat until the test returns true.
+	### An optional failure message can also be passed in.
+	def prompt( promptString, failure_msg="Try again." ) # :yields: response
 		promptString.chomp!
-		return readline( ansiCode('bold', 'green') + "#{promptString}: " + ansiCode('reset') ).strip
+		response = nil
+
+		begin
+			response = readline( ansiCode('bold', 'green') +
+				"#{promptString}: " + ansiCode('reset') ).strip
+			if block_given? && ! yield( response ) 
+				errorMessage( failure_msg + "\n\n" )
+				response = nil
+			end
+		end until response
+
+		return response
 	end
+
 
 	### Prompt the user with the given <tt>promptString</tt> via #prompt,
 	### substituting the given <tt>default</tt> if the user doesn't input
-	### anything.
-	def promptWithDefault( promptString, default )
-		response = prompt( "%s [%s]" % [ promptString, default ] )
-		if response.empty?
-			return default
-		else
-			return response
-		end
+	### anything.  If a test is provided, the prompt will repeat until the test
+	### returns true.  An optional failure message can also be passed in.
+	def promptWithDefault( promptString, default, failure_msg="Try again." )
+		response = nil
+		
+		begin
+			response = prompt( "%s [%s]" % [ promptString, default ] )
+			response = default if response.empty?
+
+			if block_given? && ! yield( response ) 
+				errorMessage( failure_msg + "\n\n" )
+				response = nil
+			end
+		end until response
+
+		return response
 	end
+
+
+	$programs = {}
 
 	### Search for the program specified by the given <tt>progname</tt> in the
 	### user's <tt>PATH</tt>, and return the full path to it, or <tt>nil</tt> if
 	### no such program is in the path.
 	def findProgram( progname )
-		ENV['PATH'].split(File::PATH_SEPARATOR).each {|d|
-			file = File.join( d, progname )
-			return file if File.executable?( file )
-		}
-		return nil
-	end
-
-	### Using the CVS log for the given <tt>file</tt> attempt to guess what the
-	### next release version might be. This only works if releases are tagged
-	### with tags like 'RELEASE_x_y'.
-	def extractNextVersionFromTags( file )
-		message "Attempting to extract next release version from CVS tags for #{file}...\n"
-		raise RuntimeError, "No such file '#{file}'" unless File.exists?( file )
-		cvsPath = findProgram( 'cvs' ) or
-			raise RuntimeError, "Cannot find the 'cvs' program. Aborting."
-
-		output = %x{#{cvsPath} log #{file}}
-		release = [ 0, 0 ]
-		output.scan( /RELEASE_(\d+)_(\d+)/ ) {|match|
-			if $1.to_i > release[0] || $2.to_i > release[1]
-				release = [ $1.to_i, $2.to_i ]
-				replaceMessage( "Found %d.%02d...\n" % release )
-			end
-		}
-
-		if release[1] >= 99
-			release[0] += 1
-			release[1] = 1
-		else
-			release[1] += 1
+		unless $programs.key?( progname )
+			ENV['PATH'].split(File::PATH_SEPARATOR).each {|d|
+				file = File.join( d, progname )
+				if File.executable?( file )
+					$programs[ progname ] = file 
+					break
+				end
+			}
 		end
 
-		return "%d.%02d" % release
+		return $programs[ progname ]
 	end
 
-	### Extract the project name (CVS Repository name) for the given directory.
-	def extractProjectName
-		File.open( "CVS/Repository", "r").readline.chomp
+
+	### Search for the release version for the project in the specified
+	### +directory+.
+	def extractVersion( directory='.' )
+		release = nil
+
+		Dir::chdir( directory ) do
+			if File::directory?( "CVS" )
+				verboseMsg( "Project is versioned via CVS. Searching for RELEASE_*_* tags..." )
+
+				if (( cvs = findProgram('cvs') ))
+					revs = []
+					output = %x{cvs log}
+					output.scan( /RELEASE_(\d+(?:_\d\w+)*)/ ) {|match|
+						rev = $1.split(/_/).collect {|s| Integer(s) rescue 0}
+						verboseMsg( "Found %s...\n" % rev.join('.') )
+						revs << rev
+					}
+
+					release = revs.sort.last
+				end
+
+			elsif File::directory?( '.svn' )
+				verboseMsg( "Project is versioned via Subversion" )
+
+				if (( svn = findProgram('svn') ))
+					output = %x{svn pg project-version}
+					unless output.empty?
+						verboseMsg( "Using 'project-version' property: %p" % output )
+						release = output.split( /[._]/ ).collect {|s| Integer(s) rescue 0}
+					end
+				end
+			end
+		end
+
+		return release
 	end
+
+
+	### Find the current release version for the project in the specified
+	### +directory+ and return its successor.
+	def extractNextVersion( directory='.' )
+		version = extractVersion( directory ) || [0,0,0]
+		version.compact!
+		version[-1] += 1
+
+		return version
+	end
+
+
+	# Pattern for extracting the name of the project from a Subversion URL
+	SVNUrlPath = %r{
+		.*/						# Skip all but the last bit
+		(\w+)					# $1 = project name
+		/						# Followed by / +
+		(?:
+			trunk |				# 'trunk'
+			(
+				branches |		# ...or branches/branch-name
+				tags			# ...or tags/tag-name
+			)/\w	
+		)
+		$						# bound to the end
+	}ix
+
+	### Extract the project name (CVS Repository name) for the given +directory+.
+	def extractProjectName( directory='.' )
+		name = nil
+
+		Dir::chdir( directory ) do
+
+			# CVS-controlled
+			if File::directory?( "CVS" )
+				verboseMsg( "Project is versioned via CVS. Using repository name." )
+				name = File.open( "CVS/Repository", "r").readline.chomp
+				name.sub!( %r{.*/}, '' )
+
+			# Subversion-controlled
+			elsif File::directory?( '.svn' )
+				verboseMsg( "Project is versioned via Subversion" )
+
+				# If the machine has the svn tool, try to get the project name
+				if (( svn = findProgram( 'svn' ) ))
+
+					# First try an explicit property
+					output = shellCommand( svn, 'pg', 'project-name' )
+					if !output.empty?
+						verboseMsg( "Using 'project-name' property: %p" % output )
+						name = output.first
+
+					# If that doesn't work, try to figure it out from the URL
+					elsif (( uri = getSvnUri() ))
+						name = uri.path.sub( SVNUrlPath ) { $1 }
+					end
+				end
+			end
+
+			# Fall back to guessing based on the directory name
+			unless name
+				name = File::basename(File::dirname( File::expand_path(__FILE__) ))
+			end
+		end
+
+		return name
+	end
+
+
+	### Extract the Subversion URL from the specified directory and return it as
+	### a URI object.
+	def getSvnUri( directory='.' )
+		uri = nil
+
+		Dir::chdir( directory ) do
+			output = %x{svn info}
+			debugMsg( "Using info: %p" % output )
+
+			if /^URL: \s* ( .* )/xi.match( output )
+				uri = URI::parse( $1 )
+			end
+		end
+
+		return uri
+	end
+
 
 	### Read the specified <tt>manifestFile</tt>, which is a text file
 	### describing which files to package up for a distribution. The manifest
 	### should consist of one or more lines, each containing one filename or
 	### shell glob pattern.
 	def readManifest( manifestFile="MANIFEST" )
-		message "Building manifest..."
+		verboseMsg "Building manifest..."
 		raise "Missing #{manifestFile}, please remake it" unless File.exists? manifestFile
 
 		manifest = IO::readlines( manifestFile ).collect {|line|
@@ -249,37 +382,38 @@ module UtilityFunctions
 
 		filelist = []
 		for pat in manifest
-			$stderr.puts "Adding files that match '#{pat}' to the file list" if $VERBOSE
+			verboseMsg "Adding files that match '#{pat}' to the file list"
 			filelist |= Dir.glob( pat ).find_all {|f| FileTest.file?(f)}
 		end
 
-		message "found #{filelist.length} files.\n"
+		verboseMsg "found #{filelist.length} files.\n"
 		return filelist
 	end
+
 
 	### Given a <tt>filelist</tt> like that returned by #readManifest, remove
 	### the entries therein which match the Regexp objects in the given
 	### <tt>antimanifest</tt> and return the resultant Array.
 	def vetManifest( filelist, antimanifest=ANITMANIFEST )
 		origLength = filelist.length
-		message "Vetting manifest..."
+		verboseMsg "Vetting manifest..."
 
 		for regex in antimanifest
-			if $VERBOSE
-				message "\n\tPattern /#{regex.source}/ removed: " +
-					filelist.find_all {|file| regex.match(file)}.join(', ')
-			end
+			verboseMsg "\n\tPattern /#{regex.source}/ removed: " +
+				filelist.find_all {|file| regex.match(file)}.join(', ')
 			filelist.delete_if {|file| regex.match(file)}
 		end
 
-		message "removed #{origLength - filelist.length} files from the list.\n"
+		verboseMsg "removed #{origLength - filelist.length} files from the list.\n"
 		return filelist
 	end
+
 
 	### Combine a call to #readManifest with one to #vetManifest.
 	def getVettedManifest( manifestFile="MANIFEST", antimanifest=ANTIMANIFEST )
 		vetManifest( readManifest(manifestFile), antimanifest )
 	end
+
 
 	### Given a documentation <tt>catalogFile</tt>, extract the title, if
 	### available, and return it. Otherwise generate a title from the name of
@@ -290,22 +424,12 @@ module UtilityFunctions
 		# Title: Foo Bar Module
 		title = findCatalogKeyword( 'title', catalogFile )
 
-		# If that doesn't work for some reason, try grabbing the name of the CVS
-		# repository the directory belongs to.
-		if title.nil? && File::directory?( "CVS" ) &&
-				File::exists?( "CVS/Repository" )
-			title = File::read( "CVS/Repository" ).chomp
-		end
-
-		# As a last resort, use the name of the project directory
-		if title.nil?
-			distdir = File::dirname( __FILE__ )
-			distdir = File::dirname( distdir ) if /docs$/ =~ distdir
-			title = File::basename( distdir )
-		end
+		# If that doesn't work for some reason, use the name of the project.
+		title = extractProjectName()
 
 		return title
 	end
+
 
 	### Given a documentation <tt>catalogFile</tt>, extract the name of the file
 	### to use as the initally displayed page. If extraction fails, the
@@ -354,7 +478,7 @@ module UtilityFunctions
 		val = nil
 
 		if File::exists? catalogFile
-			message "Extracting '#{keyword}' from CATALOG file (%s).\n" % catalogFile
+			verboseMsg "Extracting '#{keyword}' from CATALOG file (%s).\n" % catalogFile
 			File::foreach( catalogFile ) {|line|
 				debugMsg( "Examining line #{line.inspect}..." )
 				val = $1.strip and break if /^#\s*#{keyword}:\s*(.*)$/i =~ line
@@ -373,16 +497,16 @@ module UtilityFunctions
 	def findRdocableFiles( catalogFile="docs/CATALOG" )
 		startlist = []
 		if File.exists? catalogFile
-			message "Using CATALOG file (%s).\n" % catalogFile
+			verboseMsg "Using CATALOG file (%s).\n" % catalogFile
 			startlist = getVettedManifest( catalogFile )
 		else
-			message "Using default MANIFEST\n"
+			verboseMsg "Using default MANIFEST\n"
 			startlist = getVettedManifest()
 		end
 
-		message "Looking for RDoc comments in:\n" if $VERBOSE
+		verboseMsg "Looking for RDoc comments in:\n"
 		startlist.select {|fn|
-			message "  #{fn}: " if $VERBOSE
+			verboseMsg "  #{fn}: "
 			found = false
 			File::open( fn, "r" ) {|fh|
 				fh.each {|line|
@@ -393,7 +517,7 @@ module UtilityFunctions
 				}
 			}
 
-			message( (found ? "yes" : "no") + "\n" ) if $VERBOSE
+			verboseMsg( (found ? "yes" : "no") + "\n" )
 			found
 		}
 	end
@@ -402,25 +526,26 @@ module UtilityFunctions
 	### <tt>line</tt> at a time. The return value of the block is used as the
 	### new line, or omitted if the block returns <tt>nil</tt> or
 	### <tt>false</tt>.
-	def editInPlace( file ) # :yields: line
+	def editInPlace( file, testMode=false ) # :yields: line
 		raise "No block specified for editing operation" unless block_given?
 
 		tempName = "#{file}.#{$$}"
 		File::open( tempName, File::RDWR|File::CREAT, 0600 ) {|tempfile|
-			File::unlink( tempName )
 			File::open( file, File::RDONLY ) {|fh|
 				fh.each {|line|
 					newline = yield( line ) or next
 					tempfile.print( newline )
+					$deferr.puts "%p -> %p" % [ line, newline ] if
+						line != newline
 				}
 			}
-
-			tempfile.seek(0)
-
-			File::open( file, File::TRUNC|File::WRONLY, 0644 ) {|newfile|
-				newfile.print( tempfile.read )
-			}
 		}
+
+		if testMode
+			File::unlink( tempName )
+		else
+			File::rename( tempName, file )
+		end
 	end
 
 	### Execute the specified shell <tt>command</tt>, read the results, and
@@ -483,4 +608,27 @@ module UtilityFunctions
 			puts result
 		end
 	end
+end
+
+
+if __FILE__ == $0
+	# $DEBUG = true
+	include UtilityFunctions
+
+	projname = extractProjectName()
+	header "Project: #{projname}"
+
+	ver = extractVersion() || [0,0,1]
+	puts "Version: %s\n" % ver.join('.')
+
+	if File::directory?( "docs" )
+		puts "Rdoc:",
+			"  Title: " + findRdocTitle(),
+			"  Main: " + findRdocMain(),
+			"  Upload: " + findRdocUpload(),
+			"  SCCS URL: " + findRdocCvsURL()
+	end
+
+	puts "Manifest:",
+		"  " + getVettedManifest().join("\n  ")
 end

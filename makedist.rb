@@ -10,21 +10,12 @@
 #	http://language.perl.com/misc/Artistic.html)
 #
 
-require 'getoptlong'
-require 'ftools'
+require 'optparse'
+require 'fileutils'
 require "./utils.rb"
 
-include UtilityFunctions
+include UtilityFunctions, FileUtils
 
-
-### Configuration stuff
-
-Options = [
-	[ "--snapshot",	"-s",		GetoptLong::NO_ARGUMENT ],
-	[ "--verbose",  "-v",		GetoptLong::NO_ARGUMENT ],
-]
-
-### End of configuration
 
 # SVN Revision
 SVNRev = %q$Rev$
@@ -37,9 +28,9 @@ SVNURL = %q$URL$
 
 $Programs = {
 	'tar'	=> nil,
-	'rm'	=> nil,
 	'zip'	=> nil,
 	'cvs'	=> nil,
+	'svn'	=> nil,
 }
 
 Distros = [
@@ -86,38 +77,59 @@ Distros = [
 
 
 # Set interrupt handler to restore tty before exiting
-stty_save = `stty -g`.chomp
-trap("INT") { system "stty", stty_save; exit }
+#stty_save = `stty -g`.chomp
+#trap("INT") { system "stty", stty_save; exit }
 
 ### Main function
 def main
 	filelist = []
 	snapshot = false
+	wantsTag = true
+	wantsPrompt = true
 
 	# Read command-line options
-	opts = GetoptLong::new( *Options )
-	opts.each do |opt, arg|
-		case opt
+	ARGV.options do |oparser|
+		oparser.banner = "Usage: #$0 [options] [VERSION]\n"
 
-		when '--snapshot'
-			snapshot = true
-
-		when '--verbose'
+		oparser.on( "--verbose", "-v", TrueClass, "Make progress verbose" ) do
 			$VERBOSE = true
-
-		else
-			abort( "No such option '#{opt}'" )
+			debugMsg "Turned verbose on."
 		end
-			
+
+		oparser.on( "--snapshot", "-s", TrueClass,
+			"Make a snapshot distribution instead of a versioned release" ) do
+			snapshot = true
+			debugMsg "Making snapshot instead of release."
+		end
+
+		oparser.on( "--no-tag", "-n", TrueClass, "Don't tag the release." ) do
+			wantsTag = false
+		end
+
+		oparser.on( "--yes", "-y", TrueClass,
+			"Accept all the defaults instead of prompting." ) do
+			wantsPrompt = false
+		end
+
+		# Handle the 'help' option
+		oparser.on( "--help", "-h", "Display this text." ) do
+			$stderr.puts oparser
+			exit!(0)
+		end
+
+		oparser.parse!
 	end
 
+	userversion = ARGV.shift
+
 	# Find the project name
-	if File::directory?( "CVS" )
-		project = File::read( "CVS/Repository" ).chomp.sub( %r{.*/}, '' )
-	else
-		project = prompt( "Project name?" ).capitalize
-	end		
-	header "%s Distribution Maker" % project
+	header "Distribution Maker"
+	project = extractProjectName()
+	if wantsPrompt && project.nil?
+		project = prompt( "Project name?" )
+	end
+	abort( "No project name" ) unless project && !project.empty?
+	message( "Making distribution archives for %s\n" % project )
 
 	# Look for programs to use
 	message "Finding necessary programs...\n\n"
@@ -134,25 +146,56 @@ def main
 	# Prompt for version/snapshot date
 	version = distName = nil
 	if snapshot
-		version = promptWithDefault( "Snapshot version", Time::now.strftime('%Y%m%d') )
+		verboseMsg( "Making a snapshot distname." )
+
+		if userversion
+			version = userversion
+		else
+			version = Time::now.strftime('%Y%m%d')
+			version = promptWithDefault( "Snapshot version", version ) if wantsPrompt
+		end
+
+		verboseMsg( "Using version %p" % [version] )
 		distName = "%s-%s" % [ project, version ]
 		tag = "SNAPSHOT_%s" % version
 	else
-		releaseVersion = extractNextVersionFromTags( filelist[0] )
-		version = promptWithDefault( "Distribution version", releaseVersion )
+		verboseMsg( "Making a release distname." )
+
+		if userversion
+			version = userversion
+		else
+			version = extractNextVersion().join('.')
+			version = promptWithDefault( "Distribution version", version ) if wantsPrompt
+		end
+
+		verboseMsg( "Using version %p" % [version] )
 		distName = "%s-%s" % [ project, version ]
-		tag = "RELEASE_%s" % sprintf('%0.2f', version).gsub(/\./, '_') 
+		tag = "RELEASE_%s" % version.gsub( /\./, '_' )
 	end
+	verboseMsg( "Distname = %p" % [distName] )
 
 	# Tag if desired
-	tagFlag = promptWithDefault( "Tag '%s' with %s" % [ project, tag ], 'y' )
-	if tagFlag =~ /^y/i
-		$stderr.puts "Running #{$Programs['cvs']} -q tag #{tag}"
-		system $Programs['cvs'], '-q', 'tag', tag
+	if wantsTag
+		verboseMsg( "Tagging." )
+
+		tagFlag = promptWithDefault( "Tag '%s' with %s" % [ project, tag ], 'y' )
+		if /^y/i.match( tagFlag )
+			if File::directory?( "CVS" )
+				message "Running #{$Programs['cvs']} -q tag #{tag}\n"
+				system $Programs['cvs'], '-q', 'tag', tag
+			elsif File::directory?( ".svn" )
+				uri = getSvnUri()
+				taguri = uri + "tags/#{tag}"
+				message "SVN tag URI: %s\n" % [ taguri ]
+				system( $Programs['svn'], 'cp', uri.to_s, taguri.to_s )
+			else
+				errorMessage "No supported version control system. Skipping tag."
+			end
+		end
 	end
 
 	# Make the distdir
-	message "Making distribution directory #{distName}..."
+	message "Making distribution directory #{distName}...\n"
 	Dir.mkdir( distName ) unless FileTest.directory?( distName )
 	for file in filelist
 		File.makedirs( File.dirname(File.join(distName,file)) )
@@ -167,13 +210,9 @@ def main
 	end
 
 	# Remove the distdir
-	if $Programs['rm']
-		message "removing dist build directory..."
-		system( $Programs['rm'], '-rf', distName )
-		message "done.\n\n"
-	else
-		message "Cannot clean dist build directory: no 'rm' program was found."
-	end
+	message "removing dist build directory..."
+	rm_rf distName, :verbose => $VERBOSE
+	message "done.\n\n"
 end
 
 main	

@@ -5,14 +5,18 @@
 #
 
 BEGIN {
-	$:.unshift "lib", "redist", "tests/lib"
+	$basedir = File::dirname( __FILE__ )
+	["lib", "tests/lib", "redist"].each do |subdir|
+		$LOAD_PATH.unshift File::join( $basedir, subdir )
+	end
 
-	require './utils'
+	require "#{$basedir}/utils"
 	include UtilityFunctions
 
 	verboseOff {
 		require "arrow/logger"
-		logfile = File::open( 'test.log', File::CREAT|File::WRONLY|File::TRUNC )
+		logpath = File::join( $basedir, "test.log" )
+		logfile = File::open( logpath, File::CREAT|File::WRONLY|File::TRUNC )
 		logfile.sync = true
 
 		Arrow::Logger.global.outputters <<
@@ -31,7 +35,7 @@ safelevel = 0
 patterns = []
 requires = []
 $DebugPattern = nil
-$Apache = true
+$Apache = false
 
 # Parse command-line switches
 ARGV.options {|oparser|
@@ -84,7 +88,7 @@ ARGV.each {|pat| patterns << Regexp::new( pat, Regexp::IGNORECASE )}
 $stderr.puts "#{patterns.length} patterns given on the command line"
 
 ### Load all the tests from the tests dir
-Find.find("tests") {|file|
+Find.find( File::join($basedir, "tests") ) {|file|
 	Find.prune if /\/\./ =~ file or /~$/ =~ file
 	Find.prune if /TEMPLATE/ =~ file
 	next if File.stat( file ).directory?
@@ -126,8 +130,12 @@ class ArrowTests
 end
 
 # Run tests
-$SAFE = safelevel
-Test::Unit::UI::Console::TestRunner.new( ArrowTests ).start
+Dir::chdir( $basedir ) do
+	$SAFE = safelevel
+	Test::Unit::UI::Console::TestRunner.new( ArrowTests ).start
+end
+
+
 
 
 

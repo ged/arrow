@@ -12,15 +12,19 @@
 #	http://language.perl.com/misc/Artistic.html)
 #
 
-require './utils.rb'
+BEGIN {
+	$basedir = File::dirname( File::expand_path(__FILE__) )
+	$LOAD_PATH.unshift( "#$basedir/lib" )
+	
+	require "#$basedir/utils.rb"
+	require 'rbconfig'
+	require 'find'
+	require 'ftools'
+	require 'optparse'
+}
+
 include UtilityFunctions
-
-require 'rbconfig'
 include Config
-
-require 'find'
-require 'ftools'
-require 'optparse'
 
 $version	= %q$Revision: 1.4 $
 $rcsId		= %q$Id$
@@ -38,7 +42,7 @@ RequiredLibraries = [
 	],
 	[ 'pluginfactory', "PluginFactory", 
 		'http://raa.ruby-lang.org/list.rhtml?name=pluginfactory',
-		'http://www.devEiate.org/code/PluginFactory-0.01.tar.gz'
+		'redist/PluginFactory-0.01.tar.gz'
 	],
 	[ 'hashslice', "HashSlice", 
 		'http://www.ruby-lang.org/en/raa-list.rhtml?name=hashslice',
@@ -73,7 +77,7 @@ class Installer
 
 		for dir in dirs
 			if @ftools == File
-				File::mkpath( dir, $verbose )
+				File::mkpath( dir, verbose )
 			else
 				$stderr.puts "Make path %s with mode %o" % [ dir, mode ]
 			end
@@ -139,6 +143,15 @@ class Installer
 
 end
 
+HttpdConfSection = <<EOF
+RubyRequire arrow
+
+<Location /arrow-demo>
+	SetHandler ruby-object
+	RubyHandler "Arrow::Dispatcher::instance( '%s' )"
+</Location>
+EOF
+
 if $0 == __FILE__
 	header "Arrow Installer #$version"
 
@@ -146,6 +159,7 @@ if $0 == __FILE__
 		testForRequiredLibrary( *lib )
 	end
 
+	require 'arrow/config'
 	dryrun = false
 
 	# Parse command-line switches
@@ -176,12 +190,60 @@ if $0 == __FILE__
 	debugMsg "Sitearchdir = '#{CONFIG['sitearchdir']}'"
 	sitearchdir = CONFIG['sitearchdir']
 
-	message "Installing..."
+	message "Installing Arrow libraries..."
 	i = Installer.new( dryrun )
 	#i.installFiles( "redist", sitelibdir, 0444, verbose )
 	i.installFiles( "lib", sitelibdir, 0444, $VERBOSE )
+	message "done.\n\n"
 
-	message "done.\n"
+	# Ask if the demo applets should be installed
+	message "Arrow comes with some demonstration applets/templates.\n"
+	ans = promptWithDefault( "Would you like to install them?", "y" )
+	if /^y/i.match( ans )
+		message "\nFirst the applet and template files. If you don't mind ",
+			"keeping this source directory around, they can be loaded from ",
+			"here. Otherwise, specify somewhere to copy them.\n"
+		demodir = promptWithDefault( "Applet/template directory", $basedir )
+		appletdir = templatedir = nil
+
+		# If the files need to be copied, do so
+		if demodir != $basedir
+			message "Installing demo applets..."
+			appletdir = File::join( demodir, "applets" )
+			#File::mkpath( appletdir, $Verbose )
+			i.installFiles( "applets", appletdir )
+			message "done.\n"
+
+			message "Installing demo templates..."
+			templatedir = File::join( demodir, "templates" )
+			#File::mkpath( templatedir, $Verbose )
+			i.installFiles( "templates", templatedir )
+			message "done.\n"
+		else
+			appletdir = File::join( $basedir, "applets" )
+			templatedir = File::join( $basedir, "templates" )
+		end
+
+		# Load the demo config and correct the paths
+		configfile = File::join( $basedir, "demo.cfg" )
+		newconfig = File::join( demodir, "demo.cfg" )
+		config = Arrow::Config::load( configfile )
+		config.applets.path.dirs = [ appletdir ]
+		config.templates.path.dirs = [ templatedir ]
+
+		message "Writing Arrow config file to '#{newconfig}'..."
+		config.write( newconfig ) unless dryrun
+		message "done.\n\n"
+
+		# Now show the user what they'll need to put in their httpd.conf.
+		message "Okay, now all you should have to do is put something like ",
+			"this in your httpd.conf and restart:\n\n"
+		puts HttpdConfSection % newconfig
+	else
+		message "done.\n"
+	end
+	
+
 end
 	
 
