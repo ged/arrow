@@ -72,6 +72,9 @@ class Logger
 			srvr = Apache.request.server
 			return unless srvr.loglevel >= Levels[ level ]
 
+			# Translate calls to log.warning into Apache::Server#log_warn
+			level = :warn if level == :warning
+
 			logMethod = srvr.method( "log_#{level}" )
 			super {|msg|
 				# Escape any unexpanded sprintf format patterns
