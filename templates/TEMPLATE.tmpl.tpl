@@ -27,7 +27,7 @@
 
 <!--
   Local Variables:
-  mode: xml
+  mode: nxml
  -->
 
 >>>TEMPLATE-DEFINITION-SECTION<<<
