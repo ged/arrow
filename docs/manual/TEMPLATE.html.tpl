@@ -23,7 +23,22 @@
   <body>
 
 
-	<!--#include virtual="linkbox.incl" -->
+
+	<!-- Experimental linkbox thingie -->
+	<div id="linkbox">
+	  <span id="linkbox-head">Arrow Manual</span>
+	  <span id="linkbox-body">
+		<ul>
+		  <li>[<a href="index.html">Index</a>]</li>
+		  <li>[<a href="whatis.html">What Is Arrow?</a>]</li>
+		  <li>[<a href="download.html">Downloading</a>]</li>
+		  <li>[<a href="install.html">Installation</a>]</li>
+		  <li>[<a href="config.html">Configuration</a>]</li>
+		  <li>[<a href="tutorial.html">Tutorial</a>]</li>
+		  <li>[<a href="html/">API Reference</a>]</li>
+		</ul>
+	  </span>
+	</div>
 
 	<div id="content">
 	  <h1>Arrow: (>>>title<<<)</h1>
