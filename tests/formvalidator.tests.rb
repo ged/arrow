@@ -30,10 +30,6 @@ class Arrow::FormValidatorTestCase < Arrow::TestCase
 	TestProfile = {
 		:required		=> [ :required ],
 		:optional		=> %w{optional number alpha},
-		:descriptions	=> {
-			:required		=> "Required Field",
-			:numeric		=> "Numeric Field",
-		},
 		:constraints	=> {
 			:number	=> /^(\d+)$/,
 			:alpha	=> /^(\w+)$/,
