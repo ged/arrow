@@ -162,7 +162,6 @@ class FancyImageText < Arrow::Applet
 
 			count += 1
 			begin
-				self.log.debug "Attempting to load #{file}"
 				face = FT2::Face::load( file ) or
 					raise "::load returned nil"
 			rescue Exception => err
@@ -179,6 +178,8 @@ class FancyImageText < Arrow::Applet
 			}
 		}
 
+		self.log.debug "Mapped %d of %d font files" %
+			[ fonts.keys.nitems, count ]
 		return fonts
 	end
 
