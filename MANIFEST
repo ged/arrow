@@ -40,6 +40,7 @@ templates/hello-world-src.tmpl
 templates/hello-world.tmpl
 templates/loginform.tmpl
 templates/logout.tmpl
+templates/navbar.incl
 templates/nosuchapplet.tmpl
 templates/printsource.tmpl
 templates/protected.tmpl
