@@ -64,7 +64,7 @@ module Arrow
 		# SVN URL
 		SVNURL = %q$URL$
 
-		# Log levels array (in order of decreasing verbosity)
+		# Construct a log levels Hash on the fly
 		Levels = [
 			:debug,
 			:info,
@@ -191,6 +191,9 @@ module Arrow
 		### Set the level of this logger to +level+. The +level+ can be a
 		### String, a Symbol, or an Integer.
 		def level=( level )
+			debugMsg ">>> Setting log level for %s to %p" %
+				[ self.name, level ]
+
 			case level
 			when String
 				@level = Levels[ level.intern ]
@@ -199,8 +202,15 @@ module Arrow
 			when Integer
 				@level = level
 			else
-				raise ArgumentError, "Illegal level specification: %s" %
-					level.class.name
+				@level = nil
+			end
+
+			# If the level wasn't set correctly, raise an error after setting
+			# the level to something reasonable.
+			if @level.nil?
+				@level = Levels[ :notice ]
+				raise ArgumentError, "Illegal log level specification: %p for %s" %
+					[ level, self.name ]
 			end
 		end
 
@@ -223,6 +233,10 @@ module Arrow
 
 			begin
 				lastlogger = logger
+
+				raise "Ack! Logger's (%p) level is nil" % [ logger ] if
+					logger.level.nil?
+
 				if logger.level <= level
 					debugMsg "hierloggers: added %s" % logger.readableName
 					loggers.push( logger )
