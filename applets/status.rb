@@ -61,6 +61,7 @@ class ServerStatus < Arrow::Applet
 		templ = self.loadTemplate( :status )
 		templ.registry = txn.broker.registry
 		templ.transaction = txn
+		templ.txn = txn
 		templ.pid = Process::pid
 		templ.ppid = Process::ppid
 		templ.currentApplet = self

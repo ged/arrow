@@ -12,6 +12,9 @@
 	</div>
 
 	<div id="copyright">
+<?if txn ?>
+      <p>Arrow Version <?call txn.arrowVersion ?></p>
+<?end if ?>
 	  <p>Copyright &copy; 2003, 2004, <a
 		  href="http://www.rubycrafters.com/">RubyCrafters, LLC</a>. Most rights
 		reserved.</p>

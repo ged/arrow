@@ -33,6 +33,9 @@ module Arrow
 	# SVN URL
 	SVNURL = %q$URL$
 
+	# Release version
+	VERSION = '0.1.0'
+
 	# Yaml stuff
 	YamlDomain = "rubycrafters.com,2003-10-22"
 

@@ -234,6 +234,10 @@ class Transaction < Arrow::Object
 	end
 
 
+	### Get the verson of Arrow currently running.
+	def arrowVersion
+		return Arrow::VERSION
+	end
 		
 
 end # class Transaction
