@@ -5,7 +5,7 @@
 # 
 # == Rcsid
 # 
-# $Id: TEMPLATE.rb.tpl,v 1.1 2003/11/01 19:42:05 deveiant Exp $
+# $Id$
 # 
 # == Authors
 # 
@@ -19,19 +19,24 @@ require 'arrow/applet'
 ### It is an applet which generates an image from one or more characters of text.
 class FancyImageText < Arrow::Applet
 
-	# CVS version tag
-	Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
+	# SVN Revision
+	SVNRev = %q$Rev$
 
-	# CVS id tag
-	Rcsid = %q$Id: TEMPLATE.rb.tpl,v 1.1 2003/11/01 19:42:05 deveiant Exp $
+	# SVN Id
+	SVNId = %q$Id$
+
+	# SVN URL
+	SVNURL = %q$URL$
 
 	# TrueType font to use
-	DefaultFont = "/Library/Fonts/TektonPro-Regular.otf"
-	FontDir = "/Library/Fonts"
+	DefaultFont = 'TektonPro-Regular'
+	DefaultFont.untaint
+	DefaultFontDir = "/Library/WebServer/Fonts"
+	DefaultFontDir.untaint
 
 	# Colors
-	ForegroundColor = "#000000"
-	BackgroundColor = "#ffffed"
+	DefaultForegroundColor = "#006600"
+	DefaultBackgroundColor = "#ffffed"
 
 	# Applet signature
 	Signature = {
@@ -45,9 +50,9 @@ class FancyImageText < Arrow::Applet
 		},
 		:vargs => {
 			:__default__ => {
-				:optional	=> [:imgtext, :"font-size", :"font-face"],
-				:filters	=> [:strip, :squeeze],
-				:constraints => {
+				:required		=> [],
+				:optional		=> [:imgtext, :fontsize, :fontface],
+				:constraints	=> {
 					:imgtext	=> /^[\x20-\x7e]+$/,
 					:fontsize	=> /^\d+$/,
 					:fontface	=> /^\S+$/,
@@ -61,9 +66,21 @@ class FancyImageText < Arrow::Applet
  	def initialize( *args ) # :nodoc:
 		super
 
-		@background= GD::Image::trueColor( BackgroundColor )
-		@foreground = GD::Image::trueColor( ForegroundColor )
-		@fonts = load_fonts( FontDir )
+		if @config.respond_to?( :imgtext )
+			bkgnd = @config.imgtext.background
+			fgnd = @config.imgtext.foreground
+			@fontdir = @config.imgtext.fontdir
+			@defaultfont = @config.imgtext.defaultfont
+		end
+
+		bkgnd ||= DefaultBackgroundColor
+		fgnd ||= DefaultForegroundColor
+		@fontdir ||= DefaultFontDir
+		@defaultfont ||= DefaultFont
+
+		@background= GD::Image::trueColor( bkgnd )
+		@foreground = GD::Image::trueColor( fgnd )
+		@fonts = load_fonts( @fontdir )
 
 		self.log.debug "Loaded %d fonts" % @fonts.length
 	end
@@ -72,6 +89,8 @@ class FancyImageText < Arrow::Applet
 	######
 	public
 	######
+
+	attr_reader :fontdir, :background, :foreground, :fonts
 
 	action( 'form' ) {|txn,*rest|
 		templ = self.loadTemplate( :form )
@@ -84,6 +103,7 @@ class FancyImageText < Arrow::Applet
 
 	action( 'png' ) {|txn,*rest|
 		img = make_image( txn, rest )
+		self.log.debug "Made image."
 
 		txn.content_type = 'image/png'
 		return img.pngStr
@@ -109,26 +129,34 @@ class FancyImageText < Arrow::Applet
 	protected
 	#########
 
-	### Load FT2::Face objects for each of the readable fonts in the given
-	### +dir+ and return them as a Hash.
+	### Load Hashes full of font info for each of the readable fonts in the
+	### given +dir+ and return them in a Hash keyed by the font name.
 	def load_fonts( dir )
 		count = 0
 		fonts = {}
 
-		Dir[ "#{dir}/*" ].each {|file|
-			next unless /\.(ttf|otf)$/i.match( file )
+		Dir["#{dir}/*.{otf,ttf}"].each {|file|
+			file.untaint
+			next unless File::file?( file ) && File::readable?( file )
+			face = nil
 
 			count += 1
 			begin
 				self.log.debug "Attempting to load #{file}"
-				face = FT2::Face.load( file )
+				face = FT2::Face::load( file ) or
+					raise "::load returned nil"
 			rescue Exception => err
 				self.log.debug "While loading #{file}: %s" % err.message
 				next
 			end
 
-			$stderr.puts [face, face.name, face.num_glyphs ].join ', '
-			fonts[ face.name ] = { :file => file, :face => face }
+			fonts[ face.name ] = {
+				:file => file,
+				:family => face.family,
+				:style => face.style,
+				:bold => face.bold?,
+				:italic => face.italic?,
+			}
 		}
 
 		return fonts
@@ -143,22 +171,30 @@ class FancyImageText < Arrow::Applet
 		text = $1 if /([\x20-\x7f]+)/.match( rest[0] )
 		text ||= txn.vargs[:imgtext]
 		text ||= "No valid text specified."
+		self.log.debug "Set text to %p" % text
 
+		# Get the face name the same way
 		face = $1 if /(\S+)/.match( rest[1] )
 		face ||= txn.vargs[:fontface]
-		face ||= "Verdana"
+		face ||= @defaultfont
+		self.log.debug "Set face to %p" % face
 
+		# Get the pointsize the same way
 		pointsize = Integer($1) if /(\d+)/.match( rest[2] )
 		pointsize ||= Integer( txn.vargs[:fontsize] ) rescue nil
-		pointsize ||= 18
+		pointsize = 18 if pointsize.nil? || pointsize.zero?
+		self.log.debug "Set pointsize to %p" % pointsize
 
 		# Calculate the size of the image based on the size of the rendered text
 		raise "No such font '#{face}'" unless @fonts.key?( face )
 		font = @fonts[ face ][:file]
+		self.log.debug "Font file is %p" % font
 		err, brect = GD::Image::stringFT( @foreground, font, pointsize, 0, 0, 0, text )
 		raise "Failed to calculate bounding-box for #{font}: #{err}" if err
+		self.log.debug "Bounding rect: %p" % brect
 
-		# Fetch the font and calculate the image dimensions from the text.
+		# Calculate the image size from the bounding rectangle with a 5-pixel
+		# border.
 		width = brect[2] - brect[6] + 10
 		height = brect[3] - brect[7] + 10
 
