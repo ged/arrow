@@ -94,44 +94,99 @@ module Arrow
 			### definitions +defs+. Each key => value pair in +defs+ will become
 			### singleton accessors on the resulting object.
 			def initialize( defs={} )
-				@defs = defs
-				self.addDefinitions( defs )
+				@definitions = []
+				self.addDefinitionSet( defs )
 			end
 
 
-			### Fetch the Binding obejct for the object.
+			######
+			public
+			######
+
+			# The stack of definition contexts being represented by the scope.
+			#attr_reader :definitions
+
+
+			### Fetch the Binding obejct for the RenderingScope.
 			def getBinding; binding; end
 
 
 			### Add the specified definitions +defs+ to the object.
-			def addDefinitions( defs )
+			def addDefinitionSet( defs )
+				self.log.debug "adding definition set: %p" % [ defs ]
+				@definitions.push( defs )
+
 				defs.each {|name,val|
-					#self.log.debug "Adding definition %p = %p to rendering scope" %
-					#	[ name, val ]
-					(class << self; self; end).instance_eval {
-						attr_accessor name.to_s.intern
-					}
-					self.send( "#{name}=", val )
+					raise ScopeError, "Cannot override @definitions" if
+						name == 'definitions'
+					@definitions.last[ name ] = val
+
+					# Add accessor and ivar for the definition if it doesn't
+					# already have one.
+					unless self.respond_to?( name.to_s.intern )
+						self.log.debug "Adding accessor for %s" % name
+						(class << self; self; end).instance_eval {
+							attr_accessor name.to_s.intern
+						}
+					else
+						self.log.debug "Already have an accessor for '#{name}'"
+					end
+
+					self.instance_variable_set( "@#{name}", defs[name] )
 				}
 			end
+
+
+            ### Remove the specified definitions +defs+ from the object. Using
+            ### a definition so removed after this point will raise an error.
+            def removeDefinitionSet
+				self.log.debug "Removing definition set from stack of %d frames" %
+					@definitions.nitems
+                defs = @definitions.pop
+				self.log.debug "Removing defs: %p, %d frames left" % 
+					[ defs, @definitions.nitems ]
+
+                defs.keys.each {|name|
+					next if name == 'definitions'
+
+					# If there was already a definition in effect with the same
+					# name in a previous scope, fetch it so we can play with it.
+					previousSet = @definitions.reverse.find {|set| set.key?(name)}
+					self.log.debug "Found previousSet %p for %s in scope stack of %d frames" %
+						[ previousSet, name, @definitions.nitems ]
+
+					# If none of the previous definition sets had a definition
+					# with the same name, remove the accessor and the ivar
+					unless previousSet
+						self.log.debug "Removing definition '%s' entirely" % name
+						(class << self; self; end).module_eval {
+							remove_method name.to_s.intern
+						}
+						remove_instance_variable( "@#{name}" )
+
+					# Otherwise just reset the ivar to the previous value
+					else
+						self.log.debug "Restoring previous def for '%s'" % name
+						self.instance_variable_set( "@#{name}", previousSet[name] )
+					end
+				}
+
+            end
 
 
 			### Override the given definitions +defs+ for the duration of the
 			### given block. After the block exits, the original definitions
 			### will be restored.
 			def override( defs ) # :yields: receiver
-				olddefs = {}
 				begin
-					defs.each {|name,val|
-						olddefs[name] = self.send( name )
-						self.send( "#{name}=", val )
-					}
-
+					self.log.debug "Before adding definitions: %d scope frame/s. Last: %p" %
+						[ @definitions.nitems, @definitions.last.keys ]
+					self.addDefinitionSet( defs )
+					self.log.debug "After adding definitions: %d scope frame/s. Last: %p" % 
+						[ @definitions.nitems, @definitions.last.keys ]
 					yield( self )
 				ensure
-					olddefs.each {|name,val|
-						self.send( "#{name}=", val )
-					}
+					self.removeDefinitionSet
 				end
 			end
 
@@ -447,9 +502,10 @@ module Arrow
 		end
 
 
-		### Call the given +block+, overriding the contents of the attribute
-		### with those from the pairs in the given +hash+.
-		def withOverriddenAttributes( hash )
+		### Call the given +block+, overriding the contents of the template's attributes
+		### and the definitions in the specified +scope+ with those from the pairs in 
+		### the given +hash+.
+		def withOverriddenAttributes( scope, hash )
 			oldvals = {}
 			begin
 				hash.each {|name, value|
@@ -458,7 +514,9 @@ module Arrow
 					oldvals[name] = @attributes.key?( name ) ? @attributes[ name ] : nil
 					@attributes[ name ] = value
 				}
-				yield( self )
+				scope.override( hash ) {
+					yield( self )
+				}
 			ensure
 				oldvals.each {|name, value|
 					#self.log.debug "Restoring old value: %s for attribute %p" %
