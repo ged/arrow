@@ -1,7 +1,7 @@
 /* 
  *	Arrow Manual Stylesheet
  *	$Id$
- *	Time-stamp: <26-Jun-2004 17:51:00 ged>
+ *	Time-stamp: <26-Jun-2004 18:28:47 ged>
  */
 
 body {
@@ -109,6 +109,12 @@ kbd {
     color: #900;
     background: inherit;
 }
+
+acronym, cite {
+    border-bottom: 1px dotted #666;
+    font-style: normal;
+}
+acronym[title], cite[title] { cursor: help; }
 
 /* IDed entities */
 

@@ -171,9 +171,9 @@ session:
 			  files which match are loaded.</dd>
 
 			  <dt>path</dt>
-			  <dd>A Array of directories which Arrow searches for applets. Arrow
-			  maintains a list of the files in these directories or any
-			  subdirectories for files which match the <tt>pattern</tt>,
+			  <dd>An Array of directories which Arrow searches for
+			  applets. Arrow maintains a list of the files in these directories
+			  or any subdirectories for files which match the <tt>pattern</tt>,
 			  reloading, removing, and updating them as they change.</dd>
 
 			  <dt>pollInterval</dt>
@@ -188,7 +188,7 @@ session:
 			  file itself should you so desire.</dd>
 
 			  <dt>layout</dt>
-			  <dd>A Hash of URIs to applet class. Each entry maps a sub-URI
+			  <dd>A Hash of URIs to applet classes. Each entry maps a sub-URI
 			  (relative to the Arrow URI) to an instance of the given applet
 			  class. URIs can be stacked on one another (e.g., <tt>/count</tt>
 			  and <tt>/count/hello</tt> in the above example) to chain applets
@@ -223,14 +223,14 @@ session:
 			  loader class (i.e., the one in <tt>templates/loader</tt>). </dd>
 
 			  <dt>cacheConfig</dt>
-			  <dd>Setting which configure template caching.</dd>
+			  <dd>Settings which control template caching.</dd>
 
 			  <dd>
 				<dl class="linelist config-subitems">
 				  <dt>maxNum</dt>
 				  <dd>This sets the number of templates that will be
-				  cached. Templates beyond this number will expire in LRU
-				  order.</dd>
+				  cached. Templates beyond this number will expire in <acronym
+				  title="least-recently used">LRU</acronym> order.</dd>
 
 				  <dt>maxSize</dt>
 				  <dd>The maximum number of bytes allowed in the cache before it
@@ -286,11 +286,12 @@ session:
 		  </dd>
 		</dl>
 
-		<p>The YAML format is fairly forgiving of some things, but not so of
-		indentation. Make sure your indentation is consistent (i.e., if one line
-		uses tabs, then all lines at the same indent should also use tabs,
-		etc.), or server startup might fail or certain parts of your config
-		might be silently ignored.</p>
+		<p>The YAML format is fairly forgiving of some things, but not of
+		inconsistent indentation. Make sure your indentation is the same for all
+		items in a section (i.e., if one line uses tabs, then all lines at the
+		same indent should also use tabs, etc.). Failure to do so might cause
+		Arrow to fail to start up, or certain parts of your config might be
+		silently ignored.</p>
 
 	  </div>
 	</div>
