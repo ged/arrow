@@ -22,6 +22,7 @@
 	<form action="[?call txn.action?]" method="get">
 
 	  <fieldset>
+		<legend></legend>
 		<table>
 		  <tbody>
 			<tr class="odd-row">
@@ -62,12 +63,16 @@
 		  </tbody>
 		</table>
 	  </fieldset>
-	  <fieldset><input type="submit" name=" Inspect " value=" Inspect "/></fieldset>
+	  <fieldset>
+		<legend></legend>
+	    <input type="submit" name=" Inspect " value=" Inspect "/>
+	  </fieldset>
 	</form>
 
+	<div>
 <?if txn.request.paramtable.keys.empty? ?>
 	<p>Submitting the form above will dump the validation structure that is
-	  built from the args.
+	  built from the args.</p>
 <?else?>
 	<h2>Valid Args</h2>
 
@@ -88,9 +93,8 @@
 
 	<p>Fetched via: <tt>txn.vargs.unknown</tt>:</p>
 	<div class="dotbox"><tt><?escape txn.vargs.unknown.inspect ?></tt></div>
-
-	
 <?end if?>
+	</div>
 
 	<?include navbar.incl?>
 
