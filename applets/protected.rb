@@ -64,7 +64,7 @@ class ProtectedDelegator < Arrow::Applet
 			end
 		end
 
-		yield( chain, *args )
+		yield( chain )
 	end
 
 
