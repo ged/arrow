@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 # 
-# This file contains the Arrow::Template::Escape class, a derivative of
+# This file contains the Arrow::Template::EscapeDirective class, a derivative of
 # Arrow::Template::CallDirective. This is the class which defines the behaviour
 # of the 'escape' template directive., which HTML escapes the stringified
 # version of its associated attribute/s.
