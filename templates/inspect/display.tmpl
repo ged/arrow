@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<!--
+
+  Arrow Transaction Inspector
+
+  -->
+
+  <head>
+	<title>Arrow Transaction Inspector</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+	<link rel="stylesheet" type="text/css" href="/stylesheets/arrow.css" />
+  </head>
+  <body>
+
+	<h1>Arrow Transaction Inspector</h1>
+
+	<p>
+	  <code><?escape txn.inspect ?></code>
+	</p>
+
+	<dl>
+	  <dt>uri</dt>
+	  <dd><code><?call txn.uri.inspect ?></code></dd>
+
+	  <dt>path_info</dt>
+	  <dd><code><?call txn.path_info.inspect ?></code></dd>
+
+	  <dt>appRoot</dt>
+	  <dd><code><?call txn.appRoot.inspect ?></code></dd>
+
+	  <dt>headers_in</dt>
+	  <dd>
+		<dl>
+		<?for hdr, val in txn.headers_in ?>
+		<dt><?attr hdr ?></dt>
+		<dd><code><?escape val.inspect ?></code></dd>
+		<?end?>
+		</dl>
+	  </dd>
+
+	  <dt>referer</dt>
+	  <dd><code><?call txn.referer.inspect ?></code></dd>
+
+	  <dt>referringApplet</dt>
+	  <dd><code><?call txn.referringApplet.inspect ?></code></dd>
+
+	  <dt>referringAction</dt>
+	  <dd><code><?call txn.referringAction.inspect ?></code></dd>
+	</dl>
+
+	<?include navbar.incl?>
+
+  </body>
+</html>
+
+
+<!--
+  Local Variables:
+  mode: nxml
+ -->
+
