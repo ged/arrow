@@ -81,6 +81,7 @@ class Transaction < Arrow::Object
 		@templates		= nil # Filled in by the applet
 		@vargs			= nil #          "
 		@status			= Apache::OK
+		@data			= {}
 
 		super()
 	end
@@ -123,6 +124,10 @@ class Transaction < Arrow::Object
 	# The Apache status code of the transaction (e.g., Apache::OK,
 	# Apache::DECLINED, etc.)
 	attr_accessor :status
+
+	# User-data hash. Can be used to pass data between applets in a chain.
+	attr_reader :data
+
 
 
 	### Returns a human-readable String representation of the transaction,
