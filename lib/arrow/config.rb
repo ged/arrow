@@ -307,7 +307,7 @@ class Arrow::Config < Arrow::Object
 	######
 
 	# Define delegators to the inner data structure
-	def_delegators :@struct, :to_h, :member?, :members
+	def_delegators :@struct, :to_h, :member?, :members, :merge, :merge!, :each
 
 	# The underlying config data structure
 	attr_reader :struct
@@ -493,7 +493,8 @@ class Arrow::Config < Arrow::Object
 
 
 		### Merge the specified +other+ object with this config struct. The
-		### +other+ object can be either a Hash or another ConfigStruct.
+		### +other+ object can be either a Hash, another ConfigStruct, or an
+		### Arrow::Config.
 		def merge!( other )
 			case other
 			when Hash
@@ -504,10 +505,17 @@ class Arrow::Config < Arrow::Object
 				@hash = self.to_h.merge( other.to_h,
 					&Arrow::HashMergeFunction )
 
+			when Arrow::Config
+				@hash = self.to_h.merge( other.struct.to_h,
+					&Arrow::HashMergeFunction )
+
 			else
 				raise TypeError,
 					"Don't know how to merge with a %p" % other.class
 			end
+
+			# :TODO: Actually check to see if anything has changed?
+			@modified = true
 
 			return self
 		end
@@ -539,7 +547,10 @@ class Arrow::Config < Arrow::Object
 					@hash[ key ]
 				}
 				define_method( "#{key}?" ) {@hash[key] ? true : false}
-				define_method( "#{key}=" ) {|val| @hash[key] = val}
+				define_method( "#{key}=" ) {|val|
+					@modified = @hash[key] != val
+					@hash[key] = val
+				}
 			}
 
 			self.__send__( sym, *args )

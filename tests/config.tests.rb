@@ -3,7 +3,7 @@
 # Unit test for the Arrow::Config class
 # $Id$
 #
-# Copyright (c) 2003, 2004 RubyCrafters, LLC. Most rights reserved.
+# Copyright (c) 2003, 2004, 2005 RubyCrafters, LLC. Most rights reserved.
 # 
 # This work is licensed under the Creative Commons Attribution-ShareAlike
 # License. To view a copy of this license, visit
@@ -225,7 +225,7 @@ class Arrow::ConfigTestCase < Arrow::TestCase
 		}
 
 		# Test for delegated methods
-		[:to_h, :members, :member?].each {|sym|
+		[:to_h, :members, :member?, :each, :merge, :merge!].each {|sym|
 			assert_respond_to config, sym
 		}
 	end
@@ -310,18 +310,44 @@ class Arrow::ConfigTestCase < Arrow::TestCase
 	end
 
 
-	### Changed methods
-	def test_50_changed
-		printTestHeader "Arrow::Config: #changed? and .item.modified?"
+	### Changed predicate knows something has changed after regular set
+	def test_50_changed_after_set
+		printTestHeader "Arrow::Config: #changed? after .member="
 		rval = nil
-
 		config = Arrow::Config::new( TestConfig )
-		assert_nothing_raised {
+
+		# Make sure the brand-new config struct knows it's unchanged
+		assert_nothing_raised do
 			rval = config.changed?
-		}
+		end
 		assert_equal false, rval
 
-		
+		# Change something via the regular accessors
+		config.templates.cache = false
+
+		# Make sure it knows something changed
+		assert_nothing_raised do
+			rval = config.changed?
+		end
+		assert_equal true, rval
+	end
+
+
+	### "Changed" predicate knows something has changed after merge-in-place
+	def test_55_changed_after_merge
+		printTestHeader "Arrow::Config: #changed? after #merge!"
+		rval = nil
+		config = Arrow::Config::new( TestConfig )
+		config2 = Arrow::Config::new()
+
+		# Now merge the defaults back into the test config
+		config.merge!( config2 )
+
+		# Make sure it knows something changed
+		assert_nothing_raised do
+			rval = config.changed?
+		end
+		assert_equal true, rval
 	end
 
 end
