@@ -1,8 +1,47 @@
 #!/usr/bin/ruby
 # 
 # This file contains the Arrow::FormValidator class, a derivative of
-# FormValidator. A FormValidator variant that adds some nicities and addition validations
+# FormValidator. A FormValidator variant that adds some nicities and additional
+# validations.
 # 
+# == Usage
+#
+#   require 'arrow/formvalidator'
+#
+#	# Profile specifies validation criteria for input
+#	profile = {
+#     :required		=> :name,
+#     :optional		=> [:email, :description],
+#     :filters		=> [:strip, :squeeze],
+#     :untaint_all_constraints => true,
+#     :descriptions	=> {
+#     	:email			=> "Customer Email",
+#     	:description	=> "Issue Description",
+#     	:name			=> "Customer Name",
+#     },
+#     :constraints	=> {
+#     	:email	=> :email,
+#     	:name	=> /^[\x20-\x7f]+$/,
+#     	:description => /^[\x20-\x7f]+$/,
+#     },
+#	}
+#
+#	# Create a validator object and pass in a hash of request parameters and the
+#	# profile hash.
+#   validator = Arrow::FormValidator::new
+#	validator.validate( req_params, profile )
+#
+#	# Now if there weren't any errors, send the success page
+#	if validator.okay?
+#		return success_template
+#
+#	# Otherwise fill in the error template with auto-generated error messages
+#	# and return that instead.
+#	else
+#		failure_template.errors( validator.errorMessages )
+#		return failure_template
+#	end
+#
 # == Rcsid
 # 
 # $Id$
