@@ -178,7 +178,7 @@ class Applet < Arrow::Object
 
 	SignatureStructDefaults[:version] = proc {|rawsig, klass|
 		if klass.const_defined?( :SVNRev )
-			return klass.const_get( :SVNRev )
+			return klass.const_get( :SVNRev ).gsub(/Rev: /, 'r')
 		elsif klass.const_defined?( :Version )
 			return klass.const_get( :Version )
 		elsif klass.const_defined?( :Revision )
