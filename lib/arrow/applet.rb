@@ -452,6 +452,7 @@ class Applet < Arrow::Object
 	### +args+.
 	def run( txn, action=nil, *args )
 		starttimes = Process::times
+		self.log.debug "Running %s" % [ self.signature.name ]
 
 		# Do any initial preparation of the transaction that can be factored out
 		# of all the actions.
@@ -472,6 +473,9 @@ class Applet < Arrow::Object
 
 		# Make a FormValidator object and add it to the transaction
 		txn.vargs = self.makeValidator( action, txn )
+		self.log.debug "Done making validator."
+		
+		@edgecount = 0
 
 		# Now either pass control to the block, if given, or invoke the
 		# action
@@ -484,22 +488,33 @@ class Applet < Arrow::Object
 
 			# Invoke the action with the right number of arguments.
 			if meth.arity < 0
+				@edgecount += 1
+				self.log.debug "Calling negative-arity action method."
 				rval = meth.call( txn, *args )
+				self.log.debug "Back from negative-arity action method."
+				@edgecount -= 1
 			elsif meth.arity >= 1
+				@edgecount += 1
+				self.log.debug "Calling positive-arity action method."
 				args.unshift( txn )
 				rval = meth.call( *(args[0, meth.arity]) )
+				self.log.debug "Back from positive-arity action method."
+				@edgecount -= 1
 			else
 				raise AppletError,
 					"Malformed action: Must accept at least a transaction argument"
 			end
 		end
 
+		self.log.debug "About to calculate process times [pid: %d/thr: %p]" %
+			[ Process::pid, Thread.current ]
+
 		# Calculate CPU times
 		runtimes = Process::times
 		@runCount += 1
 		@totalUtime += utime = (runtimes.utime - starttimes.utime)
 		@totalStime += stime = (runtimes.stime - starttimes.stime)
-		Arrow::Logger[Arrow::Applet].debug \
+		self.log.debug \
 			"[PID %d] Runcount: %d, User: %0.2f, System: %0.2f" %
 			[ Process::pid, @runCount, utime, stime ]
 
