@@ -76,5 +76,9 @@ module Arrow
 	def_exception :AppletError,				"Applet error"
 	def_exception :AppletChainError,		"Malformed applet chain"
 
+	# Datasource errors
+	def_exception :TypeError,				"Data type incompatible"
+	def_exception :Loaderror,				"Loading failed"
+
 end # module Arrow
 

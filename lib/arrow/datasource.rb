@@ -32,9 +32,6 @@ require 'arrow/exceptions'
 ### Instance of this class The data abstraction layer..
 class Arrow::DataSource < Arrow::Object
 
-	def_exception :TypeError, "Data type incompatable"
-	def_exception :LoadError, "Loading failed"
-
 	# SVN Revision
 	SVNRev = %q$Rev$
 
