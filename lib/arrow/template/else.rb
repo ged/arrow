@@ -30,11 +30,14 @@ class Template
 	### template directive.
 	class ElseDirective < Arrow::Template::Directive
 
-		# CVS version string
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
-
-		# CVS Id string
-		Rcsid = %q$Id: else.rb,v 1.1 2003/10/13 04:20:13 deveiant Exp $
+		# SVN Revision
+		SVNRev = %q$Rev$
+		
+		# SVN Id
+		SVNId = %q$Id$
+		
+		# SVN URL
+		SVNURL = %q$URL$
 
 		#############################################################
 		###	I N S T A N C E   M E T H O D S

@@ -42,11 +42,14 @@ class Template
 	class YieldDirective < Arrow::Template::BracketingDirective
 		include Arrow::Template::Parser::Patterns
 
-		# CVS version string
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
-
-		# CVS Id string
-		Rcsid = %q$Id: yield-with-iterator.rb,v 1.1 2004/01/18 19:09:45 deveiant Exp $
+		# SVN Revision
+		SVNRev = %q$Rev$
+		
+		# SVN Id
+		SVNId = %q$Id$
+		
+		# SVN URL
+		SVNURL = %q$URL$
 
 		# The regexp format of the 'yield' part of the directive tag.
 		FROM = WHITESPACE + /from/i + WHITESPACE

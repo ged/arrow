@@ -38,11 +38,14 @@ class Template
 		include Arrow::Template::Parser::Patterns
 
 
-		# CVS version string
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
-
-		# CVS Id string
-		Rcsid = %q$Id: import.rb,v 1.1 2003/12/10 18:50:24 deveiant Exp $
+		# SVN Revision
+		SVNRev = %q$Rev$
+		
+		# SVN Id
+		SVNId = %q$Id$
+		
+		# SVN URL
+		SVNURL = %q$URL$
 
 		# Various patterns
 		SIMPLEIMPORT = CAPTURE[ IDENTIFIER ]

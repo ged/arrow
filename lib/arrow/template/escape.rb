@@ -31,11 +31,14 @@ class Template
 	### template directive.
 	class EscapeDirective < Arrow::Template::CallDirective
 
-		# CVS version string
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.2 $} )[1]
-
-		# CVS Id string
-		Rcsid = %q$Id: escape.rb,v 1.2 2003/11/09 22:29:15 deveiant Exp $
+		# SVN Revision
+		SVNRev = %q$Rev$
+		
+		# SVN Id
+		SVNId = %q$Id$
+		
+		# SVN URL
+		SVNURL = %q$URL$
 
 		
 		### Render the content and return it as HTML-escaped text.

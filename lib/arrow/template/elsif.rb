@@ -30,11 +30,14 @@ class Template
 	class ElsifDirective < Arrow::Template::AttributeDirective
 		include Arrow::Template::ConditionalDirective
 
-		# CVS version string
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.2 $} )[1]
-
-		# CVS Id string
-		Rcsid = %q$Id: elsif.rb,v 1.2 2003/11/09 22:28:35 deveiant Exp $
+		# SVN Revision
+		SVNRev = %q$Rev$
+		
+		# SVN Id
+		SVNId = %q$Id$
+		
+		# SVN URL
+		SVNURL = %q$URL$
 
 
 		#############################################################

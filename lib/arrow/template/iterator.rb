@@ -33,11 +33,14 @@ class Template
 	class Iterator < Arrow::Object
 		include Enumerable
 
-		# CVS version string
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.3 $} )[1]
-
-		# CVS Id string
-		Rcsid = %q$Id: iterator.rb,v 1.3 2004/01/23 16:23:51 deveiant Exp $
+		# SVN Revision
+		SVNRev = %q$Rev$
+		
+		# SVN Id
+		SVNId = %q$Id$
+		
+		# SVN URL
+		SVNURL = %q$URL$
 
 
 		#############################################################

@@ -79,11 +79,14 @@ class Template
 	class ForDirective < Arrow::Template::BracketingDirective
 		include Arrow::Template::Parser::Patterns
 
-		# CVS version string
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.3 $} )[1]
-
-		# CVS Id string
-		Rcsid = %q$Id: for.rb,v 1.3 2004/01/19 03:20:51 deveiant Exp $
+		# SVN Revision
+		SVNRev = %q$Rev$
+		
+		# SVN Id
+		SVNId = %q$Id$
+		
+		# SVN URL
+		SVNURL = %q$URL$
 
 		# The regexp for matching the 'in' part of the directive
 		IN = WHITESPACE + /in/i + WHITESPACE

@@ -31,11 +31,14 @@ class Template
 	### interaction with the template.
 	class AttrDirective < Arrow::Template::AttributeDirective
 
-		# CVS version string
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.2 $} )[1]
-
-		# CVS Id string
-		Rcsid = %q$Id: attr.rb,v 1.2 2003/10/13 04:34:23 deveiant Exp $
+		# SVN Revision
+		SVNRev = %q$Rev$
+		
+		# SVN Id
+		SVNId = %q$Id$
+		
+		# SVN URL
+		SVNURL = %q$URL$
 
 	end # class AttrDirective
 

@@ -27,11 +27,14 @@ class Template
 	### The class which defines the behaviour of the 'set' template directive.
 	class SetDirective < Arrow::Template::Directive
 
-		# CVS version string
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.6 $} )[1]
-
-		# CVS Id string
-		Rcsid = %q$Id: set.rb,v 1.6 2004/01/19 03:29:58 deveiant Exp $
+		# SVN Revision
+		SVNRev = %q$Rev$
+		
+		# SVN Id
+		SVNId = %q$Id$
+		
+		# SVN URL
+		SVNURL = %q$URL$
 
 		### Create and return a new Arrow::Template::SetDirective object.
 		def initialize( type, parser, state )

@@ -33,11 +33,14 @@ class Template
 		extend Forwardable
 		include Enumerable
 
-		# CVS version string
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.2 $} )[1]
-
-		# CVS Id string
-		Rcsid = %q$Id: container.rb,v 1.2 2003/10/13 04:35:07 deveiant Exp $
+		# SVN Revision
+		SVNRev = %q$Rev$
+		
+		# SVN Id
+		SVNId = %q$Id$
+		
+		# SVN URL
+		SVNURL = %q$URL$
 
 		# The methods of collections which are delegated to their contents Array
 		DelegatedMethods = 

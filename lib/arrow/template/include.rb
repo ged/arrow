@@ -52,11 +52,14 @@ class Template
 	class IncludeDirective < Arrow::Template::Directive
 		include Arrow::Template::Parser::Patterns
 
-		# CVS version string
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.6 $} )[1]
-
-		# CVS Id string
-		Rcsid = %q$Id: include.rb,v 1.6 2004/01/20 05:21:05 deveiant Exp $
+		# SVN Revision
+		SVNRev = %q$Rev$
+		
+		# SVN Id
+		SVNId = %q$Id$
+		
+		# SVN URL
+		SVNURL = %q$URL$
 
 
 

@@ -30,11 +30,14 @@ class Template
 	### template directive.
 	class CallDirective < Arrow::Template::AttributeDirective
 
-		# CVS version string
-		Version = /([\d\.]+)/.match( %q{$Revision: 1.1 $} )[1]
-
-		# CVS Id string
-		Rcsid = %q$Id: call.rb,v 1.1 2003/10/13 04:20:13 deveiant Exp $
+		# SVN Revision
+		SVNRev = %q$Rev$
+		
+		# SVN Id
+		SVNId = %q$Id$
+		
+		# SVN URL
+		SVNURL = %q$URL$
 
 	end # class CallDirective
 
