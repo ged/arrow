@@ -32,22 +32,28 @@ require 'test/unit/mock'
 class Arrow::BrokerTestCase < Arrow::TestCase
 
 	TestConfig = {
-		:noSuchAppletHandler	=> '/missing',
-		:errorHandler			=> '/error',
-
 		:applets => {
 			:path			=> Arrow::Path::new( "applets:tests/applets" ),
 			:pattern		=> '*.rb',
 			:pollInterval	=> 5,
-			:layout			=> {
-				"/"				=> "Arrow::Status",
-				"/missing"		=> "Arrow::NoSuchAppletHandler",
-				"/error"		=> "Arrow::ErrorHandler",
-				"/status"		=> "Arrow::Status",
-				"/hello"		=> "Arrow::Hello",
-				"/args"			=> "Arrow::ArgumentTester",
+			:missingApplet	=> '/missing',
+			:errorApplet	=> '/error',
+			:defaultApplet	=> '/status',
 
-				"/foo"			=> "BargleApplet",
+			:layout			=> {
+				"/"					=> "ServerStatus",
+				"/missing"			=> "NoSuchAppletHandler",
+				"/error"			=> "ErrorHandler",
+				"/status"			=> "ServerStatus",
+				"/hello"			=> "HelloWorld",
+				"/args"				=> "ArgumentTester",
+				"/protected"		=> "ProtectedDelegator",
+				"/protected/hello"	=> "HelloWorld",
+				"/counted"			=> "AccessCounter",
+				"/counted/hello"	=> "HelloWorld",
+
+				"/test"				=> "TestingApplet",
+				"/foo"				=> "BargleApplet",
 			},
 			:config			=> {},
 		},
@@ -106,10 +112,51 @@ class Arrow::BrokerTestCase < Arrow::TestCase
 
 
 	### Delegation
-	def test_20_delegation
-		printTestHeader "Broker: delegation"
+	def test_20_find_applet_chain
+		printTestHeader "Broker: find applet chain"
 		rval = nil
 
+		{
+			"/"	=> [],
+			"/status"			=> [ [/ServerStatus/, "status", []] ],
+			"/missing"			=> [ [/NoSuchAppletHandler/, "missing", []] ],
+			"/error"			=> [ [/ErrorHandler/, "error", []] ],
+			"/status"			=> [ [/ServerStatus/, "status", []] ],
+			"/hello"			=> [ [/HelloWorld/, "hello", []] ],
+			"/args"				=> [ [/ArgumentTester/, "args", []] ],
+			"/protected"		=> [ [/ProtectedDelegator/, "protected", []] ],
+			"/protected/hello"	=> [
+				[/ProtectedDelegator/, "protected", ["hello"]],
+				[/HelloWorld/, "protected/hello", []],
+			],
+			"/counted"		=> [ [/AccessCounter/, "counted", []] ],
+			"/counted/hello"	=> [
+				[/AccessCounter/, "counted", ["hello"]],
+				[/HelloWorld/, "counted/hello", []],
+			],
+		}.each do |uri, res|
+			msg = "'%s' => %p" % [ uri, res ]
+
+			assert_nothing_raised( msg ) {
+				rval = @broker.__send__( :findAppletChain, uri )
+			}
+			assert_instance_of Array, rval,
+				"applet chain is an array for '%s'" % uri
+			assert_equal res.length, rval.length,
+				"applet chain contains the right number of links for '%s'" % uri
+
+			rval.each_with_index {|link, i|
+				assert_instance_of Arrow::Broker::RegistryEntry, link.first
+				assert_instance_of Array, link.last
+
+				assert_match res[i].first, link.first.appletclass.name,
+					"registry entry applet class name"
+				assert_instance_of link.first.appletclass, link.first.object
+				assert_equal res[i][1], link[1]
+				assert_equal res[i].last, link.last
+			}
+
+		end
 	end
 end
 
