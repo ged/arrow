@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<!--
+
+  Arrow Broker Filemap Display
+
+  -->
+
+  <head>
+	<title>Arrow Broker Filemap Display</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+	<link rel="stylesheet" type="text/css" href="/stylesheets/arrow.css" />
+
+	<script type="text/javascript">
+	  <!--
+	  function toggle( id ) {
+		if ( !document.getElementById ) return;
+
+		target = document.getElementById( id );
+		if ( typeof target == "undefined" ) return;
+
+		if ( target.style.display == "none" ) {
+			target.style.display = "block";
+		} else {
+			target.style.display = "none";
+		}
+
+		return false;
+	  }
+	  // -->
+	</script>
+  </head>
+  <body>
+
+	<h1>Arrow Broker Filemap Display</h1>
+	<p><?call txn.broker.filemap.length ?> Applet Files Examined</p>
+
+	<?for filename, map in txn.broker.filemap.sort_by {|fn,map| fn} ?>
+	<div class="filemap-entry">
+	  <h3 class="filemap-filename"><?call filename ?></h3>
+	  <?if map.exception ?>
+	  <!-- Exception while loading -->
+	  <div class="filemap-exception-content">
+		<strong>Exception while loading:</strong><br />
+		<?escape map.exception.message ?>&nbsp;
+		<span class="toggle-button" onclick="toggle('exc-[?call exception.object_id?]')">expand</span>
+		<div id="exc-[?call exception.object_id?]" class="filemap-exception-backtrace">
+		  <?for frame in map.exception.backtrace ?>
+		  <code class="filemap-exception-frame"><?escape frame ?></code><br/>
+		  <?end for?>
+		</div>
+	  </div>
+	  <?else?>
+	  <!-- Loaded okay -->
+	  <div class="filemap-normal-content">
+		<div class="filemap-uris"><strong>URIs:</strong> <?call map.uris.sort.join(";") ?></div>
+		<div class="filemap-classes"><strong>Classes:</strong> <?escape map.classes.sort_by {|cl| cl.name}.join(";") ?></div>
+		<div class="filemap-timestamp"><strong>Timestamp:</strong> <?call map.timestamp.ctime ?></div>
+	  </div>
+	  <?end if ?>
+	</div>
+	<?end for ?>
+
+	<?include navbar.incl?>
+
+  </body>
+</html>
+
+
+<!--
+  Local Variables:
+  mode: xml
+ -->
+
