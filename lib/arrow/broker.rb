@@ -406,18 +406,23 @@ module Arrow
 		### given, exclude any files specified from the return value.
 		def findAppletFiles( config, excludeList=[] )
 			files = []
+			dirCount = 0
 
 			# For each directory in the configured applets path,
 			# fully-qualify it and untaint the specified pathname.
 			config.applets.path.each {|dir|
 				next unless File::directory?( dir )
 
+				dirCount += 1
 				pat = File::join( dir, config.applets.pattern )
 				pat.untaint
 
 				self.log.debug "Looking for applets: %p" % pat
 				files.push( *Dir[ pat ] )
 			}
+
+			self.log.debug "Fetched %d applet file paths from %d directories (out of %d)" %
+				[ files.nitems, dirCount, config.applets.path.dirs.nitems ]
 
 			return files - excludeList
 		end
