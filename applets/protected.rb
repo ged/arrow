@@ -54,7 +54,7 @@ class ProtectedDelegator < Arrow::Applet
 	public
 	######
 
-	def delegate( txn, *args )
+	def delegate( txn, chain, *args )
 		self.log.debug "Checking authentication for the %s applet." % args[0]
 
 		if !txn.session.key?( :user )
@@ -64,7 +64,7 @@ class ProtectedDelegator < Arrow::Applet
 			end
 		end
 
-		yield
+		yield( chain, *args )
 	end
 
 
