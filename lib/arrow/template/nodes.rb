@@ -490,7 +490,7 @@ class Template
 			%Q{<%s %s%s (Format: %p)>} % [
 				@type.capitalize,
 				@name,
-				@methodchain.empty? ? "" : "." + @methodchain,
+				@methodchain.strip.empty? ? "" : "." + @methodchain,
 				@format,
 			]
 		end
