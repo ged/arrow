@@ -229,13 +229,22 @@ class FancyImageText < Arrow::Applet
 		img = GD::Image::newTrueColor( width, height )
 		self.log.debug "Created image object: %p" % [ img ]
 
+		# If the GD library has been patched to support alpha-channel PNGs, turn
+		# that on.
+		if img.respond_to? :saveAlpha
+			img.saveAlpha = true
+			img.alphaBlending = false
+
+		# Otherwise just muddle through as best we can with immediate compositing
+		else
+			img.alphaBlending = true	
+			img.transparent( @background )
+		end
+
 		# Fill the image with the background and draw the text and a border with
 		# the foreground color.
-		img.saveAlpha = true
-		img.alphaBlending = false
 		img.fill( 1, 1, @background )
 		img.stringFT( @foreground, font, pointsize, 0, 5 - brect[6], 5 - brect[7], text )
-		#img.transparent( @background )
 		
 		self.log.debug "Filled and set string."
 
