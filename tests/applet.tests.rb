@@ -87,5 +87,33 @@ class Arrow::AppletTestCase < Arrow::TestCase
 	end
 	
 	
+	def test_31_action_function_symbol_arg
+		printTestHeader "Applet: Define actions via action() function (Symbol arg)"
+		rval = meow = nil
+
+		# Definition only
+		assert_nothing_raised {
+			@appletClass.instance_eval {
+				action( :woof ) { "woof" }
+			}
+		}
+
+		assert_has_instance_method @appletClass, :woof_action
+
+		# With Proxy
+		assert_nothing_raised {
+			@appletClass.instance_eval {
+				meow = action(:meow) {"meow"}
+				meow.template = 'one.tmpl'
+			}
+		}
+
+		assert_instance_of Arrow::Applet::SigProxy, meow
+		assert_has_instance_method @appletClass, :meow_action
+		assert_not_nil @appletClass.signature[:templates][:meow], "signature entries missing"
+		assert_equal 'one.tmpl', @appletClass.signature[:templates][:meow]
+	end
+	
+	
 end
 

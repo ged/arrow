@@ -200,7 +200,7 @@ class Applet < Arrow::Object
 		### Create a new proxy into the given +klass+'s Signature for the
 		### specified +action_name+.
 		def initialize( action_name, klass )
-			@action_name = action_name.intern
+			@action_name = action_name.to_s.intern
 			@signature = klass.signature
 			@signature[:templates] ||= {}
 			@signature[:validatorProfiles] ||= {}
