@@ -106,6 +106,7 @@
 # Please see the file docs/COPYRIGHT for licensing details.
 #
 
+require 'pp'
 require 'uri'
 require 'pluginfactory'
 
@@ -379,7 +380,7 @@ module Arrow
 				def #{key}?; @struct.#{key}?; end
 			}
 
-			@struct.send( sym, *args )
+			@struct.__send__( sym, *args )
 		end
 
 
@@ -391,7 +392,15 @@ module Arrow
 		### hashes.
 		class ConfigStruct < Arrow::Object
 			include Enumerable
-			
+
+			# Mask most of Kernel's methods away so they don't collide with
+			# config values.
+			Kernel::methods(false).each {|meth|
+				#next if /^(?:__|dup|object_id|inspect|class)/.match( meth )
+				undef_method( meth )
+			}
+
+
 			### Create a new ConfigStruct from the given +hash+.
 			def initialize( hash )
 				@hash = hash.dup
@@ -512,7 +521,7 @@ module Arrow
 					define_method( "#{key}=" ) {|val| @hash[key] = val}
 				}
 
-				self.send( sym, *args )
+				self.__send__( sym, *args )
 			end
 		end
 
