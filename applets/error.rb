@@ -40,7 +40,6 @@ class ErrorHandler < Arrow::Applet
 			"readable fashion. Cannot be called directly; it is used internally "\
 			"by the appserver to handle errors which happen in applets.",
 		:maintainer => "ged@FaerieMUD.org",
-		:version => SVNRev,
 		:config => {},
 		:templates => {
 			:display	=> 'error-display.tmpl',

@@ -39,7 +39,6 @@ class ServerStatus < Arrow::Applet
 		:description => "Displays a list of all loaded applets or information " +
 			"about a particular one.",
 		:maintainer => "ged@FaerieMUD.org",
-		:version => SVNRev,
 		:config => {},
 		:templates => {
 			:status	=> 'status.tmpl',

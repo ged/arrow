@@ -39,7 +39,6 @@ class AccessCounter < Arrow::Applet
 		:name => "Session Access Counter",
 		:description => "Increments and displays a counter contained in a session object.",
 		:maintainer => "ged@FaerieMUD.org",
-		:version => SVNRev,
 		:config => {},
 		:templates => {
 			:counter	=> 'counter.tmpl',
