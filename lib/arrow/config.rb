@@ -489,6 +489,7 @@ class Arrow::Config < Arrow::Object
 		def each( &block ) # :yield: member, value
 			@hash.each( &block )
 		end
+		alias_method :each_section, :each
 
 
 		### Merge the specified +other+ object with this config struct. The
