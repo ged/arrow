@@ -26,10 +26,14 @@ Options = [
 
 ### End of configuration
 
+# SVN Revision
+SVNRev = %q$Rev$
 
-# Version information
-Version = /([\d\.]+)/.match( %q$Revision: 1.2 $ )[1]
-Rcsid = %q$Id: makedist.rb,v 1.2 2004/01/20 07:56:20 deveiant Exp $
+# SVN Id
+SVNId = %q$Id$
+
+# SVN URL
+SVNURL = %q$URL$
 
 $Programs = {
 	'tar'	=> nil,
