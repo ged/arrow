@@ -74,7 +74,7 @@
 		with a minimum of time and effort.</p>
 
 		<p>To achieve this componentization, Arrow is made up of four basic
-		parts: a Dispatcher, a Broker, one or more Applets, and Transaction
+		parts: a Dispatcher, a Broker, one or more Applets, and the Transaction
 		objects which are wrapped around incoming requests.</p>
 	  </div>
 
@@ -94,7 +94,7 @@
 		  <dd>The Dispatcher is the mod_ruby request handler that is invoked by
 		  Apache; it loads the configuration (or reloads it if it has changed
 		  since the last time it was read), sets up the Broker, creates
-		  Transaction objects for each incoming requests, sends the response
+		  Transaction objects for each incoming request, sends the response
 		  headers, and renders the resulting output.</dd>
 
 		  <dt>Transaction</dt>
@@ -114,12 +114,14 @@
 		  <dt>Applets</dt>
 		  <dd>Applets are objects which handle user requests, and define the
 		  basic logic of different parts of the application. They can also be
-		  combined to run in sequence via delegation (aka chaining).
+		  combined to run in sequence via delegation (aka chaining).  The
+		  writing of custom Applets is where nearly all of the development work
+		  will happen while creating an application under Arrow.
 		  </dd>
 		</dl>
 
 		<p>The default classes provide enough functionality to create a fairly
-		large number of different kinds of application, but they are all
+		large number of different kinds of applications, but they are all
 		designed with subclassing in mind, so if you don't like the way
 		something behaves, it should be fairly easy to customize.</p>
 

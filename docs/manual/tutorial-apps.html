@@ -64,13 +64,13 @@
 	  provides most of the functionality that application developers will be
 	  concerned with.</p>
 
-	  <p>Applets make up the functionality of a application; each distinct task
-	  that a user can do is expressed as a separate class which inherits from
-	  Arrow::Applet. The base Applet class defines much of what is covered in
-	  the rest of this tutorial, so if you don't like the templating system or
-	  the argument validation system built into the base applet class, you can
-	  define your own that uses something else instead without having to give up
-	  any of the other functionality.</p>
+	  <p>Applets make up the functionality of an application; each distinct task
+	  that a user can do is consicely expressed as a separate class which
+	  inherits from Arrow::Applet. The base Applet class defines much of what is
+	  covered in the rest of this tutorial, so if you don't like the templating
+	  system or the argument validation system built into the base applet class,
+	  you can easily define your own that uses something else instead without
+	  having to give up any of the other functionality.</p>
 
 	  <p>For now, though, this tutorial will focus on the default functionality,
 	  with mention made of how to override or replace it where
@@ -89,10 +89,9 @@
 		<h2><a href="#signature" id="signature">The Signature</a></h2>
 
 		<p>The <strong>signature</strong> is a Hash of metadata which describes
-		the applet to the app framework, and includes information like where to
-		install it in relation to the rest of the hierarchy of applets, and
-		configures some of the logic and functionality provided by the
-		<tt>Arrow::Applet</tt> class itself.</p>
+		the applet to the app framework, and includes information like name and
+		author, and configures some of the logic and functionality provided by
+		the <tt>Arrow::Applet</tt> class itself.</p>
 
 		<p>Here's an example of a basic applet signature:</p>
 		
@@ -137,10 +136,12 @@ Signature = {
 
 		  <dt>templates</dt>
 		  <dd>This should be set to a hash filled with file names of the
-		  templates that will be used by this applet.  Templates listen in this
+		  templates that will be used by this applet.  Templates listed in this
 		  hash can later be loaded via the <tt
 		  class="method-name">#loadTemplate</tt> method of the applet
-		  object. Defaults to an empty hash.</dd>
+		  object. Defaults to an empty hash.  See the <a
+		  href="tutorial-template.html">templating tutorial</a> for more
+		  coverage of this</dd>
 
 		  <dt>version</dt>
 		  <dd>The version of the applet. If the applet defines any of the 
@@ -162,15 +163,15 @@ Signature = {
 	  <div class="section">
 		<h2><a href="#actions" id="actions">Actions</a></h2>
 
-		<p>Actions provide the actual functionality of the applet. An
-		  action is just a specially-named method which corresponds to a part of
-		  the URI the client requests, and represents a step or phase of the
-		  applet's execution.</p>
+		<p>Actions provide the actual functionality of the applet. An action is
+		just a specially-named method which corresponds to a part of the URI the
+		client requests, and represents a step or phase of the applet's
+		execution.</p>
 
 		<h3>Action Method Form</h3>
 		<p>Each action method's name must end with <tt>_action</tt>. For
-		  example, if you're defining the 'display' action, you'd define a
-		  method called <tt>display_action</tt>:</p>
+		example, if you're defining the 'display' action, you'd define a method
+		called <tt>display_action</tt>:</p>
 
 <pre>
 def display_action( txn, *args )
@@ -191,7 +192,7 @@ end
 		  methods you may define in your applet class:</p>
 
 <pre>
-action( :display ) {|txn|
+action( :display ) {|txn, *args|
   # Do something with the txn
 
   return "Some content"
@@ -211,6 +212,30 @@ action( :display ) {|txn|
 		<tt>DECLINED</tt> status to be sent back to Apache. This can be used to
 		pass control to a further handler if the action determines it cannot
 		handle the request.</p>
+
+		<p>For return behaviors outside of these (for example, altered headers
+		or a different status), it is necessary to access the Apache::Request
+		object directly (through <tt>txn.request</tt> in the examples
+		above). See the <a href="http://modruby.net">mod ruby</a> site for more
+		information on what to do with this.</p>
+
+		<h3>Action Signature Proxy</h3>
+
+		<p>For convenience, the <tt>action</tt> shortcut also returns an
+		  object that can be used to add templates and/or validation profiles to
+		  the Signature, but keep them together with the action they are used
+		  by:</p>
+
+<pre>
+formaction = action( :form ) {|txn|
+    templ = self.loadTemplate( :form )
+    templ.txn = txn
+    return templ
+}
+
+formaction.template = "form.tmpl"
+</pre>
+
 	  </div>
 
 	  <!-- Example -->
@@ -306,7 +331,8 @@ end
 		  <img src="hello-dave-sshot.png" alt="screenshot" height="324" width="464" />
 		</div>
 
-		<p>Note that we're required to call the action </p>
+		<p>Note that we're required to call the action '<tt>greet</tt>'
+		explicitly to be able to pass in URL-style arguments.</p>
 
 	  </div>
 
@@ -320,31 +346,14 @@ end
 		  through, and is responsible for calling <tt>yield</tt> when (if) it
 		  wishes to pass control to the next applet in the chain, passing any
 		  desired additional arguments. Delegation methods are invoked with the
-		  same arguments as action methods, with the addition of any arguments
-		  yielded to it by any previous applet in the chain.</p>
+		  same arguments as action methods, including any added by previous
+		  applets in the chain.</p>
 	  </div>
 	  
 
 		<p></p>
-		<h3>?(example)?</h3>
+		<h3>?(delegation example)?</h3>
 		<p></p>
-
-		<h3>Action Signature Proxy</h3>
-
-		<p>For convenience, the <tt>action</tt> shortcut also returns an
-		  object that can be used to add templates and/or validation profiles to
-		  the Signature, but keep them together with the action they are used
-		  by:</p>
-
-<pre>
-formaction = action( :form ) {|txn|
-    templ = self.loadTemplate( :form )
-    templ.txn = txn
-    return templ
-}
-
-formaction.template = "form.tmpl"
-</pre>
 
 
 	  </div>
