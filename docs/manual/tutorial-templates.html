@@ -119,7 +119,116 @@
 		<h2><a href="#example" id="example">Templated Applets - Hello World
 		(templated)</a></h2>
 		<p>
-		  The Signature of an app has room for mention of the templates it uses.
+		  First, we need to tell Arrow what kind of templates to use, where to
+		  look for templates, and various other configuration options.  These
+		  settings are kept in the Arrow config file, under the templates
+		  section:
+<pre>templates: 
+  loader: Arrow::Template
+  path:
+    - "/www/templates"
+  cache: true
+  cacheConfig: 
+    maxObjSize: 131072
+    maxNum: 20
+    expiration: 36
+    maxSize: 2621440
+</pre>
+		  Here, "loader" is the templating system to use, "path" is a list of
+		  directories to search for the templates, and the "cache" and
+		  "cacheConfig" determine how to cache templates, balancing between
+		  increased response time and decreased resource usage.
+		</p>
+		<p>
+		  Now we can access and use our templates in an Applet.  As a
+		  convenience, the Signature of an applet has room for mention of the
+		  templates it uses.
+<pre># Applet signature
+Signature = {
+    :name => "Hello World",
+    :description => %{A 'hello world' applet.},
+    :maintainer => "ged@FaerieMUD.org",
+    :defaultAction => 'templated',
+    <font color="#aa00aa">:templates => {
+        :templated     => 'hello-world.tmpl',
+    },</font>
+}
+</pre>
+		  Which then further allows the use of the Arrow::Applet#loadTemplate
+		  method to get an Arrow::Template object.  This is mostly just for you
+		  to fill with data, and then make the return value of an action:
+<pre>action( 'templated' ) {|txn, *args|
+    self.log.debug "In the 'templated' action of the %s applet." %
+        self.signature.name
+
+    <font color="#aa00aa">templ = self.loadTemplate( :templated )
+    templ.txn = txn
+    templ.time = Time.now.to_s
+    templ.applet = self
+
+    return templ</font>
+}
+</pre>
+		</p>
+		<p>
+		  So now we need to actually have a /www/templates/hello-world.tmpl file
+		  made to display our page how we want it.
+<pre>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"&gt;
+&lt;html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"&gt;
+
+&lt;!--
+
+  Arrow "Hello World" Applet Template
+
+  --&gt;
+
+  &lt;head&gt;
+	&lt;title&gt;Arrow: Hello World&lt;/title&gt;
+	&lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8" /&gt;
+	&lt;meta http-equiv="Content-Script-Type" content="text/javascript" /&gt;
+	&lt;link rel="stylesheet" type="text/css" href="/stylesheets/arrow.css" /&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+
+	&lt;h1&gt;Hello World&lt;/h1&gt;
+
+	&lt;p&gt;It is &lt;?attr time?&gt;.  This is a minimal demo applet that just
+	loads and prints a template.  There's also &lt;a href="<font
+	color="#aa00aa">[?call txn.action?]</font>/display"&gt;a simpler
+	version&lt;/a&gt; of this applet that outputs plain text (i.e., no
+	templates).&lt;p&gt;
+
+		&lt;!-- Runcount: <font color="#aa00aa">[?call applet.runCount ?]</font> --&gt;
+
+<font color="#aa00aa">&lt;?if txn.session? ?&gt;</font>
+	  &lt;!-- Session found --&gt;
+  <font color="#aa00aa">&lt;?if txn.session[:user] ?&gt;</font>
+	&lt;p&gt;Since you're logged in as '<font color="#aa00aa">&lt;?call
+	txn.session[:user]?&gt;</font>', you can also &lt;a
+		href="<font color="#aa00aa">[?call txn.appRoot?]</font>/<font
+		color="#aa00aa">[?call txn.appletPath.split(%r{/})[0]
+		?]</font>/logout"&gt;log out&lt;/a&gt; to test the protectedness
+	  of the applet chain.&lt;/p&gt;
+  <font color="#aa00aa">&lt;?end?&gt;</font>
+
+<font color="#aa00aa">&lt;?end if ?&gt;</font>
+
+	<font color="#aa00aa">&lt;?include navbar.incl?&gt;</font>
+
+  &lt;/body&gt;
+&lt;/html&gt;
+
+
+&lt;!--
+  Local Variables:
+  mode: xml
+ --&gt;
+</pre>
+		  Which is, for the most part, just static XHTML that will be displayed
+		  verbatim.  The template directives designate places where the display
+		  will be determined by the data that had been saved into the
+		  Arrow::Template object in the action itself.  This template makes use
+		  of the attr, call, if, and include directives, as described above.
 		</p>
 	  </div>
 	  <div class="section">
