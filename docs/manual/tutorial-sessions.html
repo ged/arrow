@@ -80,7 +80,8 @@
 		these, as well as offering an easily configured plugin architecture for
 		implementing any of the others.</p>
 
-		<p></p>
+		<p>The Arrow configuration file has a section on sessions, wherein you
+		can decide how sessions should behave.</p>
 
 <pre>
 session: 
@@ -91,7 +92,8 @@ session:
   rewriteUrls: false
 </pre>
 
-		<p>TODO: make this more in depth, with lists of options.</p>
+		<!-- <p>TODO: make this more in depth, with lists of options and
+		possible values.</p> -->
 
 		<dl class="linelist">
 			<dt>expires</dt>
@@ -128,6 +130,20 @@ session:
 		transparent and natural.  The session interface is set up automatically
 		inside your applets - you need only treat it as a user-specific
 		hash, accessing and altering data like normal.</p>
+<pre>
+  action( :counter ) {|txn|
+    txn.session["accesses"] ||= 0
+    txn.session["accesses"] += 1
+    return &lt;&lt;-EOF
+    &lt;html&gt;
+      &lt;head&gt;&lt;title&gt;Counter&lt;/title&gt;&lt;/head&gt;
+      &lt;body&gt;
+        &lt;p&gt;I've seen you #{txn.session["accesses"]} times!&lt;/p&gt;
+      &lt;/body&gt;
+    &lt;/html&gt;
+    EOF
+  }
+</pre>
 
 	  </div>
 
