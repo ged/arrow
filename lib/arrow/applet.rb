@@ -16,7 +16,6 @@
 #                'Displays a block of whatever character is passed as argument',
 #            :maintainer         => 'Michael Granger <mgranger@rubycrafters.com>',
 #            :version            => '1.01',
-#            :uri                => 'myapplet',
 #            :defaultAction      => 'form',
 #            :templates          => {
 #                :main => 'main.templ',
@@ -134,8 +133,6 @@ class Applet < Arrow::Object
 	SVNURL = %q$URL$
 
 	### Applet signature struct. The fields are as follows:
-	### [<b>uri</b>]
-	###	  The URI of this applet relative to the base URL for the application.
 	### [<b>name</b>]
 	###	  The name of the applet; used for introspection and reports.
 	### [<b>description</b>]
@@ -160,7 +157,7 @@ class Applet < Arrow::Object
 	###	  debugging, profiling, and tuning the applet. The keys are
 	###	  symbol identifiers which will be used later when using the
 	###	  configured monitors. See Arrow::Monitor for possible values.
-	SignatureStruct = Struct::new( :name, :description, :uri, :maintainer,
+	SignatureStruct = Struct::new( :name, :description, :maintainer,
 		:version, :config, :defaultAction, :templates, :validatorProfiles,
 		:monitors )
 
@@ -169,7 +166,6 @@ class Applet < Arrow::Object
 	SignatureStructDefaults = {
 		:name				=> proc {|rawsig, klass| klass.name},
 		:description		=> "(none)",
-		:uri				=> nil,
 		:maintainer			=> nil, # Workaround for RDoc
 		:version			=> nil, # Wordaround for RDoc
 		:defaultAction		=> '_default',
@@ -195,7 +191,9 @@ class Applet < Arrow::Object
 	}
 
 	SignatureStructDefaults[:version] = proc {|rawsig, klass|
-		if klass.const_defined?( :Version )
+		if klass.const_defined?( :SVNRev )
+			return klass.const_get( :SVNRev )
+		elsif klass.const_defined?( :Version )
 			return klass.const_get( :Version )
 		elsif klass.const_defined?( :Revision )
 			return klass.const_get( :Revision )
@@ -253,8 +251,10 @@ class Applet < Arrow::Object
 	end # class SigProxy
 
 
-	# The array of loaded applet classes (derivatives)
+	# The array of loaded applet classes (derivatives) and an array of
+	# newly-loaded ones.
 	@derivatives = []
+	@newlyLoaded = []
 
 
 	#############################################################
@@ -266,14 +266,18 @@ class Applet < Arrow::Object
 		# The Array of loaded applet classes (derivatives)
 		attr_reader :derivatives
 
+		# The Array of applet classes that were loaded by the most recent call
+		# to ::load.
+		attr_reader :newlyLoaded
+
 
 		### Inheritance callback: register any derivative classes so they can be
 		### looked up later.
 		def inherited( klass )
 			Arrow::Logger[self].debug "#{self.name} inherited by #{klass.name}"
 
-			if defined?( @derivatives )
-				@derivatives.push( klass )
+			if defined?( @newlyLoaded )
+				@newlyLoaded.push( klass )
 				super
 			else
 				Arrow::Applet::inherited( klass )
@@ -293,17 +297,15 @@ class Applet < Arrow::Object
 
 		### Load any applet classes in the given file and return them.
 		def load( filename )
-			oldderivatives = @derivatives.dup
-			@derivatives.clear
+			@newlyLoaded.clear
 
 			rval = Kernel::load( filename, true )
 			Arrow::Logger[self].debug "Kernel::load returned: %p" % rval
 
-			newderivatives = @derivatives.dup
+			newderivatives = @newlyLoaded
+			@derivatives -= @newlyLoaded
+			@derivatives.push( *@newlyLoaded )
 			return newderivatives
-		ensure
-			Arrow::Logger[self].debug "Merging applet lists"
-			@derivatives |= oldderivatives
 		end
 
 
@@ -365,7 +367,7 @@ class Applet < Arrow::Object
 				end
 			}
 
-			# Signature = Struct::new( :name, :description, :uri, :maintainer,
+			# Signature = Struct::new( :name, :description, :maintainer,
 			# 	:version, :config, :defaultAction, :templates, :validatorArgs,
 			# 	:monitors )
 			members = SignatureStruct::members.collect {|m| m.intern}
@@ -374,11 +376,11 @@ class Applet < Arrow::Object
 
 
 		### Define an action for the applet. Transactions which include the
-		### specified +name+ as the first directory of the uri after the
-		### applet's name will be passed to the given +block+. The return value
-		### from this method is an Arrow::Applet::SigProxy which can be used to
-		### set associated values in the applet's Signature; see the Synopsis in
-		### lib/arrow/applet.rb for examples of how to use this.
+		### specified +name+ as the first directory of the uri after the one the
+		### applet is assigned to will be passed to the given +block+. The
+		### return value from this method is an Arrow::Applet::SigProxy which
+		### can be used to set associated values in the applet's Signature; see
+		### the Synopsis in lib/arrow/applet.rb for examples of how to use this.
 		def action( name, &block )
 			name = '_default' if name.to_s.empty?
 			
@@ -536,13 +538,12 @@ class Applet < Arrow::Object
 
 	### Return a human-readable String representing the applet.
 	def inspect
-		"<%s:0x%08x: %s [%s/%s] at /%s>" % [
+		"<%s:0x%08x: %s [%s/%s]>" % [
 			self.class.name,
 			self.object_id * 2,
 			@signature.name,
 			@signature.version,
-			@signature.maintainer,
-			@signature.uri,
+			@signature.maintainer
 		]
 	end
 
