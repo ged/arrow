@@ -20,6 +20,7 @@
 #
 
 require 'forwardable'
+require 'uri'
 
 require 'arrow/mixins'
 require 'arrow/exceptions'
@@ -39,6 +40,25 @@ class Transaction < Arrow::Object
 
 	# SVN URL
 	SVNURL = %q$URL$
+
+	HTMLDoc = <<-"EOF".gsub(/^\t/, '')
+	<html>
+	  <head><title>%d %s</title></head>
+	  <body><h1>%s</h1><p>%s</p></body>
+	</html>
+	EOF
+
+	# Status names
+	StatusName = {
+		300		=> "Multiple Choices",
+		301		=> "Moved Permanently",
+		302		=> "Found",
+		303		=> "See Other",
+		304		=> "Not Modified",
+		305		=> "Use Proxy",
+		307		=> "Temporary Redirect",
+	}
+
 
 	# Methods that the transaction delegates to the underlying request
 	# object.
@@ -172,6 +192,49 @@ class Transaction < Arrow::Object
 		return [ self.appRoot, self.appletPath ].join("/")
 	end
 
+
+	### Redirection methods
+
+
+	### Return a minimal HTML doc for representing a given status_code
+	def statusDoc( status_code, uri=nil )
+		body = ''
+		if uri
+			body = %q{<a href="%s">%s</a>} % [ uri, uri ]
+		end
+
+		#<head><title>%d %s</title></head>
+		#<body><h1>%s</h1><p>%s</p></body>
+		return HTMLDoc % [
+			status_code,
+			StatusName[status_code],
+			StatusName[status_code],
+			body
+		]
+	end
+
+
+	### Set the necessary fields in the request to cause the response to be a
+	### redirect to the given +url+ with the specified +status_code+ (302 by
+	### default).
+	def redirect( uri, status_code=Apache::REDIRECT )
+		
+		# 304 responses don't get a Location or a body
+		return( self.not_modified ) if status_code == Apache::HTTP_NOT_MODIFIED
+		
+		self.log.debug "Redirecting to %s" % uri
+
+		# Set the status and Location: header
+		self.headers_out[ 'Location' ] = uri.to_s
+		self.status = status_code
+
+		# Return "a short hypertext note with a hyperlink to the new URI" (from
+		# the RFC).
+		return statusDoc( status_code, uri.to_s )
+	end
+
+
+		
 
 end # class Transaction
 end # module Arrow
