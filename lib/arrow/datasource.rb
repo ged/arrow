@@ -48,7 +48,7 @@ class Arrow::DataSource < Arrow::Object
 	#################
 
 	### Creates a new object of the class specified by the url provided.
-	def DataSource.new(string)
+	def self.new(string)
 		type, source = string.split('//')
 		type.downcase!
 		if @@source_types[type]
@@ -59,7 +59,7 @@ class Arrow::DataSource < Arrow::Object
 	end
 
 	### Registers the class as a valid type to create objects as.
-	def DataSource.inherited(klass)
+	def self.inherited(klass)
 		@@source_types[klass.name.downcase] = klass
 	end
 
