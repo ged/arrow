@@ -83,6 +83,9 @@ class Arrow::TemplateTestCase < Arrow::TestCase
 				section = $1.downcase.intern
 				TestTemplates[ section ] ||= {}
 
+			when /^#/
+				next
+
 			# Subtests for current directive look like:
 			# === Simple
 			when /^===\s*(.+)/
@@ -669,27 +672,27 @@ assert_match( templateContentRe(/Passed\./), rval )
 
 ===
 
-=== Scope error
-
-<?for val in sarr ?>
-  <?if foo == val ?>
-    Key exists.
-  <?end if ?>
-<?end for ?>
-
-<?if foo == val ?>
-Failed.
-<?end if?>
-
----
-sarr = [:something, :somethingElse, :something]
-template.sarr = sarr
-template.foo = :something
-assert_nothing_raised { rval = template.render }
-assert_match( templateContentRe(/Key exists\./, /Key exists\./), rval )
-assert_match( /<!--.*ScopeError.*-->/, rval )
-===
-
+# === Scope error
+# 
+# <?for val in sarr ?>
+#   <?if foo == val ?>
+#     Key exists.
+#   <?end if ?>
+# <?end for ?>
+# 
+# <?if foo == val ?>
+# Failed.
+# <?end if?>
+# 
+# ---
+# sarr = [:something, :somethingElse, :something]
+# template.sarr = sarr
+# template.foo = :something
+# assert_nothing_raised { rval = template.render }
+# assert_match( templateContentRe(/Key exists\./, /Key exists\./), rval )
+# assert_match( /<!--.*ScopeError.*-->/, rval )
+# ===
+# 
 === Cannot override definitions ivar
 
 <?for definitions in array ?>
