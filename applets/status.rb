@@ -89,6 +89,8 @@ class ServerStatus < Arrow::Applet
 		templ.applet = targetapp
 		templ.re = re
 		templ.txn = txn
+		templ.pid = Process::pid
+		templ.ppid = Process::ppid
 		templ.currentApplet = self
 		
 		return templ
