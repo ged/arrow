@@ -32,14 +32,13 @@
 				 value="[?call txn.params('fontsize') ?]" /><br/>
 
 		  <select id="fontface" name="fontface">
-<?for name,font in fonts.sort_by {|k,v| [k, v[:face].family, v[:face].style]} ?>
-<!-- Name: [?attr name ?]; Param: [?call txn.params('fontface') ?] -->
-<?if name == txn.params('fontface') ?>
+<?for name,font in fonts.sort_by {|k,v| [k, v[:family], v[:style]]} ?>
+<?if name == txn.vargs['fontface'] ?>
 			<option id="[?attr name ?]" value="[?attr name ?]" selected="selected"><?call 
-				font[:face].family?> <?call font[:face].style ?></option>
+				font[:family] ?> <?call font[:style] ?></option>
 <?else?>
 			<option id="[?attr name ?]" value="[?attr name ?]"><?call
-				font[:face].family?> <?call font[:face].style ?></option>
+				font[:family]?> <?call font[:style] ?></option>
 <?end?>
 <?end?>
 		  </select>
@@ -53,8 +52,8 @@
 
 	<div id="output-image">
 	  <h2>Output</h2>
-	  <img src="[?call txn.action ?]/png/[?call txn.vargs['imgtext'] ?]/[?call 
-		   txn.vargs['fontsize'] ?]/[?call txn.vargs['fontface'] ?]"
+	  <img src="[?call txn.action ?]/png/[?urlencode txn.vargs['imgtext'] ?]/[?call 
+		   txn.vargs['fontface'] ?]/[?call txn.vargs['fontsize'] ?]"
 		   alt="[?call txn.vargs['imgtext'] ?]" />
 	</div>
 

@@ -18,9 +18,9 @@
 	<h1>Image Text Creator: Font List</h1>
 
 	<dl>
-<?for name,font in fonts.sort_by {|k,v| [k, v[:face].family, v[:face].style]} ?>
+<?for name,font in fonts.sort_by {|k,v| [k, v[:family], v[:style]]} ?>
 		<dt><?attr name ?></dt>
-		<dd><?call font[:face].family?> <?call font[:face].style ?></dd>
+		<dd><?call font[:family] ?> <?call font[:style] ?></dd>
 <?end?>
 	</dl>
 
