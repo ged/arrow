@@ -3,7 +3,7 @@
 # Unit test for the Arrow::Template class
 # $Id$
 #
-# Copyright (c) 2003, 2004 RubyCrafters, LLC. Most rights reserved.
+# Copyright (c) 2003-2005 RubyCrafters, LLC. Most rights reserved.
 # 
 # This work is licensed under the Creative Commons Attribution-ShareAlike
 # License. To view a copy of this license, visit
@@ -890,3 +890,12 @@ assert_nothing_raised { rval = superTemplate.render }
 pat = templateContentRe(/Passed foo\./,/Passed real bar\./,/Passed bar\./)
 assert_match( pat, rval )
 ===
+
+=== Unknown PI (Ignored)
+
+<?xml version="1.0" encoding="utf-8"?>
+
+---
+assert_instance_of Arrow::Template, template
+===
+
