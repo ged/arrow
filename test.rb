@@ -9,16 +9,15 @@ BEGIN {
 
 	require './utils'
 	include UtilityFunctions
-	require 'arrow/template'
 
 	verboseOff {
 		require "arrow/logger"
 		logfile = File::open( 'test.log', File::CREAT|File::WRONLY|File::TRUNC )
 		logfile.sync = true
 
-		Arrow::Logger[ Arrow::Template ].outputters <<
+		Arrow::Logger.global.outputters <<
 			Arrow::Logger::Outputter::create('file', logfile)
-		Arrow::Logger[ Arrow::Template ].level = :debug
+		Arrow::Logger.global.level = :debug
 	}
 }
 
