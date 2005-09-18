@@ -25,74 +25,65 @@ require 'arrow'
 require 'arrow/config'
 require 'arrow/utils'
 
-module Arrow
-class Config
+### A loader used by Arrow::Config to load configuration files written in YAML.
+class Arrow::Config::YamlLoader < Arrow::Config::Loader
 
-	### It is used to load configuration files written in YAML for the Arrow web
-	### application framework.
-	class YamlLoader < Arrow::Config::Loader
+	# SVN Revision
+	SVNRev = %q$Rev$
 
-		# SVN Revision
-		SVNRev = %q$Rev$
-
-		# SVN Id
-		SVNId = %q$Id$
-
-		# SVN URL
-		SVNURL = %q$URL$
-
-		# Add YAML domain types for Arrow classes
-
-		YAML::add_domain_type( Arrow::YamlDomain, "arrowPath" ) {|type, val|
-			obj = nil
-			case val
-			when Array
-				Arrow::Logger.debug "Adding %p to loaded Arrow::Path" % [ val ]
-				obj = Arrow::Path::new( val )
-			else
-				raise "Invalid #{type}: %p" % val
-			end
-
-			obj
-		} 
+	# SVN Id
+	SVNId = %q$Id$
 
 
+	# Add YAML domain types for Arrow classes
 
-		######
-		public
-		######
-
-		### Load and return configuration values from the YAML +file+
-		### specified.
-		def load( filename )
-			self.log.info "Loading YAML-format configuration from '%s'" % filename
-			return YAML::load( File::read(filename) )
+	YAML::add_domain_type( Arrow::YamlDomain, "arrowPath" ) {|type, val|
+		obj = nil
+		case val
+		when Array
+			Arrow::Logger.debug "Adding %p to loaded Arrow::Path" % [ val ]
+			obj = Arrow::Path::new( val )
+		else
+			raise "Invalid #{type}: %p" % val
 		end
 
-
-		### Save configuration values to the YAML +file+ specified.
-		def save( confighash, filename )
-			self.log.info "Saving YAML-format configuration to '%s'" % filename
-			File::open( filename, File::WRONLY|File::CREAT|File::TRUNC ) {|ofh|
-				ofh.print( confighash.to_yaml )
-			}
-		end
+		obj
+	} 
 
 
-		### Return +true+ if the specified +file+ is newer than the given
-		### +time+.
-		def isNewer?( file, time )
-			return false unless File::exists?( file )
-			st = File::stat( file )
-			self.log.debug "File mtime is: %s, comparison time is: %s" %
-				[ st.mtime, time ]
-			return st.mtime > time
-		end
+
+	######
+	public
+	######
+
+	### Load and return configuration values from the YAML +file+
+	### specified.
+	def load( filename )
+		self.log.info "Loading YAML-format configuration from '%s'" % filename
+		return YAML::load( File::read(filename) )
+	end
 
 
-	end # class YamlLoader
+	### Save configuration values to the YAML +file+ specified.
+	def save( confighash, filename )
+		self.log.info "Saving YAML-format configuration to '%s'" % filename
+		File::open( filename, File::WRONLY|File::CREAT|File::TRUNC ) {|ofh|
+			ofh.print( confighash.to_yaml )
+		}
+	end
 
-end # class Config
-end # module Arrow
+
+	### Return +true+ if the specified +file+ is newer than the given
+	### +time+.
+	def isNewer?( file, time )
+		return false unless File::exists?( file )
+		st = File::stat( file )
+		self.log.debug "File mtime is: %s, comparison time is: %s" %
+			[ st.mtime, time ]
+		return st.mtime > time
+	end
+
+
+end # class Arrow::Config::YamlLoader
 
 

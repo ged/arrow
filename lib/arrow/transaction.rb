@@ -26,10 +26,8 @@ require 'arrow/mixins'
 require 'arrow/exceptions'
 require 'arrow/object'
 
-module Arrow
-
 ### The transaction class for Arrow web applications.
-class Transaction < Arrow::Object
+class Arrow::Transaction < Arrow::Object
 	extend Forwardable
 
 	# SVN Revision
@@ -298,7 +296,6 @@ class Transaction < Arrow::Object
 	end
 		
 
-end # class Transaction
-end # module Arrow
+end # class Arrow::Transaction
 
 

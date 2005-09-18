@@ -206,17 +206,32 @@ class Arrow::Template < Arrow::Object
 
 
 	### Load a template from a file.
-	def self::load( source, path=[] )
+	def self::load( source, path=[], cache={} )
+
+		# Find the file on either the specified or default path
 		path = self.loadPath if path.empty?
 		filename = self.findFile( source, path )
-		source = File::read( filename )
-		source.untaint
+		Arrow::Logger[self].debug "Cache contains: %p" % cache
 
-		obj = new()
-		obj._file = filename
-		obj._loadPath.replace( path )
-		obj.parse( source )
+		# Use the cached version if the caller passed on in and it exists.
+		if cache.include?( filename )
+			Arrow::Logger[self].debug "Cloning cached object %p for %p" % 
+				[ cache[filename], filename ]
+			obj = cache[ filename ].clone
+		else
+			Arrow::Logger[self].debug "No cached version: Loading %p anew" % filename
+			source = File::read( filename )
+			source.untaint
 
+			# Create a new template object, set its path and filename, then tell it
+			# to parse the loaded source to define its behaviour.
+			obj = cache[ filename ] = new()
+			obj._file = filename
+			obj._loadPath.replace( path )
+			obj.parse( source )
+		end
+
+		Arrow::Logger[self].debug "Returning template object. Cache is: %p" % cache
 		return obj
 	end
 
@@ -307,7 +322,7 @@ class Arrow::Template < Arrow::Object
 		when String
 			self.parse( content )
 		when Array
-			@syntaxTree = content
+			self.installSyntaxTree( content )
 		when NilClass
 			# No-op
 		else
@@ -320,9 +335,10 @@ class Arrow::Template < Arrow::Object
 	### Initialize a copy of the +original+ template object.
 	def initialize_copy( original )
 		super
-
+		
 		@attributes = {}
-		@syntaxTree.each {|node| node.addToTemplate(self) }
+		tree = original._syntaxTree.collect {|node| node.clone}
+		self.installSyntaxTree( tree )
 	end
 
 
@@ -378,10 +394,17 @@ class Arrow::Template < Arrow::Object
 	def parse( source )
 		@source = source
 		parserClass = @config[:parserClass]
-		@syntaxTree = parserClass::new( @config ).parse( source, self )
+		tree = parserClass::new( @config ).parse( source, self )
 
-		#self.log.debug( "Parse complete: syntax tree is: #{@syntaxTree.inspect}" )
+		#self.log.debug "Parse complete: syntax tree is: %p" % tree
+		return self.installSyntaxTree( tree )
+	end
 
+
+	### Install a new syntax tree in the template object, replacing the old one,
+	### if any.
+	def installSyntaxTree( tree )
+		@syntaxTree = tree
 		@syntaxTree.each {|node| node.addToTemplate(self) }
 	end
 
@@ -392,7 +415,7 @@ class Arrow::Template < Arrow::Object
 
 		if node.respond_to?( :name ) && node.name
 			unless @attributes.key?( node.name )
-				#self.log.debug "Installing a attribute for a node named %p" % node.name
+				#self.log.debug "Installing an attribute for a node named %p" % node.name
 				@attributes[ node.name ] = nil
 				self.addAttributeAccessor( node.name.intern )
 				self.addAttributeMutator( node.name.intern )

@@ -3,7 +3,7 @@
 # Unit test for the Arrow::Logger class
 # $Id$
 #
-# Copyright (c) 2003 RubyCrafters, LLC. Most rights reserved.
+# Copyright (c) 2003, 2005 RubyCrafters, LLC. Most rights reserved.
 # 
 # This work is licensed under the Creative Commons Attribution-ShareAlike
 # License. To view a copy of this license, visit
@@ -78,7 +78,7 @@ module Arrow
 		end
 
 		def clear
-			@outputCalls = []
+			@outputCalls.clear
 			@output = ''
 		end
 	end
@@ -89,56 +89,100 @@ module Arrow
 
 		LogLevels = [ :debug, :info, :notice, :warning, :error, :crit, :alert, :emerg ]
 
-		def test_00_Loaded
-			printTestHeader "Logger: Classes loaded"
+		def teardown
+			Arrow::Logger.global.outputters.clear
+		end
 
+
+		#############################################################
+		###	T E S T S
+		#############################################################
+
+		def test_logger_class_is_loaded
 			assert_instance_of Class, Arrow::Logger
 			[ :[], :global, :method_missing ].each {|sym|
 				assert_respond_to Arrow::Logger, sym
 			}
 		end
 
-		def test_10_GlobalLogMethods
-			printTestHeader "Logger: Global log methods"
+		def test_global_logger_method_returns_a_logger
 			rval = nil
-			testOp = TestOutputter::new
 
 			assert_nothing_raised { rval = Arrow::Logger.global }
 			assert_instance_of Arrow::Logger, rval
 			assert_equal "", rval.name
+		end
 
-			Arrow::Logger.global.outputters << testOp
 
-			LogLevels.each {|level|
+		def test_outputter_attached_to_global_logger_outputs_for_global_messages
+			rval = nil
+
+			testOp = TestOutputter::new
+			assert_nothing_raised do
+				Arrow::Logger.global.outputters << testOp
+			end
+
+			# Try outputting at each logging level
+			LogLevels.each do |level|
 				assert_nothing_raised { Arrow::Logger.global.level = level }
 				assert_nothing_raised { Arrow::Logger.send(level, "test message") }
 				assert_match( /test message/, testOp.output, "for output on #{level}" )
-
-				testOp.clear
-
-				unless level == :emerg
-					assert_nothing_raised { Arrow::Logger.global.level = :emerg }
-					Arrow::Logger.send(level, "test message")
-					assert testOp.output.empty?, "Outputter expected to be empty"
-				end
-			}
+			end
 		end
 
-		def test_20_MuesObjectLogMethods
-			printTestHeader "Logger: Object log methods"
 
+		def test_messages_to_global_logger_heed_global_loggers_level
+			rval = nil
+
+			testOp = TestOutputter::new
+			Arrow::Logger.global.outputters << testOp
+
+			LogLevels.each_with_index do |level, lvl_i|
+				Arrow::Logger.global.level = level
+
+				LogLevels.each_with_index do |msglevel, msg_i|
+					Arrow::Logger.send( msglevel, "test message" )
+
+					if msg_i < lvl_i
+						assert testOp.outputCalls.empty?,
+							"Expected no output calls for a %p message at %p level" %
+							[ msglevel, level ]
+					else
+						assert_match( /test message/, testOp.output,
+							"for %p output at %p" % [msglevel, level] )
+					end
+
+					testOp.clear
+				end
+			end
+		end
+
+		def test_arrow_objects_return_their_logger_object
+			rval = nil
+			testobj = TestObject::new
+
+			assert_nothing_raised do
+				rval = testobj.send( :log )
+			end
+
+			assert_instance_of Arrow::Logger, rval
+			assert_equal "::Arrow::TestObject", rval.name
+		end
+
+
+		def test_outputter_attached_to_global_logger_outputs_for_instance_messages
 			testObj = TestObject::new
 			testOp = TestOutputter::new
 
-			Arrow::Logger.global.outputters = [ testOp ]
+			Arrow::Logger.global.outputters << testOp
 
-			LogLevels.each {|level|
+			LogLevels.each do |level|
 				assert_nothing_raised { Arrow::Logger.global.level = level }
-				meth = "#{level.to_s}Log".intern
-				assert_nothing_raised { testObj.send(meth, "test message") }
+
+				assert_nothing_raised { testObj.send(:log).send(level, "test message") }
 				assert_match( /test message/, testOp.output )
 				testOp.clear
-			}
+			end
 		end
 
 

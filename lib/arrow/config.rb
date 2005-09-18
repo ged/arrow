@@ -20,12 +20,11 @@
 #	The URI of the applet which should handle untrapped exceptions raised
 #	from other applets. A value of '(builtin)' (the default) will cause a
 #	builtin handler to be invoked.
-# [<b>logLevel</b>]
-#	The verbosity level of the global logger. Possible values are the same as
-#	the Apache logging levels: debug, info, notice, warn, error, crit, alert,
-#	and emerg.
-# [<b>templateLogLevel</b>]
-#	The verbosity level of the logger for the templating system.
+# [<b>logLevels</b>]
+#	The verbosity level of logging for various classes. Each key in this hash
+#	should be the name of an Arrow class or 'global'. Possible values are the
+#	same as the Apache logging levels: debug, info, notice, warn, error, crit,
+#	alert, and emerg.
 # [<b>applets</b>]
 #	Applet configuration values:
 #	[<b>path</b>]
@@ -131,19 +130,18 @@ class Arrow::Config < Arrow::Object
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
+	# Output a debugging message to STDERR
 	def self::debugMsg( *msgs )
 		$stderr.puts msgs.join
 	end
+
 
 	# Define the layout and defaults for the underlying structs
 	Defaults = {
 		:startMonitor			=> false,
 
-		:logLevel				=> "info",
-		:templateLogLevel		=> "notice",
+		:logLevels				=> { :global => 'notice' },
 
 		:applets => {
 			:path			=> Arrow::Path::new( "applets:/www/applets" ),
@@ -229,17 +227,17 @@ class Arrow::Config < Arrow::Object
 				newhash[ key ] = val
 
 			when Arrow::Path
-				Arrow::Logger[ self ].debug "Untainting %p" % val
+				# Arrow::Logger[ self ].debug "Untainting %p" % val
 				val.untaint
 				newhash[ key ] = val
 
 			when Array
-				Arrow::Logger[ self ].debug "Untainting array %p" % val
+				# Arrow::Logger[ self ].debug "Untainting array %p" % val
 				newval = val.collect {|v| v.dup.untaint}
 				newhash[ key ] = newval
 
 			else
-				Arrow::Logger[ self ].debug "Untainting %p" % val
+				# Arrow::Logger[ self ].debug "Untainting %p" % val
 				newval = val.dup
 				newval.untaint
 				newhash[ key ] = newval
@@ -290,9 +288,9 @@ class Arrow::Config < Arrow::Object
 	### +confighash+ will be used instead of the defaults.
 	def initialize( confighash={} )
 		ihash = self.class.internifyKeys( confighash )
-		self.log.debug "Ihash is %p" % ihash
+		# self.log.debug "Ihash is %p" % ihash
 		mergedhash = Defaults.merge( ihash, &Arrow::HashMergeFunction )
-		self.log.debug "Merged hash is %p" % mergedhash
+		# self.log.debug "Merged hash is %p" % mergedhash
 		@struct = ConfigStruct::new( mergedhash )
 		@createTime = Time::now
 		@name = nil
@@ -307,7 +305,8 @@ class Arrow::Config < Arrow::Object
 	######
 
 	# Define delegators to the inner data structure
-	def_delegators :@struct, :to_h, :member?, :members, :merge, :merge!, :each
+	def_delegators :@struct, :to_h, :member?, :members, :merge, :merge!, :each,
+		:[], :[]=
 
 	# The underlying config data structure
 	attr_reader :struct
@@ -555,7 +554,7 @@ class Arrow::Config < Arrow::Object
 
 			self.__send__( sym, *args )
 		end
-	end
+	end # class ConfigStruct
 
 
 	### Abstract base class (and Factory) for configuration loader

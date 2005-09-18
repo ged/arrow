@@ -333,13 +333,10 @@ class Applet < Arrow::Object
 				case val
 				when Proc, Method
 					rawsig[ key ] = val.call( rawsig, self )
-					Arrow::Logger[self].debug "Defaulted %s to %p via Proc/Method" % [ key, rawsig[key] ]
 				when Numeric, NilClass, FalseClass, TrueClass
 					rawsig[ key ] = val
-					Arrow::Logger[self].debug "Defaulted %s to %p via Immediate" % [ key, rawsig[key] ]
 				else
 					rawsig[ key ] = val.dup
-					Arrow::Logger[self].debug "Defaulted %s to %p via Literal" % [ key, rawsig[key] ]
 				end
 			}
 
@@ -347,7 +344,7 @@ class Applet < Arrow::Object
 			# 	:version, :config, :defaultAction, :templates, :validatorArgs,
 			# 	:monitors )
 			members = SignatureStruct::members.collect {|m| m.intern}
-			return SignatureStruct::new( *rawsig[*members] )
+			return SignatureStruct::new( *rawsig.values_at(*members) )
 		end
 
 

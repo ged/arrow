@@ -19,7 +19,6 @@
 #
 
 require 'uri'
-require 'hashslice'
 require 'pluginfactory'
 
 require 'arrow/object'
@@ -43,10 +42,6 @@ module Arrow
 
 		# SVN Id
 		SVNId = %q$Id$
-
-		# SVN URL
-		SVNURL = %q$URL$
-
 
 		
 		#############################################################

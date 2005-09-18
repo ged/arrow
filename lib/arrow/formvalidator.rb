@@ -83,10 +83,8 @@ module FormValidator::ConstraintHelpers # :nodoc:
 end
 
 
-module Arrow
-
 ### Add some Hash-ish methods for convenient access to FormValidator#valid.
-class FormValidator < ::FormValidator
+class Arrow::FormValidator < ::FormValidator
 	extend Forwardable
 	
 	# SVN Revision
@@ -136,6 +134,18 @@ class FormValidator < ::FormValidator
 	### to the specified +val+.
 	def []=( key, val )
 		@form[ key.to_s ] = val
+	end
+
+
+	### Returns +true+ if there were no arguments given.
+	def empty?
+		return @form.empty?
+	end
+
+
+	### Returns +true+ if there were arguments given.
+	def args?
+		return !@form.empty?
 	end
 
 
@@ -204,7 +214,6 @@ class FormValidator < ::FormValidator
 		end
 	end
 
-end # class FormValidator
-end # module Arrow
+end # class Arrow::FormValidator
 
 

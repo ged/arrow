@@ -626,6 +626,24 @@ debugMsg "\n" + hruleSection( rval, "Rendered" )
 assert_match( templateContentRe('Passed.'), rval )
 ===
 
+# I think this is a general bug, not specific to 'if', but I'm testing it here
+# because I first saw it in an 'if'.
+=== Methodchain with question mark
+<?if test.is_a?( Arrow::Exception ) ?>
+Passed.
+<?else?>
+Failed.
+<?end?>
+---
+# Nothing special about an exception -- it's just a class that can be
+# instantiated easily.
+obj = Arrow::Exception::new
+assert_nothing_raised { template.test = obj }
+assert_nothing_raised { rval = template.render }
+debugMsg "\n" + hruleSection( rval, "Rendered" )
+assert_match( templateContentRe('Passed.'), rval )
+===
+
 ### For directive
 === Simple
 
@@ -963,4 +981,49 @@ assert_nothing_raised { rval = template.render }
 debugMsg "\n" + hruleSection( rval, "Rendered" )
 assert_match( templateContentRe("\nSomething: sasquatch\nBar: baz and sasquatch"), rval )
 ===
+
+=== Recursion
+
+<?render pairs as pairs in recurse.tmpl ?>
+
+---
+pairs = {
+	"integer" => 1,
+	"hash" => {
+		"bar" => 1,
+		"foo" => 2,
+		"subsubhash" => {"hope, faith" => "and charity"},
+	},
+	"string" => "A string",
+}
+debugMsg "Setting outer template's 'pairs' to %p" % pairs
+assert_nothing_raised { template.pairs = pairs }
+
+assert_nothing_raised { rval = template.render }
+debugMsg "\n" + hruleSection( rval, "Rendered" )
+assert_match( templateContentRe("Key => integer\n  Val => 1\nKey => hash\n  Val => \nKey => subsubhash\n  Val => \nKey => hope, faith\n  Val => and charity\n\n\nKey => foo\n  Val => 2\nKey => bar\n  Val => 1\n\n\nKey => string\n  Val => A string"), rval )
+===
+
+=== With Complex Methodchain
+
+<?render pairs['hash'] as pairs in recurse.tmpl ?>
+
+---
+pairs = {
+	"integer" => 1,
+	"hash" => {
+		"bar" => 1,
+		"foo" => 2,
+		"subsubhash" => {"hope, faith" => "and charity"},
+	},
+	"string" => "A string",
+}
+debugMsg "Setting outer template's 'pairs' to %p" % pairs
+assert_nothing_raised { template.pairs = pairs }
+
+assert_nothing_raised { rval = template.render }
+debugMsg "\n" + hruleSection( rval, "Rendered" )
+assert_match( templateContentRe("Key => subsubhash\n  Val => \nKey => hope, faith\n  Val => and charity\n\n\nKey => foo\n  Val => 2\nKey => bar\n  Val => 1"), rval )
+===
+
 

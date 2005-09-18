@@ -39,9 +39,6 @@ class Template
 		# SVN Id
 		SVNId = %q$Id$
 		
-		# SVN URL
-		SVNURL = %q$URL$
-
 		# The methods of collections which are delegated to their contents Array
 		DelegatedMethods = 
 			( (Array::instance_methods(false) | Enumerable::instance_methods(false)) -

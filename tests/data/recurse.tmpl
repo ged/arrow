@@ -1,0 +1,10 @@
+
+<?for k,v in pairs ?>
+Key => <?attr k ?>
+<?if v.is_a?(Hash) ?>
+  Val => <?render v as pairs in recurse.tmpl ?>
+<?else?>
+  Val => <?attr v ?>
+<?end if ?>
+<?end for ?>
+

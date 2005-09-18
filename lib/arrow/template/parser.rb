@@ -49,7 +49,7 @@ class Arrow::Template
 				# pattern to build the tag-middle pattern.
 				src = key.is_a?( Regexp ) ? key.source : key.to_s
 				mobj = /(\\.|.)(\\.|.)/.match( src ) or
-					raise ParseError, "couldn't extract first and second "\
+					raise Arrow::ParseError, "couldn't extract first and second "\
 					"char from closing tag '%s'" % key
 				char1, char2 = mobj[1,2]
 				hsh[key] = Regexp::new( /((?:[^#{char1}]|#{char1}(?!#{char2}))+)/ )
@@ -379,7 +379,7 @@ class Arrow::Template
 				# ...otherwise, it's just a malformed non-PI tag, which
 				# is always an error.
 				else
-					raise ParseError, "malformed directive name"
+					raise Arrow::ParseError, "malformed directive name"
 				end
 			end
 
@@ -407,10 +407,10 @@ class Arrow::Template
 					# If strict end tags is turned on, check to be sure we
 					# got the correct 'end'.
 					if @config[:strictEndTags]
-						raise ParseError,
+						raise Arrow::ParseError,
 							"missing or malformed closing tag name" if
 							closedTag.nil?
-						raise ParseError,
+						raise Arrow::ParseError,
 							"mismatched closing tag name '#{closedTag}'" unless
 							closedTag.downcase == context.downcase
 					end
@@ -418,13 +418,13 @@ class Arrow::Template
 					# Jump out of the loop in #scanForNodes...
 					throw :endscan 
 				else
-					raise ParseError, "dangling end"
+					raise Arrow::ParseError, "dangling end"
 				end
 			end
 
 			# Skip to the end of the tag
 			self.scanForTagEnding( state ) or
-				raise ParseError, "malformed tag: no closing tag "\
+				raise Arrow::ParseError, "malformed tag: no closing tag "\
 				"delimiters %p found" % state.tagClose
 
 			return node
@@ -563,11 +563,11 @@ class Arrow::Template
 			# If the configuration doesn't say to ignore unknown PIs or it's an
 			# [?alternate-synax?] directive, raise an error.
 			if state.tagOpen == '[?' || !@config[:ignoreUnknownPIs]
-				raise ParseError, "unknown directive"
+				raise Arrow::ParseError, "unknown directive"
 			end
 
 			remainder = state.scanner.scan( %r{(?:[^?]|\?(?!>))*\?>} ) or
-				raise ParseError, "failed to skip unknown PI"
+				raise Arrow::ParseError, "failed to skip unknown PI"
 
 			pi = state.tagOpen + tag + remainder
 			self.log.info( "Ignoring unknown PI (to = #{state.tagOpen.inspect}) '#{pi}'" )

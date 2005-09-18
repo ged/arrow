@@ -490,7 +490,7 @@ class Template
 			%Q{<%s %s%s (Format: %p)>} % [
 				@type.capitalize,
 				@name,
-				@methodchain.strip.empty? ? "" : "." + @methodchain,
+				@methodchain.strip.empty? ? "" : @methodchain,
 				@format,
 			]
 		end
@@ -657,6 +657,18 @@ class Template
 			self.subnodes.each {|node|
 				template.installNode( node )
 			}
+		end
+
+
+		### Return a human-readable version of the object suitable for debugging
+		### messages.
+		def inspect
+			%Q{<%s %s%s: %p>} % [
+				@type.capitalize,
+				@name,
+				@methodchain.strip.empty? ? "" : @methodchain,
+				@subnodes,
+			]
 		end
 
 
