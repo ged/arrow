@@ -1,0 +1,35 @@
+		<!-- [?call config.inspect ?] -->
+		<dl>
+		<?for key in config.members.sort_by {|sym| sym.to_s } ?>
+		  <dt><?attr key ?></dt>
+		  <dd>
+
+			<?if config[key].is_a?(Arrow::Config::ConfigStruct) ?>
+			<!-- Render subsections as subtables -->
+			<?render config[key] as config in config/display-table.tmpl ?>
+
+			<?elsif config[key].is_a?(Array) ?>
+			<!-- Iterate over simple Arrays -->
+			<ul>
+			  <?for item in config[key] ?>
+			  <li><?attr item ?></li>
+			  <?end for ?>
+			</ul>
+
+			<?elsif config[key].is_a?(Hash) ?>
+			<!-- ...and over simple Hashes -->
+			<dl>
+			  <?for k, v in config[key] ?>
+			  <dt><?attr k ?></dt>
+			  <dd><?attr v ?></dd>
+			  <?end for ?>
+			</dl>
+
+			<?else?>
+			<!-- Everything else just gets rendered as-is [?call config[key].class.name ?] -->
+			<!-- config[key]: [?call config[key].inspect ?] -->
+			<pre><?attr config[key] ?></pre>
+			<?end if ?>
+		  </dd>
+		<?end for ?>
+		</dl>

@@ -53,7 +53,13 @@
 		  <td class="applet-name"><?call re.object.signature.name ?></td>
 		  <td class="applet-version"><?call re.object.signature.version ?></td>
 		  <td class="applet-source"><?escape re.object.class.name.gsub(/.*>::/,'') ?></td>
-		  <td class="applet-run"><button onclick="statApplet('[?attr uri ?]')">Inspect</button></td>
+		  <td class="applet-run">
+			<button class="image-button" 
+					onclick="statApplet('[?attr uri ?]')">
+			  <img src="/images/icons/stockholm/light/info.gif" height="16" width="16" 
+				   alt="Inspect" />
+			</button>
+		  </td>
 		</tr>
 		<?end for?>
 	  </tbody>

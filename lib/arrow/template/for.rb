@@ -71,101 +71,92 @@ require 'arrow/template'
 require 'arrow/template/nodes'
 require 'arrow/template/iterator'
 
-module Arrow
-class Template
+### The class which defines the behaviour of the 'for'
+### template directive.
+class Arrow::Template::ForDirective < Arrow::Template::BracketingDirective
+	include Arrow::Template::Parser::Patterns
 
-	### The class which defines the behaviour of the 'for'
-	### template directive.
-	class ForDirective < Arrow::Template::BracketingDirective
-		include Arrow::Template::Parser::Patterns
+	# SVN Revision
+	SVNRev = %q$Rev$
 
-		# SVN Revision
-		SVNRev = %q$Rev$
-		
-		# SVN Id
-		SVNId = %q$Id$
-		
-		# SVN URL
-		SVNURL = %q$URL$
+	# SVN Id
+	SVNId = %q$Id$
 
-		# The regexp for matching the 'in' part of the directive
-		IN = WHITESPACE + /in/i + WHITESPACE
+	# The regexp for matching the 'in' part of the directive
+	IN = WHITESPACE + /in/i + WHITESPACE
 
 
-		#############################################################
-		###	I N S T A N C E   M E T H O D S
-		#############################################################
+	#############################################################
+	###	I N S T A N C E   M E T H O D S
+	#############################################################
 
-		### Create a new Arrow::Template::ForDirective object.
-		def initialize( body, parser, state )
-			@args = []
-			@pureargs = []
-			super
-		end
-
-
-		######
-		public
-		######
-
-		# The argument list for the iterator, with sigils and defaults, if any.
-		attr_reader :args
-
-		# The argument list for the iterator, with any sigils and defaults
-		# stripped away.
-		attr_reader :pureargs
+	### Create a new Arrow::Template::ForDirective object.
+	def initialize( body, parser, state )
+		@args = []
+		@pureargs = []
+		super
+	end
 
 
-		#########
-		protected
-		#########
+	######
+	public
+	######
 
-		### Parse the contents of the directive.
-		def parseDirectiveContents( parser, state )
-			@args, @pureargs = parser.scanForArgList( state )
-			return nil unless @args
+	# The argument list for the iterator, with sigils and defaults, if any.
+	attr_reader :args
 
-			state.scanner.skip( IN ) or
-				raise ParseError, "no 'in' for 'for'"
-
-			super
-		end
+	# The argument list for the iterator, with any sigils and defaults
+	# stripped away.
+	attr_reader :pureargs
 
 
-		### Render the directive's bracketed nodes once for each item in the
-		### iterated content.
-		def renderSubnodes( attribute, template, scope )
-			res = []
+	#########
+	protected
+	#########
 
-			iterator = Arrow::Template::Iterator::new( attribute )
-			iterator.each {|iter,*blockArgs|
-				#self.log.debug "[FOR] Block args are: %p" % [ blockArgs ]
+	### Parse the contents of the directive.
+	def parseDirectiveContents( parser, state )
+		@args, @pureargs = parser.scanForArgList( state )
+		return nil unless @args
 
-				# Make an attributes hash from the pure args of left side of the
-				# 'for'.
-				attributes = {}
-				blockArgs.zip( self.pureargs ) {|pair|
-					attributes[ pair[1] ] = pair[0]
-				}
-				attributes['iterator'] = iter
+		state.scanner.skip( IN ) or
+			raise ParseError, "no 'in' for 'for'"
 
-				# Process the nodes inside the 'for' block with the args being
-				# overridden.
-				#self.log.debug "  [FOR] calling into new scope with overridden " +
-				#	"attributes: %p" % [ attributes ]
-				template.withOverriddenAttributes( scope, attributes ) {|template|
-					res << template.render( @subnodes, scope )
-				}
+		super
+	end
+
+
+	### Render the directive's bracketed nodes once for each item in the
+	### iterated content.
+	def renderSubnodes( attribute, template, scope )
+		res = []
+
+		iterator = Arrow::Template::Iterator::new( attribute )
+		iterator.each {|iter,*blockArgs|
+			#self.log.debug "[FOR] Block args are: %p" % [ blockArgs ]
+
+			# Make an attributes hash from the pure args of left side of the
+			# 'for'.
+			attributes = {}
+			blockArgs.zip( self.pureargs ) {|pair|
+				attributes[ pair[1] ] = pair[0]
 			}
+			attributes['iterator'] = iter
 
-			return *res
-		end
+			# Process the nodes inside the 'for' block with the args being
+			# overridden.
+			#self.log.debug "  [FOR] calling into new scope with overridden " +
+			#	"attributes: %p" % [ attributes ]
+			template.withOverriddenAttributes( scope, attributes ) {|template|
+				res << template.render( @subnodes, scope )
+			}
+		}
+
+		return *res
+	end
 
 
 
-	end # class ForDirective
-
-end # class Template
-end # module Arrow
+end # class Arrow::Template::ForDirective
 
 

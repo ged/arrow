@@ -281,7 +281,7 @@ class Arrow::Dispatcher < Arrow::Object
 			Arrow::Logger[ realclass ].level = level
 		end
 		
-		Apache::request.server.log_notice( "Loggers: %p" % [Arrow::Logger.loggers] )
+		# Apache::request.server.log_notice( "Loggers: %p" % [Arrow::Logger.loggers] )
 
 		# Set up the session class
 		self.log.info "Configuring the Session class with %p" % config

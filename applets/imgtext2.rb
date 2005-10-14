@@ -28,9 +28,6 @@ class FancyImageText < Arrow::Applet
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
-
 	# Default settings
 	DefaultFont = 'TektonPro-Regular'
 	DefaultFont.untaint
@@ -60,15 +57,17 @@ class FancyImageText < Arrow::Applet
 		:maintainer => "ged@FaerieMUD.org",
 		:defaultAction => 'fontlist',
 		:templates => {
-			:form		=> 'imgtext.tmpl',
-			:fontlist	=> 'imgtext-fontlist.tmpl',
+			:form		  => 'imgtext/form.tmpl',
+			:fontlist	  => 'imgtext/fontlist.tmpl',
+			:reload		  => 'imgtext/reload.tmpl',
+			:reload_error => 'imgtext/reload-error.tmpl',
 		},
 		:vargs => {
 			:__default__ => {
 				:required		=> [],
 				:optional		=> [:imgtext, :fontsize, :fontface],
 				:constraints	=> {
-					:imgtext	=> /^[\x20-\x7e]+$/,
+					:imgtext	=> /^[\x20-\x7e-]+$/,
 					:fontsize	=> /^\d+$/,
 					:fontface	=> /^\S+$/,
 				},
@@ -107,8 +106,10 @@ class FancyImageText < Arrow::Applet
 
 	attr_reader :fontdir, :background, :foreground, :fonts
 
-
-	action( 'action_missing' ) {|txn, *args|
+	### The action to run when the specified action method doesn't exist. This
+	### is used to make the URL a bit shorter -- the action name becomes the
+	### font name in effect.
+	def action_missing_action( txn, *args )
 
 		# Fetch the REST arguments and build the image for them
 		fontname, size, imgname = *args
@@ -132,17 +133,48 @@ class FancyImageText < Arrow::Applet
 			self.log.error "Unsupported image extension %p" % fmt
 			return false
 		end
-	}
+	end
 
-	action( 'fontlist' ) {|txn, *rest|
+
+	### Display a list of the available fonts.
+	def fontlist_action( txn, *rest )
 		templ = self.loadTemplate( :fontlist )
 		templ.txn = txn
 		templ.app = self
 		templ.fonts = @fonts
 
 		return templ
-	}
+	end
 
+
+	### Reload the fonts and display what changed.
+	def reload_action( txn, *args )
+		self.log.debug "Doing reload of fonts for child %d" % [ Process::pid ]
+
+		newfonts = tmpl = nil
+
+		# Try to reload the fonts, replacing the currently-loaded ones and
+		# showing the differences if it succeeds, and showing the error and
+		# keeping the old ones if it fails.
+		begin
+			newfonts = load_fonts( @fontdir )
+		rescue Exception => err
+			self.log.error "Caught exception while attempting to reload fonts: %s\n\t%s" %
+				[ err.message, err.backtrace.join("\n\t") ]
+			tmpl = self.loadTemplate( :reload_error )
+			tmpl.exception = err
+		else
+			tmpl = self.loadTemplate( :reload )
+			tmpl.newfonts = newfonts.reject {|name,font| @fonts.key?(name)}
+			tmpl.removedfonts = @fonts.reject {|name,font| newfonts.key?(name)}
+			@fonts = newfonts
+		end
+
+		tmpl.txn = txn
+		tmpl.applet = self
+
+		return tmpl
+	end
 
 
 	#########
@@ -207,7 +239,7 @@ class FancyImageText < Arrow::Applet
 		# Get the pointsize the same way
 		pointsize = Integer($1) if /(\d+)/.match( size )
 		pointsize ||= Integer( txn.vargs[:fontsize] ) rescue nil
-		pointsize = DefaultPointSize if pointsize.nil? || pointsize.zero?
+		pointsize = DefaultFontSize if pointsize.nil? || pointsize.zero?
 		pointsize = MaxPointSize if pointsize > MaxPointSize
 		pointsize = MinPointSize if pointsize < MinPointSize
 		self.log.debug "Set pointsize to %p" % pointsize
@@ -233,20 +265,23 @@ class FancyImageText < Arrow::Applet
 		# If the GD library has been patched to support alpha-channel PNGs, turn
 		# that on.
 		if img.respond_to? :saveAlpha
+			self.log.debug "Using saveAlpha"
 			img.saveAlpha = true
 			img.alphaBlending = false
 
 		# Otherwise just muddle through as best we can with immediate compositing
 		else
+			self.log.debug "Using alphaBlending"
 			img.alphaBlending = true	
 			img.transparent( @background )
 		end
 
 		# Fill the image with the background and draw the text and a border with
 		# the foreground color.
+		self.log.debug "Filling background"
 		img.fill( 1, 1, @background )
+		self.log.debug "Drawing string"
 		img.stringFT( @foreground, font, pointsize, 0, 5 - brect[6], 5 - brect[7], text )
-		
 		self.log.debug "Filled and set string."
 
 		return img

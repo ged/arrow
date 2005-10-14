@@ -12,13 +12,6 @@
 # * Michael Granger <ged@FaerieMUD.org>
 # 
 
-InstikiBase = "/Users/ged/source/ruby/instiki-0.9.1"
-%w[ /libraries/ /app/models /app/controllers ].each do |dir|
-	$LOAD_PATH.unshift( File::join(InstikiBase, dir) )
-end
-
-require 'wiki_service'
-
 require 'arrow/applet'
 
 

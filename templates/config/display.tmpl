@@ -1,28 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 
 <!--
 
-  Image Text Creator: Font List
+  Arrow Configuration Inspector
 
   -->
 
   <head>
-	<title>Image Text Creator: Font List</title>
+	<title>Arrow Configuration Inspector</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Script-Type" content="text/javascript" />
 	<link rel="stylesheet" type="text/css" href="/stylesheets/arrow.css" />
+	<link rel="stylesheet" type="text/css" href="/stylesheets/arrow-config.css" />
   </head>
   <body>
 
-	<h1>Image Text Creator: Font List</h1>
+	<h1>Arrow Configuration Inspector</h1>
 
-	<dl>
-<?for name,font in fonts.sort_by {|k,v| [k, v[:family], v[:style]]} ?>
-		<dt><a href="[?call txn.action ?]/[?attr name ?]/72/72%20Pt.%20[?urlencode font[:family] ?].png"><?attr name ?></a></dt>
-		<dd><?call font[:family] ?> <?call font[:style] ?></dd>
-<?end?>
-	</dl>
+	<h1><?call config.name ?></h1>
+
+	<?render config as config in config/display-table.tmpl ?>
 
 	<?include navbar.incl?>
 
@@ -32,6 +31,6 @@
 
 <!--
   Local Variables:
-  mode: xml
+  mode: nxml
  -->
 
