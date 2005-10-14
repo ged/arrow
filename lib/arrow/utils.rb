@@ -246,7 +246,7 @@ module Arrow
 			require 'yaml'
 			YAML::quick_emit( self.object_id, opts ) {|out|
 				out.seq( self.class.to_yaml_type ){|seq|
-					seq.concat( self.dirs )
+					seq.add( self.dirs )
 				}
 			}
 		end
