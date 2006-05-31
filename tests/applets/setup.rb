@@ -12,8 +12,6 @@ class Setup < Arrow::Applet
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 	# Applet signature
 	Signature = {

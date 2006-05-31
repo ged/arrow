@@ -24,8 +24,6 @@ class SuperHello < Arrow::Applet
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 	# Applet signature -- since it defines no 'uri' item, it shouldn't be loaded
 	# by the appserver directly.
@@ -33,7 +31,7 @@ class SuperHello < Arrow::Applet
 		:name => "Hello World",
 		:description => %{A 'hello world' applet.},
 		:maintainer => "ged@FaerieMUD.org",
-		:defaultAction => 'templated',
+		:default_action => 'templated',
 		:templates => {
 			:templated		=> 'hello-world.tmpl',
 			:printsource	=> 'hello-world-src.tmpl',
@@ -46,39 +44,39 @@ class SuperHello < Arrow::Applet
 	public
 	######
 
-	action( 'display' ) {|txn, *args|
+	def_action :display do |txn, *args|
 		self.log.debug "In the 'display' action of the '%s' applet." %
 			self.signature.name 
 
 		txn.content_type = "text/plain"
 		return "Hello world."
-	}
+	end
 
 
-	action( 'templated' ) {|txn, *args|
+	def_action :templated do |txn, *args|
 		self.log.debug "In the 'templated' action of the %s applet." %
 			self.signature.name
 			
-		templ = self.loadTemplate( :templated )
+		templ = self.load_template( :templated )
 		templ.txn = txn
 		templ.applet = self
 
 		return templ
-	}
+	end
 
 
-	action( 'printsource' ) {|txn, *args|
+	def_action :printsource do |txn, *args|
 		self.log.debug "In the 'printsource' action of the %s applet." %
 			self.signature.name
 
-		src = File::read( __FILE__ ).gsub(/\t/, '    ')
+		src = File.read( __FILE__ ).gsub(/\t/, '    ')
 
-		templ = self.loadTemplate( :printsource )
+		templ = self.load_template( :printsource )
 		templ.txn = txn
 		templ.applet = self
 		templ.source = src
 
 		return templ
-	}
+	end
 
 end # class SuperHello

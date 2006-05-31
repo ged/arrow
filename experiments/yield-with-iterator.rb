@@ -34,131 +34,121 @@ require 'arrow/exceptions'
 require 'arrow/utils'
 require 'arrow/template/nodes'
 
-module Arrow
-class Template
+### The class which defines the behaviour of the 'yield'
+### template directive.
+class Arrow::Template::YieldDirective < Arrow::Template::BracketingDirective
+	include Arrow::Template::Parser::Patterns
 
-	### The class which defines the behaviour of the 'yield'
-	### template directive.
-	class YieldDirective < Arrow::Template::BracketingDirective
-		include Arrow::Template::Parser::Patterns
+	# SVN Revision
+	SVNRev = %q$Rev$
+	
+	# SVN Id
+	SVNId = %q$Id$
+	
 
-		# SVN Revision
-		SVNRev = %q$Rev$
-		
-		# SVN Id
-		SVNId = %q$Id$
-		
-		# SVN URL
-		SVNURL = %q$URL$
-
-		# The regexp format of the 'yield' part of the directive tag.
-		FROM = WHITESPACE + /from/i + WHITESPACE
+	# The regexp format of the 'yield' part of the directive tag.
+	FROM = WHITESPACE + /from/i + WHITESPACE
 
 
-		#############################################################
-		###	C L A S S   M E T H O D S
-		#############################################################
+	#############################################################
+	###	C L A S S   M E T H O D S
+	#############################################################
 
-		### Returns +false+; disallows prepended formats.
-		def self::allowsFormat
-			false
-		end
-		
+	### Returns +false+; disallows prepended formats.
+	def self.allows_format?
+		false
+	end
+	
 
-		#############################################################
-		###	I N S T A N C E   M E T H O D S
-		#############################################################
+	#############################################################
+	###	I N S T A N C E   M E T H O D S
+	#############################################################
 
-		### Initialize a new YieldDirective object with the specified +type+,
-		### +parser+, and +state+.
-		def initialize( type, parser, state )
-			@args = []
-			@pureargs = []
-			super
-		end
-
-
-		######
-		public
-		######
-
-		# The argument list for the yield block, with sigils and defaults, if any.
-		attr_reader :args
-
-		# The argument list for the callback, with any sigils and defaults
-		# stripped away.
-		attr_reader :pureargs
+	### Initialize a new YieldDirective object with the specified +type+,
+	### +parser+, and +state+.
+	def initialize( type, parser, state )
+		@args = []
+		@pureargs = []
+		super
+	end
 
 
-		#########
-		protected
-		#########
+	######
+	public
+	######
 
-		### Parse the contents of the directive, looking for an optional format
-		### for tags like <?directive "%-15s" % foo ?>, then a required
-		### identifier, then an optional methodchain attached to the indetifier.
-		def parseDirectiveContents( parser, state )
-			@args, @pureargs = parser.scanForArgList( state )
-			return nil unless @args
+	# The argument list for the yield block, with sigils and defaults, if any.
+	attr_reader :args
 
-			state.scanner.skip( FROM ) or
-				raise ParseError, "no 'from' for 'yield'"
-
-			super
-		end
+	# The argument list for the callback, with any sigils and defaults
+	# stripped away.
+	attr_reader :pureargs
 
 
-		### Build a Proc object that encapsulates the execution necessary to
-		### render the directive.
-		def buildRenderingProc( template, scope )
-			code = %q{
-				Proc::new {
-					%s {|%s| res << __callback.call(%s)}
-					res
-				}
-			} % [ self.methodchain, self.args.join(","), self.pureargs.join(",") ]
-			code.untaint
+	#########
+	protected
+	#########
 
-			#self.log.debug "Rendering proc code is: %p" % code
-			desc = "[%s (%s): %s]" %
-				[ self.class.name, __FILE__, self.methodchain ]
+	### Parse the contents of the directive, looking for an optional format
+	### for tags like <?directive "%-15s" % foo ?>, then a required
+	### identifier, then an optional methodchain attached to the indetifier.
+	def parse_directive_contents( parser, state )
+		@args, @pureargs = parser.scan_for_arglist( state )
+		return nil unless @args
 
-			return eval( code, scope.getBinding, desc, __LINE__ )
-		end
+		state.scanner.skip( FROM ) or
+			raise Arrow::ParseError, "no 'from' for 'yield'"
 
-		
-		### Render the contents of the yield block
-		def renderContents( template, scope )
-			#self.log.debug "calling method chain; callback: %p" % callback
-			chain = self.buildRenderingProc( template, scope ) or
-				raise TemplateError, "No methodchain for YIELD"
-			iProc = lambda {
-				
+		super
+	end
+
+
+	### Build a Proc object that encapsulates the execution necessary to
+	### render the directive.
+	def build_rendering_proc( template, scope )
+		code = %q{
+			Proc.new {
+				%s {|%s| res << __callback.call(%s)}
+				res
 			}
+		} % [ self.methodchain, self.args.join(","), self.pureargs.join(",") ]
+		code.untaint
 
-			iterator = Arrow::Template::Iterator::new( chain )
+		#self.log.debug "Rendering proc code is: %p" % code
+		desc = "[%s (%s): %s]" %
+			[ self.class.name, __FILE__, self.methodchain ]
 
-			iterator.iterate {|iter, *blockArgs|
-				res = []
-				attributes = {}
-				blockArgs.zip( self.pureargs ) {|pair|
-					attributes[ pair[1] ] = pair[0]
-				}
-				attributes['iterator'] = iter
+		return eval( code, scope.get_binding, desc, __LINE__ )
+	end
 
-				#self.log.debug "  override attributes are: %p" % [ attributes ]
-				template.withOverriddenAttributes( attributes ) {|template|
-					res << template.render( @subnodes, scope )
-				}
+	
+	### Render the contents of the yield block
+	def render_contents( template, scope )
+		#self.log.debug "calling method chain; callback: %p" % callback
+		chain = self.build_rendering_proc( template, scope ) or
+			raise TemplateError, "No methodchain for YIELD"
+		iProc = lambda {
+			
+		}
+
+		iterator = Arrow::Template::Iterator.new( chain )
+
+		iterator.iterate {|iter, *blockArgs|
+			res = []
+			attributes = {}
+			blockArgs.zip( self.pureargs ) {|pair|
+				attributes[ pair[1] ] = pair[0]
 			}
+			attributes['iterator'] = iter
 
-			self.callMethodChain( template, scope, callback )
-		end
+			#self.log.debug "  override attributes are: %p" % [ attributes ]
+			template.with_overridden_attributes( attributes ) {|template|
+				res << template.render( @subnodes, scope )
+			}
+		}
+
+		self.call_methodchain( template, scope, callback )
+	end
 
 
-	end # class YieldDirective
-
-end # class Template
-end # module Arrow
-
-
+end # class YieldDirective

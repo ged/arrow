@@ -23,8 +23,6 @@ SVNRev = %q$Rev$
 # SVN Id
 SVNId = %q$Id$
 
-# SVN URL
-SVNURL = %q$URL$
 
 $Programs = {
 	'tar'	=> nil,
@@ -151,7 +149,7 @@ def main
 		if userversion
 			version = userversion
 		else
-			version = Time::now.strftime('%Y%m%d')
+			version = Time.now.strftime('%Y%m%d')
 			version = promptWithDefault( "Snapshot version", version ) if wantsPrompt
 		end
 
@@ -180,10 +178,10 @@ def main
 
 		tagFlag = promptWithDefault( "Tag '%s' with %s" % [ project, tag ], 'y' )
 		if /^y/i.match( tagFlag )
-			if File::directory?( "CVS" )
+			if File.directory?( "CVS" )
 				message "Running #{$Programs['cvs']} -q tag #{tag}\n"
 				system $Programs['cvs'], '-q', 'tag', tag
-			elsif File::directory?( ".svn" )
+			elsif File.directory?( ".svn" )
 				uri = getSvnUri()
 				taguri = uri + "tags/#{tag}"
 				message "SVN tag URI: %s\n" % [ taguri ]

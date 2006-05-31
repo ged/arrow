@@ -38,8 +38,6 @@ class Arrow::DataSource < Arrow::Object
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 	@@source_types = {}
 

@@ -40,14 +40,11 @@ module Arrow
 		# SVN Id
 		SVNId = %q$Id$
 
-		# SVN URL
-		SVNURL = %q$URL$
-
 
 		### Create a new Arrow::HtmlTokenizer object.
 		def initialize( source )
 			@source = source
-			@scanner = StringScanner::new( source )
+			@scanner = StringScanner.new( source )
 		end
 
 
@@ -73,17 +70,17 @@ module Arrow
 
 					case tag
 					when /^<!--/
-						token = HTMLComment::new( tag )
+						token = HTMLComment.new( tag )
 					when /^<!/
-						token = DocType::new( tag )
+						token = DocType.new( tag )
 					when /^<\?/
-						token = ProcessingInstruction::new( tag )
+						token = ProcessingInstruction.new( tag )
 					else
-						token = HTMLTag::new( tag )
+						token = HTMLTag.new( tag )
 					end
 				else
 					text = @scanner.scan( /[^<]+/ )
-					token = HTMLText::new( text )
+					token = HTMLText.new( text )
 				end
 
 				yield( token )
@@ -122,10 +119,10 @@ module Arrow
 				content = yield
 				# self.log.debug "content = %p" % content
 			else
-				content = self.escapeHTML( @raw )
+				content = self.escape_html( @raw )
 			end
 
-			tokenclass = self.cssClass
+			tokenclass = self.css_class
 
 			%q{<span class="token %s">%s</span>} % [
 				tokenclass,
@@ -135,7 +132,7 @@ module Arrow
 
 
 		### Return the HTML element class attribute that corresponds to this node.
-		def cssClass
+		def css_class
 			tokenclass = self.class.name.
 				sub( /Arrow::(HTML)?/i, '').
 				gsub( /::/, '-' ).
@@ -152,7 +149,7 @@ module Arrow
 		### HTML inspection interface. This escapes common invisible characters
 		### like tabs and carriage-returns in additional to the regular HTML
 		### escapes.
-		def escapeHTML( string )
+		def escape_html( string )
 			return "nil" if string.nil?
 			string = string.inspect unless string.is_a?( String )
 			string.
@@ -172,7 +169,7 @@ module Arrow
 		### Return an HTML fragment that can be used to represent the token
 		### symbolically in a web-based introspection interface.
 		def to_html
-			marked = self.escapeHTML( @raw )
+			marked = self.escape_html( @raw )
 			marked.gsub( /(&amp;[^;]+;)/ ) {|ent|
 				%Q{<span class="entity">#{ent}</span>}
 			}
@@ -284,13 +281,13 @@ module Arrow
 			tagopen, tagbody = @raw.split( /\s+/, 2 )
 			# self.log.debug "tagopen = %p, tagbody = %p" % [ tagopen, tagbody ]
 
-			tagopen = self.escapeHTML( tagopen ).sub( %r{^&lt;(/)?(\w+)} ) {|match|
+			tagopen = self.escape_html( tagopen ).sub( %r{^&lt;(/)?(\w+)} ) {|match|
 				%Q{&lt;#$1<span class="tag-token-name">#$2</span>}
 			}
 
 			unless tagbody.nil?
 				tagbody.sub!( />$/, '' )
-				tagbody = self.escapeHTML( tagbody ).gsub( AttributePattern ) {|match|
+				tagbody = self.escape_html( tagbody ).gsub( AttributePattern ) {|match|
 					name, mid, val = match.split(/(\s*=\s*)/, 2)
 
 					val.gsub!( /(\[\?(?:[^\?]|\?(?!\]))+\?\])/s ) {|m|
@@ -316,7 +313,7 @@ module Arrow
 
 		### Escape special characters in the given +string+ for display in an
 		### HTML inspection interface.
-		def escapeHTML( string )
+		def escape_html( string )
 			return "nil" if string.nil?
 			string = string.inspect unless string.is_a?( String )
 			string.

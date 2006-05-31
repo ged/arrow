@@ -6,7 +6,7 @@
 #
 
 BEGIN {
-	base = File::dirname( File::dirname(File::expand_path(__FILE__)) )
+	base = File.dirname( File.dirname(File.expand_path(__FILE__)) )
 	$LOAD_PATH.unshift "#{base}/lib"
 
 	require "#{base}/utils.rb"
@@ -17,7 +17,7 @@ BEGIN {
 }
 
 $oflag	= 0
-$usage	= "Usage: #{File::basename( $0 )} [options] <filename> <type> <msg>\n"
+$usage	= "Usage: #{File.basename( $0 )} [options] <filename> <type> <msg>\n"
 $id		= 0x45
 
 ARGV.options {|oparser|
@@ -47,8 +47,8 @@ type = ARGV[1].to_i( 10 )
 msg = ARGV[2]
 
 message "Fetching message queue for #{filename}: \n"
-mq = MessageQueue::new( ftok(filename, $id), $oflag )
-perm = Permission::new( mq )
+mq = MessageQueue.new( ftok(filename, $id), $oflag )
+perm = Permission.new( mq )
 
 message "Opened %p (cuid: %d, cgid: %d, uid: %d, gid: %d, mode: %o)\n" %
 	[ mq, perm.cuid, perm.cgid, perm.uid, perm.gid, perm.mode ]

@@ -19,7 +19,7 @@ require 'bdb'
 require 'test/unit'
 
 # Prevent Test::Unit from autorunning from its own at_exit
-at_exit { Test::Unit::run = true }
+at_exit { Test::Unit.run = true }
 
 
 ### The UnitTest applet can be used to define and run tests for another applet
@@ -32,8 +32,6 @@ class UnitTester < Arrow::Applet
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 	# Default options for the BDB::Env object
 	EnvOptions = {
@@ -52,7 +50,7 @@ class UnitTester < Arrow::Applet
 			"tests for another applet by chaining through it.",
 		:uri => "/test",
 		:maintainer => "ged@FaerieMUD.org",
-		:defaultAction => 'list',
+		:default_action => 'list',
 		:templates => {
 			:list			=> 'test/list.tmpl',
 			:testharness	=> "test/harness.tmpl",
@@ -74,8 +72,8 @@ class UnitTester < Arrow::Applet
 		if @config.respond_to?( :unittester ) && false
 			begin
 				envdir = @config.unittester.dbenv
-				Dir::mkdir( envdir, 0755 ) if !File::exists?( envdir )
-				@dbenv = BDB::Env::create( envdir, EnvFlags, EnvOptions )
+				Dir.mkdir( envdir, 0755 ) if !File.exists?( envdir )
+				@dbenv = BDB::Env.create( envdir, EnvFlags, EnvOptions )
 			rescue Exception => err
 				@initError = err
 			end
@@ -103,7 +101,7 @@ class UnitTester < Arrow::Applet
 		app = chain.last
 		tests = @dbenv.open_db( BDB::Hash, app[0].signature.name.gsub(/\W+/, '_'), nil, BDB::CREATE )
 
-		templ = self.loadTemplate( :testharness )
+		templ = self.load_template( :testharness )
 		templ.txn = txn
 		templ.tests = tests
 
@@ -112,18 +110,18 @@ class UnitTester < Arrow::Applet
 
 
 	# List the applets for which tests have been defined so far.
-	action( 'list' ) {|txn, *args|
+	def_action :list do |txn, *args|
 		return reportProblem( txn ) unless @dbenv
 
-		templ = self.loadTemplate( :list )
+		templ = self.load_template( :list )
 		templ.txn = txn
 		return templ
-	}
+	end
 
 	
 	# Auxilliary action: report a problem while loading the test harness.
 	def reportProblem( txn )
-		templ = self.loadTemplate( :problem )
+		templ = self.load_template( :problem )
 		templ.err = @initErr
 
 		return templ

@@ -27,8 +27,6 @@ class ProtectedDelegator < Arrow::Applet
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 	Users = {
 		'ged'			=> "30ff9a6c184a0fde7ac7ade1479ee19f",
@@ -40,7 +38,7 @@ class ProtectedDelegator < Arrow::Applet
 		:name => "Password-protected delegator",
 		:description => "It is an applet you can chain through for authentication purposes.",
 		:maintainer => "ged@FaerieMUD.org",
-		:defaultAction => 'default',
+		:default_action => 'default',
 		:templates	=> {
 			:default	=> 'protected.tmpl',
 			:loginform	=> 'loginform.tmpl',
@@ -68,16 +66,16 @@ class ProtectedDelegator < Arrow::Applet
 	end
 
 
-	action( 'logout' ) {|txn, *args|
+	def_action :logout do |txn, *args|
 		txn.session.delete( :user )
 
-		templ = self.loadTemplate( :logout )
+		templ = self.load_template( :logout )
 		templ.txn = txn
 
 		return templ
-	}
+	end
 
-	action( 'loginform' ) {|txn, *args|
+	def_action :loginform do |txn, *args|
 		self.log.debug "In the 'display' action of the '%s' applet." %
 			self.signature.name 
 
@@ -99,12 +97,12 @@ class ProtectedDelegator < Arrow::Applet
 			end
 		end
 
-		templ = self.loadTemplate( :loginform )
+		templ = self.load_template( :loginform )
 		templ.txn = txn
 		templ.errors = errors unless errors.empty?
 
 		return templ
-	}
+	end
 
 
 end # class ProtectedDelegator

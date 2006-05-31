@@ -38,7 +38,7 @@ class Regexp #:nodoc:
 	### Create and return a new Regexp that is an alternation between the
 	### receiver and the +other+ Regexp.
 	def |( other )
-		return Regexp::new( "(?:%s|%s)" % [self.to_s, other.to_s] )
+		return Regexp.new( "(?:%s|%s)" % [self.to_s, other.to_s] )
 	end
 end
 
@@ -47,7 +47,7 @@ end
 ### and in-place interpolation.
 class String
 	def to_re( casefold=false, extended=false )
-		return Regexp::new( self.dup )
+		return Regexp.new( self.dup )
 	end
 
 	### Ideas for String-interpolation stuff courtesy of Hal E. Fulton
@@ -69,7 +69,7 @@ class String
 		nicetrace = err.backtrace.find_all {|frame|
 			/in `(interpolate|eval)'/i !~ frame
 		}
-		Kernel::raise( err, err.message, nicetrace )
+		Kernel.raise( err, err.message, nicetrace )
     end
 
 end
@@ -82,7 +82,7 @@ require 'arrow/exceptions'
 module Arrow
 
 	# Recursive hash-merge function
-	HashMergeFunction = Proc::new {|key, oldval, newval|
+	HashMergeFunction = Proc.new {|key, oldval, newval|
 		#debugMsg "Merging '%s': %s -> %s" %
 		#	[ key.inspect, oldval.inspect, newval.inspect ]
 		case oldval
@@ -108,7 +108,7 @@ module Arrow
 			if newval.is_a?( Arrow::Path )
 				newval
 			else
-				Arrow::Path::new( newval )
+				Arrow::Path.new( newval )
 			end
 
 		else
@@ -128,9 +128,6 @@ module Arrow
 		# SVN Id
 		SVNId = %q$Id$
 
-		# SVN URL
-		SVNURL = %q$URL$
-
 		# The character to split path Strings on, and join on when
 		# converting back to a String.
 		Separator = File::PATH_SEPARATOR
@@ -144,7 +141,7 @@ module Arrow
 		#############################################################
 
 		### Return the YAML type for this class
-		def self::to_yaml_type
+		def self.to_yaml_type
 			"!%s/arrowPath" % Arrow::YamlDomain
 		end
 
@@ -173,7 +170,7 @@ module Arrow
 
 			@valid_dirs = []
 			@cache_lifespan = cache_lifespan
-			@last_stat = Time::at(0)
+			@last_stat = Time.at(0)
 		end
 
 
@@ -195,14 +192,14 @@ module Arrow
 		### use this list.
 		def valid_dirs
 			if ( @cache_lifespan.nonzero? &&
-				 ((Time::now - @last_stat) < @cache_lifespan) )
+				 ((Time.now - @last_stat) < @cache_lifespan) )
 				self.log.debug "Returning cached dirs."
 				return @valid_dirs
 			end
 
 			@valid_dirs = @dirs.find_all {|dir|
 				begin
-					stat = File::stat(dir)
+					stat = File.stat(dir)
 					if stat.directory? && stat.readable?
 						true
 					else
@@ -216,15 +213,15 @@ module Arrow
 					false
 				end
 			}
-			@last_stat = Time::now
+			@last_stat = Time.now
 
 			return @valid_dirs
 		end
 
 		# Generate Array-ish methods that delegate to self.dirs
 		def_delegators :@dirs,
-			*(Array::instance_methods(false) -
-			Enumerable::instance_methods(false) -
+			*(Array.instance_methods(false) -
+			Enumerable.instance_methods(false) -
 			[:to_yaml, :inspect, :to_s])
 				
 
@@ -244,7 +241,7 @@ module Arrow
 		### Return the path as YAML text
 		def to_yaml( opts={} )
 			require 'yaml'
-			YAML::quick_emit( self.object_id, opts ) {|out|
+			YAML.quick_emit( self.object_id, opts ) {|out|
 				out.seq( self.class.to_yaml_type ){|seq|
 					seq.add( self.dirs )
 				}

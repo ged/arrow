@@ -24,15 +24,13 @@ class WikiApplet < Arrow::Applet
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 	# Applet signature
 	Signature = {
 		:name => "Arrow Wiki Toplevel Applet",
 		:description => "A wiki for FaerieMUD documentation",
 		:maintainer => "ged@FaerieMUD.org",
-		:defaultAction => 'index',
+		:default_action => 'index',
 		:templates => {
 			:main		=> 'wiki/main.tmpl',
 			:new_system => 'wiki/new_system.tmpl',
@@ -42,7 +40,7 @@ class WikiApplet < Arrow::Applet
 			:formerror	=> 'wiki/formerror.tmpl',
 		},
 
-		:validatorProfiles => {
+		:validator_profiles => {
 
 			# Target for the form in /new_system
 			:create_system => {
@@ -102,7 +100,7 @@ class WikiApplet < Arrow::Applet
 	### Debugging action /inspect
 	def inspect_action( txn, *args )
 		txn.content_type = "text/plain"
-		return "%p: %d" % [ self.wiki, Process::pid ]
+		return "%p: %d" % [ self.wiki, Process.pid ]
 	end
 
 
@@ -127,7 +125,7 @@ class WikiApplet < Arrow::Applet
 			return txn.redirect( txn.action )
 		end
 
-		tmpl = self.loadTemplate( :new_system )
+		tmpl = self.load_template( :new_system )
 		tmpl.txn = txn
 		tmpl.applet = self
 		tmpl.wiki = self.wiki
@@ -173,7 +171,7 @@ class WikiApplet < Arrow::Applet
 		return txn.redirect( txn.action ) unless web
 		return txn.redirect( txn.action + "/show/" + web ) unless topic
 
-		templ = self.loadTemplate( :new )
+		templ = self.load_template( :new )
 
 		templ.txn = txn
 		templ.topic = topic
@@ -191,7 +189,7 @@ class WikiApplet < Arrow::Applet
 		self.log.debug "Showing '#{web}/#{topic}'"
 
 		if page = self.wiki.read_page( web, topic )
-			templ = self.loadTemplate( :show )
+			templ = self.load_template( :show )
 			templ.txn = txn
 			templ.web = web
 			templ.page = page
@@ -218,21 +216,21 @@ class WikiApplet < Arrow::Applet
 		return self.report_form_errors( txn, web, topic ) if txn.vargs.errors?
 
 		webobj = self.wiki.webs[ web ] or return txn.redirect( txn.applet )
-		author = Author::new( txn.vargs[:author], txn.remote_ip )
+		author = Author.new( txn.vargs[:author], txn.remote_ip )
 		self.log.debug "Save for web: %p, author: %p" % [webobj, author]
 		
 		# If it already exists, add a revision to the page
 		if webobj.pages[ topic ]
 			self.log.debug "Revising page '#{topic}'"
 			page = self.wiki.
-				revise_page( web, topic, txn.params[:content], Time::now, author )
+				revise_page( web, topic, txn.params[:content], Time.now, author )
 			page.unlock
 
 		# Otherwise it's a new page
 		else
 			self.log.debug "Creating page '#{topic}'"
 			page = self.wiki.
-				write_page( web, topic, txn.params[:content], Time::now, author )
+				write_page( web, topic, txn.params[:content], Time.now, author )
 		end
 
 		return txn.redirect( txn.applet + "/" + ["show", web, topic].join("/") )
@@ -260,13 +258,13 @@ class WikiApplet < Arrow::Applet
 		if refaction && self.actions[ refaction ]
 			templ = self.subrun( refaction, txn, web, topic, *args )
 		else
-			templ = self.loadTemplate( :formerror )
+			templ = self.load_template( :formerror )
 
 			templ.txn = txn
 			templ.applet = self
 		end			
 
-		templ.formerrors = txn.vargs.errorMessages
+		templ.formerrors = txn.vargs.error_messages
 		return templ
 	end
 	

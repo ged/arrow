@@ -37,18 +37,18 @@ class Arrow::Config::YamlLoader < Arrow::Config::Loader
 
 	# Add YAML domain types for Arrow classes
 
-	YAML::add_domain_type( Arrow::YamlDomain, "arrowPath" ) {|type, val|
+	YAML.add_domain_type( Arrow::YamlDomain, "arrowPath" ) do |type, val|
 		obj = nil
 		case val
 		when Array
 			Arrow::Logger.debug "Adding %p to loaded Arrow::Path" % [ val ]
-			obj = Arrow::Path::new( val )
+			obj = Arrow::Path.new( val )
 		else
 			raise "Invalid #{type}: %p" % val
 		end
 
 		obj
-	} 
+	end
 
 
 
@@ -60,14 +60,14 @@ class Arrow::Config::YamlLoader < Arrow::Config::Loader
 	### specified.
 	def load( filename )
 		self.log.info "Loading YAML-format configuration from '%s'" % filename
-		return YAML::load( File::read(filename) )
+		return YAML.load( File.read(filename) )
 	end
 
 
 	### Save configuration values to the YAML +file+ specified.
 	def save( confighash, filename )
 		self.log.info "Saving YAML-format configuration to '%s'" % filename
-		File::open( filename, File::WRONLY|File::CREAT|File::TRUNC ) {|ofh|
+		File.open( filename, File::WRONLY|File::CREAT|File::TRUNC ) {|ofh|
 			ofh.print( confighash.to_yaml )
 		}
 	end
@@ -76,8 +76,8 @@ class Arrow::Config::YamlLoader < Arrow::Config::Loader
 	### Return +true+ if the specified +file+ is newer than the given
 	### +time+.
 	def isNewer?( file, time )
-		return false unless File::exists?( file )
-		st = File::stat( file )
+		return false unless File.exists?( file )
+		st = File.stat( file )
 		self.log.debug "File mtime is: %s, comparison time is: %s" %
 			[ st.mtime, time ]
 		return st.mtime > time

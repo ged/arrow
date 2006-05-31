@@ -23,15 +23,13 @@ class (>>>class<<<) < Arrow::Applet
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 	# Applet signature
 	Signature = {
 		:name => "(>>>name<<<)",
 		:description => "(>>>desc<<<)",
 		:maintainer => "(>>>AUTHOR<<<)",
-		:defaultAction => 'display',
+		:default_action => 'display',
 	}
 
 
@@ -40,14 +38,14 @@ class (>>>class<<<) < Arrow::Applet
 	public
 	######
 
-	action( 'display' ) {|txn, *args|
+	def_action :display do |txn, *args|
 		self.log.debug "In the 'display' action of the '%s' app." %
 			self.signature.name 
 
 		txn.print( "" )
 
 		return true
-	}
+	end
 
 
 end # class (>>>class<<<)

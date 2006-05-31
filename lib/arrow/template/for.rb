@@ -115,12 +115,12 @@ class Arrow::Template::ForDirective < Arrow::Template::BracketingDirective
 	#########
 
 	### Parse the contents of the directive.
-	def parseDirectiveContents( parser, state )
-		@args, @pureargs = parser.scanForArgList( state )
+	def parse_directive_contents( parser, state )
+		@args, @pureargs = parser.scan_for_arglist( state )
 		return nil unless @args
 
 		state.scanner.skip( IN ) or
-			raise ParseError, "no 'in' for 'for'"
+			raise Arrow::ParseError, "no 'in' for 'for'"
 
 		super
 	end
@@ -128,10 +128,10 @@ class Arrow::Template::ForDirective < Arrow::Template::BracketingDirective
 
 	### Render the directive's bracketed nodes once for each item in the
 	### iterated content.
-	def renderSubnodes( attribute, template, scope )
+	def render_subnodes( attribute, template, scope )
 		res = []
 
-		iterator = Arrow::Template::Iterator::new( attribute )
+		iterator = Arrow::Template::Iterator.new( attribute )
 		iterator.each {|iter,*blockArgs|
 			#self.log.debug "[FOR] Block args are: %p" % [ blockArgs ]
 
@@ -147,7 +147,7 @@ class Arrow::Template::ForDirective < Arrow::Template::BracketingDirective
 			# overridden.
 			#self.log.debug "  [FOR] calling into new scope with overridden " +
 			#	"attributes: %p" % [ attributes ]
-			template.withOverriddenAttributes( scope, attributes ) {|template|
+			template.with_overridden_attributes( scope, attributes ) {|template|
 				res << template.render( @subnodes, scope )
 			}
 		}

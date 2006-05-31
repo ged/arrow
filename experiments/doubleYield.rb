@@ -9,7 +9,7 @@
 #
 
 BEGIN {
-	base = File::dirname( File::dirname(File::expand_path(__FILE__)) )
+	base = File.dirname( File.dirname(File.expand_path(__FILE__)) )
 	$LOAD_PATH.unshift "#{base}/lib"
 
 	require "#{base}/utils.rb"

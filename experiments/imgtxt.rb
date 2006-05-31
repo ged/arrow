@@ -6,7 +6,7 @@
 #
 
 BEGIN {
-	base = File::dirname( File::dirname(File::expand_path(__FILE__)) )
+	base = File.dirname( File.dirname(File.expand_path(__FILE__)) )
 	$LOAD_PATH.unshift "#{base}/lib"
 
 	require "#{base}/utils.rb"
@@ -29,13 +29,13 @@ def load_fonts( dir )
 
 	Dir["#{dir}/*.{otf,ttf}"].each {|file|
 		file.untaint
-		next unless File::file?( file ) && File::readable?( file )
+		next unless File.file?( file ) && File.readable?( file )
 		face = nil
 
 		count += 1
 		begin
-			face = FT2::Face::load( file ) or
-				raise "::load returned nil"
+			face = FT2::Face.load( file ) or
+				raise ".load returned nil"
 		rescue Exception => err
 			debugMsg "While loading #{file}: %s" % err.message
 			next
@@ -64,7 +64,7 @@ def make_image( face, pointsize, text )
 	raise "No such font '#{face}'" unless Fonts.key?( face )
 	font = Fonts[ face ][:file]
 	debugMsg "Font file is %p" % font
-	err, brect = GD::Image::stringFT( Foreground, font, pointsize, 0, 0, 0, text )
+	err, brect = GD::Image.stringFT( Foreground, font, pointsize, 0, 0, 0, text )
 	raise "Failed to calculate bounding-box for #{font}: #{err}" if err
 	debugMsg "Bounding rect: %p" % [ brect ]
 
@@ -75,7 +75,7 @@ def make_image( face, pointsize, text )
 	debugMsg "Width: %d, height: %d" % [ width, height ]
 
 	# Make the image and colors
-	img = GD::Image::newTrueColor( width, height )
+	img = GD::Image.newTrueColor( width, height )
 	debugMsg "Created image object: %p" % [ img ]
 
 	# If the GD library has been patched to support alpha-channel PNGs, turn
@@ -104,13 +104,13 @@ def make_image( face, pointsize, text )
 end
 
 
-Background= GD::Image::trueColorAlpha( "#ffffff", GD::AlphaTransparent )
-Foreground = GD::Image::trueColorAlpha( "#000000", GD::AlphaOpaque )
+Background= GD::Image.trueColorAlpha( "#ffffff", GD::AlphaTransparent )
+Foreground = GD::Image.trueColorAlpha( "#000000", GD::AlphaOpaque )
 Fonts = load_fonts( "/Library/WebServer/Fonts" )
 
 try( "imgetxt" ) do
 	img = make_image( "Moonglow-Regular", 72, "72 Pt. Moonglow.png" )
-	File::open( "moonglow-72.png", File::WRONLY|File::TRUNC|File::CREAT ) do |ofh|
+	File.open( "moonglow-72.png", File::WRONLY|File::TRUNC|File::CREAT ) do |ofh|
 		ofh.print( img.pngStr )
 	end
 

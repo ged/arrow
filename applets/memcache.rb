@@ -23,15 +23,13 @@ class MemCacheApplet < Arrow::Applet
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 	# Applet signature
 	Signature = {
 		:name => "memcache",
 		:description => "This is a web interface to MemCached.",
 		:maintainer => "ged@FaerieMUD.org",
-		:defaultAction => 'display',
+		:default_action => 'display',
 		:templates => {
 			:display => 'memcache/display.tmpl',
 		},
@@ -47,7 +45,7 @@ class MemCacheApplet < Arrow::Applet
 			servers.replace( @config.memcache.servers )
 		end
 
-		@memcache = MemCache::new( *servers )
+		@memcache = MemCache.new( *servers )
 	end
 
 
@@ -56,7 +54,7 @@ class MemCacheApplet < Arrow::Applet
 	######
 
 	def display_action( txn, *args )
-		templ = self.loadTemplate( :display )
+		templ = self.load_template( :display )
 		templ.txn = txn
 		templ.memcache = @memcache
 

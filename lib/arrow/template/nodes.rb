@@ -51,8 +51,7 @@ require 'arrow/utils'
 require 'arrow/mixins'
 require 'arrow/template'
 
-module Arrow
-class Template
+class Arrow::Template
 
 	### The abstract base node class.
 	class Node < Arrow::Object
@@ -62,9 +61,6 @@ class Template
 
 		# SVN Id
 		SVNId = %q$Id$
-
-		# SVN URL
-		SVNURL = %q$URL$
 
 
 		#############################################################
@@ -90,15 +86,15 @@ class Template
 		### Returns +true+ for nodes which generate output themselves (as
 		### opposed to ones which generate output through subnodes). This is
 		### used for eliding blank lines from the node tree.
-		def isRenderingNode?
+		def is_rendering_node?
 			false
 		end
-		alias_method :rendering?, :isRenderingNode?
+		alias_method :rendering?, :is_rendering_node?
 		
 
 		### Install the node object into the given +template+ object.
-		def addToTemplate( template )
-			template.installNode( self )
+		def add_to_template( template )
+			template.install_node( self )
 		end
 
 
@@ -138,7 +134,7 @@ class Template
 				content = ""
 			end
 
-			nodeclass = self.cssClass
+			nodeclass = self.css_class
 
 			%q{<div class="node %s"><div class="node-head %s-head">%s</div>
 				<div class="node-body %s-body">%s</div></div>} % [
@@ -155,7 +151,7 @@ class Template
 		#########
 
 		### Return the HTML element class attribute that corresponds to this node.
-		def cssClass
+		def css_class
 			nodeclass = self.class.name.
 				sub(/Arrow::Template::/, '').
 				gsub( /::/, '-' ).
@@ -172,7 +168,7 @@ class Template
 		### HTML inspection interface. This escapes common invisible characters
 		### like tabs and carriage-returns in additional to the regular HTML
 		### escapes.
-		def escapeHTML( string )
+		def escape_html( string )
 			return "nil" if string.nil?
 			string = string.inspect unless string.is_a?( String )
 			string.
@@ -196,9 +192,6 @@ class Template
 
 		# SVN Id
 		SVNId = %q$Id$
-
-		# SVN URL
-		SVNURL = %q$URL$
 
 
 		#############################################################
@@ -239,7 +232,7 @@ class Template
 		### Returns +true+ for nodes which generate output themselves (as
 		### opposed to ones which generate output through subnodes). This is
 		### used for eliding blank lines from the node tree.
-		def isRenderingNode?
+		def is_rendering_node?
 			true
 		end
 		
@@ -253,7 +246,7 @@ class Template
 		### Return an HTML fragment that can be used to represent the node
 		### symbolically in a web-based introspection interface.
 		def to_html
-			super { self.escapeHTML(@body) }
+			super { self.escape_html(@body) }
 		end
 
 
@@ -277,9 +270,6 @@ class Template
 		# SVN Id
 		SVNId = %q$Id$
 
-		# SVN URL
-		SVNURL = %q$URL$
-
 
 		#############################################################
 		###	I N S T A N C E   M E T H O D S
@@ -297,17 +287,17 @@ class Template
 		### Render the comment in the context of the specified +template+ and
 		### +scope+.
 		def render( template, scope )
-			[ template.renderComment( self.to_s ) ]
+			[ template.render_comment( self.to_s ) ]
 		end
 
 
 		### Return an HTML fragment that can be used to represent the node
 		### symbolically in a web-based introspection interface.
 		def to_html
-			super { self.escapeHTML(self.to_s) }
+			super { self.escape_html(self.to_s) }
 		end
 
-	end
+	end # class CommentNode
 
 
 	### The abstract directive superclass. Instances of derivatives of this
@@ -321,23 +311,20 @@ class Template
 		# SVN Id
 		SVNId = %q$Id$
 
-		# SVN URL
-		SVNURL = %q$URL$
-
 
 		#############################################################
 		###	C L A S S   M E T H O D S
 		#############################################################
 
 		### Return the list of subdirectories to search for template nodes.
-		def self::derivativeDirs
+		def self.derivativeDirs
 			["arrow/template"]
 		end
 
 
-		### Factory method: overridden from PluginFactory::create to
+		### Factory method: overridden from PluginFactory.create to
 		### pass the name into constructors for parsing context.
-		def self::create( tag, parser, state )
+		def self.create( tag, parser, state )
 			super( tag, tag, parser, state )
 		end
 
@@ -351,7 +338,7 @@ class Template
 		### (Arrow::Template::Parser::State object).
 		def initialize( type, parser, state )
 			super( type )
-			self.parseDirectiveContents( parser, state )
+			self.parse_directive_contents( parser, state )
 		end
 
 
@@ -362,7 +349,7 @@ class Template
 		### Render the directive as a String and return it.
 		def render( template, scope )
 			rary = []
-			rary << template.renderComment( self.inspect ) if
+			rary << template.render_comment( self.inspect ) if
 				template._config[:debuggingComments]
 			
 			return rary
@@ -381,13 +368,13 @@ class Template
 		def to_html
 
 			if block_given?
-				callback = Proc::new
+				callback = Proc.new
 				super( &callback )
 			else
 				fields = instance_variables.sort.collect {|ivar|
 					val = instance_variable_get( ivar )
 					%q{<span class="ivar"><em>%s:</em> %s</span>} %
-						[ ivar, self.escapeHTML(val) ]
+						[ ivar, self.escape_html(val) ]
 				}
 
 				super { fields.join(", ") }
@@ -401,7 +388,7 @@ class Template
 
 		### Parse the contents of the directive. This is a no-op for this class;
 		### it's here to allow delegation of this task to subclasses.
-		def parseDirectiveContents( parser, state )
+		def parse_directive_contents( parser, state )
 		end
 
 
@@ -421,9 +408,6 @@ class Template
 		# SVN Id
 		SVNId = %q$Id$
 
-		# SVN URL
-		SVNURL = %q$URL$
-
 
 		#############################################################
 		###	C L A S S   M E T H O D S
@@ -431,7 +415,7 @@ class Template
 
 		### Returns +true+ for classes that support a prepended format. (e.g.,
 		### <?call "%15s" % foo ?>).
-		def self::allowsFormat
+		def self.allows_format?
 			true
 		end
 
@@ -469,7 +453,7 @@ class Template
 		### Returns +true+ for nodes which generate output themselves (as
 		### opposed to ones which generate output through subnodes). This is
 		### used for eliding blank lines from the node tree.
-		def isRenderingNode?
+		def is_rendering_node?
 			true
 		end
 		
@@ -479,7 +463,7 @@ class Template
 			#self.log.debug "Rendering %p" % self
 			rary = super
 
-			rary.push( *(self.renderContents( template, scope )) )
+			rary.push( *(self.render_contents( template, scope )) )
 			return rary
 		end
 
@@ -501,11 +485,11 @@ class Template
 		def to_html
 			html = ''
 			if @format
-				html << %q{"%s" %% } % self.escapeHTML( @format )
+				html << %q{"%s" %% } % self.escape_html( @format )
 			end
 			html << %q{<strong>#%s</strong>} % @name
 			if @methodchain
-				html << self.escapeHTML( @methodchain )
+				html << self.escape_html( @methodchain )
 			end
 
 			if block_given?
@@ -523,16 +507,16 @@ class Template
 		### Parse the contents of the directive, looking for an optional format
 		### for tags like <?directive "%-15s" % foo ?>, then a required
 		### identifier, then an optional methodchain attached to the indetifier.
-		def parseDirectiveContents( parser, state )
+		def parse_directive_contents( parser, state )
 			super
 
 			# Look for a format
 			# :TODO: This check for format allowability should be a bit more
 			# graceful, but I can't currently see how it might be done.
-			if self.class.allowsFormat
-				if fmt = parser.scanForQuotedString( state )
+			if self.class.allows_format?
+				if fmt = parser.scan_for_quoted_string( state )
 					state.scanner.skip( /\s*%\s*/ ) or
-						raise ParseError, "Format missing modulus operator?"
+						raise Arrow::ParseError, "Format missing modulus operator?"
 					@format = fmt[1..-2]
 					#self.log.debug "Found format %p" % @format
 				else
@@ -542,34 +526,34 @@ class Template
 			end
 
 			# Look for the identifier
-			@name = parser.scanForIdentifier( state ) or
-				raise ParseError, "missing or malformed indentifier"
+			@name = parser.scan_for_identifier( state ) or
+				raise Arrow::ParseError, "missing or malformed indentifier"
 			#self.log.debug "Set name of %s to %p" %
 			#	[ self.class.name, @name ]
 
 			# Now pick up the methodchain if there is one
-			@methodchain = parser.scanForMethodChain( state )
+			@methodchain = parser.scan_for_methodchain( state )
 
 			return true
 		end
 
 
 		### Render the contents of the node
-		def renderContents( template, scope )
-			return self.callMethodChain( template, scope )
+		def render_contents( template, scope )
+			return self.call_methodchain( template, scope )
 		end
 
 
 		### Build a Proc object that encapsulates the execution necessary to
 		### render the directive.
-		def buildRenderingProc( template, scope )
+		def build_rendering_proc( template, scope )
 			return nil if self.format.nil? && self.methodchain.nil?
 
 			if self.format
-				code = %(Proc::new {|%s| "%s" %% %s%s}) % 
+				code = %(Proc.new {|%s| "%s" %% %s%s}) % 
 					[ self.name, self.format, self.name, self.methodchain ]
 			else
-				code = "Proc::new {|%s| %s%s}" %
+				code = "Proc.new {|%s| %s%s}" %
 					[ self.name, self.name, self.methodchain ]
 			end
 			code.untaint
@@ -578,15 +562,15 @@ class Template
 			desc = "[%s (%s): %s]" %
 				[ self.class.name, __FILE__, code ]
 
-			return eval( code, scope.getBinding, desc, __LINE__ )
+			return eval( code, scope.get_binding, desc, __LINE__ )
 		end
 
 
 		### Call the node's methodchain, if any, passing the associated
 		### attribute as the first argument and any additional +args+ as second
 		### and succeeding arguments. Returns the results of the call.
-		def callMethodChain( template, scope, *args )
-			chain = self.buildRenderingProc( template, scope )
+		def call_methodchain( template, scope, *args )
+			chain = self.build_rendering_proc( template, scope )
 			#self.log.debug "Rendering proc is: %p" % chain
 
 			#self.log.debug "Fetching attribute %p of template %p" %
@@ -617,9 +601,6 @@ class Template
 		# SVN Id
 		SVNId = %q$Id$
 
-		# SVN URL
-		SVNURL = %q$URL$
-
 
 		#############################################################
 		###	I N S T A N C E   M E T H O D S
@@ -644,7 +625,7 @@ class Template
 		### Returns +true+ for nodes which generate output themselves (as
 		### opposed to ones which generate output through subnodes). This is
 		### used for eliding blank lines from the node tree.
-		def isRenderingNode?
+		def is_rendering_node?
 			false
 		end
 		
@@ -652,11 +633,11 @@ class Template
 		### Install the behaviour defined by the directive and its subnodes
 		### into the given +template+ object. This by default just installs
 		### each of its subnodes.
-		def addToTemplate( template )
+		def add_to_template( template )
 			super
-			self.subnodes.each {|node|
-				template.installNode( node )
-			}
+			self.subnodes.each do |node|
+				template.install_node( node )
+			end
 		end
 
 
@@ -684,7 +665,7 @@ class Template
 		### Return an HTML fragment that can be used to represent the node
 		### symbolically in a web-based introspection interface.
 		def to_html
-			nodeclass = self.cssClass
+			nodeclass = self.css_class
 
 			super {
 				%q{<div class="node-subtree %s-subtree">
@@ -708,7 +689,7 @@ class Template
 		### methodchain. Then look for the end of the current directive tag, and
 		### recurse into the parser for any nodes contained between this
 		### directive and its <?end?>.
-		def parseDirectiveContents( parser, state )
+		def parse_directive_contents( parser, state )
 			super
 
 			# Let subclasses implement further inner-tag parsing if they want
@@ -719,11 +700,11 @@ class Template
 			end
 
 			# Put the pointer after the closing tag 
-			parser.scanForTagEnding( state ) or
-				raise ParseError, "couldn't find tag end for '#@name'"
+			parser.scan_for_tag_ending( state ) or
+				raise Arrow::ParseError, "couldn't find tag end for '#@name'"
 
 			# Parse the content between this directive and the next <?end?>.
-			@subnodes.replace( parser.scanForNodes(state, type, self) )
+			@subnodes.replace( parser.scan_for_nodes(state, type, self) )
 
 			return true
 		end
@@ -731,18 +712,18 @@ class Template
 
 		### Use the contents of the associated attribute to render the
 		### receiver's subnodes in the specified +scope+.
-		def renderContents( template, scope )
+		def render_contents( template, scope )
 			res = super
-			self.renderSubnodes( res, template, scope )
+			self.render_subnodes( res, template, scope )
 		end
 
 
 		### Render each of the directive's bracketed nodes with the given
 		### +item+, +template+, and evaluation +scope+.
-		def renderSubnodes( item, template, scope )
-			template.withOverriddenAttributes( scope, self.name => item ) {|template|
+		def render_subnodes( item, template, scope )
+			template.with_overridden_attributes( scope, self.name => item ) do |template|
 				template.render( @subnodes, scope )
-			}
+			end
 		end
 
 	end # class BracketingDirective
@@ -757,9 +738,6 @@ class Template
 		# SVN Id
 		SVNId = %q$Id$
 
-		# SVN URL
-		SVNURL = %q$URL$
-
 
 		#############################################################
 		###	I N S T A N C E   M E T H O D S
@@ -772,7 +750,7 @@ class Template
 		### Returns +true+ for nodes which generate output themselves (as
 		### opposed to ones which generate output through subnodes). This is
 		### used for eliding blank lines from the node tree.
-		def isRenderingNode?
+		def is_rendering_node?
 			false
 		end
 		
@@ -781,16 +759,15 @@ class Template
 		### +template+ (an Arrow::Template) and +scope+ (a Binding object),
 		### should be considered "true".
 		def evaluate( template, scope )
-			rval = self.callMethodChain( template, scope )
+			rval = self.call_methodchain( template, scope )
 
 			#self.log.debug "Methodchain evaluated to %s: %p" %
 			#	[ rval ? "true" : "false", rval ]
 			return rval ? true : false
 		end
 
-	end
+	end # module ConditionalDirective
 
-end # class Template
-end # module Arrow
+end # class Arrow::Template
 
 

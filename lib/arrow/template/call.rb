@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 # 
 # This file contains the Arrow::Template::CallDirective class, a derivative of
-# Arrow::Template::ContainerDirective. This is the class which defines the
+# Arrow::Template::AttributeDirective. This is the class which defines the
 # behaviour of the 'call' template directive.
 # 
 # == Syntax
@@ -29,25 +29,14 @@ require 'arrow/exceptions'
 require 'arrow/utils'
 require 'arrow/template/nodes'
 
-module Arrow
-class Template
+### The class which defines the behaviour of the 'call'
+### template directive.
+class Arrow::Template::CallDirective < Arrow::Template::AttributeDirective
 
-	### The class which defines the behaviour of the 'call'
-	### template directive.
-	class CallDirective < Arrow::Template::AttributeDirective
+	# SVN Revision
+	SVNRev = %q$Rev$
+	
+	# SVN Id
+	SVNId = %q$Id$
 
-		# SVN Revision
-		SVNRev = %q$Rev$
-		
-		# SVN Id
-		SVNId = %q$Id$
-		
-		# SVN URL
-		SVNURL = %q$URL$
-
-	end # class CallDirective
-
-end # class Template
-end # module Arrow
-
-
+end # class Arrow::Template::CallDirective

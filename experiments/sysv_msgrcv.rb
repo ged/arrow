@@ -6,7 +6,7 @@
 #
 
 BEGIN {
-	base = File::dirname( File::dirname(File::expand_path(__FILE__)) )
+	base = File.dirname( File.dirname(File.expand_path(__FILE__)) )
 	$LOAD_PATH.unshift "#{base}/lib"
 
 	require "#{base}/utils.rb"
@@ -24,7 +24,7 @@ MSG_NOERROR = 010000
 MSG_EXCEPT	= 020000
 
 $oflag		= 0
-$usage		= "Usage: #{File::basename( $0 )} [options] <filename> <type> <len>\n"
+$usage		= "Usage: #{File.basename( $0 )} [options] <filename> <type> <len>\n"
 $id			= 0x45
 $truncate	= false
 
@@ -63,8 +63,8 @@ flags		= 0
 flags		|= MSG_NOERROR if $truncate
 
 message "Fetching message queue for #{filename}: \n"
-mq = MessageQueue::new( ftok(filename, $id), $oflag )
-perm = Permission::new( mq )
+mq = MessageQueue.new( ftok(filename, $id), $oflag )
+perm = Permission.new( mq )
 
 message "Opened %p (cuid: %d, cgid: %d, uid: %d, gid: %d, mode: %o)\n" %
 	[ mq, perm.cuid, perm.cgid, perm.uid, perm.gid, perm.mode ]

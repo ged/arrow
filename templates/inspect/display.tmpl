@@ -12,7 +12,7 @@
 	<title>Arrow Transaction Inspector</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Script-Type" content="text/javascript" />
-	<link rel="stylesheet" type="text/css" href="/stylesheets/arrow.css" />
+	<link rel="stylesheet" type="text/css" href="/css/arrow.css" />
   </head>
   <body>
 
@@ -22,19 +22,28 @@
 	  <code><?escape txn.inspect ?></code>
 	</p>
 
-	<dl>
+	<dl class="linelist">
 	  <dt>uri</dt>
 	  <dd><code><?call txn.uri.inspect ?></code></dd>
 
 	  <dt>path_info</dt>
 	  <dd><code><?call txn.path_info.inspect ?></code></dd>
 
-	  <dt>appRoot</dt>
-	  <dd><code><?call txn.appRoot.inspect ?></code></dd>
+	  <dt>app_root</dt>
+	  <dd><code><?call txn.app_root.inspect ?></code></dd>
+
+	  <dt>app_root_url</dt>
+	  <dd><code><?call txn.app_root_url.inspect ?></code></dd>
+
+	  <dt>applet</dt>
+	  <dd><code><?call txn.applet.inspect ?></code></dd>
+
+	  <dt>applet_url</dt>
+	  <dd><code><?call txn.applet_url.inspect ?></code></dd>
 
 	  <dt>headers_in</dt>
 	  <dd>
-		<dl>
+		<dl class="boldlist">
 		<?for hdr, val in txn.headers_in ?>
 		<dt><?attr hdr ?></dt>
 		<dd><code><?escape val.inspect ?></code></dd>
@@ -50,6 +59,12 @@
 
 	  <dt>referringAction</dt>
 	  <dd><code><?call txn.referringAction.inspect ?></code></dd>
+
+	  <dt>unparsed_uri</dt>
+	  <dd><code><?call txn.unparsed_uri.inspect ?></code></dd>
+
+	  <dt>full_url</dt>
+	  <dd><code><?call txn.construct_url("/arrow/inspect") ?></code></dd>
 	</dl>
 
 	<?include navbar.incl?>

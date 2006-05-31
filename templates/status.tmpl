@@ -11,12 +11,12 @@
 	<title>Arrow Demo: Applet Status Page</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Script-Type" content="text/javascript" />
-	<link rel="stylesheet" type="text/css" href="/stylesheets/arrow.css" />
+	<link rel="stylesheet" type="text/css" href="/css/arrow.css" />
 
 	<script type="text/javascript">
 	  /* <![CDATA[ */
 	  function statApplet( uri ) {
-		window.location = '[?call transaction.appRoot ?]/status/applet/' + uri;
+		window.location = '[?call transaction.app_root ?]/status/applet/' + uri;
 		return true;
 	  }
 	  /* ]]> */
@@ -44,15 +44,15 @@
 		</tr>
 	  </thead>
 	  <tbody>
-		<?for uri,re in registry.sort_by {|uri,a| uri} ?>
+		<?for uri,applet in registry.sort_by {|uri,a| uri} ?>
 		<tr class="[?if iterator.even? ?]even-row[?else?]odd-row[?end if?]">
 		  <td class="applet-uri">
-			<a title="[?call re.object.signature.description?]"
-			  href="[?call transaction.appRoot ?]/[?attr uri ?]"><?attr uri ?></a>
+			<a title="[?call applet.signature.description ?]"
+			  href="[?call transaction.app_root ?]/[?attr uri ?]"><?attr uri ?></a>
 		  </td>
-		  <td class="applet-name"><?call re.object.signature.name ?></td>
-		  <td class="applet-version"><?call re.object.signature.version ?></td>
-		  <td class="applet-source"><?escape re.object.class.name.gsub(/.*>::/,'') ?></td>
+		  <td class="applet-name"><?call applet.signature.name ?></td>
+		  <td class="applet-version"><?call applet.signature.version ?></td>
+		  <td class="applet-source"><?escape applet.class.normalized_name ?></td>
 		  <td class="applet-run">
 			<button class="image-button" 
 					onclick="statApplet('[?attr uri ?]')">

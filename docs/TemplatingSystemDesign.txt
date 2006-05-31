@@ -32,7 +32,7 @@ Attributes
 	# => "<title>Order Form</title>"
 	template.dollar_amount = 2.34
 	# => "<p>Amount: $2.34</p>"
-	template.customer = Customer::lookup( 'Babbage, Charles' )
+	template.customer = Customer.lookup( 'Babbage, Charles' )
 	# => "<p>Address: 1234 Fake Address Ave., Bridgemont, NW 10010</p>"
 	#    "<p>Amount: $4014.03</p>"
 

@@ -42,8 +42,6 @@ class Arrow::Subject < Arrow::Object
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 
 	### Initialize a new Arrow::Subject (should be called from derivatives).

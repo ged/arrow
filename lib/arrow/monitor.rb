@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 # 
-# This file contains the Arrow::monitor class. Instance of this class
+# This file contains the Arrow.monitor class. Instance of this class
 # are used to monitor activity within an Arrow system.
 # 
 # == Synopsis
@@ -12,7 +12,7 @@
 #	class MyApp < Arrow::Application
 #
 #		# Register the application's monitoring subjects.
-#		Arrow::Monitor::register( self,
+#		Arrow::Monitor.register( self,
 #			:averageExecutionTimer => {
 #				:description =>
 #					"Average execution time of each application method.",
@@ -69,8 +69,6 @@ class Arrow::Monitor < Object
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 	# The monitor instances that have been registered, keyed by the Modules
 	# that registered them.
@@ -93,7 +91,7 @@ class Arrow::Monitor < Object
 
 	
 	### Start the backend monitor server
-	def self::startBackend( config )
+	def self.startBackend( config )
 		# No-op currently
 		return false
 	end
@@ -101,7 +99,7 @@ class Arrow::Monitor < Object
 
 	### Register a +module+ with the monitoring system, specifying the
 	### available monitoring subjects in the +subjectHash+.
-	def self::register( mod, subjectHash )
+	def self.register( mod, subjectHash )
 		@instances[ mod ] = new( subjectHash )
 	end
 
@@ -117,7 +115,7 @@ class Arrow::Monitor < Object
 		@subjects = {}
 
 		subjectHash.each {|sym,config|
-			subject = Monitor::Subject::create( config )
+			subject = Monitor::Subject.create( config )
 			@subjects[ sym ] = subject
 		}
 	end

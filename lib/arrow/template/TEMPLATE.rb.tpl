@@ -27,29 +27,20 @@ require 'arrow/exceptions'
 require 'arrow/utils'
 require 'arrow/template/nodes'
 
-module Arrow
-class Template
+### The class which defines the behaviour of the '(>>>directive<<<)'
+### template directive.
+class Arrow::Template::(>>>class<<<) < Arrow::Template::(>>>superclass<<<)
 
-	### The class which defines the behaviour of the '(>>>directive<<<)'
-	### template directive.
-	class (>>>class<<<) < Arrow::Template::(>>>superclass<<<)
+	# SVN Revision
+	SVNRev = %q$Rev: 183 $
+	
+	# SVN Id
+	SVNId = %q$Id: import.rb 183 2004-08-23 06:10:32Z ged $
+	
 
-		# SVN Revision
-		SVNRev = %q$Rev: 183 $
-		
-		# SVN Id
-		SVNId = %q$Id: import.rb 183 2004-08-23 06:10:32Z ged $
-		
-		# SVN URL
-		SVNURL = %q$URL: svn+ssh://svn.FaerieMUD.org/usr/local/svn/Arrow/trunk/lib/arrow/template/import.rb $
+	(>>>MARK<<<)
 
-		(>>>MARK<<<)
-
-	end # class (>>>class<<<)
-
-end # class Template
-end # module Arrow
-
+end # class Arrow::Template::(>>>class<<<)
 
 >>>TEMPLATE-DEFINITION-SECTION<<<
 ("class" "Class: Arrow::Template::")

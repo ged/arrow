@@ -27,9 +27,6 @@ class BlueClothDingus < Arrow::Applet
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
-
 	# Applet signature
 	Signature = {
 		:name => "BlueCloth Dingus",
@@ -37,11 +34,11 @@ class BlueClothDingus < Arrow::Applet
 			"Markdown text, which when submitted will be transformed into " \
 			"HTML via the BlueCloth library and displayed.",
 		:maintainer => "ged@FaerieMUD.org",
-		:defaultAction => 'display',
+		:default_action => 'display',
 		:templates => {
 			:display => 'dingus.tmpl',
 		},
-		:validatorProfiles => {
+		:validator_profiles => {
 			:display => {
 				:required	=> :source,
 				:constraints	=> {
@@ -58,13 +55,13 @@ class BlueClothDingus < Arrow::Applet
 	public
 	######
 
-	action( 'display' ) {|txn, *args|
-		templ = self.loadTemplate( :display )
+	def_action :display do |txn, *args|
+		templ = self.load_template( :display )
 
 		if (( source = txn.vargs.valid["source"] ))
 			self.log.debug "Got valid source argument: %s" % source
 			templ.source = source
-			templ.output = BlueCloth::new( source ).to_html
+			templ.output = BlueCloth.new( source ).to_html
 		else
 			self.log.debug "No valid source argument: %p" % txn.vargs
 		end
@@ -74,7 +71,7 @@ class BlueClothDingus < Arrow::Applet
 		templ.bcmod = BlueCloth
 
 		return templ
-	}
+	end
 
 
 end # class BlueClothDingus

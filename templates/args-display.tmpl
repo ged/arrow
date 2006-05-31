@@ -11,7 +11,7 @@
 	<title>Argument Validation/Untainting/Testing applet</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Script-Type" content="text/javascript" />
-	<link rel="stylesheet" type="text/css" href="/stylesheets/arrow.css" />
+	<link rel="stylesheet" type="text/css" href="/css/arrow.css" />
 	<style type="text/css" media="screen">
 	  <!-- 
 		#form-table th { text-align: right; vertical-align: top; }
@@ -101,8 +101,8 @@
 
 	<h2>Error Messages</h2>
 
-	<p>Fetched via: <code>txn.vargs.errorMessages</code>:</p>
-	<div class="dotbox"><code><?escape txn.vargs.errorMessages.inspect ?></code></div>
+	<p>Fetched via: <code>txn.vargs.error_messages</code>:</p>
+	<div class="dotbox"><code><?escape txn.vargs.error_messages.inspect ?></code></div>
 
 <?end if?>
 	</div>

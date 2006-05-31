@@ -13,8 +13,8 @@
 # 
 
 unless defined? Arrow::TestCase
-	testsdir = File::dirname( File::expand_path(__FILE__) )
-	basedir = File::dirname( testsdir )
+	testsdir = File.dirname( File.expand_path(__FILE__) )
+	basedir = File.dirname( testsdir )
 	$LOAD_PATH.unshift "#{basedir}/lib" unless
 		$LOAD_PATH.include?( "#{basedir}/lib" )
 	$LOAD_PATH.unshift "#{basedir}/tests/lib" unless
@@ -28,52 +28,11 @@ require 'arrow/config'
 require 'arrow/transaction'
 
 
-# :TODO: This should really be a whole suite of mock objects for mod_ruby
-# testing, but I'm lazy.
-
-# Mock Apache::Request class
-module Apache
-	class Cookie
-		def initialize( name, value=nil )
-			@name = name
-			@value = value
-		end
-		
-		attr_accessor :name, :value
-	end # class Cookie
-
-	class Request
-		def initialize( params={}, cookies={} )
-			@params = params
-			@cookies = Hash::new
-			cookies.each {|k,v| @cookies[k] = Cookie::new(k,v)}
-		end
-		
-		attr_reader :cookies
-		attr_reader :params
-
-		def param( key )
-			@params[key]
-		end
-	end # class Request
-end
-
-
-# Mock Arrow::Transaction class
-class MockTransaction < Test::Unit::MockObject( Arrow::Transaction )
-	def initialize( req )
-		@request = req
-		super
-	end
-	attr_reader :request
-end
-
-
 ### Collection of tests for the Arrow::Session class.
 class Arrow::SessionTestCase < Arrow::TestCase
 
 	### Configuration
-	SessionDir			= File::dirname( File::expand_path(__FILE__) ) + "/sessions"
+	SessionDir			= File.dirname( File.expand_path(__FILE__) ) + "/sessions"
 
 	DefaultIdUri		= "md5:."
 	DefaultIdType		= 'Arrow::Session::MD5Id'
@@ -82,56 +41,52 @@ class Arrow::SessionTestCase < Arrow::TestCase
 	DefaultStoreUri		= "file:#{SessionDir}"
 	DefaultStoreType	= 'Arrow::Session::YamlStore'
 
+    TestSessionId       = "6bfb3f041cf9204c3a2ea4611bd5c9d1"
+
 	DefaultConfigHash = {
 		:idType		=> DefaultIdUri,
+		:idName     => "test_id",
 		:lockType	=> DefaultLockUri,
 		:storeType	=> DefaultStoreUri,
 	}
 
-
-	### Set up each test
-	def setup
-		@req = Apache::Request::new
-		@txn = MockTransaction::new( @req )
-		super
-	end
-
-	### Clean up after each test
-	def teardown
-		super
-		@txn = nil
-		@req = nil
-	end
 
 
 	#################################################################
 	###	T E S T S
 	#################################################################
 
-	### Test to be sure component classes are loaded.
-	def test_00_Classes
-		printTestHeader "Session: Component classes"
-
+	def test_session_class_should_be_defined_and_be_a_class
 		assert_block( "Arrow::Session defined?" ) { defined? Arrow::Session }
 		assert_instance_of Class, Arrow::Session
 	end
 
 
-	### Test Session configuration
-	def test_10_FactoryMethod
-		printTestHeader "Session: Configure"
-		rval = nil
-		config = Arrow::Config::new
+	def test_session_configure_should_fetch_session_config_from_main_config_object
+		FlexMock.use( "config" ) do |config|
+		    config.should_receive( :session ).and_return( DefaultConfigHash ).once
+			Arrow::Session.configure( config )
+		end
 
-		assert_nothing_raised {
-			Arrow::Session::configure( config )
-		}
-
-		assert_nothing_raised {
-			rval = Arrow::Session::create( @txn, DefaultConfigHash )
-		}
-		assert_instance_of Arrow::Session, rval
+        assert_equal DefaultConfigHash, Arrow::Session.config
 	end
+
+
+    def test_create_id_should_use_id_from_cookie_if_present
+        rval = nil
+        
+        FlexMock.use( "config", "request", "cookie" ) do |config, request, cookie|
+            request.should_receive( :cookies ).and_return({ "test_id" => cookie }).at_least.twice
+            config.should_receive( :idName ).and_return( "test_id" ).at_least.twice
+            cookie.should_receive( :value ).and_return( TestSessionId ).once
+            config.should_receive( :idType ).and_return( DefaultIdUri )
+            
+            rval = Arrow::Session.create_id( config, request )
+        end
+        
+        assert_kind_of Arrow::Session::Id, rval
+        assert_equal TestSessionId, rval.to_s
+    end        
 
 end
 

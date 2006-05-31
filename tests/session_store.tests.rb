@@ -13,8 +13,8 @@
 # 
 
 unless defined? Arrow::TestCase
-	testsdir = File::dirname( File::expand_path(__FILE__) )
-	basedir = File::dirname( testsdir )
+	testsdir = File.dirname( File.expand_path(__FILE__) )
+	basedir = File.dirname( testsdir )
 	$LOAD_PATH.unshift "#{basedir}/lib" unless
 		$LOAD_PATH.include?( "#{basedir}/lib" )
 	$LOAD_PATH.unshift "#{basedir}/tests/lib" unless
@@ -27,7 +27,7 @@ end
 ### Collection of tests for the Arrow::Session::Store class.
 class Arrow::SessionStoreTestCase < Arrow::TestCase
 
-	SessionDir			= File::dirname( File::expand_path(__FILE__) ) + "/sessions"
+	SessionDir			= File.dirname( File.expand_path(__FILE__) ) + "/sessions"
 	DefaultStoreUri		= "file:#{SessionDir}"
 	DefaultStoreType	= 'Arrow::Session::FileStore'
 

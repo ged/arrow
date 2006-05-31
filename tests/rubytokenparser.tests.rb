@@ -13,8 +13,8 @@
 # 
 
 unless defined? Arrow::TestCase
-	testsdir = File::dirname( File::expand_path(__FILE__) )
-	basedir = File::dirname( testsdir )
+	testsdir = File.dirname( File.expand_path(__FILE__) )
+	basedir = File.dirname( testsdir )
 	$LOAD_PATH.unshift "#{basedir}/lib" unless
 		$LOAD_PATH.include?( "#{basedir}/lib" )
 	$LOAD_PATH.unshift "#{basedir}/tests/lib" unless
@@ -66,7 +66,7 @@ class Arrow::RubyTokenParserTestCase < Arrow::TestCase
 			values = []
 
 			assert_nothing_raised {
-				tr = Arrow::RubyTokenReactor::new(#{code.inspect})
+				tr = Arrow::RubyTokenReactor.new(#{code.inspect})
 			}
 			assert_nothing_raised {
 				tr.onEvents( *#{events.inspect} ) {|reactor, *args|
@@ -87,7 +87,7 @@ class Arrow::RubyTokenParserTestCase < Arrow::TestCase
 	### Setup: skip tests if the token reactor isn't functional
 	def setup
 		skip( "No Ripper installed on this system" ) unless
-			Arrow::RubyTokenReactor::loaded?
+			Arrow::RubyTokenReactor.loaded?
 		super
 	end
 
@@ -106,12 +106,12 @@ class Arrow::RubyTokenParserTestCase < Arrow::TestCase
 			"Arrow::RubyTokenReactor not defined"
 		assert_instance_of Class, Arrow::RubyTokenReactor
 		assert_nothing_raised {
-			tr = Arrow::RubyTokenReactor::new( TestCode, "TestCode", 1 )
+			tr = Arrow::RubyTokenReactor.new( TestCode, "TestCode", 1 )
 		}
 		assert_instance_of Arrow::RubyTokenReactor, tr
 
 		addSetupBlock {
-			@tr = Arrow::RubyTokenReactor::new( TestCode, "TestCode", 1 )
+			@tr = Arrow::RubyTokenReactor.new( TestCode, "TestCode", 1 )
 		}
 		addTeardownBlock {
 			@tr = nil

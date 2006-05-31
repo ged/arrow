@@ -25,15 +25,13 @@ class InspectorApplet < Arrow::Applet
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 	# Applet signature
 	Signature = {
 		:name => "Inspector",
 		:description => "It dumps data that might be useful to applet developers.",
 		:maintainer => "ged@FaerieMUD.org",
-		:defaultAction => 'display',
+		:default_action => 'display',
 		:templates => {
 			:display => 'inspect/display.tmpl',
 		},
@@ -41,7 +39,7 @@ class InspectorApplet < Arrow::Applet
 
 
 	def display_action( txn, *args )
-		templ = self.loadTemplate( :display )
+		templ = self.load_template( :display )
 
 		templ.txn = txn
 		templ.applet = self

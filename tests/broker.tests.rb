@@ -3,7 +3,7 @@
 # Unit test for the Arrow::Broker class
 # $Id$
 #
-# Copyright (c) 2004 RubyCrafters, LLC. Most rights reserved.
+# Copyright (c) 2004, 2006 RubyCrafters, LLC. Most rights reserved.
 # 
 # This work is licensed under the Creative Commons Attribution-ShareAlike
 # License. To view a copy of this license, visit
@@ -13,8 +13,8 @@
 # 
 
 unless defined? Arrow::TestCase
-	testsdir = File::dirname( File::expand_path(__FILE__) )
-	basedir = File::dirname( testsdir )
+	testsdir = File.dirname( File.expand_path(__FILE__) )
+	basedir = File.dirname( testsdir )
 	$LOAD_PATH.unshift "#{basedir}/lib" unless
 		$LOAD_PATH.include?( "#{basedir}/lib" )
 	$LOAD_PATH.unshift "#{basedir}/tests/lib" unless
@@ -23,9 +23,10 @@ unless defined? Arrow::TestCase
 	require 'arrowtestcase'
 end
 
+require 'breakpoint'
 require 'arrow/broker'
 require 'arrow/utils'
-require 'test/unit/mock'
+require 'ostruct'
 
 
 ### Collection of tests for the Arrow::Broker class.
@@ -33,41 +34,25 @@ class Arrow::BrokerTestCase < Arrow::TestCase
 
 	TestConfig = {
 		:applets => {
-			:path			=> Arrow::Path::new( "applets:tests/applets" ),
+			:path			=> Arrow::Path.new( "" ),
 			:pattern		=> '*.rb',
-			:pollInterval	=> 5,
+			:pollInterval	=> 0,
 			:missingApplet	=> '/missing',
 			:errorApplet	=> '/error',
-			:defaultApplet	=> '/status',
 
-			:layout			=> {
-				"/"					=> "Setup",
-				"/missing"			=> "NoSuchAppletHandler",
-				"/error"			=> "ErrorHandler",
-				"/status"			=> "ServerStatus",
-				"/hello"			=> "HelloWorld",
-				"/args"				=> "ArgumentTester",
-				"/protected"		=> "ProtectedDelegator",
-				"/protected/hello"	=> "HelloWorld",
-				"/counted"			=> "AccessCounter",
-				"/counted/hello"	=> "HelloWorld",
-
-				"/test"				=> "TestingApplet",
-				"/foo"				=> "BargleApplet",
-			},
+			:layout			=> {},
 			:config			=> {},
 		},
 	}
 
-	class MockApplet < Test::Unit::MockObject( Arrow::Applet )
-	end
-
 	def setup
-		@conf = Arrow::Config::new( TestConfig )
+		@conf = Arrow::Config.new( TestConfig )
+		@broker = Arrow::Broker.new( @conf )
 		super
 	end
 
 	def teardown
+	    @broker = nil
 		@conf = nil
 		super
 	end
@@ -77,111 +62,97 @@ class Arrow::BrokerTestCase < Arrow::TestCase
 	###	T E S T S
 	#################################################################
 
-	### Class test
-	def test_00_class
-		printTestHeader "Broker: Class"
-		assert_instance_of Class, Arrow::Broker
-		assert_instance_of Class, Arrow::Broker::RegistryEntry
-	end
+    def test_delegation_with_empty_path_to_root_mounted_dispatcher_invokes_root_applet
+		res = nil
 
-	
-	### Instantiation
-	def test_01_instantiation
-		printTestHeader "Broker: Instantiation"
+		with_run_fixtured_transaction( "" ) do |txn, req, applet|
+			@broker.registry[""] = applet
+			applet.should_receive( :run ).with( txn ).and_return( "PASSED" )
+
+            assert_nothing_raised do
+                res = @broker.delegate( txn )
+            end
+        end
+
+		assert_equal "PASSED", res
+    end
+
+
+	def test_delegate_with_a_uri_that_maps_to_one_item_should_invoke_that_items_run_method
 		rval = nil
 
-		assert_nothing_raised { rval = Arrow::Broker::new(@conf) }
-		assert_instance_of Arrow::Broker, rval
+		with_run_fixtured_transaction( "/admin/create/job/1" ) do |txn, req, applet|
+			@broker.registry["admin"] = applet
+			applet.should_receive( :run ).
+				with( txn, "create", "job", "1" ).
+				and_return( :passed ).once
 
-		addSetupBlock {
-			@broker = Arrow::Broker::new( @conf )
-		}
-	end
-
-	### Applet registry
-	def test_10_registry
-		printTestHeader "Broker: Applet registry"
-		rval = nil
-
-		assert_nothing_raised {
-			rval = @broker.registry
-		}
-		assert_instance_of Hash, rval
-		assert_same_keys @conf.applets.layout, rval
+			assert_nothing_raised do
+				rval = @broker.delegate( txn )
+			end
+		end
+		
+		assert_equal :passed, rval
 	end
 
 
-	### Delegation
-	def test_20_find_applet_chain
-		printTestHeader "Broker: find applet chain"
-		rval = nil
+### Not sure how to test with a mock that yields back to the caller, since
+### FlexMock doesn't reconstruct the context of the call.
+# 	def test_delegate_with_a_uri_that_maps_to_multiple_items_should_chain_applets_together
+# 		rval = nil
+# 		
+# 		with_run_fixtured_transaction( "/admin/create/job/1" ) do |txn, req, applet|
+# 			FlexMock.use( "root applet" ) do |chained_applet|
+# 				sig = Arrow::Applet::SignatureStruct.new
+# 				sig.name = "DelegatingApplet"
+# 				chained_applet.should_receive( :signature ).
+# 					and_return( sig ).once
+# 				
+# 				@broker.registry[""] = chained_applet
+# 				@broker.registry["admin"] = applet
+# 				
+# 				link = [applet, "/admin", ["create", "job", "1"]]
+# 				chained_applet.should_receive( :delegate ).
+# # 					with( txn, [link], "admin", "create", "job", "1" ).
+# 					and_return { yield }.
+# 					once
+# 				applet.should_receive( :run ).
+# 					with( txn, "create", "job", "1" ).
+# 					and_return( :passed ).
+# 					once
+# 			
+# 				assert_nothing_raised do
+# 					rval = @broker.delegate( txn )
+# 				end
+# 			end
+# 		end
+# 
+# 		assert_equal :passed, rval
+# 	end
 
-		{
-			"/"					=> [ [/Setup/, "", []] ],
-			"/status"			=> [
-				[/Setup/, "", ["status"]],
-				[/ServerStatus/, "status", []],
-			],
-			"/missing"			=> [
-				[/Setup/, "", ["missing"]],
-				[/NoSuchAppletHandler/, "missing", []],
-			],
-			"/error"			=> [
-				[/Setup/, "", ["error"]],
-				[/ErrorHandler/, "error", []],
-			],
-			"/status"			=> [
-				[/Setup/, "", ["status"]],
-				[/ServerStatus/, "status", []],
-			],
-			"/hello"			=> [
-				[/Setup/, "", ["hello"]],
-				[/HelloWorld/, "hello", []],
-			],
-			"/args"				=> [
-				[/Setup/, "", ["args"]],
-				[/ArgumentTester/, "args", []],
-			],
-			"/protected"		=> [
-				[/Setup/, "", ["protected"]],
-				[/ProtectedDelegator/, "protected", []],
-			],
-			"/protected/hello"	=> [
-				[/Setup/, "", ["protected", "hello"]],
-				[/ProtectedDelegator/, "protected", ["hello"]],
-				[/HelloWorld/, "protected/hello", []],
-			],
-			"/counted"		=> [
-				[/Setup/, "", ["counted"]],
-				[/AccessCounter/, "counted", []],
-			],
-			"/counted/hello"	=> [
-				[/Setup/, "", ["counted", "hello"]],
-				[/AccessCounter/, "counted", ["hello"]],
-				[/HelloWorld/, "counted/hello", []],
-			],
-		}.each do |uri, res|
-			msg = "'%s' => %p" % [ uri, res ]
 
-			assert_nothing_raised( msg ) {
-				rval = @broker.__send__( :findAppletChain, uri )
-			}
-			assert_instance_of Array, rval,
-				"applet chain is an array for '%s'" % uri
-			assert_equal res.length, rval.length,
-				"applet chain contains the right number of links for '%s'" % uri
 
-			rval.each_with_index {|link, i|
-				assert_instance_of Arrow::Broker::RegistryEntry, link.first
-				assert_instance_of Array, link.last
+	#######
+	private
+	#######
 
-				assert_match res[i].first, link.first.appletclass.name,
-					"registry entry applet class name"
-				assert_instance_of link.first.appletclass, link.first.object
-				assert_equal res[i][1], link[1]
-				assert_equal res[i].last, link.last
-			}
+	def with_run_fixtured_transaction( uri, root=nil )
+		unparsed_uri = [ root, uri ].compact.join("/")
+		
+		FlexMock.use( "transaction", "request", "applet" ) do |txn, req, applet|
+			txn.should_receive( :request ).and_return( req ).at_least.once
+			req.should_receive( :unparsed_uri ).and_return( unparsed_uri ).once
+			req.should_receive( :path_info ).and_return( uri ).once
+			
+			sig = Arrow::Applet::SignatureStruct.new
+			sig.name = "MockApplet"
+			applet.should_receive( :signature ).and_return( sig )
 
+			txn.should_ignore_missing
+			req.should_ignore_missing
+			applet.should_ignore_missing
+
+			yield( txn, req, applet )
 		end
 	end
 end

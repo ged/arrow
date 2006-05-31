@@ -24,15 +24,13 @@ class LogoGenerator < Arrow::Applet
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 	# Applet signature
 	Signature = {
 		:name => "Logo Generator",
 		:description => "Generate a blank logo of a given size and format.",
 		:maintainer => "ged@FaerieMUD.org",
-		:defaultAction => 'display',
+		:default_action => 'display',
 		:vargs => {
 			:display => {
 				:optional => [:height, :width, :format],
@@ -53,8 +51,8 @@ class LogoGenerator < Arrow::Applet
 		@defaultLogoHeight = 60
 		@defaultLogoImageFormat = :png
 
-		@background= GD::Image::trueColorAlpha( "#ffffff", GD::AlphaTransparent )
-		@foreground = GD::Image::trueColorAlpha( "#000000", GD::AlphaOpaque )
+		@background= GD::Image.trueColorAlpha( "#ffffff", GD::AlphaTransparent )
+		@foreground = GD::Image.trueColorAlpha( "#000000", GD::AlphaOpaque )
 
 		Arrow::Logger[ self.class ].level = :debug
 	end
@@ -71,7 +69,7 @@ class LogoGenerator < Arrow::Applet
 		self.log.debug "height = %d, width = %d, format = %p" %
 			[ height, width, format ]
 
-		img = GD::Image::newTrueColor( width, height )
+		img = GD::Image.newTrueColor( width, height )
 		self.log.debug "Created image"
 
 		if img.respond_to? :saveAlpha

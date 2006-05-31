@@ -27,74 +27,66 @@ require 'arrow/mixins'
 require 'arrow/exceptions'
 require 'arrow/object'
 
-module Arrow
+### An HTTP response class.
+class Arrow::Response < Arrow::Object
+	extend Forwardable
 
-	### An HTTP response class.
-	class Response < Arrow::Object
-		extend Forwardable
+	# SVN Revision
+	SVNRev = %q$Rev$
 
-		# SVN Revision
-		SVNRev = %q$Rev$
-
-		# SVN Id
-		SVNId = %q$Id$
-
-		# SVN URL
-		SVNURL = %q$URL$
-
-		# The Array of method names to delegate to the request object
-		DelegatedMethods = %w{
-			<< auth_name auth_type bytes_sent cache_resp cache_resp=
-			cancel connection content_encoding= content_languages
-			content_languages= content_type= custom_response
-			escape_html internal_redirect output_buffer print
-			printf putc puts replace send_fd setup_cgi_env status
-			status= status_line status_line= user user=
-			write
-		}
+	# SVN Id
+	SVNId = %q$Id$
 
 
-		#############################################################
-		###	I N S T A N C E   M E T H O D S
-		#############################################################
-
-		### Create a new Arrow::Response object that will reply to the given
-		### +request+ (an Apache::Request object).
-		def initialize( request )
-			@request = request
-			@headers = request.headers_out
-			@errHeaders = request.err_headers_out
-
-			super()
-		end
+	# The Array of method names to delegate to the request object
+	DelegatedMethods = %w{
+		<< auth_name auth_type bytes_sent cache_resp cache_resp=
+		cancel connection content_encoding= content_languages
+		content_languages= content_type= custom_response
+		escape_html internal_redirect output_buffer print
+		printf putc puts replace send_fd setup_cgi_env status
+		status= status_line status_line= user user=
+		write
+	}
 
 
-		######
-		public
-		######
+	#############################################################
+	###	I N S T A N C E   M E T H O D S
+	#############################################################
 
-		# The Apache::Request object
-		attr_reader :request
+	### Create a new Arrow::Response object that will reply to the given
+	### +request+ (an Apache::Request object).
+	def initialize( request )
+		@request = request
+		@headers = request.headers_out
+		@errHeaders = request.err_headers_out
 
-		# The Apache::Table of response HTTP headers
-		attr_reader :headers
-
-		# The Apache::Table of HTTP headers which will be sent even when an
-		# error occurs, and which persist across internal redirects.
-		attr_reader :errHeaders
-
-		
-		# Delegate some other methods directly to the request
-		def_delegators :@request, *DelegatedMethods
+		super()
+	end
 
 
-		#########
-		protected
-		#########
+	######
+	public
+	######
+
+	# The Apache::Request object
+	attr_reader :request
+
+	# The Apache::Table of response HTTP headers
+	attr_reader :headers
+
+	# The Apache::Table of HTTP headers which will be sent even when an
+	# error occurs, and which persist across internal redirects.
+	attr_reader :errHeaders
+
+	
+	# Delegate some other methods directly to the request
+	def_delegators :@request, *DelegatedMethods
 
 
-	end # class Response
+	#########
+	protected
+	#########
 
-end # module Arrow
 
-
+end # class Arrow::Response

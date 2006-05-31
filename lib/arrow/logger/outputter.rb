@@ -37,8 +37,6 @@ class Arrow::Logger::Outputter
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 	# The default description
 	DefaultDescription = "Logging Outputter"
@@ -54,7 +52,7 @@ class Arrow::Logger::Outputter
 	#############################################################
 
 	### Specify the directory to look for the derivatives of this class in.
-	def self::derivativeDirs
+	def self.derivativeDirs
 		["arrow/logger"]
 	end
 

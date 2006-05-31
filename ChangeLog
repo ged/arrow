@@ -477,7 +477,7 @@ r116 | deveiant | 2004-06-27 23:17:09 -0700 (Sun, 27 Jun 2004) | 7 lines
 - Moved last vestiges of template-loading out of the transaction into the applet
   class. COMPAT: tx.templates[ templatekey ] should still work for the
   time-being, but should be considered deprecated and will be removed at some
-  point in the future. self.loadTemplate( templatekey ) is all the rage -- trust
+  point in the future. self.load_template( templatekey ) is all the rage -- trust
   me.
 
 
@@ -854,7 +854,7 @@ Initial checkin.
 ------------------------------------------------------------------------
 r54 | deveiant | 2004-05-21 23:42:56 -0700 (Fri, 21 May 2004) | 7 lines
 
-- Moved back out of the Arrow:: namespace, as Kernel::load apparently doesn't
+- Moved back out of the Arrow:: namespace, as Kernel.load apparently doesn't
   put them in an anonymous module that way even with the appropriate flag set.
 
 - Updated subversion keywords.

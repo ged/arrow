@@ -6,7 +6,7 @@
 #
 
 BEGIN {
-	base = File::dirname( File::dirname(File::expand_path(__FILE__)) )
+	base = File.dirname( File.dirname(File.expand_path(__FILE__)) )
 	$LOAD_PATH.unshift "#{base}/lib"
 
 	require "#{base}/utils.rb"
@@ -16,7 +16,7 @@ BEGIN {
 }
 
 $oflag	= 0644 | IPC_CREAT
-$usage	= "Usage: #{File::basename( $0 )} <filename>\n"
+$usage	= "Usage: #{File.basename( $0 )} <filename>\n"
 $id		= 0x45
 
 if ARGV.empty?
@@ -26,7 +26,7 @@ end
 filename = ARGV.shift
 
 message "Removing message queue for #{filename}: "
-mq = MessageQueue::new( ftok(filename, $id), $oflag )
+mq = MessageQueue.new( ftok(filename, $id), $oflag )
 message mq.inspect + "\n\n"
 mq.remove
 

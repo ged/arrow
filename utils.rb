@@ -247,8 +247,8 @@ module UtilityFunctions
 	def extractVersion( directory='.' )
 		release = nil
 
-		Dir::chdir( directory ) do
-			if File::directory?( "CVS" )
+		Dir.chdir( directory ) do
+			if File.directory?( "CVS" )
 				verboseMsg( "Project is versioned via CVS. Searching for RELEASE_*_* tags..." )
 
 				if (( cvs = findProgram('cvs') ))
@@ -263,7 +263,7 @@ module UtilityFunctions
 					release = revs.sort.last
 				end
 
-			elsif File::directory?( '.svn' )
+			elsif File.directory?( '.svn' )
 				verboseMsg( "Project is versioned via Subversion" )
 
 				if (( svn = findProgram('svn') ))
@@ -310,16 +310,16 @@ module UtilityFunctions
 	def extractProjectName( directory='.' )
 		name = nil
 
-		Dir::chdir( directory ) do
+		Dir.chdir( directory ) do
 
 			# CVS-controlled
-			if File::directory?( "CVS" )
+			if File.directory?( "CVS" )
 				verboseMsg( "Project is versioned via CVS. Using repository name." )
 				name = File.open( "CVS/Repository", "r").readline.chomp
 				name.sub!( %r{.*/}, '' )
 
 			# Subversion-controlled
-			elsif File::directory?( '.svn' )
+			elsif File.directory?( '.svn' )
 				verboseMsg( "Project is versioned via Subversion" )
 
 				# If the machine has the svn tool, try to get the project name
@@ -340,7 +340,7 @@ module UtilityFunctions
 
 			# Fall back to guessing based on the directory name
 			unless name
-				name = File::basename(File::dirname( File::expand_path(__FILE__) ))
+				name = File.basename(File.dirname( File.expand_path(__FILE__) ))
 			end
 		end
 
@@ -353,12 +353,12 @@ module UtilityFunctions
 	def getSvnUri( directory='.' )
 		uri = nil
 
-		Dir::chdir( directory ) do
+		Dir.chdir( directory ) do
 			output = %x{svn info}
 			debugMsg( "Using info: %p" % output )
 
 			if /^URL: \s* ( .* )/xi.match( output )
-				uri = URI::parse( $1 )
+				uri = URI.parse( $1 )
 			end
 		end
 
@@ -374,7 +374,7 @@ module UtilityFunctions
 		verboseMsg "Building manifest..."
 		raise "Missing #{manifestFile}, please remake it" unless File.exists? manifestFile
 
-		manifest = IO::readlines( manifestFile ).collect {|line|
+		manifest = IO.readlines( manifestFile ).collect {|line|
 			line.chomp
 		}.select {|line|
 			line !~ /^(\s*(#.*)?)?$/
@@ -443,10 +443,10 @@ module UtilityFunctions
 
 		# Try to make some educated guesses if that doesn't work
 		if main.nil?
-			basedir = File::dirname( __FILE__ )
-			basedir = File::dirname( basedir ) if /docs$/ =~ basedir
+			basedir = File.dirname( __FILE__ )
+			basedir = File.dirname( basedir ) if /docs$/ =~ basedir
 			
-			if File::exists?( File::join(basedir, default) )
+			if File.exists?( File.join(basedir, default) )
 				main = default
 			end
 		end
@@ -477,9 +477,9 @@ module UtilityFunctions
 	def findCatalogKeyword( keyword, catalogFile="docs/CATALOG" )
 		val = nil
 
-		if File::exists? catalogFile
+		if File.exists? catalogFile
 			verboseMsg "Extracting '#{keyword}' from CATALOG file (%s).\n" % catalogFile
-			File::foreach( catalogFile ) {|line|
+			File.foreach( catalogFile ) {|line|
 				debugMsg( "Examining line #{line.inspect}..." )
 				val = $1.strip and break if /^#\s*#{keyword}:\s*(.*)$/i =~ line
 			}
@@ -508,7 +508,7 @@ module UtilityFunctions
 		startlist.select {|fn|
 			verboseMsg "  #{fn}: "
 			found = false
-			File::open( fn, "r" ) {|fh|
+			File.open( fn, "r" ) {|fh|
 				fh.each {|line|
 					if line =~ /^(\s*#)?\s*=/ || line =~ /:\w+:/ || line =~ %r{/\*}
 						found = true
@@ -530,8 +530,8 @@ module UtilityFunctions
 		raise "No block specified for editing operation" unless block_given?
 
 		tempName = "#{file}.#{$$}"
-		File::open( tempName, File::RDWR|File::CREAT, 0600 ) {|tempfile|
-			File::open( file, File::RDONLY ) {|fh|
+		File.open( tempName, File::RDWR|File::CREAT, 0600 ) {|tempfile|
+			File.open( file, File::RDONLY ) {|fh|
 				fh.each {|line|
 					newline = yield( line ) or next
 					tempfile.print( newline )
@@ -542,9 +542,9 @@ module UtilityFunctions
 		}
 
 		if testMode
-			File::unlink( tempName )
+			File.unlink( tempName )
 		else
-			File::rename( tempName, file )
+			File.rename( tempName, file )
 		end
 	end
 
@@ -553,7 +553,7 @@ module UtilityFunctions
 	def shellCommand( *command )
 		raise "Empty command" if command.empty?
 
-		cmdpipe = IO::popen( command.join(' '), 'r' )
+		cmdpipe = IO.popen( command.join(' '), 'r' )
 		return cmdpipe.readlines
 	end
 
@@ -621,7 +621,7 @@ if __FILE__ == $0
 	ver = extractVersion() || [0,0,1]
 	puts "Version: %s\n" % ver.join('.')
 
-	if File::directory?( "docs" )
+	if File.directory?( "docs" )
 		puts "Rdoc:",
 			"  Title: " + findRdocTitle(),
 			"  Main: " + findRdocMain(),

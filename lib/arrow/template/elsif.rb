@@ -23,42 +23,32 @@ require 'arrow/exceptions'
 require 'arrow/utils'
 require 'arrow/template/nodes'
 
-module Arrow
-class Template
+### The class which defines the behaviour of the 'elsif' template directive.
+class Arrow::Template::ElsifDirective < Arrow::Template::AttributeDirective
+	include Arrow::Template::ConditionalDirective
 
-	### The class which defines the behaviour of the 'elsif' template directive.
-	class ElsifDirective < Arrow::Template::AttributeDirective
-		include Arrow::Template::ConditionalDirective
+	# SVN Revision
+	SVNRev = %q$Rev$
+	
+	# SVN Id
+	SVNId = %q$Id$
+	
 
-		# SVN Revision
-		SVNRev = %q$Rev$
-		
-		# SVN Id
-		SVNId = %q$Id$
-		
-		# SVN URL
-		SVNURL = %q$URL$
+	#############################################################
+	###	I N S T A N C E   M E T H O D S
+	#############################################################
 
-
-		#############################################################
-		###	I N S T A N C E   M E T H O D S
-		#############################################################
-
-		### Create a new Arrow::Template::ElsifDirective object.
-		def initialize( body, parser, state )
-			unless state.currentBranchNode.is_a?( ConditionalDirective )
-				raise Arrow::TemplateError,
-					"elsif outside of conditional directive (%p)" %
-					state.currentBranchNode
-			end
-				
-			super
+	### Create a new Arrow::Template::ElsifDirective object.
+	def initialize( body, parser, state )
+		unless state.current_branch_node.is_a?( Arrow::Template::ConditionalDirective )
+			raise Arrow::TemplateError,
+				"elsif outside of conditional directive (%p)" %
+				state.current_branch_node
 		end
+			
+		super
+	end
 
 
-	end # class Elsif
-
-end # class Template
-end # module Arrow
-
+end # class Arrow::Template::Elsif
 

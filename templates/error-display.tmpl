@@ -11,13 +11,13 @@
 	<title>Error</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Script-Type" content="text/javascript" />
-	<link rel="stylesheet" type="text/css" href="/stylesheets/arrow.css" />
+	<link rel="stylesheet" type="text/css" href="/css/arrow.css" />
   </head>
   <body>
 
 	<h1>Error</h1>
 	<p>An error (<?call err.class.name?>) occurred in the '<?call
-	  re.appletclass.signature.name ?>' applet.</p>
+	  applet.signature.name ?>' applet.</p>
 
 	<h2><strong><?escape err.message?></strong></h2>
 	<pre><?escape err.backtrace.join("\n") ?></pre>
@@ -30,16 +30,16 @@
 		  <td><tt><?escape txn.inspect ?></tt></td>
 		</tr>
 		<tr class="even-row">
-		  <th class="row-title">appRoot</th>
-		  <td><tt><?escape txn.appRoot.inspect ?></tt></td>
+		  <th class="row-title">app_root</th>
+		  <td><tt><?escape txn.app_root.inspect ?></tt></td>
 		</tr>
 		<tr class="odd-row">
-		  <th class="row-title">action</th>
-		  <td><tt><?escape txn.action.inspect ?></tt></td>
+		  <th class="row-title">applet</th>
+		  <td><tt><?escape applet.inspect ?></tt></td>
 		</tr>
 		<tr class="even-row">
-		  <th class="row-title">appletPath</th>
-		  <td><tt><?escape txn.appletPath.inspect ?></tt></td>
+		  <th class="row-title">applet_path</th>
+		  <td><tt><?escape txn.applet_path.inspect ?></tt></td>
 		</tr>
 		<tr class="odd-row">
 		  <th class="row-title">vargs</th>

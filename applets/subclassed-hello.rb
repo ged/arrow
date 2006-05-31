@@ -13,7 +13,7 @@
 # 
 
 begin
-	basedir = File::dirname(__FILE__)
+	basedir = File.dirname(__FILE__)
 	$LOAD_PATH.unshift( basedir ) unless $LOAD_PATH.include?( basedir )
 end
 
@@ -30,8 +30,6 @@ class SubclassedHello < SuperHello
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 	# Applet signature
 	Signature = {

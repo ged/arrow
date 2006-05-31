@@ -12,7 +12,7 @@ class Hello < Arrow::Applet
 		:name => "Hello World",
 		:description => "This is yet another implementation of Hello World",
 		:maintainer => "ged@FaerieMUD.org",
-		:defaultAction => 'greet',
+		:default_action => 'greet',
 	}
 
 	# Define the 'greet' (default) action

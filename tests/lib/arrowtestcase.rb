@@ -20,7 +20,7 @@
 #
 #		def test_00_something
 #			obj = nil
-#			assert_nothing_raised { obj = MySomething::new }
+#			assert_nothing_raised { obj = MySomething.new }
 #			assert_instance_of MySomething, obj
 #			assert_respond_to :myMethod, obj
 #		end
@@ -34,7 +34,7 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# Copyright (c) 2003, 2004 RubyCrafters, LLC.
+# Copyright (c) 2003, 2004, 2006 RubyCrafters, LLC.
 # 
 # This work is licensed under the Creative Commons Attribution License. To view
 # a copy of this license, visit http://creativecommons.org/licenses/by/1.0 or
@@ -43,7 +43,7 @@
 #
 # 
 
-basedir = File::dirname(File::dirname( __FILE__ ))
+basedir = File.dirname(File.dirname( __FILE__ ))
 $LOAD_PATH.unshift "#{basedir}/ext", "#{basedir}/lib" unless
 	$LOAD_PATH.include?( "#{basedir}/lib" )
 
@@ -59,32 +59,21 @@ rescue LoadError
 end
 
 require 'test/unit'
-require 'test/unit/mock'
 require 'test/unit/assertions'
 require 'test/unit/util/backtracefilter'
 
+require 'flexmock'
+
 require 'net/http'
 require 'filewhich'
-require 'apacheserver'
-require 'apacheconfig'
+require 'apacheconstants'
 
 require 'arrow/exceptions'
 require 'arrow/mixins'
 require 'arrow/logger'
 require 'arrow/object'
-
-if $Apache
-	begin
-		require 'arrow/broker'
-		require 'arrow/dispatcher'
-	rescue LoadError => err
-		$stderr.puts "Warning: Broker and/or Dispatcher did not load.\n" \
-		"Disabling tests which require a functional Apache httpd...\n"
-		$stderr.puts "\t" + err.message + "\n\t" + err.backtrace.join( "\n\t" ) if
-			$VERBOSE || $DEBUG
-		$Apache = false
-	end
-end
+require 'arrow/broker'
+require 'arrow/dispatcher'
 
 require 'arrow/applet'
 require 'arrow/datasource'
@@ -127,7 +116,7 @@ class Arrow::TestCase < Test::Unit::TestCase
 
 	### Inheritance callback -- adds @setupMethods and @teardownMethods ivars
 	### and accessors to the inheriting class.
-	def self::inherited( klass )
+	def self.inherited( klass )
 		klass.module_eval {
 			@setupMethods = []
 			@teardownMethods = []
@@ -143,7 +132,7 @@ class Arrow::TestCase < Test::Unit::TestCase
 	### Returns a String containing the specified ANSI escapes suitable for
 	### inclusion in another string. The <tt>attributes</tt> should be one
 	### or more of the keys of AnsiAttributes.
-	def self::ansiCode( *attributes )
+	def self.ansiCode( *attributes )
 		return '' unless /(?:xterm(?:-color)?|eterm|linux)/i =~ ENV['TERM']
 
 		attr = attributes.collect {|a|
@@ -159,7 +148,7 @@ class Arrow::TestCase < Test::Unit::TestCase
 
 	### Output the specified <tt>msgs</tt> joined together to
 	### <tt>STDERR</tt> if <tt>$DEBUG</tt> is set.
-	def self::debugMsg( *msgs )
+	def self.debugMsg( *msgs )
 		return unless $DEBUG
 		self.message "%sDEBUG>>> %s %s" %
 			[ ansiCode('dark', 'white'), msgs.join(''), ansiCode('reset') ]
@@ -168,13 +157,13 @@ class Arrow::TestCase < Test::Unit::TestCase
 
 	### Output the specified <tt>msgs</tt> joined together to
 	### <tt>STDOUT</tt>.
-	def self::message( *msgs )
+	def self.message( *msgs )
 		$stderr.puts msgs.join('')
 		$stderr.flush
 	end
 
 	### Append a setup block for the current testcase
-	def self::addSetupBlock( &block )
+	def self.addSetupBlock( &block )
 		@@methodCounter += 1
 		newMethodName = "setup_#{@@methodCounter}".intern
 		define_method( newMethodName, &block )
@@ -183,7 +172,7 @@ class Arrow::TestCase < Test::Unit::TestCase
 
 
 	### Prepend a teardown block for the current testcase
-	def self::addTeardownBlock( &block )
+	def self.addTeardownBlock( &block )
 		@@methodCounter += 1
 		newMethodName = "teardown_#{@@methodCounter}".intern
 		define_method( newMethodName, &block )
@@ -195,35 +184,6 @@ class Arrow::TestCase < Test::Unit::TestCase
 	###	I N S T A N C E   M E T H O D S
 	#############################################################
 
-	### Initialization: Either prompt for or load configuration values.
-	def initialize( *args )
-	
-		if $Apache
-			# If there's no readable config file, prompt the user for configuration
-			# values and make sure the logs are present and empty.
-			unless File::readable?( ConfigSaveFile )
-				File::open(ConfigSaveFile, File::CREAT|File::TRUNC|File::WRONLY) {|ofh|
-					config = self.promptForConfigValues()
-					Marshal::dump( config, ofh )
-				}
-				Dir::mkdir( "tests/logs" ) unless File::directory?( "tests/logs" )
-				zerofile( "tests/logs/error_log" )
-				zerofile( "tests/logs/access_log" )
-			end
-			
-			File::open( ConfigSaveFile, File::RDONLY ) {|ifh|
-				@config = Marshal::load( ifh )
-			}
-		else
-			@config = nil
-		end
-		
-		super
-	rescue => e
-		File::unlink( ConfigSaveFile ) if File::exists?( ConfigSaveFile )
-		Kernel::raise( e )
-	end
-	 
 
 	######
 	public
@@ -302,7 +262,7 @@ class Arrow::TestCase < Test::Unit::TestCase
 			/assert_hash_equal/ =~ frame
 		}
 		firstIdx = (err.backtrace.rindex( cutframe )||0) + 1
-		Kernel::raise( err, err.message, err.backtrace[firstIdx..-1] )
+		Kernel.raise( err, err.message, err.backtrace[firstIdx..-1] )
 	end
 
 
@@ -364,7 +324,7 @@ class Arrow::TestCase < Test::Unit::TestCase
 			/assert_hash_equal/ =~ frame
 		}
 		firstIdx = (err.backtrace.rindex( cutframe )||0) + 1
-		Kernel::raise( err, err.message, err.backtrace[firstIdx..-1] )
+		Kernel.raise( err, err.message, err.backtrace[firstIdx..-1] )
 	end
 
 	
@@ -378,7 +338,7 @@ class Arrow::TestCase < Test::Unit::TestCase
 			/assert_not_nil/ =~ frame
 		}
 		firstIdx = (err.backtrace.rindex( cutframe )||0) + 1
-		Kernel::raise( err, err.message, err.backtrace[firstIdx..-1] )
+		Kernel.raise( err, err.message, err.backtrace[firstIdx..-1] )
 	end
 
 
@@ -391,7 +351,7 @@ class Arrow::TestCase < Test::Unit::TestCase
 			/assert_include/ =~ frame
 		}
 		firstIdx = (err.backtrace.rindex( cutframe )||0) + 1
-		Kernel::raise( err, err.message, err.backtrace[firstIdx..-1] )
+		Kernel.raise( err, err.message, err.backtrace[firstIdx..-1] )
 	end
 
 
@@ -406,7 +366,7 @@ class Arrow::TestCase < Test::Unit::TestCase
 			/assert_not_tainted/ =~ frame
 		}
 		firstIdx = (err.backtrace.rindex( cutframe )||0) + 1
-		Kernel::raise( err, err.message, err.backtrace[firstIdx..-1] )
+		Kernel.raise( err, err.message, err.backtrace[firstIdx..-1] )
 	end
 
 
@@ -422,7 +382,7 @@ class Arrow::TestCase < Test::Unit::TestCase
 			/assert_not_respond_to/ =~ frame
 		}
 		firstIdx = (err.backtrace.rindex( cutframe )||0) + 1
-		Kernel::raise( err, err.message, err.backtrace[firstIdx..-1] )
+		Kernel.raise( err, err.message, err.backtrace[firstIdx..-1] )
 	end
 
 
@@ -433,7 +393,7 @@ class Arrow::TestCase < Test::Unit::TestCase
 		sym = "@#{sym}".intern unless /^@/ =~ sym.to_s
 		msg = "Instance variable '%s'\n\tof <%s>\n\texpected to be <%s>\n" %
 			[ sym, object.inspect, value.inspect ]
-		msg += "\tbut was: <%s>" % object.instance_variable_get(sym)
+		msg += "\tbut was: <%p>" % [ object.instance_variable_get(sym) ]
 		assert_block( msg ) {
 			value == object.instance_variable_get(sym)
 		}
@@ -442,7 +402,7 @@ class Arrow::TestCase < Test::Unit::TestCase
 			/assert_ivar_equal/ =~ frame
 		}
 		firstIdx = (err.backtrace.rindex( cutframe )||0) + 1
-		Kernel::raise( err, err.message, err.backtrace[firstIdx..-1] )
+		Kernel.raise( err, err.message, err.backtrace[firstIdx..-1] )
 	end
 
 
@@ -461,7 +421,7 @@ class Arrow::TestCase < Test::Unit::TestCase
 			/assert_has_ivar/ =~ frame
 		}
 		firstIdx = (err.backtrace.rindex( cutframe )||0) + 1
-		Kernel::raise( err, err.message, err.backtrace[firstIdx..-1] )
+		Kernel.raise( err, err.message, err.backtrace[firstIdx..-1] )
 	end
 
 
@@ -478,7 +438,7 @@ class Arrow::TestCase < Test::Unit::TestCase
 			/assert_not_match/ =~ frame
 		}
 		firstIdx = (err.backtrace.rindex( cutframe )||0) + 1
-		Kernel::raise( err, err.message, err.backtrace[firstIdx..-1] )
+		Kernel.raise( err, err.message, err.backtrace[firstIdx..-1] )
 	end
 
 
@@ -495,102 +455,7 @@ class Arrow::TestCase < Test::Unit::TestCase
 			/assert_has_instance_method/ =~ frame
 		}
 		firstIdx = (err.backtrace.rindex( cutframe )||0) + 1
-		Kernel::raise( err, err.message, err.backtrace[firstIdx..-1] )
-	end
-
-
-	#################################################################
-	###	M O D _ R U B Y - S P E C I F I C   M E T H O D S
-	#################################################################
-
-	### Get an ApacheServer object configured to run mod_ruby with the current
-	### configuration
-	def getTestingServer
-		raise RuntimeError, "Apache-related tests are disabled" unless $Apache
-
-		server = ApacheServer::new
-		debugMsg "Rewriting module config lines to #{@config.inspect}..."
-		server.config[:LoadModule].each {|line|
-			line.gsub!( %r{ libexec\b}, " #{@config[:moddir]}" )
-		}
-		
-		server.config[:Listen].gsub!( /8888/, @config[:port] ) unless
-			@config[:port] == "8888"
-		
-		server.config[:RubyAddPath] = [
-			File::join(server.config[:ServerRoot], "lib"),
-			File::join(File::dirname( server.config[:ServerRoot] ), "lib"),
-		]
-		
-		debugMsg "Returning mod_ruby-enabled server object: \n#{server.inspect}"
-		
-		return server
-	end
-
-
-	### Clean up the files created for the the testing server if the test passed
-	### and shut the server down if it's still running. If $DEBUG is set, just
-	### rename it to something unique.
-	def cleanupServer( server )
-		raise RuntimeError, "Apache-related tests are disabled" unless $Apache
-
-		if defined?(server) && passed? && File::exists?(server.config_file)
-			if $DEBUG
-				time = Time::now
-				File::link server.config_file, "%s.%s.%s" %
-					[ server.config_file, time.tv_sec, time.tv_usec ]
-			end
-
-			debugMsg "Removing config file %s" % server.config_file
-			File::delete( server.config_file )
-		end
-
-		server.stop if server.running?
-	end
-
-
-	### Prompt the user with the given <tt>promptString</tt> via #prompt, or
-	### #promptWithDefault if a default is given, and return the answer after
-	### testing to make sure it's been filled. If it has not, a RuntimeError is
-	### raised.
-	def promptForRequiredValue( promptString, default=nil )
-		res = nil
-		
-		if default
-			res = promptWithDefault( promptString, default )
-		else
-			res = prompt( promptString )
-		end
-		
-		if res.nil? || res.empty?
-			raise RuntimeError,
-				"Cannot test: missing required config value"
-		end
-		
-		return res
-	end
-
-
-	### Prompt for configuration values
-	def promptForConfigValues
-		config = {}
-	
-		config[:httpd] = 
-			promptForRequiredValue( "Path to the Apache httpd binary",
-									File::which('httpd') )
-		$stderr.puts "Fetching directory layout from #{config[:httpd]}"
-		
-		root = IO::popen( "#{config[:httpd]} -V", "r" ).find {|line|
-			/HTTPD_ROOT/ =~ line
-		}.gsub(	%r{.*HTTPD_ROOT="([^"]+)".*}, "\\1" ).chomp  #" #(for font-lock)
-									
-		config[:moddir] =
-			promptForRequiredValue( "Apache module directory", "#{root}/libexec" )
-
-		config[:port] =
-			promptForRequiredValue( "Testing port", "8888" )
-
-		return config
+		Kernel.raise( err, err.message, err.backtrace[firstIdx..-1] )
 	end
 
 
@@ -657,8 +522,8 @@ class Arrow::TestCase < Test::Unit::TestCase
 
 	### Touch a file and truncate it to 0 bytes
 	def zerofile( filename )
-		File::open( filename, File::WRONLY|File::CREAT ) {}
-		File::truncate( filename, 0 )
+		File.open( filename, File::WRONLY|File::CREAT ) {}
+		File.truncate( filename, 0 )
 	end
 
 
@@ -669,9 +534,9 @@ class Arrow::TestCase < Test::Unit::TestCase
 		# Support debugging for individual tests
 		olddb = nil
 		if $DebugPattern && $DebugPattern =~ @method_name
-			Arrow::Logger::global.outputters <<
-				Arrow::Logger::Outputter::create( 'file', $stderr, "STDERR" )
-			Arrow::Logger::global.level = :debug
+			Arrow::Logger.global.outputters <<
+				Arrow::Logger::Outputter.create( 'file', $stderr, "STDERR" )
+			Arrow::Logger.global.level = :debug
 
 			olddb = $DEBUG
 			$DEBUG = true
@@ -681,7 +546,7 @@ class Arrow::TestCase < Test::Unit::TestCase
 
 		unless olddb.nil?
 			$DEBUG = olddb 
-			Arrow::Logger::global.outputters.clear
+			Arrow::Logger.global.outputters.clear
 		end
 	end
 

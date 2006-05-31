@@ -3,7 +3,7 @@
 # Unit test for the Arrow::Logger class
 # $Id$
 #
-# Copyright (c) 2003, 2005 RubyCrafters, LLC. Most rights reserved.
+# Copyright (c) 2003, 2005, 2006 RubyCrafters, LLC. Most rights reserved.
 # 
 # This work is licensed under the Creative Commons Attribution-ShareAlike
 # License. To view a copy of this license, visit
@@ -13,8 +13,8 @@
 # 
 
 unless defined? Arrow::TestCase
-	testsdir = File::dirname( File::expand_path(__FILE__) )
-	basedir = File::dirname( testsdir )
+	testsdir = File.dirname( File.expand_path(__FILE__) )
+	basedir = File.dirname( testsdir )
 	$LOAD_PATH.unshift "#{basedir}/lib" unless
 		$LOAD_PATH.include?( "#{basedir}/lib" )
 	$LOAD_PATH.unshift "#{basedir}/tests/lib" unless
@@ -28,7 +28,7 @@ require 'arrow/logger'
 
 module Arrow
 
-	class TestObject < Arrow::Object
+	module LogDelegators
 		def debugLog( msg )
 			self.log.debug( msg )
 		end
@@ -62,23 +62,31 @@ module Arrow
 		end
 	end
 
+	class TestObject < Arrow::Object
+		include LogDelegators
+	end
+	
+	class TestObject::SubObject < Arrow::Object
+		include LogDelegators
+	end
+
 
 	class TestOutputter < Arrow::Logger::Outputter
 		def initialize
-			@outputCalls = []
+			@output_calls = []
 			@output = ''
 			super( "Testing outputter" )
 		end
 
-		attr_reader :outputCalls, :output
+		attr_reader :output_calls, :output
 
 		def write( *args )
-			@outputCalls << args
+			@output_calls << args
 			super {|msg| @output << msg}
 		end
 
 		def clear
-			@outputCalls.clear
+			@output_calls.clear
 			@output = ''
 		end
 	end
@@ -117,7 +125,7 @@ module Arrow
 		def test_outputter_attached_to_global_logger_outputs_for_global_messages
 			rval = nil
 
-			testOp = TestOutputter::new
+			testOp = TestOutputter.new
 			assert_nothing_raised do
 				Arrow::Logger.global.outputters << testOp
 			end
@@ -134,7 +142,7 @@ module Arrow
 		def test_messages_to_global_logger_heed_global_loggers_level
 			rval = nil
 
-			testOp = TestOutputter::new
+			testOp = TestOutputter.new
 			Arrow::Logger.global.outputters << testOp
 
 			LogLevels.each_with_index do |level, lvl_i|
@@ -144,7 +152,7 @@ module Arrow
 					Arrow::Logger.send( msglevel, "test message" )
 
 					if msg_i < lvl_i
-						assert testOp.outputCalls.empty?,
+						assert testOp.output_calls.empty?,
 							"Expected no output calls for a %p message at %p level" %
 							[ msglevel, level ]
 					else
@@ -159,7 +167,7 @@ module Arrow
 
 		def test_arrow_objects_return_their_logger_object
 			rval = nil
-			testobj = TestObject::new
+			testobj = TestObject.new
 
 			assert_nothing_raised do
 				rval = testobj.send( :log )
@@ -171,8 +179,8 @@ module Arrow
 
 
 		def test_outputter_attached_to_global_logger_outputs_for_instance_messages
-			testObj = TestObject::new
-			testOp = TestOutputter::new
+			testObj = TestObject.new
+			testOp = TestOutputter.new
 
 			Arrow::Logger.global.outputters << testOp
 
@@ -186,6 +194,70 @@ module Arrow
 		end
 
 
+		def test_readable_name_should_return_name_derived_from_logged_class
+			logger = Arrow::Logger[ TestObject ]
+			rval = nil
+
+			assert_nothing_raised do
+				rval = logger.readable_name
+			end
+
+			assert_equal "Arrow::TestObject", rval
+		end
+
+
+		def test_readable_name_should_return_global_for_global_logger
+			logger = Arrow::Logger.global
+			rval = nil
+
+			assert_nothing_raised do
+				rval = logger.readable_name
+			end
+
+			assert_equal "(global)", rval
+		end
+
+
+		def test_readable_level_should_return_the_symbol_for_current_level
+			logger = Arrow::Logger[ TestObject ]
+			logger.level = :notice
+			rval = nil
+
+			assert_nothing_raised do
+				rval = logger.readable_level
+			end
+
+			assert_equal :notice, rval
+		end
+
+		
+		def test_messages_sent_at_lower_level_than_logger_level_dont_output_anything
+			testObject = TestObject.new
+			testObject2 = TestObject::SubObject.new
+			testOp = TestOutputter.new
+			
+			Arrow::Logger.global.outputters << testOp
+			
+			Arrow::Logger[ TestObject ].level = :notice
+			Arrow::Logger[ TestObject::SubObject ].level = :info
+			
+			[ testObject, testObject2 ].each do |obj|
+				obj.debugLog( "debug" )
+				obj.infoLog( "info" )
+				obj.noticeLog( "notice" )
+				obj.critLog( "crit" )
+			end
+			
+			calls = testOp.output_calls
+			
+			assert_equal 5, calls.length, 
+				"Output calls = %p" % [calls]
+			assert_equal :notice, calls[0][1]
+			assert_equal :crit, calls[1][1]
+			assert_equal :info, calls[2][1]
+			assert_equal :notice, calls[3][1]
+			assert_equal :crit, calls[4][1]
+		end
 	end
 end
 

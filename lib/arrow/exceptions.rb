@@ -38,7 +38,7 @@ module Arrow
 	### with the specified <tt>message</tt>. The new exception class will
 	### inherit from the specified <tt>superclass</tt>, if specified, or
 	### <tt>StandardError</tt> if not specified.
-	def Arrow::def_exception( name, message, superclass=Arrow::Exception )
+	def Arrow.def_exception( name, message, superclass=Arrow::Exception )
 		name = name.id2name if name.kind_of?( Fixnum )
 		eClass = Class.new( superclass )
 		eClass.module_eval %Q{

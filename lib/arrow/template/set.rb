@@ -25,81 +25,73 @@
 
 require 'arrow/template/nodes'
 
-module Arrow
-class Template
+### The class which defines the behaviour of the 'set' template directive.
+class Arrow::Template::SetDirective < Arrow::Template::Directive
 
-	### The class which defines the behaviour of the 'set' template directive.
-	class SetDirective < Arrow::Template::Directive
+	# SVN Revision
+	SVNRev = %q$Rev$
+	
+	# SVN Id
+	SVNId = %q$Id$
+	
 
-		# SVN Revision
-		SVNRev = %q$Rev$
-		
-		# SVN Id
-		SVNId = %q$Id$
-		
-		# SVN URL
-		SVNURL = %q$URL$
+	### Create and return a new Arrow::Template::SetDirective object.
+	def initialize( type, parser, state )
+		@name = nil
+		@value = nil
 
-		### Create and return a new Arrow::Template::SetDirective object.
-		def initialize( type, parser, state )
-			@name = nil
-			@value = nil
+		super
+	end
 
-			super
+
+	######
+	public
+	######
+
+	# The name of the definition set by this directive.
+	attr_reader :name
+
+	# The raw (unevaluated) value of the definition
+	attr_reader :value
+
+
+	### Render the directive. This adds the defined variable to the
+	### +template+'s rendering +scope+ and returns an empty string (or a
+	### comment if +:debuggingComments+ is turned on in the template.
+	def render( template, scope )
+		rval = super
+
+		self.log.debug "Evaling <%s> for 'set' directive." % @value
+		template[@name] = eval( @value, scope.get_binding, __FILE__, __LINE__ )
+
+		if template._config[:debuggingComments]
+			rval << template.render_comment( "Set '%s' to '%s'" %
+				[ @name, template[@name] ] )
 		end
 
-
-		######
-		public
-		######
-
-		# The name of the definition set by this directive.
-		attr_reader :name
-
-		# The raw (unevaluated) value of the definition
-		attr_reader :value
+		return rval
+	end
 
 
-		### Render the directive. This adds the defined variable to the
-		### +template+'s rendering +scope+ and returns an empty string (or a
-		### comment if +:debuggingComments+ is turned on in the template.
-		def render( template, scope )
-			rval = super
+	#########
+	protected
+	#########
 
-			self.log.debug "Evaling <%s> for 'set' directive." % @value
-			template[@name] = eval( @value, scope.getBinding, __FILE__, __LINE__ )
+	### Parse the contents of the directive.
+	def parse_directive_contents( parser, state )
+		@name = parser.scan_for_identifier( state )
 
-			if template._config[:debuggingComments]
-				rval << template.renderComment( "Set '%s' to '%s'" %
-					[ @name, template[@name] ] )
-			end
+		state.scanner.skip( /\s*=\s*/ )
 
-			return rval
+		@value = parser.scan_for_identifier( state ) ||
+			parser.scan_for_quoted_string( state ) or
+			raise Arrow::ParseError, "No value for 'set' directive"
+
+		if (( chain = parser.scan_for_methodchain(state) ))
+			@value << chain
 		end
+	end
 
-
-		#########
-		protected
-		#########
-
-		### Parse the contents of the directive.
-		def parseDirectiveContents( parser, state )
-			@name = parser.scanForIdentifier( state )
-
-			state.scanner.skip( /\s*=\s*/ )
-
-			@value = parser.scanForIdentifier( state ) ||
-				parser.scanForQuotedString( state ) or
-				raise ParseError, "No value for 'set' directive"
-
-			if (( chain = parser.scanForMethodChain(state) ))
-				@value << chain
-			end
-		end
-
-	end # class SetDirective
-
-end # class Template
-end # module Arrow
+end # class Arrow::Template::SetDirective
 
 

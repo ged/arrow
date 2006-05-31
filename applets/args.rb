@@ -25,15 +25,12 @@ class ArgumentTester < Arrow::Applet
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
-
 	# Applet signature
 	Signature = {
 		:name => "Argument Tester",
 		:description => "This app is for testing/debugging the argument validator.",
 		:maintainer => "ged@FaerieMUD.org",
-		:defaultAction => 'display',
+		:default_action => 'display',
 		:templates => {
 			:display	=> 'args-display.tmpl',
 		},

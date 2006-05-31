@@ -26,8 +26,6 @@ class AppletViewer < Arrow::Applet
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 	# Width of tabs in prettified code
 	DefaultTabWidth = 4
@@ -38,7 +36,7 @@ class AppletViewer < Arrow::Applet
 		:description => "An introspection applet that can be used to view the " +
 			"code for Arrow applets in a running Arrow application.",
 		:maintainer => "ged@FaerieMUD.org",
-		:defaultAction => 'display',
+		:default_action => 'display',
 		:templates => {
 			:display	=> 'view-applet.tmpl',
 			:nosuch		=> 'view-applet-nosuch.tmpl',
@@ -72,31 +70,30 @@ class AppletViewer < Arrow::Applet
 		# Pick out the applet to view from the URI, if present
 		templ = nil
 		uri = appleturi.join( "/" )
-		re = txn.broker.registry[ uri ]
+		applet = txn.broker.registry[ uri ]
 
-		# If the URI matched a loaded registry entry, display the source for the
-		# applet it contains.
-		if re
+		# If the URI matched a loaded applet, display its source
+		if applet
 
 			# The applet's class knows from whence it was loaded.
-			fn = re.appletclass.filename
+			fn = applet.class.filename
 			fn.untaint
 
 			# Plug the loaded values into the template
-			templ = self.loadTemplate( :display )
-			templ.re = re
+			templ = self.load_template( :display )
+			templ.displayed_applet = applet
 			templ.filename = fn
 
 			# Read the code. This will later undergo some sort of greater
 			# fancification.
-			code = File::read( fn )
+			code = File.read( fn )
 			templ.code = self.format_code( code )
 			
 		else
 
 			# If there wasn't an applet to load, load the generic "oops"
 			# template and plug a message in.
-			templ = self.loadTemplate( :nosuch )
+			templ = self.load_template( :nosuch )
 			templ.message = "Invalid or missing applet URI"
 		end
 

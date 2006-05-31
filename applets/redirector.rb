@@ -25,8 +25,6 @@ class RedirectorApplet < Arrow::Applet
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 	# The default URI to redirect to
 	DefaultURI = "status"
@@ -37,7 +35,7 @@ class RedirectorApplet < Arrow::Applet
 		:name => "Redirector",
 		:description => "It's only a demonstration of the Transaction's #redirect method.",
 		:maintainer => "ged@FaerieMUD.org",
-		:defaultAction => 'redirect',
+		:default_action => 'redirect',
 	}
 
 
@@ -51,7 +49,7 @@ class RedirectorApplet < Arrow::Applet
 			self.signature.name 
 
 		uri = args.empty? ? DefaultURI : args.join("/")
-		return txn.redirect( txn.appRoot + "/" + uri )
+		return txn.redirect( txn.app_root + "/" + uri )
 	end
 	alias_method :action_missing_action, :redirect_action
 

@@ -6,7 +6,7 @@
 #
 
 BEGIN {
-	base = File::dirname( File::dirname(File::expand_path(__FILE__)) )
+	base = File.dirname( File.dirname(File.expand_path(__FILE__)) )
 	$LOAD_PATH.unshift "#{base}/lib"
 
 	require "#{base}/utils.rb"
@@ -25,7 +25,7 @@ end
 rval = nil
 filename = "experiments/loadme.rb"
 try( "loader" ) {
-	source = File::read( filename )
+	source = File.read( filename )
 	rval = load_class( source, filename )
 }
 

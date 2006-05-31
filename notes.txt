@@ -11,7 +11,7 @@ URL specifiers:
 
 Example code:
 
-   data = DataSource::new( url )
+   data = DataSource.new( url )
    template.meows = data.size
      - or -
    template.meows = data["size"]
@@ -45,7 +45,7 @@ Application Example/Prototype
                     :constraint => 0..340,
                 },
             },
-			:defaultAction		=> 'display',
+			:default_action		=> 'display',
             :templates          => {
                 :main => 'main.templ',
             },
@@ -77,7 +77,7 @@ Application Example/Prototype
         }
 
 
-        action( 'display' ) {|tr|
+        def_action :display do |tr|
             Monitor[self].cumulativeRuntime.time do
                 char = tr.vargs[:char] || 'x'
                 char_page = self.make_character_page( char )
@@ -85,7 +85,7 @@ Application Example/Prototype
 
                 tr.request << tr.templates[:main]
             end
-        }
+        end
 
 
         def make_character_page( char )

@@ -27,8 +27,6 @@ class RandomImages < Arrow::Applet
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 	# Default feed URL if none is configured
 	DefaultFeedUrl = 'http://www.livejournal.com/stats/latest-img.bml'
@@ -48,7 +46,7 @@ class RandomImages < Arrow::Applet
 	}x
 
 	# Image struct
-	Image = Struct::new( :src, :href )
+	Image = Struct.new( :src, :href )
 
 	# Default number of images to display from the feed at a time
 	DefaultImageCount = 15
@@ -59,7 +57,7 @@ class RandomImages < Arrow::Applet
 		:description => "Shows the 'latest images' feed from LiveJournal as " +
 			"a page full of clickable links.",
 		:maintainer => "ged@FaerieMUD.org",
-		:defaultAction => 'display',
+		:default_action => 'display',
 		:templates => {
 			:display	=> 'rndimages.tmpl',
 		}
@@ -77,10 +75,10 @@ class RandomImages < Arrow::Applet
 		end
 
 		feeduri ||= DefaultFeedUrl
-		@feeduri = URI::parse( feeduri )
+		@feeduri = URI.parse( feeduri )
 
 		@cache_seconds ||= DefaultCacheSeconds
-		@cache_expiry = Time::at( 0 )
+		@cache_expiry = Time.at( 0 )
 		@count ||= DefaultImageCount
 		@images = []
 	end
@@ -91,12 +89,12 @@ class RandomImages < Arrow::Applet
 	public
 	######
 
-	action( 'display' ) {|txn, *args|
-		if @cache_expiry < Time::now
+	def_action :display do |txn, *args|
+		if @cache_expiry < Time.now
 			self.log.debug "Cached images expired at %s: Fetching new list" %
 				[ @cache_expiry ]
 			@images = self.build_imagelist( @feeduri )
-			@cache_expiry = Time::now + @cache_seconds
+			@cache_expiry = Time.now + @cache_seconds
 		end
 
 		imgslice = []
@@ -105,13 +103,13 @@ class RandomImages < Arrow::Applet
 			imgslice.uniq!
 		end
 
-		tmpl = self.loadTemplate( :display )
+		tmpl = self.load_template( :display )
 		tmpl.txn = txn
 		tmpl.app = self
 		tmpl.images = @images.values_at( *imgslice )
 
 		return tmpl
-	}
+	end
 
 
 
@@ -134,7 +132,7 @@ class RandomImages < Arrow::Applet
 	def fetch_imagefeed( uri )
 		res = nil
 
-		Net::HTTP::start( uri.host, uri.port ) do |http|
+		Net::HTTP.start( uri.host, uri.port ) do |http|
 			res = http.get( uri.path )
 		end
 
@@ -154,7 +152,7 @@ class RandomImages < Arrow::Applet
 
 		rawdata.scan( RecentImagePattern ) do |match|
 			self.log.debug "Matched image tag: %p" % match
-			images << Image::new( $1, $2 )
+			images << Image.new( $1, $2 )
 		end
 
 		self.log.debug "Parsed images: %p ..." % images[0..3]

@@ -42,9 +42,6 @@ class Template
 		# SVN Id
 		SVNId = %q$Id$
 		
-		# SVN URL
-		SVNURL = %q$URL$
-
 		
 		### Render the content and return it as HTML-escaped text.
 		def render( template, scope )
@@ -57,7 +54,7 @@ class Template
 			end
 
 			rawary.each {|line|
-				rary << line.
+				rary << line.to_s.
 					gsub( /&/, '&amp;' ).
 					gsub( /</, '&lt;' ).
 					gsub( />/, '&gt;' )

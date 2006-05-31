@@ -28,7 +28,7 @@
 #
 #	# Create a validator object and pass in a hash of request parameters and the
 #	# profile hash.
-#   validator = Arrow::FormValidator::new
+#   validator = Arrow::FormValidator.new
 #	validator.validate( req_params, profile )
 #
 #	# Now if there weren't any errors, send the success page
@@ -38,7 +38,7 @@
 #	# Otherwise fill in the error template with auto-generated error messages
 #	# and return that instead.
 #	else
-#		failure_template.errors( validator.errorMessages )
+#		failure_template.errors( validator.error_messages )
 #		return failure_template
 #	end
 #
@@ -52,6 +52,31 @@
 # 
 #:include: COPYRIGHT
 #
+# Portions of this file are from Ruby on Rails' CGIMethods class from the
+# action_controller:
+#   
+#   Copyright (c) 2004 David Heinemeier Hansson
+#   
+#   Permission is hereby granted, free of charge, to any person obtaining
+#   a copy of this software and associated documentation files (the
+#   "Software"), to deal in the Software without restriction, including
+#   without limitation the rights to use, copy, modify, merge, publish,
+#   distribute, sublicense, and/or sell copies of the Software, and to
+#   permit persons to whom the Software is furnished to do so, subject to
+#   the following conditions:
+#   
+#   The above copyright notice and this permission notice shall be
+#   included in all copies or substantial portions of the Software.
+#   
+#   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+#   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+#   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+#   NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+#   LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+#   OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+#   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#   
+# 
 #---
 #
 # Please see the file COPYRIGHT in the 'docs' directory for licensing details.
@@ -82,10 +107,11 @@ module FormValidator::ConstraintHelpers # :nodoc:
     end
 end
 
-
 ### Add some Hash-ish methods for convenient access to FormValidator#valid.
 class Arrow::FormValidator < ::FormValidator
 	extend Forwardable
+	include Arrow::Loggable
+	
 	
 	# SVN Revision
 	SVNRev = %q$Rev$
@@ -93,14 +119,15 @@ class Arrow::FormValidator < ::FormValidator
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
+	Defaults = {
+		:descriptions => {},
+	}
 
 
 	### Create a new Arrow::FormValidator object.
-	def initialize( profile=nil )
-		super
-		@descriptions = {}
+	def initialize( profile, params=nil )
+		@profile = Defaults.merge( profile )
+		validate( params ) if params
 	end
 
 
@@ -108,19 +135,37 @@ class Arrow::FormValidator < ::FormValidator
 	public
 	######
 
-	# Hash of field descriptions
-	attr_reader :descriptions
-
 	### Delegate Hash methods to the valid form variables hash
 	def_delegators :@form,
-		*(Hash::public_instance_methods(false) - ['[]', '[]=', 'inspect'])
+		*(Hash.public_instance_methods(false) - ['[]', '[]=', 'inspect'])
 
 
-	### Validate the input in +params+ against the given +profile+. Overridden
-	### because the original chokes on unknown fields.
-	def validate( params, profile )
-		@descriptions = profile.delete( :descriptions ) || {}
-		super
+	### Hash of field descriptions
+	def descriptions
+		@profile[:descriptions]
+	end
+
+
+	### Set hash of field descriptions
+	def descriptions=( new_descs )
+		@profile[:descriptions] = new_descs
+	end
+
+
+	### Validate the input in +params+. If the optional +additional_profile+ is
+	### given, merge it with the validator's default profile before validating.
+	def validate( params, additional_profile=nil )
+		if additional_profile
+			self.log.debug "Merging additional profile %p" % [additional_profile]
+			@profile.merge!( additional_profile ) 
+		end
+
+		super( params, @profile )
+	end
+
+
+	### Overridden to remove the check for extra keys.
+	def check_profile_syntax( profile )
 	end
 
 
@@ -162,23 +207,32 @@ class Arrow::FormValidator < ::FormValidator
 	end
 
 
+	### Return an array of field names which had some kind of error associated
+	### with them.
+	def error_fields
+		return self.missing | self.invalid
+	end
+	
+
 	### Return an error message for each missing or invalid field; if
 	### +includeUnknown+ is +true+, also include messages for unknown fields.
-	def errorMessages( includeUnknown=false )
+	def error_messages( includeUnknown=false )
+		self.log.debug "Building error messages from descriptions: %p" %
+			[ @profile[:descriptions] ]
 		msgs = []
 		self.missing.each do |field|
-			desc = @descriptions[ field.to_s.intern ] || field
-			msgs << "Missing required field '#{desc}'"
+			desc = @profile[:descriptions][ field.to_s ] || field
+			msgs << "Missing value for '#{desc}'"
 		end
 
 		self.invalid.each do |field, constraint|
-			desc = @descriptions[ field.to_s.intern ] || field
+			desc = @profile[:descriptions][ field.to_s ] || field
 			msgs << "Invalid value for field '#{desc}'"
 		end
 
 		if includeUnknown
 			self.unknown.each do |field|
-				desc = @descriptions[ field.to_s.intern ] || field
+				desc = @profile[:descriptions][ field.to_s ] || field
 				msgs << "Unknown field '#{desc}'"
 			end
 		end
@@ -187,17 +241,72 @@ class Arrow::FormValidator < ::FormValidator
 	end
 
 
-	# Returns a distinct list of missing fields. Overridden to eliminate the
-	# "undefined method `<=>' for :foo:Symbol" error.
+	### Returns a distinct list of missing fields. Overridden to eliminate the
+	### "undefined method `<=>' for :foo:Symbol" error.
 	def missing
 		@missing_fields.uniq.sort_by {|f| f.to_s}
 	end
 	
-	# Returns a distinct list of unknown fields.
+	### Returns a distinct list of unknown fields.
 	def unknown
 		(@unknown_fields - @invalid_fields.keys).uniq.sort_by {|f| f.to_s}
 	end
 
+
+	### Returns the valid fields after expanding Rails-style
+	### 'customer[address][street]' variables into multi-level hashes.
+	def valid
+		if @parsed_params.nil?
+			@parsed_params = {}
+			valid = super()
+
+			for key, value in valid
+				value = [value] if key =~ /.*\[\]$/
+				unless key.include?( '[' )
+					@parsed_params[ key ] = value
+				else
+					build_deep_hash( value, @parsed_params, get_levels(key) )
+				end
+			end
+		end
+
+		return @parsed_params
+	end
+
+
+	### Constraint methods
+	
+	### Constrain a value to +true+ and +false+.
+	def match_boolean( val )
+		rval = nil
+		if ( val =~ /^(t(?:rue)?|y(?:es)?)$/i )
+			rval = true
+		elsif ( val =~ /^(no?|f(?:alse)?)$/i )
+			rval = false
+		end
+		
+		return rval
+	end
+
+
+	# Applies a builtin constraint to form[key]
+	def apply_string_constraint(key, constraint)
+		# FIXME: multiple elements
+		res = self.__send__( "match_#{constraint}", @form[key].to_s )
+		unless res.nil?
+			@form[key] = res 
+			if untaint?(key)
+				@form[key].untaint
+			end
+		else
+			@form.delete(key)
+			@invalid_fields[key] ||= []
+			unless @invalid_fields[key].include?(constraint)
+				@invalid_fields[key].push(constraint) 
+			end
+			nil
+		end
+	end
 
 
 	#######
@@ -211,6 +320,35 @@ class Arrow::FormValidator < ::FormValidator
 			m = (Array === m) ? strify_array(m) : m
 			m = (Hash === m) ? strify_hash(m) : m
 			Symbol === m ? m.to_s : m
+		end
+	end
+
+
+	### Build a deep hash out of the given parameter +value+
+	def build_deep_hash( value, hash, levels )
+		if levels.length == 0
+			value
+		elsif hash.nil?
+			{ levels.first => build_deep_hash(value, nil, levels[1..-1]) }
+		else
+			hash.update({ levels.first => build_deep_hash(value, hash[levels.first], levels[1..-1]) })
+		end
+	end
+
+
+	### Get the number of hash levels in the specified +key+
+	### Stolen from the CGIMethods class in Rails' action_controller.
+	PARAMS_HASH_RE = /^([^\[]+)(\[.*\])?(.)?.*$/
+	def get_levels( key )
+		all, main, bracketed, trailing = PARAMS_HASH_RE.match( key ).to_a
+		if main.nil?
+			return []
+		elsif trailing
+			return [key]
+		elsif bracketed
+			return [main] + bracketed.slice(1...-1).split('][')
+		else
+			return [main]
 		end
 	end
 

@@ -55,7 +55,7 @@ class FancyImageText < Arrow::Applet
 		:name => "imagetext",
 		:description => "Generates an image from one or more characters of text.",
 		:maintainer => "ged@FaerieMUD.org",
-		:defaultAction => 'fontlist',
+		:default_action => 'fontlist',
 		:templates => {
 			:form		  => 'imgtext/form.tmpl',
 			:fontlist	  => 'imgtext/fontlist.tmpl',
@@ -92,8 +92,8 @@ class FancyImageText < Arrow::Applet
 		@fontdir ||= DefaultFontDir
 		@defaultfont ||= DefaultFont
 
-		@background= GD::Image::trueColorAlpha( bkgnd, GD::AlphaTransparent )
-		@foreground = GD::Image::trueColorAlpha( fgnd, GD::AlphaOpaque )
+		@background= GD::Image.trueColorAlpha( bkgnd, GD::AlphaTransparent )
+		@foreground = GD::Image.trueColorAlpha( fgnd, GD::AlphaOpaque )
 		@fonts = load_fonts( @fontdir )
 
 		self.log.debug "Loaded %d fonts" % @fonts.length
@@ -138,7 +138,7 @@ class FancyImageText < Arrow::Applet
 
 	### Display a list of the available fonts.
 	def fontlist_action( txn, *rest )
-		templ = self.loadTemplate( :fontlist )
+		templ = self.load_template( :fontlist )
 		templ.txn = txn
 		templ.app = self
 		templ.fonts = @fonts
@@ -149,7 +149,7 @@ class FancyImageText < Arrow::Applet
 
 	### Reload the fonts and display what changed.
 	def reload_action( txn, *args )
-		self.log.debug "Doing reload of fonts for child %d" % [ Process::pid ]
+		self.log.debug "Doing reload of fonts for child %d" % [ Process.pid ]
 
 		newfonts = tmpl = nil
 
@@ -161,10 +161,10 @@ class FancyImageText < Arrow::Applet
 		rescue Exception => err
 			self.log.error "Caught exception while attempting to reload fonts: %s\n\t%s" %
 				[ err.message, err.backtrace.join("\n\t") ]
-			tmpl = self.loadTemplate( :reload_error )
+			tmpl = self.load_template( :reload_error )
 			tmpl.exception = err
 		else
-			tmpl = self.loadTemplate( :reload )
+			tmpl = self.load_template( :reload )
 			tmpl.newfonts = newfonts.reject {|name,font| @fonts.key?(name)}
 			tmpl.removedfonts = @fonts.reject {|name,font| newfonts.key?(name)}
 			@fonts = newfonts
@@ -189,13 +189,13 @@ class FancyImageText < Arrow::Applet
 
 		Dir["#{dir}/*.{otf,ttf}"].each {|file|
 			file.untaint
-			next unless File::file?( file ) && File::readable?( file )
+			next unless File.file?( file ) && File.readable?( file )
 			face = nil
 
 			count += 1
 			begin
-				face = FT2::Face::load( file ) or
-					raise "::load returned nil"
+				face = FT2::Face.load( file ) or
+					raise ".load returned nil"
 			rescue Exception => err
 				self.log.debug "While loading #{file}: %s" % err.message
 				next
@@ -248,7 +248,7 @@ class FancyImageText < Arrow::Applet
 		raise "No such font '#{face}'" unless @fonts.key?( face )
 		font = @fonts[ face ][:file]
 		self.log.debug "Font file is %p" % font
-		err, brect = GD::Image::stringFT( @foreground, font, pointsize, 0, 0, 0, text )
+		err, brect = GD::Image.stringFT( @foreground, font, pointsize, 0, 0, 0, text )
 		raise "Failed to calculate bounding-box for #{font}: #{err}" if err
 		self.log.debug "Bounding rect: %p" % [ brect ]
 
@@ -259,7 +259,7 @@ class FancyImageText < Arrow::Applet
 		self.log.debug "Width: %d, height: %d" % [ width, height ]
 
 		# Make the image and colors
-		img = GD::Image::newTrueColor( width, height )
+		img = GD::Image.newTrueColor( width, height )
 		self.log.debug "Created image object: %p" % [ img ]
 
 		# If the GD library has been patched to support alpha-channel PNGs, turn

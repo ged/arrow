@@ -8,20 +8,20 @@
   -->
 
   <head>
-	<title><?call txn.appletPath.capitalize?> Applet</title>
+	<title><?call txn.applet_path.capitalize?> Applet</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Script-Type" content="text/javascript" />
-	<link rel="stylesheet" type="text/css" href="/stylesheets/arrow.css" />
+	<link rel="stylesheet" type="text/css" href="/css/arrow.css" />
   </head>
   <body>
 
-	<h1><?call txn.appletPath.capitalize?> Applet</h1>
+	<h1><?call txn.applet_path.capitalize?> Applet</h1>
 
-	<p>This is the '<tt><?call txn.appletPath?></tt>' applet, which provides
+	<p>This is the '<tt><?call txn.applet_path?></tt>' applet, which provides
 	  password protection to other applets. You can make any applet
 	  password-protected by chaining it through this one. For example, if your
 	  applet had a current URI of '<tt>myapp</tt>', you could chain it through this
-	  applet by changing its URI to '<tt><?call txn.appletPath ?>/myapp</tt>'.</p>
+	  applet by changing its URI to '<tt><?call txn.applet_path ?>/myapp</tt>'.</p>
 
 	<?include navbar.incl?>
 

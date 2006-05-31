@@ -47,6 +47,7 @@ module Arrow
 	require 'arrow/broker'
 	require 'arrow/dispatcher'
 	require 'arrow/applet'
+	require 'arrow/appletregistry'
 	require 'arrow/datasource'
 	require 'arrow/monitor'
 	require 'arrow/template'
@@ -62,9 +63,10 @@ module Arrow
 	### can eliminate the startup lag for the first request each child
 	### handles. See the docs for dispatcher.rb for an example of how to use
 	### this.
-	def self::load_dispatchers( hosts_file )
+	def self.load_dispatchers( hosts_file )
+		$deferr.puts "Loading dispatchers; $SAFE is #$SAFE"
 		hosts_file.untaint
-		configs = YAML::load( File::read(hosts_file) )
+		configs = YAML.load( File.read(hosts_file) )
 
 		# Convert the keys to Symbols and the values to untainted Strings.
 		configs.each do |key,config|
@@ -75,7 +77,7 @@ module Arrow
 
 		$deferr.puts "Loading dispatchers from %p" % [configs]
 
-		return Arrow::Dispatcher::create( configs )
+		return Arrow::Dispatcher.create( configs )
 	rescue ::Exception => err
 
 		# Try to log fatal errors to both the Apache server log and a crashfile
@@ -87,13 +89,13 @@ module Arrow
 			err.backtrace.join("\n  ")
 		]
 
-		logfile = File::join( Dir::tmpdir, 'arrow-dispatcher-failure.log' )
-		File::open( logfile, IO::WRONLY|IO::TRUNC|IO::CREAT ) {|ofh|
+		logfile = File.join( Dir.tmpdir, 'arrow-dispatcher-failure.log' )
+		File.open( logfile, IO::WRONLY|IO::TRUNC|IO::CREAT ) {|ofh|
 			ofh.puts( errmsg )
 			ofh.flush
 		}
-		Apache::request.server.log_crit( errmsg )
-		Kernel::raise( err )
+		Apache.request.server.log_crit( errmsg )
+		Kernel.raise( err )
 	end
 
 end # module Arrow

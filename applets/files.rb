@@ -24,8 +24,6 @@ class LoadedFiles < Arrow::Applet
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 	# Applet signature
 	Signature = {
@@ -33,7 +31,7 @@ class LoadedFiles < Arrow::Applet
 		:description => "It displays the disposition of all the file that are" +
 			" being monitored by Arrow.",
 		:maintainer => "ged@FaerieMUD.org",
-		:defaultAction => 'filemap',
+		:default_action => 'filemap',
 		:templates => {
 			:filemap => 'filemap.tmpl',
 		}
@@ -45,12 +43,12 @@ class LoadedFiles < Arrow::Applet
 	public
 	######
 
-	action( 'filemap' ) {|txn, *args|
-		templ = self.loadTemplate( :filemap )
+	def_action :filemap do |txn, *args|
+		templ = self.load_template( :filemap )
 		templ.txn = txn
 
 		return templ
-	}
+	end
 
 
 end # class LoadedFiles

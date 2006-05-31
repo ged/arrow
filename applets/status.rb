@@ -30,8 +30,6 @@ class ServerStatus < Arrow::Applet
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 	# Applet signature
 	Signature = {
@@ -46,7 +44,7 @@ class ServerStatus < Arrow::Applet
 		},
 		:vargs => {},
 		:monitors => {},
-		:defaultAction => 'display',
+		:default_action => 'display',
 	}
 
 
@@ -54,47 +52,44 @@ class ServerStatus < Arrow::Applet
 	public
 	######
 
-	action( 'display' ) {|txn, *args|
+	def_action :display do |txn, *args|
 		self.log.debug "In the 'display' action of the '%s' applet." %
 			self.signature.name 
 
-		templ = self.loadTemplate( :status )
+		templ = self.load_template( :status )
 		templ.registry = txn.broker.registry
 		templ.transaction = txn
 		templ.txn = txn
-		templ.pid = Process::pid
-		templ.ppid = Process::ppid
+		templ.pid = Process.pid
+		templ.ppid = Process.ppid
 		templ.currentApplet = self
 
 		self.log.debug "About to return from the 'display' action."
 		return templ
-	}
+	end
 
 
-	action( 'applet' ) {|txn, *args|
+	def_action :applet do |txn, *args|
 		self.log.debug "In the 'applet' action of the '%s' applet." %
 			self.signature.name
 
-		re = txn.broker.registry[ args.join("/") ]
-		if re.nil?
+		applet = txn.broker.registry[ args.join("/") ]
+		if applet.nil?
 			self.log.error "%s: no such applet to inspect. Registry contains: %p" % 
 				[ args[0], txn.broker.registry.keys.sort ]
 			return self.run( txn, 'display' )
 		end
 
-		targetapp = re.object
-
-		templ = self.loadTemplate( :applet )
+		templ = self.load_template( :applet )
 		templ.uri = args.join("/")
-		templ.applet = targetapp
-		templ.re = re
+		templ.applet = applet
 		templ.txn = txn
-		templ.pid = Process::pid
-		templ.ppid = Process::ppid
+		templ.pid = Process.pid
+		templ.ppid = Process.ppid
 		templ.currentApplet = self
 		
 		return templ
-	}
+	end
 
 
 end # class ServerStatus

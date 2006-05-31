@@ -11,14 +11,14 @@
 	<title>Applet Viewer Applet</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Script-Type" content="text/javascript" />
-	<link rel="stylesheet" type="text/css" href="/stylesheets/arrow.css" />
+	<link rel="stylesheet" type="text/css" href="/css/arrow.css" />
   </head>
   <body>
 
-	<h1><?call re.object.signature.name?>: Source View</h1>
+	<h1><?call displayed_applet.signature.name ?>: Source View</h1>
 
-	<p>This is the source code for the <tt><?call re.object.signature.name
-	?></tt> applet, which is currently registered at <tt>/<?call re.object.uri
+	<p>This is the source code for the <tt><?call displayed_applet.signature.name
+	?></tt> applet, which is currently registered at <tt>/<?call applet.uri
 	?></tt>.</p>
 
 	<div id="applet-code">

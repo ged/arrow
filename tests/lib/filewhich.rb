@@ -7,7 +7,7 @@
 # 
 #   require 'filewhich'
 #
-#	httpd = File::which('httpd')
+#	httpd = File.which('httpd')
 # 
 # == Authors
 # 
@@ -44,21 +44,21 @@
 class File
 	Win32Exts = %w{.exe .com .bat}
 
-	def self::which( prog, path=ENV['PATH'] )
+	def self.which( prog, path=ENV['PATH'] )
 		path.split(File::PATH_SEPARATOR).each {|dir|
 			# If running under Windows, look for prog + extensions
 			if File::ALT_SEPARATOR
 				ext = Win32Exts.find_all {|ext|
-					f = File::join(dir, prog+ext)
-					File::executable?(f) && !File::directory?(f)
+					f = File.join(dir, prog+ext)
+					File.executable?(f) && !File.directory?(f)
 				}
 				ext.each {|f|
-					f = File::join( dir, prog + f ).gsub(%r:/:,'\\')
+					f = File.join( dir, prog + f ).gsub(%r:/:,'\\')
 					if block_given? then yield( f ) else return f end
 				}
 			else
-				f = File::join( dir, prog )
-				if File::executable?( f ) && ! File::directory?( f )
+				f = File.join( dir, prog )
+				if File.executable?( f ) && ! File.directory?( f )
 					if block_given? then yield(f) else return f end
 				end
 			end

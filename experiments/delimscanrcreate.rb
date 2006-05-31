@@ -11,7 +11,7 @@ require 'benchmark'
 require 'delimscanner'
 
 BEGIN {
-	base = File::dirname( File::dirname(File::expand_path(__FILE__)) )
+	base = File.dirname( File.dirname(File.expand_path(__FILE__)) )
 	$LOAD_PATH.unshift "#{base}/lib", "#{base}/redist"
 
 	require "#{base}/utils.rb"
@@ -23,14 +23,14 @@ header "DelimScanner Benchmarks"
 testString = "some testing text"
 n = 50000
 
-Benchmark::bm( 15 ) do |x|
+Benchmark.bm( 15 ) do |x|
 	scanner = nil
 	x.report("Create: ") {
 		n.times do
-			scanner = DelimScanner::new( testString )
+			scanner = DelimScanner.new( testString )
 		end
 	}
-	scanner = DelimScanner::new( testString )
+	scanner = DelimScanner.new( testString )
 	x.report("Setstring: ") {
 		n.times do
 			scanner.string = testString

@@ -20,39 +20,32 @@
 
 (>>>MARK<<<)
 
-module Arrow
+### (>>>description<<<).
+class Arrow::(>>>class<<<) < (>>>superclass<<<)
 
-	### (>>>description<<<).
-	class (>>>class<<<) < (>>>superclass<<<)
+	# SVN Revision
+	SVNRev = %q$Rev$
 
-		# SVN Revision
-		SVNRev = %q$Rev$
-
-		# SVN Id
-		SVNId = %q$Id$
-
-		# SVN URL
-		SVNURL = %q$URL$
+	# SVN Id
+	SVNId = %q$Id$
 
 
-		### Create a new Arrow::(>>>class<<<) object.
-		def initialize
-		end
+	### Create a new Arrow::(>>>class<<<) object.
+	def initialize
+	end
 
 
-		######
-		public
-		######
+	######
+	public
+	######
 
 
-		#########
-		protected
-		#########
+	#########
+	protected
+	#########
 
 
-	end # class (>>>class<<<)
-
-end # module Arrow
+end # class Arrow::(>>>class<<<)
 
 
 >>>TEMPLATE-DEFINITION-SECTION<<<

@@ -13,8 +13,8 @@
 # 
 
 unless defined? Arrow::TestCase
-	testsdir = File::dirname( File::expand_path(__FILE__) )
-	basedir = File::dirname( testsdir )
+	testsdir = File.dirname( File.expand_path(__FILE__) )
+	basedir = File.dirname( testsdir )
 	$LOAD_PATH.unshift "#{basedir}/lib" unless
 		$LOAD_PATH.include?( "#{basedir}/lib" )
 	$LOAD_PATH.unshift "#{basedir}/tests/lib" unless
@@ -29,7 +29,7 @@ require 'digest/md5'
 ### Collection of tests for the Arrow::Session::Lock class.
 class Arrow::SessionLockTestCase < Arrow::TestCase
 
-	SessionDir			= File::dirname( File::expand_path(__FILE__) ) + "/sessions"
+	SessionDir			= File.dirname( File.expand_path(__FILE__) ) + "/sessions"
 
 	LockTypes = {
 		"file:#{SessionDir}" => 'Arrow::Session::FileLock',
@@ -46,9 +46,9 @@ class Arrow::SessionLockTestCase < Arrow::TestCase
 	def initialize( *args )
 		super
 
-		ctx = Digest::MD5::new
-		ctx << Process::pid.to_s
-		ctx << Time::now.to_s
+		ctx = Digest::MD5.new
+		ctx << Process.pid.to_s
+		ctx << Time.now.to_s
 
 		@id = ctx.hexdigest
 	end
@@ -74,17 +74,17 @@ class Arrow::SessionLockTestCase < Arrow::TestCase
 
 			# Should be able to a lock
 			assert_nothing_raised do
-				rval = Arrow::Session::Lock::create( uri, @id )
+				rval = Arrow::Session::Lock.create( uri, @id )
 			end
 
 			# Lock should support locking/unlocking/predicate methods
 			assert_equal type, rval.class.name
 
 			[
-				:readLock, :writeLock, 
-				:withReadLock, :withWriteLock,
-				:locked?, :readLocked?, :writeLocked?,
-				:readUnlock, :writeUnlock, :finish
+				:read_lock, :write_lock, 
+				:with_read_lock, :with_write_lock,
+				:locked?, :read_locked?, :write_locked?,
+				:read_unlock, :write_unlock, :finish
 			].each do |meth|
 				assert_respond_to rval, meth
 			end
@@ -92,7 +92,7 @@ class Arrow::SessionLockTestCase < Arrow::TestCase
 
 		addSetupBlock {
 			@locks = LockTypes.keys.collect {|uri|
-				Arrow::Session::Lock::create( uri, @id )
+				Arrow::Session::Lock.create( uri, @id )
 			}
 		}
 		addTeardownBlock {
@@ -117,14 +117,14 @@ class Arrow::SessionLockTestCase < Arrow::TestCase
 
 			assert_nothing_raised { rval = lock.locked? }
 			assert !rval, "locked? should be false, ie., unlocked (#{locktype})"
-			assert_nothing_raised { rval = lock.readLocked? }
-			assert !rval, "readLocked? should be false, ie., unlocked (#{locktype})"
-			assert_nothing_raised { rval = lock.writeLocked? }
-			assert !rval, "writeLocked? should be false, ie., unlocked (#{locktype})"
+			assert_nothing_raised { rval = lock.read_locked? }
+			assert !rval, "read_locked? should be false, ie., unlocked (#{locktype})"
+			assert_nothing_raised { rval = lock.write_locked? }
+			assert !rval, "write_locked? should be false, ie., unlocked (#{locktype})"
 
 			# Lock should raise errors when unlocked without first being locked.
-			assert_raises( Arrow::LockingError, locktype ) { lock.readUnlock }
-			assert_raises( Arrow::LockingError, locktype ) { lock.writeUnlock }
+			assert_raises( Arrow::LockingError, locktype ) { lock.read_unlock }
+			assert_raises( Arrow::LockingError, locktype ) { lock.write_unlock }
 		end
 	end
 
@@ -138,22 +138,22 @@ class Arrow::SessionLockTestCase < Arrow::TestCase
 		@locks.each do |lock|
 			locktype = lock.class.name
 
-			assert_nothing_raised( locktype ) { lock.readLock }
-			assert_nothing_raised( locktype ) { rval = lock.readLocked? }
-			assert rval, "readLocked? should be true, ie., read locked (#{locktype})"
+			assert_nothing_raised( locktype ) { lock.read_lock }
+			assert_nothing_raised( locktype ) { rval = lock.read_locked? }
+			assert rval, "read_locked? should be true, ie., read locked (#{locktype})"
 			assert_nothing_raised( locktype ) { rval = lock.locked? }
 			assert rval, "locked? should be true, ie., either read or write locked (#{locktype})"
-			assert_nothing_raised( locktype ) { rval = lock.writeLocked? }
-			assert !rval, "writeLocked? should be false, ie., not write locked (#{locktype})"
+			assert_nothing_raised( locktype ) { rval = lock.write_locked? }
+			assert !rval, "write_locked? should be false, ie., not write locked (#{locktype})"
 
-			# readUnlock should work and leave it unlocked
-			assert_nothing_raised( locktype ) { lock.readUnlock }
-			assert_nothing_raised( locktype ) { rval = lock.readLocked? }
-			assert !rval, "readLocked? should be false, ie., not locked (#{locktype})"
+			# read_unlock should work and leave it unlocked
+			assert_nothing_raised( locktype ) { lock.read_unlock }
+			assert_nothing_raised( locktype ) { rval = lock.read_locked? }
+			assert !rval, "read_locked? should be false, ie., not locked (#{locktype})"
 			assert_nothing_raised( locktype ) { rval = lock.locked? }
 			assert !rval, "locked? should be false, ie., not read nor write locked (#{locktype})"
-			assert_nothing_raised( locktype ) { rval = lock.writeLocked? }
-			assert !rval, "writeLocked? should be false, ie., not write locked (#{locktype})"
+			assert_nothing_raised( locktype ) { rval = lock.write_locked? }
+			assert !rval, "write_locked? should be false, ie., not write locked (#{locktype})"
 		end
 	end
 
@@ -167,22 +167,22 @@ class Arrow::SessionLockTestCase < Arrow::TestCase
 			locktype = lock.class.name
 
 			# Write lock should work
-			assert_nothing_raised( locktype ) { lock.writeLock }
-			assert_nothing_raised( locktype ) { rval = lock.writeLocked? }
-			assert rval, "writeLocked? should be true, ie., write locked (#{locktype})"
+			assert_nothing_raised( locktype ) { lock.write_lock }
+			assert_nothing_raised( locktype ) { rval = lock.write_locked? }
+			assert rval, "write_locked? should be true, ie., write locked (#{locktype})"
 			assert_nothing_raised( locktype ) { rval = lock.locked? }
 			assert rval, "locked? should be true, ie., either write or read locked (#{locktype})"
-			assert_nothing_raised( locktype ) { rval = lock.readLocked? }
-			assert !rval, "readLocked? should be false, ie., not read locked (#{locktype})"
+			assert_nothing_raised( locktype ) { rval = lock.read_locked? }
+			assert !rval, "read_locked? should be false, ie., not read locked (#{locktype})"
 
-			# writeUnlock should work and leave it unlocked
-			assert_nothing_raised( locktype ) { lock.writeUnlock }
-			assert_nothing_raised( locktype ) { rval = lock.writeLocked? }
-			assert !rval, "writeLocked? should be false, ie., not locked (#{locktype})"
+			# write_unlock should work and leave it unlocked
+			assert_nothing_raised( locktype ) { lock.write_unlock }
+			assert_nothing_raised( locktype ) { rval = lock.write_locked? }
+			assert !rval, "write_locked? should be false, ie., not locked (#{locktype})"
 			assert_nothing_raised( locktype ) { rval = lock.locked? }
 			assert !rval, "locked? should be false, ie., not write nor read locked (#{locktype})"
-			assert_nothing_raised( locktype ) { rval = lock.readLocked? }
-			assert !rval, "readLocked? should be false, ie., not read locked (#{locktype})"
+			assert_nothing_raised( locktype ) { rval = lock.read_locked? }
+			assert !rval, "read_locked? should be false, ie., not read locked (#{locktype})"
 		end
 
 	end

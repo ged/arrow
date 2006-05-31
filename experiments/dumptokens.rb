@@ -6,7 +6,7 @@
 #
 
 BEGIN {
-	base = File::dirname( File::dirname(File::expand_path(__FILE__)) )
+	base = File.dirname( File.dirname(File.expand_path(__FILE__)) )
 	$LOAD_PATH.unshift "#{base}/lib"
 
 	require "#{base}/utils.rb"
@@ -24,11 +24,11 @@ if $DEBUG
 	puts "Turning on logging..."
 	format = colored( %q{#{time} [#{level}]: }, 'cyan' ) +
 		colored( %q{#{name} #{frame ? '('+frame+')' : ''}: #{msg[0,1024]}}, 'white' )
-	outputter = Arrow::Logger::Outputter::create( 'file', $deferr, ".irbrc", format )
-	Arrow::Logger::global.outputters << outputter
-	Arrow::Logger::global.level = :debug
+	outputter = Arrow::Logger::Outputter.create( 'file', $deferr, ".irbrc", format )
+	Arrow::Logger.global.outputters << outputter
+	Arrow::Logger.global.level = :debug
 
-	Arrow::Logger::global.notice "Logging enabled."
+	Arrow::Logger.global.notice "Logging enabled."
 end	
 
 def showToken( tr, tok, *args )
@@ -43,16 +43,16 @@ end
 
 if ARGV.empty?
 	until (line = prompt( "Eval" )).empty?
-		Arrow::RubyTokenReactor::parse( line, :all, &method(:showToken) )
+		Arrow::RubyTokenReactor.parse( line, :all, &method(:showToken) )
 	end
 else
 	ARGV.each {|arg|
 		tr = nil
 
 		if File.file?( arg )
-			tr = Arrow::RubyTokenReactor::new( File::open(arg, "r") )
+			tr = Arrow::RubyTokenReactor.new( File.open(arg, "r") )
 		else
-			tr = Arrow::RubyTokenReactor::new( arg )
+			tr = Arrow::RubyTokenReactor.new( arg )
 		end		
 
 		tr.onEvents( :all, &method(:showToken) ) 

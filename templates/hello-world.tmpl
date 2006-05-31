@@ -11,7 +11,7 @@
 	<title>Arrow: Hello World</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Script-Type" content="text/javascript" />
-	<link rel="stylesheet" type="text/css" href="/stylesheets/arrow.css" />
+	<link rel="stylesheet" type="text/css" href="/css/arrow.css" />
   </head>
   <body>
 
@@ -23,7 +23,7 @@
 		href="[?call txn.action?]/display">a simpler version</a> of this applet
 	  that outputs plain text (i.e., no templates).<p>
 
-		<!-- Runcount: [?call applet.runCount ?] -->
+		<!-- Runcount: [?call applet.run_count ?] -->
 
 <?if txn.session? ?>
 	  <!-- Session found -->
@@ -41,7 +41,7 @@
 
   <?if txn.session[:user] ?>
 	<p>Since you're logged in as '<?call txn.session[:user]?>', you can also <a
-		href="[?call txn.appRoot?]/[?call txn.appletPath.split(%r{/})[0]
+		href="[?call txn.app_root?]/[?call txn.applet_path.split(%r{/})[0]
 		?]/logout">log out</a> to test the protectedness
 	  of the applet chain.</p>
   <?end?>

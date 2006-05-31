@@ -58,7 +58,7 @@ class Arrow::Template::YieldDirective < Arrow::Template::BracketingDirective
 	#############################################################
 
 	### Returns +false+; disallows prepended formats.
-	def self::allowsFormat
+	def self.allows_format?
 		false
 	end
 
@@ -95,11 +95,11 @@ class Arrow::Template::YieldDirective < Arrow::Template::BracketingDirective
 	### Parse the contents of the directive, looking for an optional format
 	### for tags like <?directive "%-15s" % foo ?>, then a required
 	### identifier, then an optional methodchain attached to the indetifier.
-	def parseDirectiveContents( parser, state )
-		@args, @pureargs = parser.scanForArgList( state )
+	def parse_directive_contents( parser, state )
+		@args, @pureargs = parser.scan_for_arglist( state )
 		return nil unless @args
 		state.scanner.skip( FROM ) or
-			raise ParseError, "no 'from' for yield"
+			raise Arrow::ParseError, "no 'from' for yield"
 
 		super
 	end
@@ -107,9 +107,9 @@ class Arrow::Template::YieldDirective < Arrow::Template::BracketingDirective
 
 	### Build a Proc object that encapsulates the execution necessary to
 	### render the directive.
-	def buildRenderingProc( template, scope )
+	def build_rendering_proc( template, scope )
 		code = %q{
-			Proc::new {|__item, __callback|
+			Proc.new {|__item, __callback|
 				res = []
 				__item%s {|%s| res << __callback.call(%s)}
 				res
@@ -121,7 +121,7 @@ class Arrow::Template::YieldDirective < Arrow::Template::BracketingDirective
 		desc = "[%s (%s): %s]" %
 			[ self.class.name, __FILE__, self.methodchain ]
 
-		return eval( code, scope.getBinding, desc, __LINE__ )
+		return eval( code, scope.get_binding, desc, __LINE__ )
 	end
 
 
@@ -130,16 +130,16 @@ class Arrow::Template::YieldDirective < Arrow::Template::BracketingDirective
 	### block passed to whatever this directive is calling, which in turn
 	### renders each of its subnodes with the arguments specified by the
 	### yield.
-	def renderContents( template, scope )
+	def render_contents( template, scope )
 		#self.log.debug "Bulding callback for rendering subnodes..."
-		callback = Proc::new {|*blockArgs|
+		callback = Proc.new {|*blockArgs|
 			res = []
 			attributes = {}
 			blockArgs.zip( self.pureargs ) {|pair|
 				attributes[ pair[1] ] = pair[0]
 			}
 			#self.log.debug "  override attributes are: %p" % [ attributes ]
-			template.withOverriddenAttributes( scope, attributes ) {|template|
+			template.with_overridden_attributes( scope, attributes ) {|template|
 				res << template.render( @subnodes, scope )
 			}
 
@@ -147,7 +147,7 @@ class Arrow::Template::YieldDirective < Arrow::Template::BracketingDirective
 		}
 
 		#self.log.debug "calling method chain; callback: %p" % callback
-		self.callMethodChain( template, scope, callback )
+		self.call_methodchain( template, scope, callback )
 	end
 
 

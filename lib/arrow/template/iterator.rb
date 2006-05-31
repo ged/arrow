@@ -10,14 +10,14 @@
 #
 #   ### Render the directive's bracketed nodes once for each item in the
 #   ### iterated content.
-#   def renderSubnodes( attribute, template, scope )
+#   def render_subnodes( attribute, template, scope )
 #       res = []
 #   
-#       iterator = Arrow::Template::Iterator::new( attribute )
+#       iterator = Arrow::Template::Iterator.new( attribute )
 #       iterator.each {|iter,*blockArgs|
 #   
 #           # Process the nodes
-#           template.withOverriddenAttributes( scope, 'iterator' => iter ) {|template|
+#           template.with_overridden_attributes( scope, 'iterator' => iter ) {|template|
 #               res << template.render( @subnodes, scope )
 #           }
 #       }

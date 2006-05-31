@@ -24,8 +24,6 @@ class MissingApplet < Arrow::Applet
 	# SVN Id
 	SVNId = %q$Id: noSuchApp.rb 54 2004-05-22 06:42:56Z deveiant $
 
-	# SVN URL
-	SVNURL = %q$URL: svn+ssh://svn.FaerieMUD.org/usr/local/svn/Arrow/trunk/applets/noSuchApp.rb $
 
 	# Applet signature
 	Signature = {
@@ -35,7 +33,7 @@ class MissingApplet < Arrow::Applet
 						"it will run this applet instead of declining requests for " +
 						"URIs that don't match a registered applet.",
 		:maintainer => "ged@FaerieMUD.org",
-		:defaultAction => 'display',
+		:default_action => 'display',
 		:templates => {
 			:display	=> 'missingapplet.tmpl',
 		},

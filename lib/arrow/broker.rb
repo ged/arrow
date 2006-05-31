@@ -23,7 +23,9 @@ require 'arrow/mixins'
 require 'arrow/exceptions'
 require 'arrow/object'
 require 'arrow/cache'
-require 'arrow/factories'
+require 'arrow/templatefactory'
+require 'arrow/appletregistry'
+
 
 ### Instance of this class contain a map of applets registered to a given location..
 class Arrow::Broker < Arrow::Object
@@ -36,42 +38,15 @@ class Arrow::Broker < Arrow::Object
 	# SVN Id
 	SVNId = %q$Id$
 
-
-	# Registry entry data structure.
-	RegistryEntry = Struct::new( :appletclass, :file, :timestamp, :object )
-
-	# Filemap entry data structure
-	class FileMapEntry < Struct::new( :file, :timestamp )
-
-		### Create a new FileMapEntry
-		def initialize( *args )
-			@uris = []
-			@classes = []
-			@exception = nil
-			super
-		end
-
-		# URIs associated with a class loaded from this file
-		attr_reader :uris
-
-		# The classes loaded from this file
-		attr_reader :classes
-
-		# The exception raised when attempting to load the file, if any
-		attr_accessor :exception
-		alias_method :exception?, :exception
-	end
+	# A regular expression that matches the file separator on this system
+	FILE_SEPARATOR = Regexp.new( Regexp.compile(File::SEPARATOR) )
 
 
 	### Create a new Arrow::Broker object from the specified +config+ (an
 	### Arrow::Config object).
 	def initialize( config )
-		@config				= config
-		@templateFactory	= Arrow::TemplateFactory::new( config )
-		@filemap			= {}
-		@loadTime			= Time::now
-
-		@registry = self.loadAppletRegistry( config )
+		@config = config
+		@registry = Arrow::AppletRegistry.new( config )
 	end
 
 
@@ -79,15 +54,8 @@ class Arrow::Broker < Arrow::Object
 	public
 	######
 
-	# The factory used to load/create/cache templates for applets
-	attr_reader :templateFactory
-
 	# The Hash of RegistryEntry structs keyed by uri
 	attr_reader :registry
-
-	# A hash, keyed by the filenames of all files examined the last time the
-	# registry was built, with FileMapEntrys for values.
-	attr_reader :filemap
 
 
 	### Dispatch the specified transaction +txn+ to the appropriate handler
@@ -95,35 +63,27 @@ class Arrow::Broker < Arrow::Object
 	def delegate( txn )
 		rval = appletchain = nil
 		req = txn.request
-		self.log.debug "Start of delegation (%s:%s)" %
-			[ req.path_info, req.unparsed_uri ]
+		self.log.debug "Start of delegation (%s)" % [ req.unparsed_uri ]
 
 		# Extract the path from either the path info, or the unparsed uri if
 		# that's empty (to handle the case where the dispatcher is bound to the
 		# root)
 		path = req.path_info
-		path = req.unparsed_uri if path.empty?
 		path.sub!( %r{^/}, '' )
 		self.log.debug "Request's path is %p" % path
 
 		# Check for updated/deleted/added applets
-		self.checkForUpdates
+		@registry.check_for_updates
 
-		# Run either the default applet if no path info was given, or an 
-		if path.empty?
-			rval = self.runDefaultApplet( txn )
+		# Get the chain of applets to execute for the request
+		appletchain = @registry.find_applet_chain( path )
+
+		# If the pathinfo doesn't correspond to at least one applet, run
+		# the no-such-applet handler.
+		if appletchain.empty?
+			rval = self.run_missing_applet_handler( txn, path )
 		else
-
-			# Get the chain of applets to execute for the request
-			appletchain = self.findAppletChain( path )
-
-			# If the pathinfo doesn't correspond to at least one applet, run
-			# the no-such-applet handler.
-			if appletchain.empty?
-				rval = self.runMissingAppletHandler( txn, path )
-			else
-				rval = self.runAppletChain( txn, appletchain )
-			end
+			rval = self.run_applet_chain( txn, appletchain )
 		end
 
 		# Set the request status to declined if it hasn't been set yet and
@@ -143,187 +103,93 @@ class Arrow::Broker < Arrow::Object
 	protected
 	#########
 
-	### Find the chain of applets indicated by the given +uri+ and return an
-	### Array of tuples describing the chain. The format of the chain will
-	### be:
-	###   [ [RegistryEntry, URI, Array[*uriparts]], ... ]
-	def findAppletChain( uri, allowInternal=false )
-		self.log.debug "Searching for appletchain for %p" % [uri]
-		uriParts = uri.sub(%r{^/(?=.)}, '').split(%r{/})
-		appletchain = []
-		args = []
-
-		self.log.debug "Split URI into parts: %p" % [uriParts]
-		if allowInternal
-			identPat = /^\w[-\w]*/
-		else
-			identPat = /^[a-zA-Z][-\w]*/
-		end
-
-		# If there's an applet installed at the base, prepend it to the
-		# appletchain
-		if @registry.key?( "" )
-			appletchain << [@registry[""], "", uriParts]
-		end
-
-		# Map uri fragments onto registry entries
-		uriParts.each_index {|i|
-			unless identPat.match( uriParts[i] )
-				self.log.debug "Stopping at %s: Not an identifier" %
-					uriParts[i]
-				break
-			end
-
-			newuri = uriParts[0,i+1].join("/")
-			self.log.debug "Testing %s against %p" %
-				[ newuri, @registry.keys.sort ]
-			appletchain << [@registry[newuri], newuri, uriParts[(i+1)..-1]] if
-				@registry.key?( newuri )
-		}
-
-		#  Output the applet chain to the debugging log.
-		self.log.debug "Found %d applets in %p:\n\t%p" % [
-			appletchain.nitems,
-			uriParts.join("/"),
-			appletchain.collect {|item|
-				re = item[0]
-				"%s (%s): '%s': %p" % [
-					re.appletclass.signature.name,
-					re.appletclass,
-					item[1],
-					item[2]
-				]
-			}.join("\n\t")
-		]
-
-		return appletchain
-	end
-
-
 	### Given a chain of applets built from a URI, run the +index+th one with
 	### the specified transaction (+txn+). Applets before the last get called
 	### via their #delegate method, while the last one is called via #run.
-	def runAppletChain( txn, chain )
+	def run_applet_chain( txn, chain )
 		self.log.debug "Running applet chain: #{chain.inspect}"
-		raise AppletError, "Malformed applet chain" if
-			chain.empty? || !chain.first.is_a?( Array )
+		raise Arrow::AppletError, "Malformed applet chain" if
+			chain.empty? || !chain.first.respond_to?( :applet )
 
-		re, txn.appletPath, args = self.unwrapChainLink( chain.first )
+		res = nil
+		applet, txn.applet_path, args = self.unwrap_chain_link( chain.first )
 
-		# Run the final applet in the chain
+		# If there's only one item left, run it
 		if chain.nitems == 1
 			self.log.debug "Running final applet in chain"
-			return self.runApplet( re, txn, args )
+			res = self.run_applet( applet, txn, args )
+
+		# Otherwise, delegate the transaction to the next applet with the
+		# remainder of the chain.
 		else
 			dchain = chain[ 1..-1 ]
 			self.log.debug "Running applet %s in chain of %d; chain = %p" %
-				[ re.object.signature.name, chain.nitems, dchain ]
+				[ applet.signature.name, chain.nitems, dchain ]
 
-			return re.object.delegate( txn, dchain, *args ) {|subchain|
-				subchain = dchain if subchain.nil?
-				self.log.debug "Delegated call to appletchain %p" % [ subchain ]
-				self.runAppletChain( txn, subchain )
-			}
+			begin
+				res = applet.delegate( txn, dchain, *args ) do |subchain|
+					subchain = dchain if subchain.nil?
+					self.log.debug "Delegated call to appletchain %p" % [ subchain ]
+					self.run_applet_chain( txn, subchain )
+				end
+			rescue ::Exception => err
+				self.log.error "Error while executing applet chain: %p (/%s): %s:\n\t%s" % [
+					applet,
+					chain.first[1],
+					err.message,
+					err.backtrace.join("\n\t"),
+				]
+				res = self.run_error_handler( applet, txn, err )
+			end
 		end
-	rescue ::Exception => err
-		self.log.error "Error while executing applet chain: %p (/%s): %s:\n\t%s" % [
-			re,
-			chain.first[1],
-			err.message,
-			err.backtrace.join("\n\t"),
-		]
-		return self.runErrorHandler( re, txn, err )
+
+		return res
 	end
 
 
 	### Check the specified +link+ of an applet chain for sanity and return
 	### its constituent bits for assignment. This is necessary to provide
 	### sensible errors if a delegating app screws up a chain somehow.
-	def unwrapChainLink( link )
-		re = link[0] or raise AppletChainError, "Null registry entry"
-
-		unless re.is_a?( RegistryEntry )
-			emsg = "Registry entry is a %s: Expected a RegistryEntry" %
-				re.class.name
-			raise AppletChainError, emsg
-		end
-
-		path = link[1] or raise AppletChainError, "Null path"
-		args = link[2] or raise AppletChainError, "Null argument list"
+	def unwrap_chain_link( link )
+		applet = link.applet or raise Arrow::AppletChainError, "Null applet"
+		path = link.path or raise Arrow::AppletChainError, "Null path"
+		args = link.args or raise Arrow::AppletChainError, "Null argument list"
 		unless args.is_a?( Array )
 			emsg = "Argument list is a %s: expected an Array" %
 				args.class.name
-			raise AppletChainError, emsg
+			raise Arrow::AppletChainError, emsg
 		end					
 
-		return re, path, args
+		return applet, path, args
 	end
 
 
-	### Run the applet for the specified registry entry +re+ with the
-	### given +txn+ (an Arrow::Transaction) and the +rest+ of the path_info
-	### split on '/'.
-	def runApplet( re, txn, rest )
+	### Run the specified +applet+ with the given +txn+ (an Arrow::Transaction) 
+	### and the +rest+ of the path_info split on '/'.
+	def run_applet( applet, txn, rest )
 		self.log.debug "Running '%s' with args: %p" %
-			[ re.appletclass.signature.name, rest ]
-		return re.object.run( txn, *rest )
+			[ applet.signature.name, rest ]
+		return applet.run( txn, *rest )
 	rescue ::Exception => err
 		self.log.error "Error running %s (%s): %s:\n\t%s" % [
-			re.appletclass.signature.name,
-			re.file,
+			applet.signature.name,
+			applet.class.filename,
 			err.message,
 			err.backtrace.join("\n\t"),
 		]
-		return self.runErrorHandler( re, txn, err )
-	end
-
-
-	### Handle requests that don't target a specific applet (i.e.,
-	### their path_info is empty). This will attempt to run whatever applet is
-	### configured as the default one (:defaultApplet), or run a builtin status
-	### applet if no default is configured or if the configured one isn't
-	### loaded.
-	def runDefaultApplet( txn, *args )
-		rval = appletchain = nil
-		handlerUri = @config.applets.defaultApplet
-
-		if handlerUri != "(builtin)"
-			appletchain = self.findAppletChain( handlerUri, true )
-			self.log.debug "Found appletchain %p for default applet" % [ appletchain ]
-
-			if appletchain.empty?
-				rval = self.runMissingAppletHandler( txn, handlerUri )
-			else
-				rval = self.runAppletChain( txn, appletchain )
-			end
-		else
-			rval = self.builtinDefaultHandler( txn )
-		end
-
-		return rval
-	end
-
-
-	### The builtin default handler routine. Outputs a plain-text status
-	### message.
-	def builtinDefaultHandler( txn )
-		self.log.notice "Using builtin default handler."
-
-		txn.request.content_type = "text/plain"
-		return "Arrow Status: Running %s (%d applets loaded)" %
-			[ Time::now, @registry.length ]
+		return self.run_error_handler( applet, txn, err )
 	end
 
 
 	### Handle requests that target an applet that doesn't exist.
-	def runMissingAppletHandler( txn, uri )
+	def run_missing_applet_handler( txn, uri )
 		rval = appletchain = nil
 		handlerUri = @config.applets.missingApplet
 		args = uri.split( %r{/} )
 
 		# Build an applet chain for user-configured handlers
 		if handlerUri != "(builtin)"
-			appletchain = self.findAppletChain( handlerUri, true )
+			appletchain = @registry.find_applet_chain( handlerUri, true )
 			self.log.error "Configured MissingApplet handler (%s) doesn't exist" %
 				handlerUri if appletchain.empty?
 		end
@@ -331,52 +197,50 @@ class Arrow::Broker < Arrow::Object
 		# If the user-configured handler maps to one or more handlers, run
 		# them. Otherwise, run the build-in handler.
 		unless appletchain.nil? || appletchain.empty?
-			rval = self.runAppletChain( txn, appletchain )
+			rval = self.run_applet_chain( txn, appletchain )
 		else
-			rval = self.builtinMissingHandler( txn, *args )
+			rval = self.builtin_missing_handler( txn, *args )
 		end
 
 		return rval
 	end
 
 
-	### The builtin missing-applet handler routine. Outputs a plain-text "no
-	### such applet" message.
-	def builtinMissingHandler( txn, *args )
+	### The builtin missing-applet handler routine. Returns +false+, which 
+	### causes the dispatcher to decline the request.
+	def builtin_missing_handler( txn, *args )
 		self.log.notice "Using builtin missing-applet handler."
 		return false
 	end
 
 
-	### Handle the given applet error +err+ for the applet
-	### specified by the registry entry +re+, using the given transaction
-	### +txn+. This will attempt to run whatever applet is configured as the
-	### error-handler, or run a builtin handler applet if none is configured or
-	### the configured one isn't loaded.
-	def runErrorHandler( re, txn, err )
+	### Handle the given applet error +err+ for the specified +applet+, using 
+	### the given transaction +txn+. This will attempt to run whatever applet 
+	### is configured as the error-handler, or run a builtin handler applet 
+	### if none is configured or the configured one isn't loaded.
+	def run_error_handler( applet, txn, err )
 		rval = nil
-		re ||= RegistryEntry::new
 		handlerName = @config.applets.errorApplet.sub( %r{^/}, '' )
 
 		unless handlerName == "(builtin)" or !@registry.key?( handlerName )
 			handler = @registry[handlerName]
 			self.log.notice "Running error handler applet '%s' (%s)" %
-				[ handler.appletclass.signature.name, handlerName ]
+				[ handler.signature.name, handlerName ]
 
 			begin
-				rval = handler.object.run( txn, "report_error", re, err )
+				rval = handler.run( txn, "report_error", applet, err )
 			rescue ::Exception => err2
 				self.log.error "Error while attempting to use custom error "\
 				"handler '%s': %s\n\t%s" % [
-					handler.appletclass.signature.name,
+					handler.signature.name,
 					err2.message,
 					err2.backtrace.join("\n\t"),
 				]
 
-				rval = self.defaultErrorHandler( txn, re, err )
+				rval = self.default_error_handler( applet, txn, err )
 			end
 		else
-			rval = self.defaultErrorHandler( txn, re, err )
+			rval = self.default_error_handler( applet, txn, err )
 		end
 
 		return rval
@@ -384,253 +248,17 @@ class Arrow::Broker < Arrow::Object
 
 
 	### The builtin error handler routine. Outputs a plain-text backtrace
-	### for the given exception +err+ and registry entry +re+ to the given
+	### for the given exception +err+ and +applet+ to the given
 	### transaction +txn+.
-	def defaultErrorHandler( txn, re, err )
+	def default_error_handler( applet, txn, err )
 		self.log.notice "Using builtin error handler."
 		txn.request.content_type = "text/plain"
 		txn.status = Apache::OK
 
 		return "Arrow Applet Error in '%s': %s\n\t%s" %
-			[ re.appletclass.signature.name, err.message, err.backtrace.join("\n\t") ]
+			[ applet.class.signature.name, err.message, err.backtrace.join("\n\t") ]
 	end
 
-
-	### Check the applets path for new/updated/deleted applets if the poll
-	### interval has passed.
-	def checkForUpdates
-		return unless @config.applets.pollInterval.nonzero?
-		if Time::now - @loadTime > @config.applets.pollInterval
-			self.updateAppletRegistry( @config )
-		end
-	end
-
-
-	### Find applet files by looking in the applets path of the given
-	### +config+ for files matching the configured pattern. Return an Array
-	### of fully-qualified applet files. If the optional +excludeList+ is
-	### given, exclude any files specified from the return value.
-	def findAppletFiles( config, excludeList=[] )
-		files = []
-		dirCount = 0
-
-		# For each directory in the configured applets path,
-		# fully-qualify it and untaint the specified pathname.
-		config.applets.path.each {|dir|
-			next unless File::directory?( dir )
-
-			dirCount += 1
-			pat = File::join( dir, config.applets.pattern )
-			pat.untaint
-
-			self.log.debug "Looking for applets: %p" % pat
-			files.push( *Dir[ pat ] )
-		}
-
-		self.log.debug "Fetched %d applet file paths from %d directories (out of %d)" %
-			[ files.nitems, dirCount, config.applets.path.dirs.nitems ]
-
-		return files - excludeList
-	end
-
-
-	### Load each file in the directories specified by the applets path in
-	### the given config (an Arrow::Config object) into a Hash of
-	### Arrow::Broker::RegistryEntry structs keyed by the name of the applet
-	### class.
-	def loadAppletRegistry( config )
-		self.log.debug "Loading applet registry"
-		registry = {}
-
-		# Reverse map the config's applet layout so we can tell which
-		# classes map to where in the URL hierarchy.
-		urimap = self.makeUriMap( config )
-		self.log.debug "Urimap: %p" % urimap
-
-		# Now search the applet path for applet files
-		self.findAppletFiles( config ).each do |appletfile|
-			self.log.debug "Found applet file %p" % appletfile
-
-			registry.merge!( self.loadRegistryEntries(appletfile, urimap) )
-			self.log.debug "After %s, registry has %d entries" %
-				[ appletfile, registry.length ]
-		end
-
-		return registry
-	end
-
-
-	### Make and return a Hash which inverts the given +config+'s applet
-	### layout into a map of class name to the URIs onto which instances of
-	### them should be installed.
-	def makeUriMap( config )
-		urimap = Hash::new {|ary,k| ary[k] = []}
-
-		# Invert the applet layout into Class => [ uris ] so as classes
-		# load, we know where to put 'em.
-		config.applets.layout.each do |uri, klassname|
-			uri = uri.to_s.sub( %r{^/}, '' )
-			self.log.debug "Mapping %p to %p" % [ klassname, uri ]
-			urimap[ klassname ] << uri
-		end
-
-		return urimap
-	end
-
-
-	### Load registry entries from the specified +appletfile+ and return
-	### them in a hash keyed by uri. Use the specified +urimap+ (like the
-	### one returned by #makeUriMap) to decide where to install any classes
-	### that are loaded.
-	def loadRegistryEntries( appletfile, urimap )
-		entries = {}
-
-		appletfile.untaint
-		timestamp = File::mtime( appletfile )
-		@filemap[ appletfile ] = FileMapEntry::new( appletfile, timestamp )
-
-		self.log.debug "Mapping classes from %s" % [ appletfile ]
-
-		# Load registry entries for each class contained in the applet
-		# file
-		begin
-			self.loadAppletClasses( appletfile ) {|klass|
-
-				# Trim the Module serving as private namespace from the
-				# class name, then add the class to the filemap so we can
-				# keep track of which classes came from which files for
-				# reloading later.
-				klassname = klass.name.sub( /#<Module:0x\w+>::/, '' )
-				@filemap[ appletfile ].classes << klass
-
-				self.log.debug "Looking for a mapped %p" % klassname
-				if urimap.key?( klassname )
-					self.log.info "Found one or more uris for '%s'" % klassname
-
-					# Create a new instance of the applet for each uri it's
-					# registered under, then wrap that in a RegistryEntry
-					# and put it in the entries hash we'll return later.
-					urimap[ klassname ].each do |uri|
-						applet = klass.new( @config, @templateFactory, uri )
-						timestamp = Time::now
-						re = RegistryEntry::new( klass, appletfile, timestamp, applet )
-						self.log.info "Registered %p (%s) at '%s'" %
-							[ applet, klassname, uri ]
-
-						# Track the uris the applet file affects, and add it
-						# to the registry entries
-						@filemap[ appletfile ].uris << uri
-						entries[ uri ] = re
-					end
-				else
-					self.log.info "No uri for '%s': Not instantiated" % klassname
-				end
-			}
-		rescue ::Exception => err
-			self.log.error "%s failed to load: %s\n\t%s" %
-				[ appletfile, err.message, err.backtrace.join("\n\t") ]
-			@filemap[ appletfile ].exception = err
-		end
-
-		self.log.debug "Returning %d registry entries" % entries.length
-		return entries
-	end
-
-
-	### Using the specified registry, return a Hash of Arrays of uris keyed
-	### by the name of the file from which the applet installed there was
-	### loaded.
-	def makeRegistryMap( registry=@registry )
-		regmap = Hash::new {|hsh,key| hsh[key] = []}
-		registry.each {|uri,re|
-			regmap[ re.file ] << uri
-		}
-
-		return regmap
-	end
-
-
-	### Check for updates for each file in the directories specified by the
-	### applet path in the given config if it has been modified since it was
-	### last loaded. Also check to see if there are any new files present,
-	### and if so, load them.
-	def updateAppletRegistry( config )
-
-		# Fetch the list of available applet files
-		filelist = self.findAppletFiles( config )
-
-		# Make a registry map
-		regmap = self.makeRegistryMap( @registry )
-
-		# Delete applets for files that are no longer in the list
-		(@filemap.keys - filelist).each do |file|
-			self.log.debug "File '#{file}' no longer exists."
-
-			# If something from the file is in the registry, remove them.
-			regmap[ file ].each {|uri|
-				self.log.notice "Removing app at %s: source file %s deleted" %
-					[ uri, file ]
-				@registry.delete( uri )
-			}
-
-			regmap.delete( file )
-			@filemap.delete( file )
-		end
-
-		# Now check the timestamps of already-seen files and reload those
-		# that have changed.
-		filelist.each do |file|
-			file.untaint
-
-			if @filemap.key?( file )
-				next if File::mtime( file ) == @filemap[file].timestamp
-				self.log.debug "File '#{file}' changed since last seen."
-
-				# Remove the registry entries loaded from this file
-				regmap[ file ].each {|uri|
-					self.log.notice "Removing %s for update from %s" %
-					[ uri, file ]
-					@registry.delete( uri )
-				}
-
-			else
-				self.log.notice "Found new applet file '#{file}'"
-			end
-
-			# We need the urimap, so make it if it isn't already
-			urimap ||= self.makeUriMap( config )
-
-			# Reload the file and install any registry entries which are
-			# loaded from it
-			@registry.merge!( self.loadRegistryEntries(file, urimap) )
-		end
-
-	end
-
-
-	### Load the applet classes from the given +appletfile+ and return them
-	### in an Array. If a block is given, then each loaded class is yielded
-	### to the block in turn, and the return values are used in the Array
-	### instead.
-	def loadAppletClasses( appletfile )
-		self.log.debug "Attempting to load applet objects from %p" % appletfile
-		classes = []
-
-		# Get the applet file's timestamp, load any applet classes in it,
-		# then yield it to the block or stick it in a return Array.
-		Arrow::Applet::load( appletfile ).each {|appletclass|
-			# Handle callback-style invocations
-			if block_given?
-				self.log.info "Yielding %s to caller." % appletclass.name
-				classes << yield( appletclass )
-			else
-				self.log.info "Loaded %s." % appletclass.name
-				classes << appletclass
-			end
-		}
-
-		return *classes
-	end
 
 
 end # class Arrow::Broker

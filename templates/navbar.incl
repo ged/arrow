@@ -1,9 +1,9 @@
 	<div id="navbar" class="dashbox">
 	  &lt;
 <?if txn?>
-	  <a href="[?call txn.appRoot ?]">Top</a> |
-	  <a href="[?call txn.appRoot ?]/status/applet/[?call txn.appletPath?]">Applet Status</a> |
-	  <a href="[?call txn.appRoot ?]/view-applet/[?call txn.appletPath?]">Applet Source</a> |
+	  <a href="[?call txn.app_root ?]">Top</a> |
+	  <a href="[?call txn.app_root ?]/status/applet/[?call txn.applet_path?]">Applet Status</a> |
+	  <a href="[?call txn.app_root ?]/view-applet/[?call txn.applet_path?]">Applet Source</a> |
 <?else?>
 	  <!-- Cannot build top links without a transaction object called 'txn'. -->
 <?end if?>
@@ -13,7 +13,7 @@
 
 	<div id="copyright">
 <?if txn ?>
-      <p>Arrow Version <?call txn.arrowVersion ?></p>
+      <p>Arrow Version <?call txn.arrow_version ?></p>
 <?end if ?>
 	  <p>Copyright &copy; 2003, 2004, <a
 		  href="http://www.rubycrafters.com/">RubyCrafters, LLC</a>. Most rights

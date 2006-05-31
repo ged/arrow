@@ -23,52 +23,41 @@ require 'arrow/exceptions'
 require 'arrow/utils'
 require 'arrow/template/nodes'
 
-module Arrow
-class Template
+### The class which defines the behaviour of the 'urlencode'
+### template directive.
+class Arrow::Template::URLEncodeDirective < Arrow::Template::CallDirective
 
-	### The class which defines the behaviour of the 'urlencode'
-	### template directive.
-	class URLEncodeDirective < Arrow::Template::CallDirective
+	# SVN Revision
+	SVNRev = %q$Rev$
 
-		# SVN Revision
-		SVNRev = %q$Rev$
+	# SVN Id
+	SVNId = %q$Id$
 
-		# SVN Id
-		SVNId = %q$Id$
-
-		# SVN URL
-		SVNURL = %q$URL$
-
-		# Non-URIC Characters (RFC 2396)
-		NonUricRegexp = /[^A-Za-z0-9\-_.!~*'()]/
+	# Non-URIC Characters (RFC 2396)
+	NonUricRegexp = /[^A-Za-z0-9\-_.!~*'()]/
 
 
-		######
-		public
-		######
+	######
+	public
+	######
 
-		### Render the content and return it as URL-escaped text.
-		def render( template, scope )
-			rawary = super
-			rary = []
+	### Render the content and return it as URL-escaped text.
+	def render( template, scope )
+		rawary = super
+		rary = []
 
-			# Try our best to skip debugging comments
-			if template._config[:debuggingComments]
-				rary.push( rawary.shift ) if /^<!--.*-->$/ =~ rawary.first
-			end
-
-			rawary.each {|line|
-				rary << line.to_s.gsub( NonUricRegexp ) do |match|
-					"%%%x" % match[0]
-				end
-			}
-
-			return rary
+		# Try our best to skip debugging comments
+		if template._config[:debuggingComments]
+			rary.push( rawary.shift ) if /^<!--.*-->$/ =~ rawary.first
 		end
 
-	end # class URLEncodeDirective
+		rawary.each {|line|
+			rary << line.to_s.gsub( NonUricRegexp ) do |match|
+				"%%%x" % match[0]
+			end
+		}
 
-end # class Template
-end # module Arrow
+		return rary
+	end
 
-
+end # class Arrow::Template::URLEncodeDirective

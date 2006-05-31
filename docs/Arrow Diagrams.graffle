@@ -260,7 +260,7 @@
 +session(config): Session\
 +executeSubRequest(request,pathInfo=nil): Integer\
 +response: Response\
-+appRoot: String}</string>
++app_root: String}</string>
 				</dict>
 			</array>
 			<key>TextPlacement</key>
@@ -951,10 +951,10 @@
 @config: Config\
 @signature: Application::Signature\
 @templateFactory: TemplateFactory\
-@runCount: Integer = 0\
-@totalUtime: Float = 0.0\
-@totalStime: Float = 0.0\
-@actionsRe: Regexp}</string>
+@run_count: Integer = 0\
+@total_utime: Float = 0.0\
+@total_stime: Float = 0.0\
+@actions_regexp: Regexp}</string>
 				</dict>
 				<dict>
 					<key>Align</key>
@@ -969,20 +969,20 @@
 \ul +inherited\ulnone (mod): nil\
 \ul +load\ulnone (filename): Array(Application)\
 \ul +signature\ulnone : Application::Signature\
-\ul +makeSignature\ulnone : Application::Signature\
+\ul +make_signature\ulnone : Application::Signature\
 \ul +action\ulnone (name, &amp;block): nil\
 +config: Config\
 +config=(config): Config\
 +signature: Application::Signature\
-+runCount: Integer\
-+totalUtime: Float\
-+totalStime: Float\
++run_count: Integer\
++total_utime: Float\
++total_stime: Float\
 +templateFactory: TemplateFactory\
 +run(transaction, *rest): Integer\
 +inspect: String\
-+averageUsage: Float\
--loadTemplates(hash): Hash\
--makeValidator(action, txn)}</string>
++average_usage: Float\
+-load_templates(hash): Hash\
+-make_validator(action, txn)}</string>
 				</dict>
 			</array>
 			<key>TextPlacement</key>
@@ -1159,8 +1159,8 @@
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
 
 \f0\fs20 \cf0 ::[](Module): Logger\
-::global: Logger\
-::loggers: Hash\
+.global: Logger\
+.loggers: Hash\
 #hierloggers: Array(Logger)\
 #hieroutputters: Array(Logger::Outputter)\
 #write(level,args): nil\

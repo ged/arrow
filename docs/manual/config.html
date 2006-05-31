@@ -62,7 +62,7 @@ RubyAddPath /path/to/your/Arrow/lib
 RubyRequire arrow
 &lt;Location /your/desired/arrow/url&gt;
     SetHandler ruby-object
-    RubyHandler "Arrow::Dispatcher::create('/your/arrow.conf')"
+    RubyHandler "Arrow::Dispatcher.create('/your/arrow.conf')"
 &lt;/Location&gt;
 		</pre>
 
@@ -95,7 +95,6 @@ RubyRequire arrow
 logLevel: debug
 templateLogLevel: info
 applets: 
-  defaultApplet: "/status"
   missingApplet: "/missing"
   errorApplet: "/error"
   pattern: "*.rb"
@@ -167,14 +166,6 @@ session:
 		  into Arrow and how they are accessed after loading.</dd>
 		  <dd>
 			<dl class="linelist config-subitems">
-			  <dt>defaultApplet</dt>
-			  <dd>This specifies the URI of the applet which is executed when
-			  none is specified by a request's URI. If this value is not
-			  specified or set to <tt>(builtin)</tt>, a very simple status
-			  handler is called instead (<a
-			  href="http://dev.rubycrafters.com/html/classes/Arrow/Broker.html#M000086"
-			  >Arrow::Broker#runDefaultApplet</a>).</dd>
-
 			  <dt>missingApplet</dt>
 			  <dd>Specifies the URI of an applet which should be executed when
 			  the one specified by the request's URI does not exist. If this

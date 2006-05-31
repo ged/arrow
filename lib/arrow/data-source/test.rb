@@ -31,8 +31,6 @@ class Arrow::TestDataSource < Arrow::DataSource
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 
 	#############################################################

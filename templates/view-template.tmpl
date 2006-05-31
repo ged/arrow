@@ -11,7 +11,7 @@
 	<title>Arrow Template Viewer: '<?attr path?>'</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Script-Type" content="text/javascript" />
-	<link rel="stylesheet" type="text/css" href="/stylesheets/arrow.css" />
+	<link rel="stylesheet" type="text/css" href="/css/arrow.css" />
   </head>
   <body>
 
@@ -53,7 +53,7 @@
 	  behaviours, and eventual output.</p>
 
 	<div id="node-tree-section" class="node-tree">
-  <?yield node from template._syntaxTree.each?>
+  <?yield node from template._syntax_tree.each?>
 	  <?call node.to_html?>
   <?end yield?>
 	</div>

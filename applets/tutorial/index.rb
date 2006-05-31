@@ -24,15 +24,13 @@ class ArrowTutorial < Arrow::Applet
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 	# Applet signature
 	Signature = {
 		:name => "Arrow Tutorial",
 		:description => "The tutorial applet.",
 		:maintainer => "ged@FaerieMUD.org",
-		:defaultAction => 'index',
+		:default_action => 'index',
 		:templates => {
 			:index => 'index.tmpl',
 		},

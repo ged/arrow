@@ -30,8 +30,6 @@ class ErrorHandler < Arrow::Applet
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 	# Applet signature
 	Signature = {
@@ -46,7 +44,7 @@ class ErrorHandler < Arrow::Applet
 		},
 		:vargs => {},
 		:monitors => {},
-		:defaultAction => 'default',
+		:default_action => 'default',
 	}
 
 
@@ -55,14 +53,14 @@ class ErrorHandler < Arrow::Applet
 	public
 	######
 
-	action( 'default' ) {|*args|
+	def_action :default do |*args|
 		intentional_undefined_local_variable_or_method
 		return "Hmmm... that didn't work"
-	}
+	end
 
 	def report_error_action( txn, re, err )
 		self.log.debug "Loading 'display' template"
-		template = self.loadTemplate( :display )
+		template = self.load_template( :display )
 		self.log.debug "'display' template: %p" % template
 
 		template.re = re
@@ -74,10 +72,6 @@ class ErrorHandler < Arrow::Applet
 		return true
 	end
 	
-
-	#########
-	protected
-	#########
 
 
 end # class ErrorHandler

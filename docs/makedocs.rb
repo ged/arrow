@@ -12,9 +12,9 @@
 
 # Make sure we're in the correct directory, and if not, change there.
 BEGIN {
-	basedir = File::dirname(File::dirname( File::expand_path(__FILE__) ))
-	unless Dir::pwd == basedir
-		Dir::chdir( basedir ) 
+	basedir = File.dirname(File.dirname( File.expand_path(__FILE__) ))
+	unless Dir.pwd == basedir
+		Dir.chdir( basedir ) 
 	end
 	$LOAD_PATH.unshift basedir
 }

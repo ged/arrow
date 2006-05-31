@@ -13,8 +13,8 @@
 # 
 
 unless defined? Arrow::TestCase
-	testsdir = File::dirname( File::expand_path(__FILE__) )
-	basedir = File::dirname( testsdir )
+	testsdir = File.dirname( File.expand_path(__FILE__) )
+	basedir = File.dirname( testsdir )
 	$LOAD_PATH.unshift "#{basedir}/lib" unless
 		$LOAD_PATH.include?( "#{basedir}/lib" )
 	$LOAD_PATH.unshift "#{basedir}/tests/lib" unless
@@ -31,35 +31,29 @@ class Arrow::SessionIdTestCase < Arrow::TestCase
 	DefaultIdType		= 'Arrow::Session::MD5Id'
 
 
+	def setup
+		@id = Arrow::Session::Id.create( DefaultIdUri, @req )
+	end
+
+	def teardown
+		@id = nil
+	end
+
+
 	#################################################################
 	###	T E S T S
 	#################################################################
 
 	### Test to make sure the Id class is defined
-	def test_00_Class
-		printTestHeader "Session::Id: Class"
-
+	def test_session_id_class_should_exist_and_be_a_class
 		assert_block( "Arrow::Session::Id defined?" ) { defined? Arrow::Session::Id }
 		assert_instance_of Class, Arrow::Session::Id
 	end
 
 
 	### Test the id component.
-	def test_10_IdCreate
-		printTestHeader "Session::Id: Create"
-		rval = nil
-
-		assert_nothing_raised {
-			rval = Arrow::Session::Id::create( DefaultIdUri, @req )
-		}
-		assert_equal DefaultIdType, rval.class.name
-
-		addSetupBlock {
-			@id = Arrow::Session::Id::create( DefaultIdUri, @req )
-		}
-		addTeardownBlock {
-			@id = nil
-		}
+	def test_creating_an_id_should_determine_the_id_class_from_the_uri
+		assert_equal DefaultIdType, @id.class.name
 	end
 
 

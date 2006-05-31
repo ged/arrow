@@ -101,7 +101,7 @@ Signature = {
     :name => "Hello World",
     :description => "This is yet another implementation of Hello World",
     :maintainer => "ged@FaerieMUD.org",
-    :defaultAction => 'greet',
+    :default_action => 'greet',
 }
 </pre>
 
@@ -129,7 +129,7 @@ Signature = {
 		  set to, or the empty string if the <tt>ServerAdmin</tt> setting is not
 		  available.</dd>
 
-		  <dt>defaultAction</dt>
+		  <dt>default_action</dt>
 		  <dd>When no action is specified by the incoming request, this
 		  determines which one will be used. Defaults to
 		  <tt>'_default'</tt>.</dd>
@@ -138,7 +138,7 @@ Signature = {
 		  <dd>This should be set to a hash filled with file names of the
 		  templates that will be used by this applet.  Templates listed in this
 		  hash can later be loaded via the <tt
-		  class="method-name">#loadTemplate</tt> method of the applet
+		  class="method-name">#load_template</tt> method of the applet
 		  object. Defaults to an empty hash.  See the <a
 		  href="tutorial-template.html">templating tutorial</a> for more
 		  coverage of this</dd>
@@ -187,16 +187,16 @@ end
 		  transaction argument is mandatory; defining an action method without
 		  parameters will result in an error.</p>
 
-		<p>You can also use the <tt class="method-name">action</tt> shortcut to
+		<p>You can also use the <tt class="method-name">def_action</tt> shortcut to
 		  define an action to make them easily distinguishable from other
 		  methods you may define in your applet class:</p>
 
 <pre>
-action( :display ) {|txn, *args|
+def_action :display do |txn, *args|
   # Do something with the txn
 
   return "Some content"
-}	
+end
 </pre>
 
 		<p>The two declarations are equivalent.</p>
@@ -227,11 +227,11 @@ action( :display ) {|txn, *args|
 		  by:</p>
 
 <pre>
-formaction = action( :form ) {|txn|
-    templ = self.loadTemplate( :form )
+formaction = def_action :form do |txn|
+    templ = self.load_template( :form )
     templ.txn = txn
     return templ
-}
+end
 
 formaction.template = "form.tmpl"
 </pre>
@@ -262,18 +262,18 @@ class Hello &lt; Arrow::Applet
 	  :name =&gt; "Hello World",
 	  :description =&gt; "This is yet another implementation of Hello World",
 	  :maintainer =&gt; "ged@FaerieMUD.org",
-	  :defaultAction =&gt; 'greet',
+	  :default_action =&gt; 'greet',
   }
 
   # Define the 'greet' (default) action
-  action( :greet ) {|txn|
+  def_action :greet do |txn|
     return &lt;&lt;-EOF
 	&lt;html&gt;
 	  &lt;head&gt;&lt;title&gt;Hello&lt;/title&gt;&lt;/head&gt;
 	  &lt;body&gt;&lt;p&gt;Hello, world.&lt;/p&gt;&lt;/body&gt;
 	&lt;/html&gt;
     EOF
-  }
+  end
 
 end
 </pre>

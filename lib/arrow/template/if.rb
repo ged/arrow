@@ -33,73 +33,62 @@
 require 'arrow/template'
 require 'arrow/template/nodes'
 
-module Arrow
-class Template
+### Conditional directive node object class.
+class Arrow::Template::IfDirective < Arrow::Template::BracketingDirective
+	include Arrow::Template::ConditionalDirective
 
-	### Conditional directive node object class.
-	class IfDirective < Arrow::Template::BracketingDirective
-		include Arrow::Template::ConditionalDirective
+	require 'arrow/template/else'
+	require 'arrow/template/elsif'
 
-		require 'arrow/template/else'
-		require 'arrow/template/elsif'
+	# SVN Revision
+	SVNRev = %q$Rev$
 
-		# SVN Revision
-		SVNRev = %q$Rev$
-
-		# SVN Id
-		SVNId = %q$Id$
-
-		# SVN URL
-		SVNURL = %q$URL$
+	# SVN Id
+	SVNId = %q$Id$
 
 
-		#############################################################
-		###	I N S T A N C E   M E T H O D S
-		#############################################################
+	#############################################################
+	###	I N S T A N C E   M E T H O D S
+	#############################################################
 
-		#########
-		protected
-		#########
+	#########
+	protected
+	#########
 
-		### Render the contents of the conditional if it evaluates to +true+, or
-		### the nodes after 'elsif' or 'else' subnodes if their conditions are
-		### met.
-		def renderContents( template, scope )
-			cond = hasBeenTrue = self.evaluate( template, scope )
+	### Render the contents of the conditional if it evaluates to +true+, or
+	### the nodes after 'elsif' or 'else' subnodes if their conditions are
+	### met.
+	def render_contents( template, scope )
+		cond = hasBeenTrue = self.evaluate( template, scope )
 
-			nodes = []
-			
-			# Now splice out the chunk of nodes that should be rendered based on
-			# the conditional.
-			@subnodes.each {|node|
-				case node
-				when Arrow::Template::ElsifDirective
-					if !hasBeenTrue
-						cond = hasBeenTrue = node.evaluate( template, scope )
-					else
-						cond = false
-					end
-
-				when Arrow::Template::ElseDirective
-					if !hasBeenTrue
-						cond = hasBeenTrue = true
-					else
-						cond = false
-					end
-
+		nodes = []
+		
+		# Now splice out the chunk of nodes that should be rendered based on
+		# the conditional.
+		@subnodes.each do |node|
+			case node
+			when Arrow::Template::ElsifDirective
+				if !hasBeenTrue
+					cond = hasBeenTrue = node.evaluate( template, scope )
 				else
-					nodes.push( node ) if cond
+					cond = false
 				end
-			}
 
-			return template.render( nodes, scope )
+			when Arrow::Template::ElseDirective
+				if !hasBeenTrue
+					cond = hasBeenTrue = true
+				else
+					cond = false
+				end
+
+			else
+				nodes.push( node ) if cond
+			end
 		end
 
+		return template.render( nodes, scope )
+	end
 
 
-	end # class IfDirective
 
-end # class Template
-end # module Arrow
-
-
+end # class Arrow::Template::IfDirective

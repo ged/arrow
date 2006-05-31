@@ -303,28 +303,28 @@ Signature = {
     :name => "Hello World",
     :description => %{A 'hello world' applet.},
     :maintainer => "ged@FaerieMUD.org",
-    :defaultAction => 'templated',
+    :default_action => 'templated',
     <span class="highlighted">:templates => {
         :templated     => 'hello-world.tmpl',
     },</span>
 }
 </pre>
 
-		<p>Which then further allows the use of the Arrow::Applet#loadTemplate
+		<p>Which then further allows the use of the Arrow::Applet#load_template
 		  method to get an Arrow::Template object.  This is mostly just for you
 		  to fill with data, and then make the return value of an action:</p>
 
-<pre>action( 'templated' ) {|txn, *args|
+<pre>def_action :templated do |txn, *args|
     self.log.debug "In the 'templated' action of the %s applet." %
         self.signature.name
 
-    <span class="highlighted">templ = self.loadTemplate( :templated )
+    <span class="highlighted">templ = self.load_template( :templated )
     templ.txn = txn
     templ.time = Time.now.to_s
     templ.applet = self
 
     return templ</span>
-}
+end
 </pre>
 
 		<p>
@@ -344,7 +344,7 @@ Signature = {
 	&lt;title&gt;Arrow: Hello World&lt;/title&gt;
 	&lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8" /&gt;
 	&lt;meta http-equiv="Content-Script-Type" content="text/javascript" /&gt;
-	&lt;link rel="stylesheet" type="text/css" href="/stylesheets/arrow.css" /&gt;
+	&lt;link rel="stylesheet" type="text/css" href="/css/arrow.css" /&gt;
   &lt;/head&gt;
   &lt;body&gt;
 
@@ -355,14 +355,14 @@ Signature = {
 	version&lt;/a&gt; of this applet that outputs plain text (i.e., no
 	templates).&lt;p&gt;
 
-		&lt;!-- Runcount: <span class="highlighted">[?call applet.runCount ?]</span> --&gt;
+		&lt;!-- Runcount: <span class="highlighted">[?call applet.run_count ?]</span> --&gt;
 
 <span class="highlighted">&lt;?if txn.session? ?&gt;</span>
 	  &lt;!-- Session found --&gt;
   <span class="highlighted">&lt;?if txn.session[:user] ?&gt;</span>
 	&lt;p&gt;Since you're logged in as '<span class="highlighted">&lt;?call
 	txn.session[:user]?&gt;</span>', you can also &lt;a
-		href="<span class="highlighted">[?call txn.appRoot?]</span>/<span class="highlighted">[?call txn.appletPath.split(%r{/})[0]
+		href="<span class="highlighted">[?call txn.app_root?]</span>/<span class="highlighted">[?call txn.applet_path.split(%r{/})[0]
 		?]</span>/logout"&gt;log out&lt;/a&gt; to test the protectedness
 	  of the applet chain.&lt;/p&gt;
   <span class="highlighted">&lt;?end?&gt;</span>

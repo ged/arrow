@@ -13,8 +13,8 @@
 # 
 
 unless defined? Arrow::TestCase
-	testsdir = File::dirname( File::expand_path(__FILE__) )
-	basedir = File::dirname( testsdir )
+	testsdir = File.dirname( File.expand_path(__FILE__) )
+	basedir = File.dirname( testsdir )
 	$LOAD_PATH.unshift "#{basedir}/lib" unless
 		$LOAD_PATH.include?( "#{basedir}/lib" )
 	$LOAD_PATH.unshift "#{basedir}/tests/lib" unless
@@ -32,11 +32,11 @@ class Arrow::ConfigTestCase < Arrow::TestCase
 	# Testing config values
 	TestConfig = {
 		:applets => {
-			:path	=> Arrow::Path::new( "apps:/www/apps" ),
+			:path	=> Arrow::Path.new( "apps:/www/apps" ),
 		},
 		:templates => {
 			:loader => 'Arrow::Template',
-			:path  => Arrow::Path::new( "templates:/www/templates" ),
+			:path  => Arrow::Path.new( "templates:/www/templates" ),
 			:cache => true,
 			:cacheConfig => {
 				:maxNum => 20,
@@ -47,7 +47,7 @@ class Arrow::ConfigTestCase < Arrow::TestCase
 	TestConfig.freeze
 
 	# The name of the testing configuration file
-	TestConfigFilename = File::join( File::dirname(__FILE__), "testconfig.conf" )
+	TestConfigFilename = File.join( File.dirname(__FILE__), "testconfig.conf" )
 
 	# Testing Config::Loader class
 	class TestLoader < Arrow::Config::Loader
@@ -115,18 +115,20 @@ class Arrow::ConfigTestCase < Arrow::TestCase
 			end
 		end
 
-		Kernel::raise( err, err.message, bt[firstIdx..-1] )
+		Kernel.raise( err, err.message, bt[firstIdx..-1] )
 	end
 
 	def setup
-		File::delete( TestConfigFilename ) if
-			File::exists?( TestConfigFilename )
+		File.delete( TestConfigFilename ) if
+			File.exists?( TestConfigFilename )
+		@struct = Arrow::Config::ConfigStruct.new( TestConfig )
 	end
 	alias_method :set_up, :setup
 
 	def teardown
-		File::delete( TestConfigFilename ) if
-			File::exists?( TestConfigFilename )
+		File.delete( TestConfigFilename ) if
+			File.exists?( TestConfigFilename )
+    		@struct = nil
 	end
 	alias_method :tear_down, :teardown
 
@@ -136,51 +138,38 @@ class Arrow::ConfigTestCase < Arrow::TestCase
 	###	T E S T S
 	#################################################################
 
-	### Classes test
-	def test_00_Classes
-		printTestHeader "Arrow::Config: Classes"
+	def test_struct_can_behave_as_a_hash
+        [:keys, :key?, :values, :value?, :[], :[]=, :length, :empty?, :clear].each do |meth|
+		    assert_respond_to @struct, meth
+	    end
+    end
 
-		assert_instance_of Class, Arrow::Config
-		assert_instance_of Class, Arrow::Config::ConfigStruct
-		assert_instance_of Class, Arrow::Config::Loader
-	end
-
-
-	### Test the ConfigStruct class
-	def test_05_ConfigStruct
-		printTestHeader "Arrow::Config: ConfigStruct class"
-		struct = rval = nil
-
-		assert_nothing_raised {
-			struct = Arrow::Config::ConfigStruct::new( TestConfig )
-		}
-		assert_instance_of Arrow::Config::ConfigStruct, struct
-
-		assert_respond_to struct, :[]
-
+    def test_config_struct_reflects_structure_of_config_hash
+        rval = nil
+        
 		# :TODO: This whole block should really be factored into something that
 		# can traverse the whole TestConfig recursively to test more then 2-deep
 		# methods.
-		TestConfig.each {|key, val|
+		TestConfig.each do |key, val|
 
 			# Response predicate
-			assert_nothing_raised { rval = struct.respond_to?(key) }
+			assert_nothing_raised { rval = @struct.respond_to?(key) }
 			assert_equal true, rval, "respond_to?( #{key.inspect} )"
-			assert_nothing_raised { rval = struct.respond_to?("#{key}=") }
+			assert_nothing_raised { rval = @struct.respond_to?("#{key}=") }
 			assert_equal true, rval, "respond_to?( #{key.inspect}= )"
-			assert_nothing_raised { rval = struct.respond_to?("#{key}?") }
+			assert_nothing_raised { rval = @struct.respond_to?("#{key}?") }
 			assert_equal true, rval, "respond_to?( #{key.inspect}? )"
 
 			# Get
-			assert_nothing_raised { rval = struct.send(key) }
+			assert_nothing_raised { rval = @struct.send(key) }
 			assert_config_equal val, rval, "#{key}"
 
 			# Get via index operator
-			assert_nothing_raised { rval = struct[key] }
+			assert_nothing_raised { rval = @struct[key] }
 			assert_config_equal val, rval, "#{key}"
 			
 			# Predicate
-			assert_nothing_raised { rval = struct.send("#{key}?") }
+			assert_nothing_raised { rval = @struct.send("#{key}?") }
 			if val
 				assert_equal true, rval
 			else
@@ -188,10 +177,10 @@ class Arrow::ConfigTestCase < Arrow::TestCase
 			end
 
 			# Set (and test get again to make sure it actually set a correct value)
-			assert_nothing_raised { struct.send("#{key}=", val) }
-			assert_nothing_raised { rval = struct.send(key) }
+			assert_nothing_raised { @struct.send("#{key}=", val) }
+			assert_nothing_raised { rval = @struct.send(key) }
 			assert_config_equal val, rval, "#{key} after #{key}="
-		}
+		end
 	end
 
 
@@ -200,7 +189,7 @@ class Arrow::ConfigTestCase < Arrow::TestCase
 		printTestHeader "Arrow::Config: Hashification of ConfigStructs"
 		struct = rval = nil
 
-		struct = Arrow::Config::ConfigStruct::new( TestConfig )
+		struct = Arrow::Config::ConfigStruct.new( TestConfig )
 		
 		# Call all member methods to convert subhashes to ConfigStructs
 		TestConfig.each {|key,val| struct.send(key) }
@@ -216,7 +205,7 @@ class Arrow::ConfigTestCase < Arrow::TestCase
 		printTestHeader "Arrow::Config: Instantiation without arguments"
 		rval = config = nil
 
-		assert_nothing_raised { config = Arrow::Config::new }
+		assert_nothing_raised { config = Arrow::Config.new }
 		assert_instance_of Arrow::Config, config
 
 		Arrow::Config::Defaults.each {|key,val|
@@ -237,7 +226,7 @@ class Arrow::ConfigTestCase < Arrow::TestCase
 		rval = config = nil
 
 		assert_nothing_raised {
-			config = Arrow::Config::new( TestConfig )
+			config = Arrow::Config.new( TestConfig )
 		}
 		assert_instance_of Arrow::Config, config
 
@@ -255,9 +244,9 @@ class Arrow::ConfigTestCase < Arrow::TestCase
 	def test_30_Loader
 		printTestHeader "Arrow::Config: Loader base class"
 		rval = loader = nil
-		createTime = Time::now
+		createTime = Time.now
 
-		assert_nothing_raised { loader = Arrow::Config::Loader::create('test') }
+		assert_nothing_raised { loader = Arrow::Config::Loader.create('test') }
 		assert_kind_of Arrow::Config::Loader, loader
 
 		# The #load method
@@ -273,23 +262,23 @@ class Arrow::ConfigTestCase < Arrow::TestCase
 	end
 
 
-	### Test the ::create method of Loader with the YAML Loader class.
+	### Test the .create method of Loader with the YAML Loader class.
 	def test_31_CreateYamlLoader
 		printTestHeader "Arrow::Config: YAML loader"
 		loader = rval = nil
 
 		assert_nothing_raised {
-			loader = Arrow::Config::Loader::create( 'yaml' )
+			loader = Arrow::Config::Loader.create( 'yaml' )
 		}
 		assert_kind_of Arrow::Config::Loader, loader
 
 		assert_nothing_raised {
-			loader = Arrow::Config::Loader::create( 'YAML' )
+			loader = Arrow::Config::Loader.create( 'YAML' )
 		}
 		assert_kind_of Arrow::Config::Loader, loader
 
 		assert_nothing_raised {
-			loader = Arrow::Config::Loader::create( 'Yaml' )
+			loader = Arrow::Config::Loader.create( 'Yaml' )
 		}
 		assert_kind_of Arrow::Config::Loader, loader
 	end
@@ -299,12 +288,12 @@ class Arrow::ConfigTestCase < Arrow::TestCase
 	def test_40_ConfigWriteRead
 		printTestHeader "Arrow::Config: #write and #read"
 		
-		config = Arrow::Config::new( TestConfig )
+		config = Arrow::Config.new( TestConfig )
 		assert_nothing_raised {
 			config.write( TestConfigFilename )
 		}
 
-		otherConfig = Arrow::Config::load( TestConfigFilename )
+		otherConfig = Arrow::Config.load( TestConfigFilename )
 
 		assert_config_equal config.struct, otherConfig.struct
 	end
@@ -314,7 +303,7 @@ class Arrow::ConfigTestCase < Arrow::TestCase
 	def test_50_changed_after_set
 		printTestHeader "Arrow::Config: #changed? after .member="
 		rval = nil
-		config = Arrow::Config::new( TestConfig )
+		config = Arrow::Config.new( TestConfig )
 
 		# Make sure the brand-new config struct knows it's unchanged
 		assert_nothing_raised do
@@ -337,8 +326,8 @@ class Arrow::ConfigTestCase < Arrow::TestCase
 	def test_55_changed_after_merge
 		printTestHeader "Arrow::Config: #changed? after #merge!"
 		rval = nil
-		config = Arrow::Config::new( TestConfig )
-		config2 = Arrow::Config::new()
+		config = Arrow::Config.new( TestConfig )
+		config2 = Arrow::Config.new()
 
 		# Now merge the defaults back into the test config
 		config.merge!( config2 )

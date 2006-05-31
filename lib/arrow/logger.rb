@@ -13,14 +13,14 @@
 #   require 'arrow/object'
 #   require 'arrow/logger'
 # 
-#   logger = Arrow::Logger::global
-#	logfile = File::open( "global.log", "a" )
-#	logger.outputters << Arrow::Logger::Outputter::new(logfile)
+#   logger = Arrow::Logger.global
+#	logfile = File.open( "global.log", "a" )
+#	logger.outputters << Arrow::Logger::Outputter.new(logfile)
 #	logger.level = :debug
 #
 #	class MyClass < Arrow::Object
 #
-#		def self::fooMethod
+#		def self.fooMethod
 #			Arrow::Logger.debug( "In server start routine" )
 #			Arrow::Logger.info( "Server is not yet configured." )
 #			Arrow::Logger.notice( "Server is starting up." )
@@ -59,8 +59,6 @@ class Arrow::Logger
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 	# Construct a log levels Hash on the fly
 	Levels = [
@@ -73,6 +71,7 @@ class Arrow::Logger
 		:alert,
 		:emerg,
 	].inject({}) {|hsh, sym| hsh[ sym ] = hsh.length; hsh}
+	LevelNames = Levels.invert
 
 	# Constant for debugging the logger - set to true to output internals to
 	# $stderr.
@@ -95,7 +94,7 @@ class Arrow::Logger
 	### Module object, a Symbol, or a String.
 	def self::[]( mod=nil )
 		modname = mod.to_s
-		return self::global if modname.empty?
+		return self.global if modname.empty?
 
 		modname = '::' + modname unless /^::/ =~ modname
 		names = modname.split( /::/ )
@@ -109,13 +108,13 @@ class Arrow::Logger
 
 	### Return the global Arrow logger, setting it up if it hasn't been
 	### already.
-	def self::global
+	def self.global
 		@loggers[ '' ] ||= new( '' )
 	end
 
 
 	### Autoload global logging methods for the log levels
-	def self::method_missing( sym, *args )
+	def self.method_missing( sym, *args )
 		return super unless Levels.key?( sym )
 
 		self.global.debug( "Autoloading class log method '#{sym}'." )
@@ -178,13 +177,19 @@ class Arrow::Logger
 
 
 	### Return the name of the logger formatted to be suitable for reading.
-	def readableName
+	def readable_name
 		logname = self.name.sub( /^::/, '' )
 		logname = '(global)' if logname.empty?
 
 		return logname
 	end
+	
 
+	### Return the logger's level as a Symbol.
+	def readable_level
+		return LevelNames[ @level ]
+	end
+	
 
 	### Set the level of this logger to +level+. The +level+ can be a
 	### String, a Symbol, or an Integer.
@@ -213,11 +218,6 @@ class Arrow::Logger
 	end
 
 
-	### Return the level of this logger as a Symbol
-	def levelSym
-		Levels.invert[ @level ]
-	end
-
 
 	### Return a uniquified Array of the loggers which are more-generally
 	### related hierarchically to the receiver, inclusive. If called with a
@@ -241,7 +241,7 @@ class Arrow::Logger
 
 			# When one is found, add it to the ones being returned and yield it
 			# if there's a block
-			debugMsg "hierloggers: added %s" % logger.readableName
+			debugMsg "hierloggers: added %s" % logger.readable_name
 			loggers.push( logger )
 			yield( logger ) if block_given?
 
@@ -289,12 +289,12 @@ class Arrow::Logger
 		debugMsg "Writing message at %p: %p" % [ level, args ]
 
 		msg, frame = nil, nil
-		time = Time::now
+		time = Time.now
 
 		# If tracing is turned on, pick the first frame in the stack that
 		# isn't in this file, or the last one if that fails to yield one.
 		if @trace
-			re = Regexp::new( Regexp::quote(__FILE__) + ":\d+:" )
+			re = Regexp.new( Regexp.quote(__FILE__) + ":\d+:" )
 			frame = caller(1).find {|fr| re !~ fr } || caller(1).last
 		end
 
@@ -302,7 +302,7 @@ class Arrow::Logger
 		self.hieroutputters( level ) do |outp, logger|
 			debugMsg "Got outputter %p" % outp
 			msg ||= args.collect {|obj| self.stringifyObject(obj)}.join
-			outp.write( time, level, self.readableName, frame, msg )
+			outp.write( time, level, self.readable_name, frame, msg )
 		end
 	end
 

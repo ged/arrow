@@ -44,8 +44,6 @@ class Arrow::Template < Arrow::Object
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 	# Configuration defaults. Valid members are the same as those listed for
 	# the +config+ item of the #new method.
@@ -67,16 +65,16 @@ class Arrow::Template < Arrow::Object
 		},
 		::Object		=> :to_s,
 		::Array			=> lambda {|ary,tmpl|
-			tmpl.renderObjects(*ary)
+			tmpl.render_objects(*ary)
 		},
 		::Hash			=> lambda {|hsh,tmpl|
-			hsh.collect do |k,v| tmpl.renderObjects(k, ": ", v) end
+			hsh.collect do |k,v| tmpl.render_objects(k, ": ", v) end
 		},
 		::Method		=> lambda {|meth,tmpl|
-			tmpl.renderObjects( meth.call )
+			tmpl.render_objects( meth.call )
 		},
 		::Exception		=> lambda {|err,tmpl|
-			tmpl.renderComment "%s: %s: %s" % [
+			tmpl.render_comment "%s: %s: %s" % [
 				err.class.name,
 				err.message,
 				err.backtrace ? err.backtrace[0] : "Stupid exception with no backtrace.",
@@ -94,7 +92,7 @@ class Arrow::Template < Arrow::Object
 		### singleton accessors on the resulting object.
 		def initialize( defs={} )
 			@definitions = []
-			self.addDefinitionSet( defs )
+			self.add_definition_set( defs )
 		end
 
 
@@ -106,16 +104,16 @@ class Arrow::Template < Arrow::Object
 		#attr_reader :definitions
 
 
-		### Fetch the Binding obejct for the RenderingScope.
-		def getBinding; binding; end
+		### Fetch the Binding object for the RenderingScope.
+		def get_binding; binding; end
 
 
 		### Add the specified definitions +defs+ to the object.
-		def addDefinitionSet( defs )
+		def add_definition_set( defs )
 			#self.log.debug "adding definition set: %p" % [ defs ]
 			@definitions.push( defs )
 
-			defs.each {|name,val|
+			defs.each do |name,val|
 				raise ScopeError, "Cannot override @definitions" if
 					name == 'definitions'
 				@definitions.last[ name ] = val
@@ -132,20 +130,20 @@ class Arrow::Template < Arrow::Object
 				end
 
 				self.instance_variable_set( "@#{name}", defs[name] )
-			}
+			end
 		end
 
 
 		### Remove the specified definitions +defs+ from the object. Using
 		### a definition so removed after this point will raise an error.
-		def removeDefinitionSet
+		def remove_definition_set
 			#self.log.debug "Removing definition set from stack of %d frames" %
 			#	@definitions.nitems
 			defs = @definitions.pop
 			#self.log.debug "Removing defs: %p, %d frames left" % 
 			#	[ defs, @definitions.nitems ]
 
-			defs.keys.each {|name|
+			defs.keys.each do |name|
 				next if name == 'definitions'
 
 				# If there was already a definition in effect with the same
@@ -168,7 +166,7 @@ class Arrow::Template < Arrow::Object
 					#self.log.debug "Restoring previous def for '%s'" % name
 					self.instance_variable_set( "@#{name}", previousSet[name] )
 				end
-			}
+			end
 
 		end
 
@@ -180,12 +178,12 @@ class Arrow::Template < Arrow::Object
 			begin
 				#self.log.debug "Before adding definitions: %d scope frame/s. Last: %p" %
 				#	[ @definitions.nitems, @definitions.last.keys ]
-				self.addDefinitionSet( defs )
+				self.add_definition_set( defs )
 				#self.log.debug "After adding definitions: %d scope frame/s. Last: %p" % 
 				#	[ @definitions.nitems, @definitions.last.keys ]
 				yield( self )
 			ensure
-				self.removeDefinitionSet
+				self.remove_definition_set
 			end
 		end
 
@@ -199,9 +197,9 @@ class Arrow::Template < Arrow::Object
 
 	# The Array of directories the template class searches for template
 	# names given to #load.
-	@loadPath = %w{.}
+	@load_path = %w{.}
 	class << self
-		attr_accessor :loadPath
+		attr_accessor :load_path
 	end
 
 
@@ -209,44 +207,45 @@ class Arrow::Template < Arrow::Object
 	def self::load( source, path=[], cache={} )
 
 		# Find the file on either the specified or default path
-		path = self.loadPath if path.empty?
-		filename = self.findFile( source, path )
-		Arrow::Logger[self].debug "Cache contains: %p" % cache
+		path = self.load_path if path.empty?
+		Arrow::Logger[self].debug "Searching for template '%s' in %d directories" % [ source, path.size ]
+		filename = self.find_file( source, path )
+		Arrow::Logger[self].debug "Found '%s'; cache contains %d entries" % [ filename, cache.size ]
 
-		# Use the cached version if the caller passed on in and it exists.
-		if cache.include?( filename )
-			Arrow::Logger[self].debug "Cloning cached object %p for %p" % 
-				[ cache[filename], filename ]
+		# Use the cached version if the caller passed one in and it exists.
+		if cache.include?( filename ) && !cache[ filename ].nil?
+			Arrow::Logger[self].debug "Cloning cached object for %p" % [ filename ]
 			obj = cache[ filename ].clone
 		else
-			Arrow::Logger[self].debug "No cached version: Loading %p anew" % filename
-			source = File::read( filename )
+			Arrow::Logger[self].debug "No cached version: Loading %p anew" % [ filename ]
+			source = File.read( filename )
 			source.untaint
 
 			# Create a new template object, set its path and filename, then tell it
 			# to parse the loaded source to define its behaviour.
 			obj = cache[ filename ] = new()
 			obj._file = filename
-			obj._loadPath.replace( path )
+			obj._load_path.replace( path )
 			obj.parse( source )
 		end
 
-		Arrow::Logger[self].debug "Returning template object. Cache is: %p" % cache
+		Arrow::Logger[self].debug "Returning template object. Cache has %d entries" % 
+			[ cache.size ]
 		return obj
 	end
 
 
 	### Find the specified +file+ in the given +path+ (or the Template
-	### class's #loadPath if not specified).
-	def self::findFile( file, path=[] )
+	### class's #load_path if not specified).
+	def self::find_file( file, path=[] )
 		raise TemplateError, "Filename #{file} is tainted." if
 			file.tainted?
 
 		filename = path.
-			collect {|dir| File::expand_path(file, dir).untaint }.
-			find {|fn| File::file?(fn) }
+			collect {|dir| File.expand_path(file, dir).untaint }.
+			find {|fn| File.file?(fn) }
 		raise Arrow::TemplateError,
-			"Template '%s' not found. Search path was %s" %
+			"Template '%s' not found. Search path was %p" %
 			[ file, path ] unless filename
 
 		return filename
@@ -297,10 +296,10 @@ class Arrow::Template < Arrow::Object
 	###   their rendered output.
 	### [<b>:commentStart</b>]
 	###   The String which will be prepended to all comments rendered in the
-	###   output. See #renderComment.
+	###   output. See #render_comment.
 	### [<b>:commentEnd</b>]
 	###   The String which will be appended to all comments rendered in the
-	###   output. See #renderComment.
+	###   output. See #render_comment.
 	### [<b>:strictAttributes</b>]
 	###   If set to a +true+ value, method calls which don't match
 	###   already-extant attributes will result in NameErrors. This is
@@ -310,19 +309,19 @@ class Arrow::Template < Arrow::Object
 		@config = Defaults.merge( config, &Arrow::HashMergeFunction )
 		@renderers = DefaultRenderers.dup
 		@attributes = {}
-		@syntaxTree = []
+		@syntax_tree = []
 		@source = content
 		@file = nil
-		@creationTime = Time::now
-		@loadPath = self.class.loadPath
+		@creation_time = Time.now
+		@load_path = self.class.load_path.dup
 
-		@superTemplate = nil
+		@enclosing_template = nil
 
 		case content
 		when String
 			self.parse( content )
 		when Array
-			self.installSyntaxTree( content )
+			self.install_syntax_tree( content )
 		when NilClass
 			# No-op
 		else
@@ -337,8 +336,8 @@ class Arrow::Template < Arrow::Object
 		super
 		
 		@attributes = {}
-		tree = original._syntaxTree.collect {|node| node.clone}
-		self.installSyntaxTree( tree )
+		tree = original._syntax_tree.collect {|node| node.clone}
+		self.install_syntax_tree( tree )
 	end
 
 
@@ -354,7 +353,7 @@ class Arrow::Template < Arrow::Object
 	attr_underbarred_reader :_attributes
 
 	# The Array of first-level nodes which make up the AST of the template.
-	attr_underbarred_reader :_syntaxTree
+	attr_underbarred_reader :_syntax_tree
 
 	# The template's configuration
 	attr_underbarred_reader :_config
@@ -372,53 +371,53 @@ class Arrow::Template < Arrow::Object
 
 	# The load path used when the template was loaded. This is the path that
 	# will be used to load any subordinate resources (eg., includes).
-	attr_underbarred_accessor :_loadPath
+	attr_underbarred_accessor :_load_path
 
 	# The Time that the template object was created
-	attr_underbarred_accessor :_creationTime
+	attr_underbarred_accessor :_creation_time
 
 	# The template which contains this one (if any) during a render.
-	attr_underbarred_accessor :_superTemplate
+	attr_underbarred_accessor :_enclosing_template
 
 
 
 	### Return the approximate size of the template, in bytes. Used by
 	### Arrow::Cache for size thresholds.
 	def memsize
-		@source.length
+		@source ? @source.length : 0
 	end
 
 
 	### Parse the given template source (a String) and put the resulting
-	### nodes into the template's syntaxTree.
+	### nodes into the template's syntax_tree.
 	def parse( source )
 		@source = source
 		parserClass = @config[:parserClass]
-		tree = parserClass::new( @config ).parse( source, self )
+		tree = parserClass.new( @config ).parse( source, self )
 
 		#self.log.debug "Parse complete: syntax tree is: %p" % tree
-		return self.installSyntaxTree( tree )
+		return self.install_syntax_tree( tree )
 	end
 
 
 	### Install a new syntax tree in the template object, replacing the old one,
 	### if any.
-	def installSyntaxTree( tree )
-		@syntaxTree = tree
-		@syntaxTree.each {|node| node.addToTemplate(self) }
+	def install_syntax_tree( tree )
+		@syntax_tree = tree
+		@syntax_tree.each do |node| node.add_to_template(self) end
 	end
 
 
 	### Install the given +node+ into the template object.
-	def installNode( node )
+	def install_node( node )
 		#self.log.debug "Installing a %s %p" % [node.type, node]
 
 		if node.respond_to?( :name ) && node.name
 			unless @attributes.key?( node.name )
 				#self.log.debug "Installing an attribute for a node named %p" % node.name
 				@attributes[ node.name ] = nil
-				self.addAttributeAccessor( node.name.intern )
-				self.addAttributeMutator( node.name.intern )
+				self.add_attribute_accessor( node.name.intern )
+				self.add_attribute_mutator( node.name.intern )
 			else
 				#self.log.debug "Already have a attribute named %p" % node.name
 			end
@@ -432,10 +431,10 @@ class Arrow::Template < Arrow::Object
 	def changed?
 		return false unless @file
 
-		if File::exists?( @file )
+		if File.exists?( @file )
 			self.log.debug "Comparing creation time '%s' with file mtime '%s'" %
-				[ @creationTime, File::mtime(@file) ]
-			rval = File::mtime( @file ) > @creationTime
+				[ @creation_time, File.mtime(@file) ]
+			rval = File.mtime( @file ) > @creation_time
 		end
 
 		self.log.debug "Template file '%s' has %s" %
@@ -446,26 +445,26 @@ class Arrow::Template < Arrow::Object
 
 	### Render the template to text and return it as a String. If called with an
 	### Array of +nodes+, the template will render them instead of its own
-	### syntaxTree. If given a scope (a Module object), a Binding of its
+	### syntax_tree. If given a scope (a Module object), a Binding of its
 	### internal state it will be used as the context of evaluation for the
 	### render. If not specified, a new anonymous Module instance is created for
-	### the render. If a +superTemplate+ is given, make it available during
+	### the render. If a +enclosing_template+ is given, make it available during
 	### rendering for variable-sharing, etc. Returns the results of each nodes'
 	### render joined together with the default string separator (+$,+).
-	def render( nodes=nil, scope=nil, superTemplate=nil )
-		oldSuper = @superTemplate
-		@superTemplate = superTemplate
+	def render( nodes=nil, scope=nil, enclosing_template=nil )
+		oldSuper = @enclosing_template
+		@enclosing_template = enclosing_template
 
 		# If no nodes were given, fetch a prepped copy of this template's
 		# syntax tree
-		nodes ||= self.getPreppedNodes
+		nodes ||= self.get_prepped_nodes
 
 		# Set up a rendering scope if none was specified
-		scope ||= self.makeRenderingScope
+		scope ||= self.make_rendering_scope
 
 		# Catenate the results of rendering each node
 		rval = []
-		nodes.each {|node|
+		nodes.each do |node|
 			#self.log.debug "Rendering a %s: %p" % 
 			#	[ node.class.name, node ]
 			begin
@@ -473,26 +472,26 @@ class Arrow::Template < Arrow::Object
 			rescue ::Exception => err
 				rval << err
 			end
-		}
+		end
 
-		return self.renderObjects( *rval )
+		return self.render_objects( *rval )
 	ensure
-		@superTemplate = oldSuper
+		@enclosing_template = oldSuper
 	end
 	alias_method :to_s, :render
 
 
 	### Create an anonymous module to act as a scope for any evals that take
 	### place during a single render.
-	def makeRenderingScope
-		scope = RenderingScope::new( @attributes )
+	def make_rendering_scope
+		scope = RenderingScope.new( @attributes )
 		return scope
 	end
 
 
 	### Render the specified object into text.
-	def renderObjects( *objs )
-		objs.collect {|obj|
+	def render_objects( *objs )
+		objs.collect do |obj|
 			rval = nil
 			key = (@renderers.keys & obj.class.ancestors).sort {|a,b| a <=> b}.first
 
@@ -509,13 +508,13 @@ class Arrow::Template < Arrow::Object
 			else
 				rval = obj.to_s
 			end
-		}.join('')
+		end.join('')
 	end
 
 
 	### Render the given +message+ as a comment as specified by the template
 	### configuration.
-	def renderComment( message )
+	def render_comment( message )
 		comment = "%s%s%s\n" % [
 			@config[:commentStart],
 			message,
@@ -529,25 +528,25 @@ class Arrow::Template < Arrow::Object
 	### Call the given +block+, overriding the contents of the template's attributes
 	### and the definitions in the specified +scope+ with those from the pairs in 
 	### the given +hash+.
-	def withOverriddenAttributes( scope, hash )
+	def with_overridden_attributes( scope, hash )
 		oldvals = {}
 		begin
-			hash.each {|name, value|
+			hash.each do |name, value|
 				#self.log.debug "Overriding attribute %s with value: %p" %
 				#	[ name, value ]
 				oldvals[name] = @attributes.key?( name ) ? @attributes[ name ] : nil
 				@attributes[ name ] = value
-			}
-			scope.override( hash ) {
+			end
+			scope.override( hash ) do
 				yield( self )
-			}
+			end
 		ensure
-			oldvals.each {|name, value|
+			oldvals.each do |name, value|
 				#self.log.debug "Restoring old value: %s for attribute %p" %
 				#	[ name, value ]
 				@attributes.delete( name )
 				@attributes[ name ] = oldvals[name] if oldvals[name]
-			}
+			end
 		end
 	end
 
@@ -559,8 +558,10 @@ class Arrow::Template < Arrow::Object
 
 	### Returns the syntax tree with its nodes prepped in accordance with
 	### the template's configuration.
-	def getPreppedNodes
-		tree = @syntaxTree.dup
+	def get_prepped_nodes
+		tree = @syntax_tree.dup
+
+		# Make a flat list of all nodes
 		nodes = tree.collect {|node| node.to_a}.flatten
 
 		# Elide directive lines. Match node lists like:
@@ -571,12 +572,8 @@ class Arrow::Template < Arrow::Object
 		# head of the trailing textnode. Trailing textnode can also be a
 		# leading textnode for another series.
 
-		### Commented because this probably isn't the best place to do this,
-		### as this way only catches toplevel nodes. Need something that
-		### does recursion or make the parser state do this on the fly.
-
 		if @config[:elideDirectiveLines]
-			nodes.each_with_index {|node,i|
+			nodes.each_with_index do |node,i|
 				#self.log.debug "Examining node #%d: %p" % [ i, node ]
 				leadingNode = nodes[i-1]
 
@@ -588,14 +585,14 @@ class Arrow::Template < Arrow::Object
 
 					# Find the trailing node. Abandon the search on any
 					# rendering directive or text node that 
-					trailingNode = nodes[i..-1].find {|node|
+					trailingNode = nodes[i..-1].find do |node|
 						if node.rendering?
 							#self.log.debug "Stopping search: Found a rendering node."
 							break nil
 						end
 
 						node.is_a?( TextNode ) && node =~ /^\n/
-					}
+					end
 
 					if trailingNode
 						leadingNode.body.sub!( /\n\s*$/, '' )
@@ -604,7 +601,7 @@ class Arrow::Template < Arrow::Object
 						#self.log.debug "No trailing node. Skipping"
 					end
 				end
-			}
+			end
 		end
 
 		return tree
@@ -621,11 +618,11 @@ class Arrow::Template < Arrow::Object
 		# Mutator
 		if /=$/ =~ sym.to_s
 			#self.log.debug "Autoloading mutator %p" % sym
-			self.addAttributeMutator( sym )
+			self.add_attribute_mutator( sym )
 		# Accessor
 		else
 			#self.log.debug "Autoloading accessor %p" % sym
-			self.addAttributeAccessor( sym )
+			self.add_attribute_accessor( sym )
 		end
 
 		# Don't use #send to avoid infinite recursion in case method
@@ -636,7 +633,7 @@ class Arrow::Template < Arrow::Object
 
 	### Add a singleton accessor (getter) method for accessing the attribute
 	### specified by +sym+ to the receiver.
-	def addAttributeAccessor( sym )
+	def add_attribute_accessor( sym )
 		name = sym.to_s.sub( /=$/, '' )
 
 		code = %Q{
@@ -652,7 +649,7 @@ class Arrow::Template < Arrow::Object
 
 	### Add a singleton mutator (setter) method for accessing the attribute
 	### specified by +sym+ to the receiver.
-	def addAttributeMutator( sym )
+	def add_attribute_mutator( sym )
 		name = sym.to_s.sub( /=$/, '' )
 
 		code = %Q{

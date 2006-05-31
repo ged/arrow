@@ -8,10 +8,6 @@
 #
 # [<b>startMonitor</b>]
 #	Start the monitoring subsystem. Defaults to +false+.
-# [<b>defaultApplet</b>]
-#   The URI of the default applet to run when the Arrow appserver root URI
-#	is requested. A value of '(builtin)' (the default) will cause a default
-#	status method to be invoked.
 # [<b>noSuchAppletHandler</b>]
 #   The URI of the applet which should handle requests for applets that don't
 #   exist. A value of '(builtin)' (the default) will cause a builtin handler to
@@ -71,7 +67,7 @@
 #	[<b>lockType</b>]
 #	  A URI which specifies what locking class to use and its configuration. If
 #	  this is the string +'recommended'+, the lock object will be created by
-#	  calling the #createRecommendedLock method of the store. Defaults to
+#	  calling the #create_recommended_lock method of the store. Defaults to
 #	  'recommended'. See Arrow::Session::Lock and its derivatives for the format
 #	  of the URI.
 #	[<b>storeType</b>]
@@ -108,6 +104,7 @@
 require 'pp'
 require 'uri'
 require 'pluginfactory'
+require 'forwardable'
 
 require 'arrow'
 require 'arrow/mixins'
@@ -132,7 +129,7 @@ class Arrow::Config < Arrow::Object
 
 
 	# Output a debugging message to STDERR
-	def self::debugMsg( *msgs )
+	def self.debugMsg( *msgs )
 		$stderr.puts msgs.join
 	end
 
@@ -144,19 +141,18 @@ class Arrow::Config < Arrow::Object
 		:logLevels				=> { :global => 'notice' },
 
 		:applets => {
-			:path			=> Arrow::Path::new( "applets:/www/applets" ),
+			:path			=> Arrow::Path.new( "applets:/www/applets" ),
 			:pattern		=> '*.rb',
 			:pollInterval	=> 5,
 			:layout			=> {},
 			:config			=> {},
 			:missingApplet	=> '/missing',
 			:errorApplet	=> '/error',
-			:defaultApplet	=> '/',
 		},
 
 		:templates => {
 			:loader			=> 'Arrow::Template',
-			:path			=> Arrow::Path::new( "templates:/www/templates" ),
+			:path			=> Arrow::Path.new( "templates:/www/templates" ),
 			:cache			=> true,
 			:cacheConfig	=> {
 				:maxNum			=> 20,
@@ -193,15 +189,15 @@ class Arrow::Config < Arrow::Object
 
 	### Get the loader by the given name, creating a new one if one is not
 	### already instantiated.
-	def self::getLoader( name=nil )
+	def self.getLoader( name=nil )
 		name ||= self.defaultLoader
-		self.loaders[name] ||= Arrow::Config::Loader::create( name )
+		self.loaders[name] ||= Arrow::Config::Loader.create( name )
 	end
 
 
 	### Read and return an Arrow::Config object from the given file or
 	### configuration source using the specified +loader+.
-	def self::load( source, loaderObj=nil )
+	def self.load( source, loaderObj=nil )
 		loaderObj = self.getLoader( loaderObj ) unless
 			loaderObj.is_a?( Arrow::Config::Loader )
 		confighash = loaderObj.load( source )
@@ -216,7 +212,7 @@ class Arrow::Config < Arrow::Object
 
 	### Return a copy of the specified +hash+ with all of its values
 	### untainted.
-	def self::untaintValues( hash )
+	def self.untaintValues( hash )
 		newhash = {}
 		hash.each {|key,val|
 			case val
@@ -249,7 +245,7 @@ class Arrow::Config < Arrow::Object
 
 	### Return a duplicate of the given +hash+ with its identifier-like keys
 	### transformed into symbols from whatever they were before.
-	def self::internifyKeys( hash )
+	def self.internifyKeys( hash )
 		newhash = {}
 		hash.each {|key,val|
 			if val.is_a?( Hash )
@@ -265,7 +261,7 @@ class Arrow::Config < Arrow::Object
 
 	### Return a version of the given +hash+ with its keys transformed
 	### into Strings from whatever they were before.
-	def self::stringifyKeys( hash )
+	def self.stringifyKeys( hash )
 		newhash = {}
 		hash.each {|key,val|
 			if val.is_a?( Hash )
@@ -291,8 +287,8 @@ class Arrow::Config < Arrow::Object
 		# self.log.debug "Ihash is %p" % ihash
 		mergedhash = Defaults.merge( ihash, &Arrow::HashMergeFunction )
 		# self.log.debug "Merged hash is %p" % mergedhash
-		@struct = ConfigStruct::new( mergedhash )
-		@createTime = Time::now
+		@struct = ConfigStruct.new( mergedhash )
+		@createTime = Time.now
 		@name = nil
 		@loader = self.class.getLoader
 
@@ -324,7 +320,7 @@ class Arrow::Config < Arrow::Object
 
 	### Change the configuration object's loader. The +newLoader+ argument
 	### can be either an Arrow::Config::Loader object or the name of one
-	### suitable for passing to Arrow::Config::Loader::create.
+	### suitable for passing to Arrow::Config::Loader.create.
 	def loader=( newLoader )
 		if newLoader.is_a?( Arrow::Config::Loader )
 			@loader = newLoader
@@ -356,9 +352,16 @@ class Arrow::Config < Arrow::Object
 	### loaded, either by setting one of its members or changing the file
 	### from which it was loaded.
 	def changed?
-		return true if @struct.modified?
+		if @struct.modified?
+			self.log.debug "Struct was modified"
+			return true
+		end
 		return false unless self.name
-		self.loader.isNewer?( self.name, self.createTime )
+		if self.loader.isNewer?( self.name, self.createTime )
+			self.log.debug "Config source (%s) has been updated since %s" %
+				[ self.name, self.createTime ]
+			return true
+		end
 	end
 
 
@@ -369,7 +372,7 @@ class Arrow::Config < Arrow::Object
 		confighash = @loader.load( @name )
 		ihash = self.class.internifyKeys( self.class.untaintValues(confighash) )
 		mergedhash = Defaults.merge( ihash, &Arrow::HashMergeFunction )
-		@struct = ConfigStruct::new( mergedhash )
+		@struct = ConfigStruct.new( mergedhash )
 	end
 
 
@@ -406,20 +409,21 @@ class Arrow::Config < Arrow::Object
 
 		# Mask most of Kernel's methods away so they don't collide with
 		# config values.
-		Kernel::methods(false).each {|meth|
+		Kernel.methods(false).each {|meth|
 			next unless method_defined?( meth )
 			next if /^(?:__|dup|object_id|inspect|class|raise|method_missing)/.match( meth )
 			undef_method( meth )
 		}
 
 		# Forward some methods to the internal hash
-		def_delegators :@hash, :keys, :key?, :values, :value?, :[]
+		def_delegators :@hash, :keys, :key?, :values, :value?, :[], :[]=, :length,
+		    :empty?, :clear
 
 
 		### Create a new ConfigStruct from the given +hash+.
 		def initialize( hash )
 			@hash = hash.dup
-			@modified = false
+			@dirty = false
 		end
 
 
@@ -435,15 +439,15 @@ class Arrow::Config < Arrow::Object
 		### Returns +true+ if the ConfigStruct or any of its sub-structs
 		### have changed since it was created.
 		def modified?
-			return @modified || @hash.values.find {|obj|
+			@dirty || @hash.values.find do |obj|
 				obj.is_a?( ConfigStruct ) && obj.modified?
-			}
+			end
 		end
 
 
 		### Return the receiver's values as a (possibly multi-dimensional)
 		### Hash with String keys.
-		def to_h
+		def to_hash
 			rhash = {}
 			@hash.each {|k,v|
 				case v
@@ -460,7 +464,8 @@ class Arrow::Config < Arrow::Object
 			}
 			return rhash
 		end
-
+        alias_method :to_h, :to_hash
+        
 
 		### Return +true+ if the receiver responds to the given
 		### method. Overridden to grok autoloaded methods.
@@ -514,7 +519,7 @@ class Arrow::Config < Arrow::Object
 			end
 
 			# :TODO: Actually check to see if anything has changed?
-			@modified = true
+			@dirty = true
 
 			return self
 		end
@@ -540,14 +545,14 @@ class Arrow::Config < Arrow::Object
 			self.class.class_eval {
 				define_method( key ) {
 					if @hash[ key ].is_a?( Hash )
-						@hash[ key ] = ConfigStruct::new( @hash[key] )
+						@hash[ key ] = ConfigStruct.new( @hash[key] )
 					end
 
 					@hash[ key ]
 				}
 				define_method( "#{key}?" ) {@hash[key] ? true : false}
 				define_method( "#{key}=" ) {|val|
-					@modified = @hash[key] != val
+					@dirty = @hash[key] != val
 					@hash[key] = val
 				}
 			}
@@ -559,7 +564,7 @@ class Arrow::Config < Arrow::Object
 
 	### Abstract base class (and Factory) for configuration loader
 	### delegates. Create specific instances with the
-	### Arrow::Config::Loader::create method.
+	### Arrow::Config::Loader.create method.
 	class Loader < Arrow::Object
 		include PluginFactory
 
@@ -568,7 +573,7 @@ class Arrow::Config < Arrow::Object
 		#########################################################
 
 		### Returns a list of directories to search for deriviatives.
-		def self::derivativeDirs
+		def self.derivativeDirs
 			["arrow/config-loaders"]
 		end
 
@@ -615,12 +620,12 @@ end # class Arrow::Config
 ### If run directly, write a default config file to the current directory
 if __FILE__ == $0
 	filename = ARGV.shift || "default.cfg" 
-	loader = ARGV.shift || Arrow::Config::defaultLoader
+	loader = ARGV.shift || Arrow::Config.defaultLoader
 
 	$stderr.puts "Dumping default configuration to '%s' using the '%s' loader" %
 		[ filename, loader ]
 
-	conf = Arrow::Config::new
+	conf = Arrow::Config.new
 	conf.loader = loader
 	conf.write( filename )
 end

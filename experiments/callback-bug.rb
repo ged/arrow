@@ -24,7 +24,7 @@ end
 
 ary = (1..20).to_a
 puts "Creating a Foo"
-obj = Foo::new( &ary.method(:each) )
+obj = Foo.new( &ary.method(:each) )
 puts "Running the Foo"
 obj.run {|*args|
 	puts "callback for the inner block with args: %p" % args

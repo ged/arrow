@@ -9,7 +9,7 @@
 #	Config = ApacheServer::Config
 #
 #	# Create a new server instance
-#	config = ApacheServer::Config::new( :Listen => "localhost:4848" )
+#	config = ApacheServer::Config.new( :Listen => "localhost:4848" )
 #
 #	# Set some config values
 #	config[ :ErrorLog ] = "myerrors"
@@ -22,7 +22,7 @@
 #	# Add a Location section with a mod_ruby handler
 #	config[ :RubyRequire ] ||= []
 #	config[ :RubyRequire ] << "'simplehandler'"
-# 	config[Config::Location::new("/test")] = {
+# 	config[Config::Location.new("/test")] = {
 # 		:SetHandler		=> "ruby-object",
 # 		:RubyHandler	=> "SimpleHandler.instance",
 # 	}
@@ -118,8 +118,8 @@ class ApacheServer
 
 			# These two need full paths because of the way the server is
 			# started. At least for now, anyway.
-			[:ServerRoot,			File::expand_path("tests")],
-			[:DocumentRoot,			File::expand_path("tests/docs")],
+			[:ServerRoot,			File.expand_path("tests")],
+			[:DocumentRoot,			File.expand_path("tests/docs")],
 
 			[:PidFile,				"logs/test-httpd.pid"],
 			[:ScoreBoardFile,		"logs/apache_runtime_status"],
@@ -166,11 +166,11 @@ class ApacheServer
 			[:ErrorLog,				"logs/error_log"],
 			[:LogLevel,				"debug"],
 
-			[Directory::new("/"), {
+			[Directory.new("/"), {
 					:Options			=> "FollowSymLinks",
 					:AllowOverride		=> "None",
 			}],
-			[Directory::new("/docs/"), {
+			[Directory.new("/docs/"), {
 					:Options			=> "All",
 					:AllowOverride		=> "All",
 			}]
@@ -178,7 +178,7 @@ class ApacheServer
 		DefaultValues.freeze
 
 		### The default filename to write to
-		DefaultFile = "httpd.conf.%d" % Process::pid
+		DefaultFile = "httpd.conf.%d" % Process.pid
 
 
 		### Create a new ApacheServer::Config object that will write to the
@@ -237,13 +237,13 @@ class ApacheServer
 
 		### Write configuration values to the given file.
 		def write( file=nil )
-			file ||= File::join( self[:ServerRoot], DefaultFile )
+			file ||= File.join( self[:ServerRoot], DefaultFile )
 
 			case file
 			when IO, StringIO
 				file.puts( self.to_s )
 			when String
-				File::open( file, File::CREAT|File::WRONLY|File::TRUNC ) {|ofh|
+				File.open( file, File::CREAT|File::WRONLY|File::TRUNC ) {|ofh|
 					ofh.puts( self.to_s )
 				}
 			else
@@ -259,7 +259,7 @@ class ApacheServer
 		### Return the configuration as a single string
 		def to_s
 			string = <<-EOS.gsub(/^\t+/, '')
-			### Apache config file -- auto-generated on #{Time::now::ctime}
+			### Apache config file -- auto-generated on #{Time.now.ctime}
 			EOS
 
 			@values.each do |pair|

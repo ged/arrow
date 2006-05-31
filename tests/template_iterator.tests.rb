@@ -13,8 +13,8 @@
 # 
 
 unless defined? Arrow::TestCase
-	testsdir = File::dirname( File::expand_path(__FILE__) )
-	basedir = File::dirname( testsdir )
+	testsdir = File.dirname( File.expand_path(__FILE__) )
+	basedir = File.dirname( testsdir )
 	$LOAD_PATH.unshift "#{basedir}/lib" unless
 		$LOAD_PATH.include?( "#{basedir}/lib" )
 	$LOAD_PATH.unshift "#{basedir}/tests/lib" unless
@@ -72,17 +72,17 @@ class Arrow::TemplateIteratorTestCase < Arrow::TestCase
 		printTestHeader "Template Iterator: Instantiation"
 		rval = nil
 
-		assert_nothing_raised { rval = Arrow::Template::Iterator::new }
+		assert_nothing_raised { rval = Arrow::Template::Iterator.new }
 		assert_instance_of Arrow::Template::Iterator, rval
 
-		assert_nothing_raised { rval = Arrow::Template::Iterator::new(TestItems[0]) }
+		assert_nothing_raised { rval = Arrow::Template::Iterator.new(TestItems[0]) }
 		assert_instance_of Arrow::Template::Iterator, rval
 
-		assert_nothing_raised { rval = Arrow::Template::Iterator::new(*TestItems) }
+		assert_nothing_raised { rval = Arrow::Template::Iterator.new(*TestItems) }
 		assert_instance_of Arrow::Template::Iterator, rval
 
 		addSetupBlock {
-			@iter = Arrow::Template::Iterator::new(*TestItems)
+			@iter = Arrow::Template::Iterator.new(*TestItems)
 		}
 		addTeardownBlock {
 			@iter = nil

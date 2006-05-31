@@ -12,8 +12,8 @@
 #
 
 unless defined? Arrow::TestCase
-	testsdir = File::dirname( File::expand_path(__FILE__) )
-	basedir = File::dirname( testsdir )
+	testsdir = File.dirname( File.expand_path(__FILE__) )
+	basedir = File.dirname( testsdir )
 	$LOAD_PATH.unshift "#{basedir}/lib" unless
 		$LOAD_PATH.include?( "#{basedir}/lib" )
 	$LOAD_PATH.unshift "#{basedir}/tests/lib" unless
@@ -29,10 +29,10 @@ require 'arrow/utils'
 class Arrow::PathTestCase < Arrow::TestCase
 
 	TestArrayPath = %w{/etc /bin /shouldnt/exist} +
-		[ Dir::pwd, File::dirname(Dir::pwd) ]
+		[ Dir.pwd, File.dirname(Dir.pwd) ]
 	TestStringPath = TestArrayPath.join( File::PATH_SEPARATOR )
 	ExtantDirs = TestArrayPath.find_all {|dir|
-		File::directory?(dir) && File::readable?(dir)
+		File.directory?(dir) && File.readable?(dir)
 	}
 	warn "No extant directories in the array of test paths." if ExtantDirs.empty?
 
@@ -47,7 +47,7 @@ class Arrow::PathTestCase < Arrow::TestCase
 		path = nil
 
 		assert_instance_of Class, Arrow::Path
-		assert_nothing_raised { path = Arrow::Path::new }
+		assert_nothing_raised { path = Arrow::Path.new }
 		assert_instance_of Arrow::Path, path
 		assert_equal 0, path.dirs.length
 	end
@@ -58,7 +58,7 @@ class Arrow::PathTestCase < Arrow::TestCase
 		path, rval = nil, nil
 
 		assert_nothing_raised {
-			path = Arrow::Path::new( TestStringPath )
+			path = Arrow::Path.new( TestStringPath )
 		}
 
 		assert_instance_of Arrow::Path, path
@@ -76,7 +76,7 @@ class Arrow::PathTestCase < Arrow::TestCase
 		path, rval = nil, nil
 
 		assert_nothing_raised {
-			path = Arrow::Path::new( TestArrayPath )
+			path = Arrow::Path.new( TestArrayPath )
 		}
 
 		assert_instance_of Arrow::Path, path
@@ -88,7 +88,7 @@ class Arrow::PathTestCase < Arrow::TestCase
 		}
 
 		self.class.addSetupBlock {
-			@path = Arrow::Path::new( TestArrayPath )
+			@path = Arrow::Path.new( TestArrayPath )
 		}
 		self.class.addTeardownBlock {
 			@path = nil
@@ -132,10 +132,10 @@ class Arrow::PathTestCase < Arrow::TestCase
 		printTestHeader "Arrow::Path: Array Delegate: Push"
 
 		assert_nothing_raised {
-			@path.push Dir::pwd
+			@path.push Dir.pwd
 		}
 		
-		newpath = ExtantDirs + [Dir::pwd]
+		newpath = ExtantDirs + [Dir.pwd]
 		assert_equal newpath, @path.valid_dirs
 	end
 
@@ -144,10 +144,10 @@ class Arrow::PathTestCase < Arrow::TestCase
 		printTestHeader "Arrow::Path: Array Delegate: Unshift"
 
 		assert_nothing_raised {
-			@path.unshift( Dir::pwd, File::dirname(Dir::pwd) )
+			@path.unshift( Dir.pwd, File.dirname(Dir.pwd) )
 		}
 		
-		newpath = [Dir::pwd, File::dirname(Dir::pwd)] + ExtantDirs 
+		newpath = [Dir.pwd, File.dirname(Dir.pwd)] + ExtantDirs 
 		assert_equal newpath, @path.valid_dirs
 	end
 

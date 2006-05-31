@@ -36,8 +36,6 @@ class Arrow::Template::RenderDirective < Arrow::Template::AttributeDirective
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 	# Parse tokens
 	AS = /\s+as\s+/i
@@ -49,7 +47,7 @@ class Arrow::Template::RenderDirective < Arrow::Template::AttributeDirective
 	#############################################################
 
 	### Disallow formats
-	def self::allowsFormat; false; end
+	def self.allows_format?; false; end
 
 
 	#############################################################
@@ -95,15 +93,15 @@ class Arrow::Template::RenderDirective < Arrow::Template::AttributeDirective
 	#########
 
 	### Parse the contents of the directive.
-	def parseDirectiveContents( parser, state )
+	def parse_directive_contents( parser, state )
 		scanner = state.scanner
 		
-		@name = parser.scanForIdentifier( state, true ) or
-			raise ParseError, "missing or malformed identifier"
+		@name = parser.scan_for_identifier( state, true ) or
+			raise Arrow::ParseError, "missing or malformed identifier"
 
 		# If there's an infix operator, the rest of the tag up to the 'as' is
 		# the methodchain. Can't use the parser's
-		# #scanForMethodChain because it just scans the rest of the tag.
+		# #scan_for_methodchain because it just scans the rest of the tag.
 		if scanner.scan( INFIX )
 			# If the 'infix' was actually the left side of an index operator,
 			# include it in the methodchain.
@@ -128,7 +126,7 @@ class Arrow::Template::RenderDirective < Arrow::Template::AttributeDirective
 		end
 
 		# Parse the target identifier
-		@target = parser.scanForIdentifier( state ) or
+		@target = parser.scan_for_identifier( state ) or
 			raise Arrow::ParseError, "missing or malformed target identifier"
 		self.log.debug "Parsed target identifier: %p" % [@target]
 
@@ -139,7 +137,7 @@ class Arrow::Template::RenderDirective < Arrow::Template::AttributeDirective
 		scanner.skip( WHITESPACE )
 
 		# Parse the filename of the subtemplate to load
-		filename = parser.scanForPathname( state ) or
+		filename = parser.scan_for_pathname( state ) or
 			raise Arrow::ParseError, "No filename found for 'render'"
 		filename.untaint
 		self.log.debug "Parsed subtemplate filename: %p" % [filename]
@@ -154,7 +152,7 @@ class Arrow::Template::RenderDirective < Arrow::Template::AttributeDirective
 
 	### Render the directive's value via the specified attribute in the delegate
 	### template.
-	def renderContents( template, scope )
+	def render_contents( template, scope )
 		data = super
 
 		@subtemplate.send( "#{@target}=", data )
@@ -167,8 +165,8 @@ class Arrow::Template::RenderDirective < Arrow::Template::AttributeDirective
 	### parser.
 	def loadSubtemplate( filename, parser, state )
 		nodes = nil
-		loadPath = state.template._loadPath
-		path = Arrow::Template::findFile( filename, loadPath )
+		load_path = state.template._load_path
+		path = Arrow::Template.find_file( filename, load_path )
 		subtemplate = nil
 		
 		# If the template has already been loaded, just reuse the nodelist
@@ -180,7 +178,7 @@ class Arrow::Template::RenderDirective < Arrow::Template::AttributeDirective
 		else
 			# Load the content of the file and untaint it
 			self.log.debug "Loading %p for the first time" % path
-			content = File::read( path )
+			content = File.read( path )
 			content.untaint
 
 			# Load a blank template object, cache it, then parse the content
@@ -188,15 +186,15 @@ class Arrow::Template::RenderDirective < Arrow::Template::AttributeDirective
 			# template. The template object is created before parsing so that
 			# recursive renders work.
 			initialData = state.data.dup
-			subtemplate = initialData[:loadCache][ path ] = Arrow::Template::new()
+			subtemplate = initialData[:loadCache][ path ] = Arrow::Template.new()
 			nodes = parser.parse( content, state.template, initialData )
-			subtemplate.installSyntaxTree( nodes )
+			subtemplate.install_syntax_tree( nodes )
 		end
 
 		return subtemplate
 	rescue Arrow::TemplateError, ::IOError => err
 		msg = "#{err.class.name}: Render with #{filename}: #{err.message}"
-		@nodes = [ Arrow::Template::CommentNode::new(msg) ]
+		@nodes = [ Arrow::Template::CommentNode.new(msg) ]
 	end
 
 

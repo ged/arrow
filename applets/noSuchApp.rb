@@ -24,8 +24,6 @@ class NoSuchAppletHandler < Arrow::Applet
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 	# Applet signature
 	Signature = {
@@ -35,7 +33,7 @@ class NoSuchAppletHandler < Arrow::Applet
 						"it will run this applet instead of declining requests for " +
 						"URIs that don't match a registered applet.",
 		:maintainer => "ged@FaerieMUD.org",
-		:defaultAction => 'display',
+		:default_action => 'display',
 		:templates => {
 			:display	=> 'nosuchapplet.tmpl',
 		},

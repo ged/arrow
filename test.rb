@@ -5,9 +5,9 @@
 #
 
 BEGIN {
-	$basedir = File::dirname( __FILE__ )
+	$basedir = File.dirname( __FILE__ )
 	["lib", "tests/lib", "redist"].each do |subdir|
-		$LOAD_PATH.unshift File::join( $basedir, subdir )
+		$LOAD_PATH.unshift File.join( $basedir, subdir )
 	end
 
 	require "#{$basedir}/utils"
@@ -15,12 +15,12 @@ BEGIN {
 
 	verboseOff {
 		require "arrow/logger"
-		logpath = File::join( $basedir, "test.log" )
-		logfile = File::open( logpath, File::CREAT|File::WRONLY|File::TRUNC )
+		logpath = File.join( $basedir, "test.log" )
+		logfile = File.open( logpath, File::CREAT|File::WRONLY|File::TRUNC )
 		logfile.sync = true
 
 		Arrow::Logger.global.outputters <<
-			Arrow::Logger::Outputter::create('file', logfile)
+			Arrow::Logger::Outputter.create('file', logfile)
 		Arrow::Logger.global.level = :debug
 	}
 }
@@ -35,7 +35,6 @@ safelevel = 0
 patterns = []
 requires = []
 $DebugPattern = nil
-$Apache = false
 
 # Parse command-line switches
 ARGV.options {|oparser|
@@ -44,12 +43,12 @@ ARGV.options {|oparser|
 	oparser.on( "--debug[=PATTERN]", "-d[=PATTERN]", String,
 		"Turn debugging on (for tests which match PATTERN)" ) {|arg|
 		if arg
-			$DebugPattern = Regexp::new( arg )
+			$DebugPattern = Regexp.new( arg )
 			puts "Turned debugging on for %p." % $DebugPattern
 		else
-			Arrow::Logger::global.outputters <<
-				Arrow::Logger::Outputter::create( 'file', $stderr, "STDERR" )
-			Arrow::Logger::global.level = :debug
+			Arrow::Logger.global.outputters <<
+				Arrow::Logger::Outputter.create( 'file', $stderr, "STDERR" )
+			Arrow::Logger.global.level = :debug
 			$DEBUG = true
 			debugMsg "Turned debugging on globally."
 		end
@@ -58,12 +57,6 @@ ARGV.options {|oparser|
 	oparser.on( "--verbose", "-v", TrueClass, "Make progress verbose" ) {
 		$VERBOSE = true
 		debugMsg "Turned verbose on."
-	}
-
-	oparser.on( "--no-apache", "-n", TrueClass,
-		"Skip the tests which require an installed Apache httpd." ) {
-		$Apache = false
-		debugMsg "Skipping apache-based tests"
 	}
 
 	# Handle the 'help' option
@@ -84,11 +77,12 @@ verboseOff {
 }
 
 # Parse test patterns
-ARGV.each {|pat| patterns << Regexp::new( pat, Regexp::IGNORECASE )}
-$stderr.puts "#{patterns.length} patterns given on the command line"
+ARGV.each {|pat| patterns << Regexp.new( pat, Regexp::IGNORECASE )}
+$stderr.puts "#{patterns.length} patterns given on the command line:",
+    patterns.collect {|pat| "  " + pat.to_s }.join( "\n" )
 
 ### Load all the tests from the tests dir
-Find.find( File::join($basedir, "tests") ) {|file|
+Find.find( File.join($basedir, "tests") ) {|file|
 	Find.prune if /\/\./ =~ file or /~$/ =~ file
 	Find.prune if /TEMPLATE/ =~ file
 	next if File.stat( file ).directory?
@@ -130,7 +124,7 @@ class ArrowTests
 end
 
 # Run tests
-Dir::chdir( $basedir ) do
+Dir.chdir( $basedir ) do
 	$SAFE = safelevel
 	Test::Unit::UI::Console::TestRunner.new( ArrowTests ).start
 end

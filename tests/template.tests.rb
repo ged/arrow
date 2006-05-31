@@ -3,7 +3,7 @@
 # Unit test for the Arrow::Template class
 # $Id$
 #
-# Copyright (c) 2003-2005 RubyCrafters, LLC. Most rights reserved.
+# Copyright (c) 2003-2006 RubyCrafters, LLC. Most rights reserved.
 # 
 # This work is licensed under the Creative Commons Attribution-ShareAlike
 # License. To view a copy of this license, visit
@@ -13,8 +13,8 @@
 # 
 
 unless defined? Arrow::TestCase
-	testsdir = File::dirname( File::expand_path(__FILE__) )
-	basedir = File::dirname( testsdir )
+	testsdir = File.dirname( File.expand_path(__FILE__) )
+	basedir = File.dirname( testsdir )
 	$LOAD_PATH.unshift "#{basedir}/lib" unless
 		$LOAD_PATH.include?( "#{basedir}/lib" )
 	$LOAD_PATH.unshift "#{basedir}/tests/lib" unless
@@ -31,11 +31,13 @@ class Arrow::TemplateTestCase < Arrow::TestCase
 	WHITESPACE_OR_COMMENT = '(\s|<!--(?:[^-]|-(?!->))+-->)*'
 
 	# The directory all test data files are located in
-	TestDataDir = File::join( File::dirname(__FILE__), "data" )
+	TestDataDir = File.join( File.dirname(__FILE__), "data" )
+	Arrow::Template.load_path << TestDataDir
+	Arrow::Template.load_path.freeze
 
 	# The instance variables which should have underbarred accessors
 	TemplateAttr = %w{
-		attributes syntaxTree config renderers file source creationTime
+		attributes syntax_tree config renderers file source creation_time
 	}
 
 
@@ -49,13 +51,13 @@ class Arrow::TemplateTestCase < Arrow::TestCase
 			when Regexp
 				parts << pat.to_s
 			else
-				parts << Regexp::quote( pat )
+				parts << Regexp.quote( pat )
 			end
 			parts << WHITESPACE_OR_COMMENT
 		end
 		parts << '\\Z'
 
-		return Regexp::new( parts.join('') )
+		return Regexp.new( parts.join('') )
 	end
 
 
@@ -68,7 +70,7 @@ class Arrow::TemplateTestCase < Arrow::TestCase
 
 		# Read this file, skipping lines until the __END__ token. Then start
 		# reading the tests.
-		File::foreach( __FILE__ ) {|line|
+		File.foreach( __FILE__ ) do |line|
 			linenum += 1
 			if /^__END__/ =~ line then seenEnd = true; next end
 			debugMsg "#{linenum}: #{line.chomp}"
@@ -117,14 +119,13 @@ class Arrow::TemplateTestCase < Arrow::TestCase
 				next unless section && template
 				TestTemplates[ section ][ template ][part] << line << "\n"
 			end
-		}
+		end
 
 		### Generate methods for all of the test data
-		counter = 50
-		TestTemplates.each {|section, templates|
-			templates.each {|templateName, content|
-				methodName = "test_%03d_%s_%s" %
-					[ counter, section, templateName ]
+		TestTemplates.each do |section, templates|
+			templates.each do |templateName, content|
+				methodName = "test_%s_%s" %
+					[ section, templateName ]
 				debugMsg "Generating test method #{methodName}"
 
 				# If there's no code with the template, then just expect a
@@ -139,7 +140,7 @@ class Arrow::TemplateTestCase < Arrow::TestCase
 							TEMPLATE_END
 
 							assert_raises( Arrow::ParseError ) {
-								template = Arrow::Template::new(source)
+								template = Arrow::Template.new(source)
 							}
 						end
 						}.gsub( /^\t{6}/, '' )
@@ -152,44 +153,44 @@ class Arrow::TemplateTestCase < Arrow::TestCase
 							#{content[:template]}
 							TEMPLATE_END
 
-							assert_nothing_raised {
-								template = Arrow::Template::new(source)
-							}
+							assert_nothing_raised do
+								template = Arrow::Template.new(source)
+							end
 							assert_instance_of Arrow::Template, template
 							template._config[:debuggingComments] = true if $DEBUG
 
 							# Make sure all the attr_underbarred_* methods work
 							TemplateAttr.each do |ivar|
 								assert_has_ivar ivar.intern, template
-								assert_nothing_raised {
+								assert_nothing_raised do
 									rval = template.send( "_\#{ivar}".intern )
-								}
+								end
 								assert_ivar_equal rval, template, ivar.intern
 							end
 
 							# Test attribute hashish setting/getting
-							assert_nothing_raised {
+							assert_nothing_raised do
 								rval = template._attributes['foo'] = 'bar'
-							}
+							end
 							assert_respond_to template, :[]
-							assert_nothing_raised {
+							assert_nothing_raised do
 								rval = template['foo']
-							}
+							end
 							assert_equal 'bar', rval
 							assert_respond_to template, :[]=
-							assert_nothing_raised {
+							assert_nothing_raised do
 								template['foo'] = 'tinkywinky'
-							}
-							assert_nothing_raised {
+							end
+							assert_nothing_raised do
 								rval = template._attributes['foo']
-							}
+							end
 							assert_equal 'tinkywinky', rval
 
 							# Test #changed? to make sure it doesn't error even
 							# with templates not loaded from a file.
-							assert_nothing_raised {
+							assert_nothing_raised do
 								rval = template.changed?
-							}
+							end
 							assert_equal false, rval
 
 							# Compare memsize with the length of the actual source.
@@ -204,9 +205,8 @@ class Arrow::TemplateTestCase < Arrow::TestCase
 				eval( code, nil, __FILE__,
 					  content[:linenumber] - code.count("\n") + content[:code].count("\n") )
 
-				counter += 1
-			}
-		}
+			end
+		end
 	end
 
 
@@ -215,38 +215,14 @@ class Arrow::TemplateTestCase < Arrow::TestCase
 	###	T E S T S
 	#################################################################
 
-	### Instance test
-	def test_00_Class
-		printTestHeader "Template: Class"
-		assert_instance_of Class, Arrow::Template
-	end
-
-
-	### Loadpath
-	def test_01_LoadPath
-		printTestHeader "Template: LoadPath"
-		rval = nil
-
-		assert_respond_to Arrow::Template, :loadPath
-		assert_nothing_raised {
-			Arrow::Template.loadPath << TestDataDir
-		}
-		assert_nothing_raised {
-			rval = Arrow::Template.loadPath
-		}
-
-		assert_include TestDataDir, rval
-	end
-
 	### Test template loading
-	def test_02_Load
-		printTestHeader "Template: Load"
+	def test_template_memsize_should_be_equal_to_the_source_length
 		template = size = nil
-		source = File::read( File::join(TestDataDir, "loadtest.tmpl") )
+		source = File.read( File.join(TestDataDir, "loadtest.tmpl") )
 
-		# Test the ::load method loads template using the path
+		# Test the .load method loads template using the path
 		assert_nothing_raised do
-			template = Arrow::Template::load( "loadtest.tmpl" )
+			template = Arrow::Template.load( "loadtest.tmpl" )
 		end
 		assert_instance_of Arrow::Template, template
 
@@ -256,15 +232,38 @@ class Arrow::TemplateTestCase < Arrow::TestCase
 		end
 		assert_equal source.length, size,
 			"Template memsize should equal source length"
+	end
 
-		# Test for loaded attributes
+	def test_template_memsize_should_be_zero_for_blank_template
+		size = nil
+		template = Arrow::Template.new
+
+		assert_nothing_raised do
+			size = template.memsize
+		end
+
+		assert_equal 0, size
+	end
+
+	def test_loading_template_should_define_template_attributes
+		template = Arrow::Template.load( "loadtest.tmpl" )
+
 		assert template._attributes.key?( 'mooselips' ),
 			"Expect loaded template to have a 'mooselips' attribute"
 		assert template._attributes.key?( 'queenofallbroccoli' ),
 			"Expect loaded template to have a 'queenofallbroccoli' attribute"
 	end
 
-
+	def test_default_renderer_understands_arrays
+		template = Arrow::Template.new
+		rval = nil
+		
+		assert_nothing_raised do
+			rval = template.render_objects( ["foo", "bar"] )
+		end
+		
+		assert_equal "foobar", rval
+	end
 
 end
 
@@ -405,7 +404,7 @@ assert_match( templateContentRe(/^test/), rval )
 ### Set directive
 === Simple
 
-<?set time = Time::now ?>
+<?set time = Time.now ?>
 
 ---
 assert_nothing_raised { rval = template['time'] }
@@ -417,7 +416,7 @@ assert_match( templateContentRe(), rval )
 
 === Method Chain
 
-<?set time = Time::now.strftime( "%Y%m%d %H:%M:%S" ) ?>
+<?set time = Time.now.strftime( "%Y%m%d %H:%M:%S" ) ?>
 
 ---
 assert_nothing_raised { rval = template['time'] }
@@ -637,7 +636,7 @@ Failed.
 ---
 # Nothing special about an exception -- it's just a class that can be
 # instantiated easily.
-obj = Arrow::Exception::new
+obj = Arrow::Exception.new
 assert_nothing_raised { template.test = obj }
 assert_nothing_raised { rval = template.render }
 debugMsg "\n" + hruleSection( rval, "Rendered" )
@@ -722,27 +721,27 @@ assert_match( templateContentRe(/Passed\./), rval )
 
 ===
 
-# === Scope error
-# 
-# <?for val in sarr ?>
-#   <?if foo == val ?>
-#     Key exists.
-#   <?end if ?>
-# <?end for ?>
-# 
-# <?if foo == val ?>
-# Failed.
-# <?end if?>
-# 
-# ---
-# sarr = [:something, :somethingElse, :something]
-# template.sarr = sarr
-# template.foo = :something
-# assert_nothing_raised { rval = template.render }
-# assert_match( templateContentRe(/Key exists\./, /Key exists\./), rval )
-# assert_match( /<!--.*ScopeError.*-->/, rval )
-# ===
-# 
+=== Scope error
+
+<?for val in sarr ?>
+  <?if foo == val ?>
+    Key exists.
+  <?end if ?>
+<?end for ?>
+
+<?if foo == val ?>
+Failed.
+<?end if?>
+
+---
+sarr = [:something, :somethingElse, :something]
+template.sarr = sarr
+template.foo = :something
+assert_nothing_raised { rval = template.render }
+assert_match( templateContentRe(/Key exists\./, /Key exists\./), rval )
+assert_match( /<!--.*ScopeError.*-->/, rval )
+===
+
 === Cannot override definitions ivar
 
 <?for definitions in array ?>
@@ -871,7 +870,7 @@ assert_match( templateContentRe(/Passed\./), rval )
 <?attr foo?>
 
 ---
-superTemplate = Arrow::Template::new( "<?attr subtempl?>" )
+superTemplate = Arrow::Template.new( "<?attr subtempl?>" )
 superTemplate.foo = "Passed."
 superTemplate.subtempl = template
 
@@ -885,7 +884,7 @@ assert_match( templateContentRe(/Passed\./), rval )
 <?attr foo?> <?attr bar?>
 
 ---
-superTemplate = Arrow::Template::new( "<?attr subtempl?>" )
+superTemplate = Arrow::Template.new( "<?attr subtempl?>" )
 superTemplate.foo = "Passed foo."
 superTemplate.bar = "Passed bar."
 superTemplate.subtempl = template
@@ -900,7 +899,7 @@ assert_match( templateContentRe(/Passed foo\./,/Passed bar\./), rval )
 <?attr bar?>
 
 ---
-superTemplate = Arrow::Template::new( "<?attr subtempl?>" )
+superTemplate = Arrow::Template.new( "<?attr subtempl?>" )
 superTemplate.foo = "Passed."
 superTemplate.subtempl = template
 
@@ -914,7 +913,7 @@ assert_match( templateContentRe(/Passed\./), rval )
 <?attr foo?> <?attr bar?>
 
 ---
-superTemplate = Arrow::Template::new( "<?attr subtempl?>" )
+superTemplate = Arrow::Template.new( "<?attr subtempl?>" )
 superTemplate.foo = "Passed foo."
 superTemplate.bar = "Passed bar."
 superTemplate.subtempl = template
@@ -929,7 +928,7 @@ assert_match( templateContentRe(/Passed bar\./,/Passed foo\./), rval )
 <?attr foo?> <?attr bar?> <?attr superbar?>
 
 ---
-superTemplate = Arrow::Template::new( "<?attr subtempl?>" )
+superTemplate = Arrow::Template.new( "<?attr subtempl?>" )
 superTemplate.foo = "Passed foo."
 superTemplate.bar = "Passed bar."
 superTemplate.subtempl = template
@@ -979,7 +978,7 @@ assert_nothing_raised { template.something = "sasquatch" }
 
 assert_nothing_raised { rval = template.render }
 debugMsg "\n" + hruleSection( rval, "Rendered" )
-assert_match( templateContentRe("\nSomething: sasquatch\nBar: baz and sasquatch"), rval )
+assert_match( templateContentRe(/Something: sasquatch/,/Bar: baz and sasquatch/), rval )
 ===
 
 === Recursion
@@ -1026,4 +1025,19 @@ debugMsg "\n" + hruleSection( rval, "Rendered" )
 assert_match( templateContentRe("Key => subsubhash\n  Val => \nKey => hope, faith\n  Val => and charity\n\n\nKey => foo\n  Val => 2\nKey => bar\n  Val => 1"), rval )
 ===
 
+
+### Export directive
+=== Simple
+
+<?attr headsections ?>
+<?attr subtemplate ?>
+<?attr tailsections ?>
+
+---
+template.subtemplate = Arrow::Template.load( "export.tmpl" )
+
+assert_nothing_raised { rval = template.render }
+debugMsg "\n" + hruleSection( rval, "Rendered" )
+assert_match( templateContentRe(""), rval )
+===
 

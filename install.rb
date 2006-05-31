@@ -13,7 +13,7 @@
 #
 
 BEGIN {
-	$basedir = File::dirname( File::expand_path(__FILE__) )
+	$basedir = File.dirname( File.expand_path(__FILE__) )
 	$LOAD_PATH.unshift( "#$basedir/lib" )
 	
 	require "#$basedir/utils.rb"
@@ -44,10 +44,6 @@ RequiredLibraries = [
 		'http://raa.ruby-lang.org/list.rhtml?name=pluginfactory',
 		'redist/PluginFactory-1.0.0.tar.gz'
 	],
-	[ 'hashslice', "HashSlice", 
-		'http://www.ruby-lang.org/en/raa-list.rhtml?name=hashslice',
-		'redist/hashslice.rb',
-	],
 	[ 'strscan', "Strscan", 
 		'http://www.ruby-lang.org/en/raa-list.rhtml?name=strscan',
 		'http://i.loveruby.net/archive/strscan/strscan-0.6.7.tar.gz',
@@ -72,18 +68,18 @@ class Installer
 	def makedirs( dirs, mode=0755, verbose=false )
 		dirs = [ dirs ] unless dirs.is_a? Array
 
-		oldumask = File::umask
-		File::umask( 0777 - mode )
+		oldumask = File.umask
+		File.umask( 0777 - mode )
 
 		for dir in dirs
 			if @ftools == File
-				File::mkpath( dir, verbose )
+				File.mkpath( dir, verbose )
 			else
 				$stderr.puts "Make path %s with mode %o" % [ dir, mode ]
 			end
 		end
 
-		File::umask( oldumask )
+		File.umask( oldumask )
 	end
 
 	def install( srcfile, dstfile, mode=nil, verbose=false )
@@ -148,7 +144,7 @@ RubyRequire arrow
 
 <Location /arrow-demo>
 	SetHandler ruby-object
-	RubyHandler "Arrow::Dispatcher::instance( '%s' )"
+	RubyHandler "Arrow::Dispatcher.instance( '%s' )"
 </Location>
 EOF
 
@@ -209,29 +205,29 @@ if $0 == __FILE__
 		# If the files need to be copied, do so
 		if demodir != $basedir
 			message "Installing demo applets..."
-			appletdir = File::join( demodir, "applets" )
-			#File::mkpath( appletdir, $Verbose )
+			appletdir = File.join( demodir, "applets" )
+			#File.mkpath( appletdir, $Verbose )
 			i.installFiles( "applets", appletdir, 0644, $VERBOSE )
 			message "done.\n"
 
 			message "Installing demo templates..."
-			templatedir = File::join( demodir, "templates" )
-			#File::mkpath( templatedir, $Verbose )
+			templatedir = File.join( demodir, "templates" )
+			#File.mkpath( templatedir, $Verbose )
 			i.installFiles( "templates", templatedir, 0644, $VERBOSE )
 			message "done.\n"
 		else
-			appletdir = File::join( $basedir, "applets" )
-			templatedir = File::join( $basedir, "templates" )
+			appletdir = File.join( $basedir, "applets" )
+			templatedir = File.join( $basedir, "templates" )
 		end
 
 		# Load the demo config and correct the paths
-		configfile = File::join( $basedir, "demo.cfg" )
-		newconfig = File::join( demodir, "demo.cfg" )
+		configfile = File.join( $basedir, "demo.cfg" )
+		newconfig = File.join( demodir, "demo.cfg" )
 
-		if File::exists?( newconfig )
+		if File.exists?( newconfig )
 			message "Not replacing existing config '%s'\n" % newconfig
 		else
-			config = Arrow::Config::load( configfile )
+			config = Arrow::Config.load( configfile )
 			config.applets.path.dirs = [ appletdir ]
 			config.templates.path.dirs = [ templatedir ]
 

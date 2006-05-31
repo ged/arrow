@@ -132,7 +132,7 @@ okay.  let's say we use a struct as a base - in fact, let's make the individual
 drivers return a struct describing the data on connect, providing a nice,
 universal interface for DataSource to deal with.  while we're here, we can just
 extend onto that Struct with all our functionality, and return that from
-::create.  should i let individual drivers add "special" functionality to an
+.create.  should i let individual drivers add "special" functionality to an
 individual source?  i don't think so: users should have to explicitly break out			*
 of the interface, thus encouraging portable usage.
 
@@ -148,7 +148,7 @@ capacity.  this is a barrier for interoperability.  how about, for every kind of
 object a record can have other than string, the source must provide to/from				*
 conversion procs.  i hope that this won't be much of a bother for driver
 writers, and that the source interface they're wrapping gives an easy route to
-this (Fx: MyDB::quote( a_date )?).
+this (Fx: MyDB.quote( a_date )?).
 
 
 here's a transcript of a conversation between stillflame and oGMo on this

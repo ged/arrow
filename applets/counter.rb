@@ -31,9 +31,6 @@ class AccessCounter < Arrow::Applet
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
-
 	# Applet signature
 	Signature = {
 		:name => "Session Access Counter",
@@ -46,7 +43,7 @@ class AccessCounter < Arrow::Applet
 		},
 		:vargs => {},
 		:monitors => {},
-		:defaultAction => 'display',
+		:default_action => 'display',
 	}
 
 
@@ -75,15 +72,15 @@ class AccessCounter < Arrow::Applet
 
 
 	### The 'display' (default) action. Increments and displays the counter.
-	action( 'display' ) {|txn, *args|
+	def_action :display do |txn, *args|
 		self.log.debug "In the 'display' action of the '%s' applet." %
 			self.signature.name 
 
-		templ = self.loadTemplate( :counter )
+		templ = self.load_template( :counter )
 		txn.session[:counter] ||= 0
 		txn.session[:counter] += 1
 
-		txn.session[:lastChild] = Process::pid
+		txn.session[:lastChild] = Process.pid
 
 		templ.session = txn.session
 		templ.txn = txn
@@ -91,21 +88,21 @@ class AccessCounter < Arrow::Applet
 		txn.print( templ )
 
 		return true
-	}
+	end
 
 	### Deletes the session
-	action( 'delete' ) {|txn, *args|
+	def_action :delete do |txn, *args|
 		self.log.debug "In the 'delete' action of the '%s' applet." %
 			self.signature.name 
 
-		templ = self.loadTemplate( :deleted )
+		templ = self.load_template( :deleted )
 		txn.session.remove
 
 		templ.txn = txn
 		txn.print( templ )
 
 		return true
-	}
+	end
 
 
 end # class AccessCounter

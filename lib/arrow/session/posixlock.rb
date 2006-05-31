@@ -34,8 +34,6 @@ class Arrow::Session::PosixLock < Arrow::Session::Lock
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 	# The path to the default lockdir
 	DefaultLockDir = '/tmp'
@@ -56,16 +54,16 @@ class Arrow::Session::PosixLock < Arrow::Session::Lock
 	### Clean the specified +directory+ of lock files older than +threshold+
 	### seconds.
 	def self::clean( directory=DefaultLockDir, threshold=3600 )
-		pat = File::join( directory, LockfileFormat.gsub(/%s/, '*') )
-		threshold = Time::now - threshold
-		Dir[ pat ].each {|file|
-			if File::mtime( file ) < threshold
+		pat = File.join( directory, LockfileFormat.gsub(/%s/, '*') )
+		threshold = Time.now - threshold
+		Dir[ pat ].each do |file|
+			if File.mtime( file ) < threshold
 				Arrow::Logger[self].info \
 				"Removing stale lockfile '%s'" % file
 				begin
-					fh = File::open( file, FileMode )
+					fh = File.open( file, FileMode )
 					fh.posixlock( File::LOCK_EX|File::LOCK_NB )
-					File::delete( file )
+					File.delete( file )
 					fh.posixlock( File::LOCK_UN )
 					fh.close
 				rescue => err
@@ -75,7 +73,7 @@ class Arrow::Session::PosixLock < Arrow::Session::Lock
 					next
 				end
 			end
-		}
+		end
 	end
 
 
@@ -89,8 +87,8 @@ class Arrow::Session::PosixLock < Arrow::Session::Lock
 		@lockDir = uri.path || DefaultLockDir
 		super
 
-		File::mkpath( @lockDir )
-		@filename = File::join( @lockDir, LockfileFormat % id.to_s.gsub(/\W/, '_') ).untaint
+		File.mkpath( @lockDir )
+		@filename = File.join( @lockDir, LockfileFormat % id.to_s.gsub(/\W/, '_') ).untaint
 		self.log.debug "Filename is: #@filename"
 		@lockfile = nil
 	end
@@ -108,7 +106,7 @@ class Arrow::Session::PosixLock < Arrow::Session::Lock
 	### may free any resources it had been using.
 	def finish
 		super
-		self.closeLockfile
+		self.close_lock_file
 	end
 
 
@@ -120,24 +118,24 @@ class Arrow::Session::PosixLock < Arrow::Session::Lock
 	### Get the File object for the lockfile belonging to this lock,
 	### creating it if necessary.
 	def lockfile
-		@lockfile ||= File::open( @filename, FileMode )
+		@lockfile ||= File.open( @filename, FileMode )
 	end
 
 
 	### Close the lockfile and destroy the File object belonging to this
 	### lock.
-	def closeLockfile
+	def close_lock_file
 		if @lockfile
 			path = @lockfile.path
 			@lockfile.close
 			@lockfile = nil
-			File::delete( path.untaint )
+			File.delete( path.untaint )
 		end
 	end
 
 
 	### Acquire a read (shared) lock on the lockfile.
-	def acquireReadLock( blocking )
+	def acquire_read_lock( blocking )
 		flags = File::LOCK_SH
 		flags |= File::LOCK_NB if !blocking
 
@@ -146,7 +144,7 @@ class Arrow::Session::PosixLock < Arrow::Session::Lock
 
 
 	### Acquire a write (exclusive) lock on the lockfile.
-	def acquireWriteLock( blocking )
+	def acquire_write_lock( blocking )
 		flags = File::LOCK_EX
 		flags |= File::LOCK_NB if !blocking
 
@@ -155,21 +153,21 @@ class Arrow::Session::PosixLock < Arrow::Session::Lock
 
 
 	### Release a previously-acquired read lock.
-	def releaseReadLock
-		if !self.writeLocked?
+	def release_read_lock
+		if !self.write_locked?
 			self.lockfile.posixlock( File::LOCK_UN )
-			self.closeLockfile
+			self.close_lock_file
 		end
 	end
 
 
 	### Release a previously-acquired write lock.
-	def releaseWriteLock
-		if self.readLocked?
+	def release_write_lock
+		if self.read_locked?
 			self.lockfile.posixlock( File::LOCK_SH )
 		else
 			self.lockfile.posixlock( File::LOCK_UN )
-			self.closeLockfile
+			self.close_lock_file
 		end
 	end
 

@@ -7,7 +7,7 @@
 #   require 'tests/apacheserver'
 #
 #	# Create a new server instance
-#	server = ApacheServer::new( :Listen => "localhost:4848" )
+#	server = ApacheServer.new( :Listen => "localhost:4848" )
 #
 #	# Set some config values
 #	server.config[:ErrorLog] = "myerrors"
@@ -73,12 +73,12 @@ class ApacheServer
 	### default configuration is used.
 	def initialize( config={} )
 		unless config.is_a?( ApacheServer::Config )
-			config = ApacheServer::Config::new( config )
+			config = ApacheServer::Config.new( config )
 		end
 		
 		@config = config
 		@config_file = nil
-		@exe = File::which( "httpd" )
+		@exe = File.which( "httpd" )
 		@pid = nil
 		@errlog = nil
 		@custom_logs = {}
@@ -105,7 +105,7 @@ class ApacheServer
 		offset = @errlog.pos
 	
 		# Fork and send the child off to become the server		
-		unless @pid = Kernel::fork
+		unless @pid = Kernel.fork
 			begin
 				self.start_httpd( @config_file )
 			rescue Exception => e
@@ -121,7 +121,7 @@ class ApacheServer
 			@errlog.seek( 0, IO::SEEK_CUR )
 			
 			# Stop waiting if the child dies for some reason
-			deadpid, stat = Process::waitpid2( @pid, Process::WNOHANG )
+			deadpid, stat = Process.waitpid2( @pid, Process::WNOHANG )
 			if stat
 				$stderr.puts "waitpid returned non-nil: %d / %d, %s" %
 					[ @pid, deadpid, stat.inspect ]
@@ -149,10 +149,10 @@ class ApacheServer
 
 		# Set up a finalizer that will kill the child server/s if they are still
 		# running.
-		ObjectSpace::define_finalizer( self ) {
+		ObjectSpace.define_finalizer( self ) {
 			begin
-				Process::kill( "TERM", @pid )
-				Process::wait
+				Process.kill( "TERM", @pid )
+				Process.wait
 			rescue SystemCallError
 			end
 		}
@@ -165,7 +165,7 @@ class ApacheServer
 	def running?
 		return false if @pid.nil?
 
-		if (Process::kill 0, @pid) == 1
+		if (Process.kill 0, @pid) == 1
 			return true
 		else
 			return false
@@ -178,14 +178,14 @@ class ApacheServer
 	### Sends the server a 'graceful' restart signal
 	def graceful
 		return nil unless self.running?
-		Process::kill 'SIGUSR1', @pid
+		Process.kill 'SIGUSR1', @pid
 	end
 	
 
 	### Sends the server a hard restart signal
 	def restart
 		return nil unless self.running?
-		Process::kill 'SIGHUP', @pid
+		Process.kill 'SIGHUP', @pid
 	end
 	
 	
@@ -193,8 +193,8 @@ class ApacheServer
 	def stop
 		return nil unless self.running?
 		begin
-			Process::kill 'TERM', @pid
-			Process::waitpid( @pid, 0 )
+			Process.kill 'TERM', @pid
+			Process.waitpid( @pid, 0 )
 		rescue SystemCallError => err
 			$stderr.puts "SystemCallError while stopping: #{err.message}" if
 				$DEBUG || $VERBOSE
@@ -202,7 +202,7 @@ class ApacheServer
 
 		@errlog = nil
 		@custom_logs = {}
-		ObjectSpace::undefine_finalizer( self )	
+		ObjectSpace.undefine_finalizer( self )	
 	end		
 
 
@@ -215,7 +215,7 @@ class ApacheServer
 		#$stderr.close
 		#$stderr.reopen( $stdout )
 
-		config_file = File::expand_path( config_file )
+		config_file = File.expand_path( config_file )
 
 		command = [ @exe, '-F', '-f', config_file ]
 		$stderr.puts "Starting server with: #{command.join(' ')}" if $DEBUG
@@ -226,10 +226,10 @@ class ApacheServer
 	### configuration, seek to the end, and store the resulting filehandle in
 	### @errlog.
 	def open_errlog
-		logfile = File::expand_path( @config[:ErrorLog], @config[:ServerRoot] )
-		Dir::mkdir( File::dirname(logfile), 0755 ) if
-			!File::directory?( File::dirname(logfile) )
-		@errlog = File::open( logfile, File::RDONLY|File::CREAT )
+		logfile = File.expand_path( @config[:ErrorLog], @config[:ServerRoot] )
+		Dir.mkdir( File.dirname(logfile), 0755 ) if
+			!File.directory?( File.dirname(logfile) )
+		@errlog = File.open( logfile, File::RDONLY|File::CREAT )
 		@errlog.seek( 0, IO::SEEK_END )
 	end
 
@@ -244,25 +244,25 @@ class ApacheServer
 		# the filenames of logs to open.
 		case @config[:CustomLog]
 		when String
-			logs.push File::expand_path( @config[:CustomLog].split(/\s+/, 2)[0],
+			logs.push File.expand_path( @config[:CustomLog].split(/\s+/, 2)[0],
 										 @config[:ServerRoot] )
 
 		when Hash
 			logs.push @config[:CustomLog].collect {|logfile,format|
-				File::expand_path( logfile, @config[:ServerRoot] )
+				File.expand_path( logfile, @config[:ServerRoot] )
 			}
 			
 		when Array
 			logs.push @config[:CustomLog].collect {|line|
-				File::expand_path( line.split(/\s+/, 2)[0], @config[:ServerRoot] )
+				File.expand_path( line.split(/\s+/, 2)[0], @config[:ServerRoot] )
 			}
 		end
 
 		# Now open each logfile and seek to the end
 		logs.each {|logfile|
-			Dir::mkdir( File::dirname(logfile), 0755 ) if
-				!File::directory?( File::dirname(logfile) )
-			@custom_logs[logfile] = File::open( logfile, File::RDONLY|File::CREAT )
+			Dir.mkdir( File.dirname(logfile), 0755 ) if
+				!File.directory?( File.dirname(logfile) )
+			@custom_logs[logfile] = File.open( logfile, File::RDONLY|File::CREAT )
 			@custom_logs[logfile].seek( 0, IO::SEEK_END )
 		}
 	end

@@ -25,8 +25,6 @@ class TemplateViewer < Arrow::Applet
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 	# Applet signature
 	Signature = {
@@ -34,7 +32,7 @@ class TemplateViewer < Arrow::Applet
 		:description => "It is an introspection applet that displays "\
 			"Arrow templates with syntax highlighting.",
 		:maintainer => "ged@FaerieMUD.org",
-		:defaultAction => 'default',
+		:default_action => 'default',
 		:templates => {
 			:display	=> 'view-template.tmpl',
 			:default	=> 'templateviewer.tmpl',
@@ -61,11 +59,11 @@ class TemplateViewer < Arrow::Applet
 	###	A C T I O N S
 	#################################################################
 	
-	action( 'display' ) {|txn, *args|
+	def display_action( txn, *args )
 		self.log.debug "In the 'display' action of the '%s' applet." %
 			self.signature.name 
 
-		templ = self.loadTemplate( :display )
+		templ = self.load_template( :display )
 		templ.txn = txn
 		templ.applet = self
 
@@ -79,24 +77,24 @@ class TemplateViewer < Arrow::Applet
 		args.reject! {|dir|
 			dir.nil? || dir.empty? || /^\./ =~ dir || /[^-\w.]/ =~ dir
 		}
-		tpath = File::join( *args ).untaint
+		tpath = File.join( *args ).untaint
 		templ.path = tpath
 
 		unless tpath.empty?
 			begin
-				dtempl = self.templateFactory.getTemplate( tpath )
+				dtempl = self.templateFactory.get_template( tpath )
 			rescue Arrow::TemplateError => err
 				templ.error = err
 			else
 				templ.template = dtempl
-				templ.tokenizer = Arrow::HTMLTokenizer::new( dtempl._source )
+				templ.tokenizer = Arrow::HTMLTokenizer.new( dtempl._source )
 			end
 		end
 
 		txn.print( templ )
 
 		return true
-	}
+	end
 
 
 end # class TemplateViewer

@@ -32,8 +32,6 @@ class TimeClock < Arrow::Applet
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 	# Applet signature
 	Signature = {
@@ -59,7 +57,7 @@ class TimeClock < Arrow::Applet
 			},
 		},
 		:monitors => {},
-		:defaultAction => 'home',
+		:default_action => 'home',
 	}
 
 
@@ -73,7 +71,7 @@ class TimeClock < Arrow::Applet
 	### they return in a container 'main' template.
 	def run( txn, *rest )
 		super {|meth, txn, *rest|
-			template = self.loadTemplate( :main )
+			template = self.load_template( :main )
 			
 			template.body = meth.call( txn, *rest )
 			template.txn = txn

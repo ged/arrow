@@ -7,7 +7,7 @@
 #
 
 BEGIN {
-	base = File::dirname( File::dirname(File::expand_path(__FILE__)) )
+	base = File.dirname( File.dirname(File.expand_path(__FILE__)) )
 	$stderr.puts "Base: #{base}"
 	$LOAD_PATH.unshift "#{base}/lib"
 	$stderr.puts "Adding '#{base}/lib' to the $LOAD_PATH"
@@ -48,7 +48,7 @@ try( "just a straight ohash#merge( newhash )" ) {
 }
 
 # resolveconflict = nil
-resolveconflict = Proc::new {|key, oldval, newval|
+resolveconflict = Proc.new {|key, oldval, newval|
 	debugMsg "Merging '%s': %s -> %s" %
 		[ key.inspect, oldval.inspect, newval.inspect ]
 	case oldval

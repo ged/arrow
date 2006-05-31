@@ -39,8 +39,6 @@ class Arrow::Template::AttrDirective < Arrow::Template::AttributeDirective
 	# SVN Id
 	SVNId = %q$Id$
 	
-	# SVN URL
-	SVNURL = %q$URL$
 
 end # class Arrow::Template::AttrDirective
 

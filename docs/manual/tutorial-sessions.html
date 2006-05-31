@@ -131,7 +131,7 @@ session:
 		inside your applets - you need only treat it as a user-specific
 		hash, accessing and altering data like normal.</p>
 <pre>
-  action( :counter ) {|txn|
+  def_action :counter do |txn|
     txn.session["accesses"] ||= 0
     txn.session["accesses"] += 1
     return &lt;&lt;-EOF
@@ -142,7 +142,7 @@ session:
       &lt;/body&gt;
     &lt;/html&gt;
     EOF
-  }
+  end
 </pre>
 
 	  </div>

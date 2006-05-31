@@ -30,8 +30,6 @@ module ArrowWiki
 	# SVN Id
 	SVNId = %q$Id$
 
-	# SVN URL
-	SVNURL = %q$URL$
 
 	### Abstract base data class for wiki objects.
 	class WikiDataObject < TableAdapter
@@ -83,7 +81,7 @@ module ArrowWiki
 
 		### Return the content as an HTML fragment
 		def to_html
-			BlueCloth::new( @content ).to_html
+			BlueCloth.new( @content ).to_html
 		end
 	end
 
