@@ -166,7 +166,7 @@ class Arrow::Transaction < Arrow::Object
 		uri = @request.uri
 		uri.sub!( Regexp.new(@request.path_info), '' )
 		uri.chomp!( "/" )
-		uri = "/" + uri unless uri[0] == ?/
+		uri = "/" + uri unless uri[0] == ?/ || uri.empty?
 		return uri
 	end
 	alias_method :approot, :app_root

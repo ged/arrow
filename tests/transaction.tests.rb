@@ -34,13 +34,42 @@ class Arrow::TransactionTestCase < Arrow::TestCase
 	def test_transaction_delegates_to_request_for_request_methods
 		allowed = Apache::M_GET|Apache::M_POST
 		
+		with_fixtured_request do |txn, req, config, broker|
+			req.should_receive( :allowed ).and_return( allowed ).once
+			assert_equal allowed, txn.allowed
+		end
+	end
+
+
+	def test_transaction_for_root_uri_should_return_empty_app_root
+		rval = ''
+		
+		with_fixtured_request do |txn, req, config, broker|
+			req.should_receive( :uri ).and_return( "/" ).once
+			req.should_receive( :path_info ).and_return( "" ).once
+			
+			rval = txn.app_root
+		end
+		
+		assert_equal "", rval,
+			"#app_root should return an empty string for a base URI"
+	end
+
+
+
+	#######
+	private
+	#######
+
+	### Set up mocks for the request, config, and broker and yield them to
+	### the given block.
+	def with_fixtured_request( uri="/" )
 		FlexMock.use( "request", "config", "broker" ) do |req, config, broker|
 			req.should_receive( :hostname ).and_return( "hostname" ).once
-			req.should_receive( :allowed ).and_return( allowed ).once
 
 			txn = Arrow::Transaction.new( req, config, broker )
-
-			assert_equal allowed, txn.allowed
+			
+			yield( txn, req, config, broker )
 		end
 	end
 	
