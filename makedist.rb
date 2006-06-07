@@ -3,18 +3,23 @@
 #	Distribution Maker Script
 #	$Id$
 #
-#	Copyright (c) 2001, 2002, 2004, The FaerieMUD Consortium.
+#	Copyright (c) 2001-2005, The FaerieMUD Consortium.
 #
 #	This is free software. You may use, modify, and/or redistribute this
 #	software under the terms of the Perl Artistic License. (See
 #	http://language.perl.com/misc/Artistic.html)
 #
 
+BEGIN {
+	basedir = File::dirname( File::expand_path(__FILE__) )
+	require "#{basedir}/utils.rb"
+}
+
 require 'optparse'
 require 'fileutils'
-require "./utils.rb"
+require 'rbconfig'
 
-include UtilityFunctions, FileUtils
+include UtilityFunctions, FileUtils, Config
 
 
 # SVN Revision
@@ -23,6 +28,8 @@ SVNRev = %q$Rev$
 # SVN Id
 SVNId = %q$Id$
 
+# SVN URL
+SVNURL = %q$URL$
 
 $Programs = {
 	'tar'	=> nil,
@@ -36,9 +43,9 @@ Distros = [
 	# Tar+gzipped
 	{
 		'type'		=> 'Tar+Gzipped',
-		'makeProc'	=> Proc.new {|distName|
+		'makeProc'	=> lambda {|distName|
 			gzArchiveName = "%s.tar.gz" % distName
-			if FileTest.exists?( gzArchiveName )
+			if File::exists?( gzArchiveName )
 				message "Removing old archive #{gzArchiveName}..."
 				File.delete( gzArchiveName )
 			end
@@ -49,28 +56,49 @@ Distros = [
 	# Tar+bzipped
 	{
 		'type'		=> 'Tar+Bzipped',
-		'makeProc'	=> Proc.new {|distName|
+		'makeProc'	=> lambda {|distName|
 			bzArchiveName = "%s.tar.bz2" % distName
-			if FileTest.exists?( bzArchiveName )
+			if File::exists?( bzArchiveName )
 				message "Removing old archive #{bzArchiveName}..."
 				File.delete( bzArchiveName )
 			end
-			system( $Programs['tar'], '-cjf', bzArchiveName, distName ) or abort( "tar failed: #{$?}" )
+			system( $Programs['tar'], '-cjf', bzArchiveName, distName ) or
+				abort( "tar failed: #{$?}" )
 		}
 	},
 
 	# Zipped
 	{
 		'type'		=> 'Zipped',
-		'makeProc'	=> Proc.new {|distName|
+		'makeProc'	=> lambda {|distName|
 			zipArchiveName = "%s.zip" % distName
-			if FileTest.exists?( zipArchiveName )
+			if File::exists?( zipArchiveName )
 				message "Removing old archive #{zipArchiveName}..."
 				File.delete( zipArchiveName )
 			end
-			system( $Programs['zip'], '-lrq9', zipArchiveName, distName ) or abort( "zip failed: #{$?}" )
+			system( $Programs['zip'], '-lrq9', zipArchiveName, distName ) or
+				abort( "zip failed: #{$?}" )
 		}
 	},
+
+	# Gem
+	{
+		'type'		=> 'RubyGem',
+		'makeProc'	=> lambda {|distName|
+			gemName = "%s.gem" % distName
+			if File::exists?( ".gemspec" )
+				if File::exists?( gemName )
+					message "Removing old gem #{gemName}..."
+					File::delete( gemName )
+				end
+
+				system( CONFIG['RUBY_INSTALL_NAME'], ".gemspec" ) or
+					abort( "Gem create failed: #{$?}" )
+			else
+				message "Skipping Gem: no .gemspec"
+			end
+		}
+	}
 ]
 
 
@@ -149,7 +177,7 @@ def main
 		if userversion
 			version = userversion
 		else
-			version = Time.now.strftime('%Y%m%d')
+			version = Time::now.strftime('%Y%m%d')
 			version = promptWithDefault( "Snapshot version", version ) if wantsPrompt
 		end
 
@@ -178,14 +206,15 @@ def main
 
 		tagFlag = promptWithDefault( "Tag '%s' with %s" % [ project, tag ], 'y' )
 		if /^y/i.match( tagFlag )
-			if File.directory?( "CVS" )
+			if File::directory?( "CVS" )
 				message "Running #{$Programs['cvs']} -q tag #{tag}\n"
 				system $Programs['cvs'], '-q', 'tag', tag
-			elsif File.directory?( ".svn" )
+			elsif File::directory?( ".svn" )
 				uri = getSvnUri()
 				taguri = uri + "tags/#{tag}"
 				message "SVN tag URI: %s\n" % [ taguri ]
-				system( $Programs['svn'], 'cp', uri.to_s, taguri.to_s )
+				system( $Programs['svn'], 'cp', uri.to_s, taguri.to_s,
+					'-m', "Tagging for version %s" % [version] )
 			else
 				errorMessage "No supported version control system. Skipping tag."
 			end
@@ -196,8 +225,8 @@ def main
 	message "Making distribution directory #{distName}...\n"
 	Dir.mkdir( distName ) unless FileTest.directory?( distName )
 	for file in filelist
-		File.makedirs( File.dirname(File.join(distName,file)) )
-		File.link( file, File.join(distName,file) )
+		FileUtils.mkdir_p( File.dirname(File.join(distName,file)), :verbose => true )
+		FileUtils.ln( file, File.join(distName,file), :verbose => true )
 	end
 
 	# Make an archive file for each known kind

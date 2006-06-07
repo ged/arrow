@@ -2,7 +2,7 @@
 #	Install/distribution utility functions
 #	$Id$
 #
-#	Copyright (c) 2001-2004, The FaerieMUD Consortium.
+#	Copyright (c) 2001-2006, The FaerieMUD Consortium.
 #
 #	This is free software. You may use, modify, and/or redistribute this
 #	software under the terms of the Perl Artistic License. (See
@@ -12,6 +12,8 @@
 BEGIN {
 	require 'rbconfig'
 	require 'uri'
+	require 'find'
+	require 'pp'
 
 	begin
 		require 'readline'
@@ -23,6 +25,7 @@ BEGIN {
 			return $stdin.gets.chomp
 		end
 	end
+
 }
 
 
@@ -67,6 +70,13 @@ module UtilityFunctions
 
 	ErasePreviousLine = "\033[A\033[K"
 
+	ManifestHeader = (<<-"EOF").gsub( /^\t+/, '' )
+		#
+		# Distribution Manifest
+		# Created: #{Time::now.to_s}
+		# 
+
+	EOF
 
 	###############
 	module_function
@@ -82,6 +92,15 @@ module UtilityFunctions
 			return "\e[%sm" % attr
 		end
 	end
+
+
+	### Colorize the given +string+ with the specified +attributes+ and return it, handling line-endings, etc.
+	def colorize( string, *attributes )
+		ending = string[/(\s)$/] || ''
+		string = string.rstrip
+		return ansiCode( attributes ) + string + ansiCode( 'reset' ) + ending
+	end
+
 
 	# Test for the presence of the specified <tt>library</tt>, and output a
 	# message describing the test using <tt>nicename</tt>. If <tt>nicename</tt>
@@ -161,13 +180,13 @@ module UtilityFunctions
 	### Erase the previous line (if supported by your terminal) and output the
 	### specified <tt>msg</tt> instead.
 	def replaceMessage( msg )
-		print ErasePreviousLine
+		$stderr.print ErasePreviousLine
 		message( msg )
 	end
 
 	### Output a divider made up of <tt>length</tt> hyphen characters.
 	def divider( length=75 )
-		puts "\r" + ("-" * length )
+		$stderr.puts "\r" + ("-" * length )
 	end
 	alias :writeLine :divider
 
@@ -186,11 +205,13 @@ module UtilityFunctions
 	### An optional failure message can also be passed in.
 	def prompt( promptString, failure_msg="Try again." ) # :yields: response
 		promptString.chomp!
+		promptString << ":" unless /\W$/.match( promptString )
 		response = nil
 
 		begin
 			response = readline( ansiCode('bold', 'green') +
-				"#{promptString}: " + ansiCode('reset') ).strip
+				"#{promptString} " + ansiCode('reset') ) || ''
+			response.strip!
 			if block_given? && ! yield( response ) 
 				errorMessage( failure_msg + "\n\n" )
 				response = nil
@@ -247,8 +268,8 @@ module UtilityFunctions
 	def extractVersion( directory='.' )
 		release = nil
 
-		Dir.chdir( directory ) do
-			if File.directory?( "CVS" )
+		Dir::chdir( directory ) do
+			if File::directory?( "CVS" )
 				verboseMsg( "Project is versioned via CVS. Searching for RELEASE_*_* tags..." )
 
 				if (( cvs = findProgram('cvs') ))
@@ -263,11 +284,11 @@ module UtilityFunctions
 					release = revs.sort.last
 				end
 
-			elsif File.directory?( '.svn' )
+			elsif File::directory?( '.svn' )
 				verboseMsg( "Project is versioned via Subversion" )
 
 				if (( svn = findProgram('svn') ))
-					output = %x{svn pg project-version}
+					output = %x{svn pg project-version}.chomp
 					unless output.empty?
 						verboseMsg( "Using 'project-version' property: %p" % output )
 						release = output.split( /[._]/ ).collect {|s| Integer(s) rescue 0}
@@ -294,7 +315,7 @@ module UtilityFunctions
 	# Pattern for extracting the name of the project from a Subversion URL
 	SVNUrlPath = %r{
 		.*/						# Skip all but the last bit
-		(\w+)					# $1 = project name
+		([^/]+)					# $1 = project name
 		/						# Followed by / +
 		(?:
 			trunk |				# 'trunk'
@@ -310,16 +331,16 @@ module UtilityFunctions
 	def extractProjectName( directory='.' )
 		name = nil
 
-		Dir.chdir( directory ) do
+		Dir::chdir( directory ) do
 
 			# CVS-controlled
-			if File.directory?( "CVS" )
+			if File::directory?( "CVS" )
 				verboseMsg( "Project is versioned via CVS. Using repository name." )
 				name = File.open( "CVS/Repository", "r").readline.chomp
 				name.sub!( %r{.*/}, '' )
 
 			# Subversion-controlled
-			elsif File.directory?( '.svn' )
+			elsif File::directory?( '.svn' )
 				verboseMsg( "Project is versioned via Subversion" )
 
 				# If the machine has the svn tool, try to get the project name
@@ -329,7 +350,7 @@ module UtilityFunctions
 					output = shellCommand( svn, 'pg', 'project-name' )
 					if !output.empty?
 						verboseMsg( "Using 'project-name' property: %p" % output )
-						name = output.first
+						name = output.first.chomp
 
 					# If that doesn't work, try to figure it out from the URL
 					elsif (( uri = getSvnUri() ))
@@ -340,7 +361,7 @@ module UtilityFunctions
 
 			# Fall back to guessing based on the directory name
 			unless name
-				name = File.basename(File.dirname( File.expand_path(__FILE__) ))
+				name = File::basename(File::dirname( File::expand_path(__FILE__) ))
 			end
 		end
 
@@ -353,16 +374,46 @@ module UtilityFunctions
 	def getSvnUri( directory='.' )
 		uri = nil
 
-		Dir.chdir( directory ) do
+		Dir::chdir( directory ) do
 			output = %x{svn info}
 			debugMsg( "Using info: %p" % output )
 
 			if /^URL: \s* ( .* )/xi.match( output )
-				uri = URI.parse( $1 )
+				uri = URI::parse( $1 )
 			end
 		end
 
 		return uri
+	end
+
+
+	### (Re)make a manifest file in the specified +path+.
+	def makeManifest( path="MANIFEST" )
+		if File::exists?( path )
+			reply = promptWithDefault( "Replace current '#{path}'? [yN]", "n" )
+			return false unless /^y/i.match( reply )
+
+			verboseMsg "Replacing manifest at '#{path}'"
+		else
+			verboseMsg "Creating new manifest at '#{path}'"
+		end
+
+		files = []
+		verboseMsg( "Finding files...\n" )
+		Find::find( Dir::pwd ) do |f|
+			Find::prune if File::directory?( f ) &&
+				/^\./.match( File::basename(f) )
+			verboseMsg( "  found: #{f}\n" )
+			files << f.sub( %r{^#{Dir::pwd}/?}, '' )
+		end
+		files = vetManifest( files )
+		
+		verboseMsg( "Writing new manifest to #{path}..." )
+		File::open( path, File::WRONLY|File::CREAT|File::TRUNC ) do |ofh|
+			ofh.puts( ManifestHeader )
+			ofh.puts( files )
+		end
+		verboseMsg( "done." )
 	end
 
 
@@ -374,7 +425,7 @@ module UtilityFunctions
 		verboseMsg "Building manifest..."
 		raise "Missing #{manifestFile}, please remake it" unless File.exists? manifestFile
 
-		manifest = IO.readlines( manifestFile ).collect {|line|
+		manifest = IO::readlines( manifestFile ).collect {|line|
 			line.chomp
 		}.select {|line|
 			line !~ /^(\s*(#.*)?)?$/
@@ -394,7 +445,7 @@ module UtilityFunctions
 	### Given a <tt>filelist</tt> like that returned by #readManifest, remove
 	### the entries therein which match the Regexp objects in the given
 	### <tt>antimanifest</tt> and return the resultant Array.
-	def vetManifest( filelist, antimanifest=ANITMANIFEST )
+	def vetManifest( filelist, antimanifest=ANTIMANIFEST )
 		origLength = filelist.length
 		verboseMsg "Vetting manifest..."
 
@@ -443,10 +494,10 @@ module UtilityFunctions
 
 		# Try to make some educated guesses if that doesn't work
 		if main.nil?
-			basedir = File.dirname( __FILE__ )
-			basedir = File.dirname( basedir ) if /docs$/ =~ basedir
+			basedir = File::dirname( __FILE__ )
+			basedir = File::dirname( basedir ) if /docs$/ =~ basedir
 			
-			if File.exists?( File.join(basedir, default) )
+			if File::exists?( File::join(basedir, default) )
 				main = default
 			end
 		end
@@ -469,6 +520,51 @@ module UtilityFunctions
 	end
 
 
+	### Find one or more 'accessor' directives in the catalog if they exist and
+	### return an Array of them.
+	def findRdocAccessors( catalogFile="docs/CATALOG" )
+		accessors = []
+		in_attr_section = false
+		indent = ''
+
+		if File::exists?( catalogFile )
+			verboseMsg "Extracting accessors from CATALOG file (%s).\n" % catalogFile
+
+			# Read lines from the catalog
+			File::foreach( catalogFile ) do |line|
+				debugMsg( "  Examining line #{line.inspect}..." )
+
+				# Multi-line accessors
+				if in_attr_section
+					if /^#\s+([a-z0-9_]+(?:\s*=\s*.*)?)$/i.match( line )
+						debugMsg( "    Found accessor: #$1" )
+						accessors << $1
+						next
+					end
+
+					debugMsg( "  End of accessors section." )
+					in_attr_section = false
+
+				# Single-line accessor
+				elsif /^#\s*Accessors:\s*(\S+)$/i.match( line )
+					debugMsg( "  Found single accessors line: #$1" )
+					vals = $1.split(/,/).collect {|val| val.strip }
+					accessors.replace( vals )
+
+				# Multi-line accessor header
+				elsif /^#\s*Accessors:\s*$/i.match( line )
+					debugMsg( "  Start of accessors section." )
+					in_attr_section = true
+				end
+
+			end
+		end
+
+		debugMsg( "Found accessors: %s" % accessors.join(",") )
+		return accessors
+	end
+
+		
 	### Given a documentation <tt>catalogFile</tt>, try extracting the given
 	### +keyword+'s value from it. Keywords are lines that look like:
 	###   # <keyword>: <value>
@@ -477,12 +573,12 @@ module UtilityFunctions
 	def findCatalogKeyword( keyword, catalogFile="docs/CATALOG" )
 		val = nil
 
-		if File.exists? catalogFile
+		if File::exists? catalogFile
 			verboseMsg "Extracting '#{keyword}' from CATALOG file (%s).\n" % catalogFile
-			File.foreach( catalogFile ) {|line|
+			File::foreach( catalogFile ) do |line|
 				debugMsg( "Examining line #{line.inspect}..." )
-				val = $1.strip and break if /^#\s*#{keyword}:\s*(.*)$/i =~ line
-			}
+				val = $1.strip and break if /^#\s*#{keyword}:\s*(.*)$/i.match( line )
+			end
 		end
 
 		return val
@@ -508,7 +604,7 @@ module UtilityFunctions
 		startlist.select {|fn|
 			verboseMsg "  #{fn}: "
 			found = false
-			File.open( fn, "r" ) {|fh|
+			File::open( fn, "r" ) {|fh|
 				fh.each {|line|
 					if line =~ /^(\s*#)?\s*=/ || line =~ /:\w+:/ || line =~ %r{/\*}
 						found = true
@@ -522,6 +618,7 @@ module UtilityFunctions
 		}
 	end
 
+
 	### Open a file and filter each of its lines through the given block a
 	### <tt>line</tt> at a time. The return value of the block is used as the
 	### new line, or omitted if the block returns <tt>nil</tt> or
@@ -530,8 +627,8 @@ module UtilityFunctions
 		raise "No block specified for editing operation" unless block_given?
 
 		tempName = "#{file}.#{$$}"
-		File.open( tempName, File::RDWR|File::CREAT, 0600 ) {|tempfile|
-			File.open( file, File::RDONLY ) {|fh|
+		File::open( tempName, File::RDWR|File::CREAT, 0600 ) {|tempfile|
+			File::open( file, File::RDONLY ) {|fh|
 				fh.each {|line|
 					newline = yield( line ) or next
 					tempfile.print( newline )
@@ -542,20 +639,22 @@ module UtilityFunctions
 		}
 
 		if testMode
-			File.unlink( tempName )
+			File::unlink( tempName )
 		else
-			File.rename( tempName, file )
+			File::rename( tempName, file )
 		end
 	end
+
 
 	### Execute the specified shell <tt>command</tt>, read the results, and
 	### return them. Like a %x{} that returns an Array instead of a String.
 	def shellCommand( *command )
 		raise "Empty command" if command.empty?
 
-		cmdpipe = IO.popen( command.join(' '), 'r' )
+		cmdpipe = IO::popen( command.join(' '), 'r' )
 		return cmdpipe.readlines
 	end
+
 
 	### Execute a block with $VERBOSE set to +false+, restoring it to its
 	### previous value before returning.
@@ -576,12 +675,12 @@ module UtilityFunctions
 
 
 	### Try the specified code block, printing the given 
-	def try( msg, bind=nil )
-		result = nil
+	def try( msg, bind=TOPLEVEL_BINDING )
+		result = ''
 		if msg =~ /^to\s/
-			message = "Trying #{msg}..."
+			message "Trying #{msg}...\n"
 		else
-			message = msg
+			message msg + "\n"
 		end
 			
 		begin
@@ -593,7 +692,8 @@ module UtilityFunctions
 				rval = eval( msg, bind, file, line.to_i )
 			end
 
-			result = rval.inspect
+			PP.pp( rval, result )
+
 		rescue Exception => err
 			if err.backtrace
 				nicetrace = err.backtrace.delete_if {|frame|
@@ -604,8 +704,12 @@ module UtilityFunctions
 			end
 
 			result = err.message + "\n\t" + nicetrace
+
 		ensure
-			puts result
+			divider
+			message result.chomp + "\n"
+			divider
+			$deferr.puts
 		end
 	end
 end
@@ -621,12 +725,13 @@ if __FILE__ == $0
 	ver = extractVersion() || [0,0,1]
 	puts "Version: %s\n" % ver.join('.')
 
-	if File.directory?( "docs" )
+	if File::directory?( "docs" )
 		puts "Rdoc:",
 			"  Title: " + findRdocTitle(),
 			"  Main: " + findRdocMain(),
 			"  Upload: " + findRdocUpload(),
-			"  SCCS URL: " + findRdocCvsURL()
+			"  SCCS URL: " + findRdocCvsURL(),
+			"  Accessors: " + findRdocAccessors().join(",")
 	end
 
 	puts "Manifest:",

@@ -238,6 +238,9 @@ module Apache # :nodoc:
 			@server ||= Apache::Server.new
 		end
 		
+        def path_info( ); end
+        def uri(  ); end
+        def hostname(  ); end
     end
 
     class Server < ModRubySimObject
