@@ -96,7 +96,7 @@ class Arrow::Logger
 		modname = mod.to_s
 		return self.global if modname.empty?
 
-		modname = '::' + modname unless /^::/ =~ modname
+		modname = '::' + modname unless /^::/ =~ modname #/
 		names = modname.split( /::/ )
 
 		# Create the global logger if it isn't already created
@@ -127,6 +127,19 @@ class Arrow::Logger
 		self.global.send( sym, *args )
 	end
 
+
+	### Return a human-readable string representation of the object.
+	def inspect
+		"#<%s:0x%0x %s [level: %s, outputters: %d, trace: %s]>" % [
+			self.class.name,
+			self.object_id * 2,
+			self.readable_name,
+			self.readable_level,
+			self.outputters.length,
+			self.trace ? "on" : "off",
+		]
+	end
+	
 
 	#############################################################
 	###	I N S T A N C E   M E T H O D S
