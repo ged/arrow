@@ -4,7 +4,7 @@
 # Arrow::Object. Instances of concrete deriviatives of this class provide
 # serialization and semi-permanent storage of session data for Arrow::Session
 # objects.
-# 
+#
 # == Subversion Id
 #
 #  $Id$
@@ -28,7 +28,83 @@ require 'arrow/exceptions'
 require 'arrow/session'
 require 'arrow/session/lock'
 
-### Serialization and semi-permanent session-data storage class.
+# Serialization and semi-permanent session-data storage class.
+#
+# === Derivative Interface ===
+# 
+# In order to create your own session store classes, you need to provide four 
+# methods: #insert, #update, #retrieve, #remove. All but one of the methods
+# provides serialization and marking records as dirty in the base class, so
+# unless you want to manage these tasks yourself, you should +super()+ to the
+# parent's implementation with a block. Examples are provided for each method.
+#
+# #insert::
+#   Insert a new session into the backing store. Example:
+#     def insert
+#       super {|data| @io.print(data) }
+#     end
+# 
+# #update::
+#   Update an existing session's data in the backing store. Example:
+#     def update
+#       super {|data| @io.rewind; @io.truncate(0); @io.print(data) }
+#     end
+# 
+# #retrieve::
+#   Retrieve the serialized session data from the backing store. Example:
+#     def retrieve
+#       super { @io.rewind; @io.read }
+#     end
+# 
+# #delete::
+#   Delete the session from the backing store. Example:
+#     def delete
+#       super {|data| @io.close; File.delete(@session_file) }
+#     end
+# 
+# === Optional Derivative Interface ===
+# ==== Serialization ====
+# 
+# If you want to use something other than Marshal for object serialization,
+# you can override the protected methods #serialized_data and #serialized_data=
+# to provide your own serialization.
+# 
+# #serialized_data::
+#   Serialize the data in the instance variable +@data+ and return it.
+# #serialized_data=( serialized )::
+#   Deserialize the given +serialized+ data and assign it to @data.
+#
+# Example (serializing to YAML instead of binary):
+#     require 'yaml'
+# 
+#     def serialized_data
+#       @data.to_yaml
+#     end
+#
+#     def serialized_data=( data )
+#       @data = YAML.load( data )
+#     end
+#
+# ==== Lock Recommendation ====
+# 
+# If arrow is configured to use the 'recommended' session lock, your session
+# store can recommend one it knows will work (e.g., if your session store is 
+# a database, you can recommend a lock that uses database locking). The simple
+# way to do that is to define a RecommendedLocker constant in your class which
+# contains the URI of the locker you wish to use. If you need more control
+# than the URI can provide, you can also override the #create_recommended_lock
+# method, which should return an instance of the locker that should be used.
+# 
+# The method will be given the instantiated Arrow::Session::Lock object that
+# identifies the session so that you can derive a filename, primary key, etc.
+#
+# Example:
+#
+#   def create_recommended_lock( idobj )
+#     return DBITransactionLock.new( idobj.to_s )
+#   end
+#
+# 
 class Arrow::Session::Store < Arrow::Object
 	include PluginFactory
 	extend Forwardable
@@ -153,22 +229,13 @@ class Arrow::Session::Store < Arrow::Object
 
 	### Deletes every key-value pair from the session data for which the
 	### +block+ evaluates to true.
-	def delete_if( &block ) # :yields: key, value
-		rval = @data.reject!( &block )
-		return @data
-	ensure
-		@modified = true if rval
-	end
-
-
-	### Deletes every key-value pair from the session data for which the
-	### +block+ evaluates to true.
 	def reject!( &block ) # :yields: key, value
 		rval = @data.reject!( &block )
 		return rval
 	ensure
 		@modified = true if rval
 	end
+	alias_method :delete_if, :reject!
 
 
 	### Returns +true+ if the receiver's data is out of sync with the
@@ -246,10 +313,14 @@ class Arrow::Session::Store < Arrow::Object
 	def create_recommended_lock( idobj )
 		self.log.debug "Searching for recommended lock for %s" %
 			self.class.name
+
+		# Traverse the class hierarchy to find a class which defines a
+		# RecommendedLocker constant
 		adviceClass = self.class.ancestors.find {|klass|
 			klass.const_defined?( :RecommendedLocker )
 		} or raise SessionError, "No recommended locker for %p" %
 			self.class.ancestors
+
 		uri = adviceClass.const_get( :RecommendedLocker ) or
 			raise SessionError, "Could not fetch RecommendedLocker constant"
 

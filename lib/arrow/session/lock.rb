@@ -2,8 +2,8 @@
 # 
 # This file contains the Arrow::Session::Lock class, which is the abstract
 # superclass for session lock object classes. Locks are objects which fulfill
-# the locking interface of Arrow::Session, providing a way of serializing access
-# to session data.
+# the locking interface of Arrow::Session, providing a way of serializing
+# access to session data.
 # 
 # == Subversion Id
 #
@@ -29,7 +29,31 @@ require 'arrow/mixins'
 require 'arrow/session'
 
 
-### The abstract base class for session lock manager objects.
+# The abstract base class for session lock manager objects. To derive your own
+# lock manager classes from this class, you'll need to follow the following
+# interface:
+#
+# === Derivative Interface ===
+# 
+# Locking is achieved via four methods: #acquire_read_lock, #acquire_write_lock,
+# #release_read_lock, and #release_write_lock. These methods provide the
+# #concurrency for sessions shared between multiple servers. You will probably
+# #also want to provide your own initializer to capture the session's ID.
+# 
+# #initialize( uri=string, id=Arrow::Session::Id )
+#
+# #acquire_read_lock::
+#   Acquire a shared lock on the session data.
+#
+# #acquire_write_lock::
+#   Acquire an exclusive lock on the session data.
+# 
+# #release_read_lock
+#   Release a shared lock on the session data.
+#
+# #release_write_lock::
+#   Release an exclusive lock on the session data.
+# 
 class Arrow::Session::Lock < Arrow::Object
 	include PluginFactory
 

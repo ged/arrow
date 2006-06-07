@@ -266,7 +266,8 @@ class Arrow::Session < Arrow::Object
 	end
 
 
-	### Tell the session that it will not be used again in the current session.
+	### Tell the session that it will not be used again in the current
+	### session.
 	def finish
 		@lock.release_all_locks
 	end

@@ -55,7 +55,7 @@ class Arrow::Session::FileLock < Arrow::Session::Lock
 	def self.clean( directory=DefaultLockDir, threshold=3600 )
 		pat = File.join( directory, LockfileFormat.gsub(/%s/, '*') )
 		threshold = Time.now - threshold
-		Dir[ pat ].each {|file|
+		Dir[ pat ].each do |file|
 			if File.mtime( file ) < threshold
 				Arrow::Logger[self].info \
 					"Removing stale lockfile '%s'" % file
@@ -72,7 +72,7 @@ class Arrow::Session::FileLock < Arrow::Session::Lock
 					next
 				end
 			end
-		}
+		end
 	end
 
 
@@ -86,8 +86,11 @@ class Arrow::Session::FileLock < Arrow::Session::Lock
 		@lockDir = uri.path || DefaultLockDir
 		super
 
+		# 'foo de barg blag 0x1f2eca'.gsub( /\W/, '_' ) 
+		#  => foo_de_barg_blag_0x1f2eca
+		lockfilename = LockfileFormat % id.to_s.gsub( /\W/, '_' )
 		File.mkpath( @lockDir )
-		@filename = File.join( @lockDir, LockfileFormat % id.to_s.gsub(/\W/, '_') ).untaint
+		@filename = File.join( @lockDir, lockfilename ).untaint
 		@lockfile = nil
 	end
 
