@@ -142,7 +142,7 @@ class Arrow::Config < Arrow::Object
 
 		:applets => {
 			:path			=> Arrow::Path.new( "applets:/www/applets" ),
-			:pattern		=> '*.rb',
+			:pattern		=> '**/*.rb',
 			:pollInterval	=> 5,
 			:layout			=> {},
 			:config			=> {},
