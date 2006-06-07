@@ -270,11 +270,14 @@ class Arrow::Dispatcher < Arrow::Object
 				next
 			end
 
-			realclass = "Arrow::%s" % klass.to_s.
-				sub(/^Arrow::/, '').
-				sub(/^([a-z])/){ $1.upcase }
-			Apache.request.server.log_notice(
-				"Setting log level for %p to %p" % [realclass, level] )
+			if klass.to_s.match( /^[a-z][a-zA-Z]+$/ )
+				realclass = "Arrow::%s" % klass.to_s.sub(/^([a-z])/){ $1.upcase }
+			else
+				realclass = klass.to_s
+			end
+
+			Apache.request.server.log_notice \
+				"Setting log level for %p to %p" % [realclass, level]
 			Arrow::Logger[ realclass ].level = level
 		end
 		
