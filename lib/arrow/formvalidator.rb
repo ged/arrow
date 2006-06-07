@@ -210,7 +210,7 @@ class Arrow::FormValidator < ::FormValidator
 	### Return an array of field names which had some kind of error associated
 	### with them.
 	def error_fields
-		return self.missing | self.invalid
+		return self.missing | self.invalid.keys
 	end
 	
 

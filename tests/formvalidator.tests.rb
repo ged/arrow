@@ -94,6 +94,22 @@ class Arrow::FormValidatorTestCase < Arrow::TestCase
 	end
 
 
+	def test_error_fields_should_return_names_of_missing_and_invalid_fields
+		rval = nil
+
+		# Invalid value
+		@validator.validate( {'number' => 'rhinoceros'} )
+		assert_nothing_raised do
+			rval = @validator.error_fields
+		end
+
+		assert_instance_of Array, rval
+		assert_equal 2, rval.length
+		assert_include 'number', rval
+		assert_include 'required', rval
+	end
+
+
 	def test_error_messages_should_return_an_array_of_error_messages
 		rval = nil
 
