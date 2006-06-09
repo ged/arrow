@@ -92,6 +92,15 @@ class ServerStatus < Arrow::Applet
 	end
 
 
+	def decline_action( txn, *args )
+		return nil
+	end
+
+	alias_method :css_action, :decline_action
+	alias_method :images_action, :decline_action
+	alias_method :js_action, :decline_action
+	alias_method :javascript_action, :decline_action
+
 end # class ServerStatus
 
 

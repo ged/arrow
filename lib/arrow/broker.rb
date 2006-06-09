@@ -62,13 +62,10 @@ class Arrow::Broker < Arrow::Object
 	### based on the request's path_info.
 	def delegate( txn )
 		rval = appletchain = nil
-		req = txn.request
-		self.log.debug "Start of delegation (%s)" % [ req.unparsed_uri ]
+		self.log.debug "Start of delegation (%s)" % [ txn.unparsed_uri ]
 
-		# Extract the path from either the path info, or the unparsed uri if
-		# that's empty (to handle the case where the dispatcher is bound to the
-		# root)
-		path = req.path_info
+		# Fetch the path and trim the leading '/'
+		path = txn.path
 		path.sub!( %r{^/}, '' )
 		self.log.debug "Request's path is %p" % path
 

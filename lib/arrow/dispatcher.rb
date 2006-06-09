@@ -276,7 +276,7 @@ class Arrow::Dispatcher < Arrow::Object
 				realclass = klass.to_s
 			end
 
-			Apache.request.server.log_notice \
+			Apache.request.server.log_info \
 				"Setting log level for %p to %p" % [realclass, level]
 			Arrow::Logger[ realclass ].level = level
 		end

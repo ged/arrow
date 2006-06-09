@@ -88,6 +88,14 @@ class Arrow::Transaction < Arrow::Object
 		@status			= Apache::OK
 		@data			= {}
 
+		# Check for a "RubyOption root_dispatcher true"
+		if @request.options.key?('root_dispatcher') &&
+			!@request.options['root_dispatcher'].match( /false|0/i )
+			@root_dispatcher = true
+		else
+			@root_dispatcher = false
+		end
+
 		super()
 	end
 
@@ -159,15 +167,53 @@ class Arrow::Transaction < Arrow::Object
 	end
 
 
+	# Apache::Request attributes under various conditions. Need to determine 
+	# if the dispatcher is mounted on the root URI without access to the 
+	# config. It doesn't appear to be possible, since Apache doesn't set 
+	# path_info for handlers mounted at "/":
+	#
+	# Dispatcher mounted on "/foo"                                            
+	# +--------------+-----------+-----------------+-------------+-------------+
+	# | Request      | path_info : unparsed_uri    : uri         : script_name :
+	# +--------------+-----------+-----------------+-------------+-------------+
+	# |/foo          | ""        | "/foo"          | "/foo"      | "/foo"      |
+	# |/foo/?a=b     | "/"       | "/foo/?a=b"     | "/foo/"     | "/foo"      |
+	# |/foo/args     | "/args"   | "/foo/args"     | "/foo/args" | "/foo"      |
+	# |/foo/args?a=b | "/args"   | "/foo/args?a=b" | "/foo/args" | "/foo"      |
+	# +--------------+-----------+-----------------+-------------+-------------+
+	# Dispatcher mounted on "/":
+	# +--------------+-----------+-----------------+-------------+-------------+
+	# | Request      | path_info : unparsed_uri    : uri         : script_name :
+	# +--------------+-----------+-----------------+-------------+-------------+
+	# | /            | ""        | "/"             | "/"         | "/"         |
+	# | /?a=b        | ""        | "/?a=b"         | "/"         | "/"         |
+	# | /args        | ""        | "/args"         | "/args"     | "/args"     |
+	# | /args?a=b    | ""        | "/args?a=b"     | "/args"     | "/args"     |
+	# +--------------+-----------+-----------------+-------------+-------------+
+	# Note that with the dispatcher at "/", path_info is always empty and
+	# #script_name is always the same as the #uri. Strange.
+
+	### Returns +true+ if the dispatcher is mounted on the root URI ("/")
+	def root_dispatcher?
+		return @root_dispatcher
+	end
+
+
+	### Returns the path operated on by the Arrow::Broker when delegating the 
+	### transaction. Equal to the #uri minus the #app_root.
+	def path
+		path = @request.uri
+		uripat = Regexp.new( "^" + self.app_root )
+		return path.sub( uripat, '' )
+	end
+	
+
 	### Return the portion of the request's URI that serves as the base URI for
 	### the application. All self-referential URLs created by the application
 	### should include this.
 	def app_root
-		uri = @request.uri
-		uri.sub!( Regexp.new(@request.path_info), '' )
-		uri.chomp!( "/" )
-		uri = "/" + uri unless uri[0] == ?/ || uri.empty?
-		return uri
+		return "" if self.root_dispatcher?
+		return @request.script_name
 	end
 	alias_method :approot, :app_root
 
@@ -182,7 +228,7 @@ class Arrow::Transaction < Arrow::Object
 	### Return an absolute uri that refers back to the applet the transaction is
 	### being run in
 	def applet
-		return [ self.app_root, self.applet_path ].join("/")
+		return [ self.app_root, self.applet_path ].join("/").gsub( %r{//+}, '/' )
 	end
 	deprecate_method :action, :applet
 
