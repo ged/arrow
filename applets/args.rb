@@ -26,37 +26,34 @@ class ArgumentTester < Arrow::Applet
 	SVNId = %q$Id$
 
 	# Applet signature
-	Signature = {
-		:name => "Argument Tester",
-		:description => "This app is for testing/debugging the argument validator.",
-		:maintainer => "ged@FaerieMUD.org",
-		:default_action => 'display',
-		:templates => {
-			:display	=> 'args-display.tmpl',
-		},
-		:vargs => {
-			:display	=> {
-				:required		=> :name,
-				:optional		=> [:email, :description],
-				:filters		=> [:strip, :squeeze],
-				:untaint_all_constraints => true,
-				:descriptions	=> {
-					:email			=> "Customer Email",
-					:description	=> "Issue Description",
-					:name			=> "Customer Name",
-				},
-				:constraints	=> {
-					:email	=> :email,
-					:name	=> /^[\x20-\x7f]+$/,
-					:description => /^[\x20-\x7f]+$/,
-				},
-			},
-		},
-	}
+	applet_name "Argument Tester"
+	applet_description "This app is for testing/debugging the argument validator."
+	applet_maintainer "ged@FaerieMUD.org"
+
+	default_action :display
+
+
 
 	### All of the applet's functionality is handled by the default action
 	### (action_missing_action), which loads the 'display' template and renders
 	### it.
+	template :display => 'args-display.tmpl'
+    validator :display => {
+		:required		=> :name,
+		:optional		=> [:email, :description],
+		:filters		=> [:strip, :squeeze],
+		:untaint_all_constraints => true,
+		:descriptions	=> {
+			:email			=> "Customer Email",
+			:description	=> "Issue Description",
+			:name			=> "Customer Name",
+		},
+		:constraints	=> {
+			:email	=> :email,
+			:name	=> /^[\x20-\x7f]+$/,
+			:description => /^[\x20-\x7f]+$/,
+		},
+	}
 
 end # class ArgumentTester
 
