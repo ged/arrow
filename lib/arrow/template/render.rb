@@ -27,7 +27,7 @@ require 'arrow/template/nodes'
 require 'arrow/template/parser'
 
 ### The class which defines the behaviour of the 'render' template directive.
-class Arrow::Template::RenderDirective < Arrow::Template::AttributeDirective
+class Arrow::Template::RenderDirective < Arrow::Template::AttributeDirective # :nodoc:
 	include Arrow::Template::Parser::Patterns
 
 	# SVN Revision

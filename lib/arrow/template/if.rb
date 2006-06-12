@@ -34,7 +34,7 @@ require 'arrow/template'
 require 'arrow/template/nodes'
 
 ### Conditional directive node object class.
-class Arrow::Template::IfDirective < Arrow::Template::BracketingDirective
+class Arrow::Template::IfDirective < Arrow::Template::BracketingDirective # :nodoc:
 	include Arrow::Template::ConditionalDirective
 
 	require 'arrow/template/else'

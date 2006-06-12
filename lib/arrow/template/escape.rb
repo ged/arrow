@@ -29,43 +29,35 @@ require 'arrow/exceptions'
 require 'arrow/utils'
 require 'arrow/template/call'
 
-module Arrow
-class Template
+### The class which defines the behaviour of the 'escape'
+### template directive.
+class Arrow::Template::EscapeDirective < Arrow::Template::CallDirective # :nodoc:
 
-	### The class which defines the behaviour of the 'escape'
-	### template directive.
-	class EscapeDirective < Arrow::Template::CallDirective
+	# SVN Revision
+	SVNRev = %q$Rev$
+	
+	# SVN Id
+	SVNId = %q$Id$
+	
+	
+	### Render the content and return it as HTML-escaped text.
+	def render( template, scope )
+		rawary = super
+		rary = []
 
-		# SVN Revision
-		SVNRev = %q$Rev$
-		
-		# SVN Id
-		SVNId = %q$Id$
-		
-		
-		### Render the content and return it as HTML-escaped text.
-		def render( template, scope )
-			rawary = super
-			rary = []
-
-			# Try our best to skip debugging comments
-			if template._config[:debuggingComments]
-				rary.push( rawary.shift ) if /^<!--.*-->$/ =~ rawary.first
-			end
-
-			rawary.each {|line|
-				rary << line.to_s.
-					gsub( /&/, '&amp;' ).
-					gsub( /</, '&lt;' ).
-					gsub( />/, '&gt;' )
-			}
-
-			return rary
+		# Try our best to skip debugging comments
+		if template._config[:debuggingComments]
+			rary.push( rawary.shift ) if /^<!--.*-->$/ =~ rawary.first
 		end
 
-	end # class Escape
+		rawary.each {|line|
+			rary << line.to_s.
+				gsub( /&/, '&amp;' ).
+				gsub( /</, '&lt;' ).
+				gsub( />/, '&gt;' )
+		}
 
-end # class Template
-end # module Arrow
+		return rary
+	end
 
-
+end # class Arrow::Template::Escape

@@ -25,7 +25,7 @@ require 'arrow/template/nodes'
 
 ### The class which defines the behaviour of the 'else'
 ### template directive.
-class Arrow::Template::ElseDirective < Arrow::Template::Directive
+class Arrow::Template::ElseDirective < Arrow::Template::Directive # :nodoc:
 
 	# SVN Revision
 	SVNRev = %q$Rev$

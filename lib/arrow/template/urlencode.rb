@@ -25,7 +25,7 @@ require 'arrow/template/nodes'
 
 ### The class which defines the behaviour of the 'urlencode'
 ### template directive.
-class Arrow::Template::URLEncodeDirective < Arrow::Template::CallDirective
+class Arrow::Template::URLEncodeDirective < Arrow::Template::CallDirective # :nodoc:
 
 	# SVN Revision
 	SVNRev = %q$Rev$

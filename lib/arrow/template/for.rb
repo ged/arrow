@@ -73,7 +73,7 @@ require 'arrow/template/iterator'
 
 ### The class which defines the behaviour of the 'for'
 ### template directive.
-class Arrow::Template::ForDirective < Arrow::Template::BracketingDirective
+class Arrow::Template::ForDirective < Arrow::Template::BracketingDirective # :nodoc:
 	include Arrow::Template::Parser::Patterns
 
 	# SVN Revision

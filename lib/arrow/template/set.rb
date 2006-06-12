@@ -26,7 +26,7 @@
 require 'arrow/template/nodes'
 
 ### The class which defines the behaviour of the 'set' template directive.
-class Arrow::Template::SetDirective < Arrow::Template::Directive
+class Arrow::Template::SetDirective < Arrow::Template::Directive # :nodoc:
 
 	# SVN Revision
 	SVNRev = %q$Rev$

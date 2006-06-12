@@ -31,7 +31,7 @@ require 'arrow/template/parser'
 
 ### The class which defines the behaviour of the 'import' template
 ### directive.
-class Arrow::Template::ImportDirective < Arrow::Template::Directive
+class Arrow::Template::ImportDirective < Arrow::Template::Directive # :nodoc:
 	include Arrow::Template::Parser::Patterns
 
 	# SVN Revision

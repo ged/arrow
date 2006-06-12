@@ -46,7 +46,7 @@ require 'arrow/template/nodes'
 
 ### The class which defines the behaviour of the 'include'
 ### template directive.
-class Arrow::Template::IncludeDirective < Arrow::Template::Directive
+class Arrow::Template::IncludeDirective < Arrow::Template::Directive # :nodoc:
 	include Arrow::Template::Parser::Patterns
 
 	# SVN Revision

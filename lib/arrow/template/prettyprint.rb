@@ -32,7 +32,7 @@ require 'pp'
 
 ### The class which defines the behaviour of the 'prettyprint'
 ### template directive.
-class Arrow::Template::PrettyPrintDirective < Arrow::Template::CallDirective
+class Arrow::Template::PrettyPrintDirective < Arrow::Template::CallDirective # :nodoc:
 
 	# SVN Revision
 	SVNRev = %q$Rev$

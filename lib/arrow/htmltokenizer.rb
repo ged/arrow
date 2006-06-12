@@ -98,7 +98,7 @@ module Arrow
 
 
 	### Base class for HTML tokens output by Arrow::HTMLTokenizer.
-	class HTMLToken < Arrow::Object
+	class HTMLToken < Arrow::Object # :nodoc:
 
 		### Initialize a token with the +raw+ source of it.
 		def initialize( raw ) # :notnew:
@@ -164,7 +164,7 @@ module Arrow
 
 	### Class for tokens output by Arrow::HTMLTokenizer for the text bits of an
 	### HTML document.
-	class HTMLText < HTMLToken
+	class HTMLText < HTMLToken # :nodoc:
 		
 		### Return an HTML fragment that can be used to represent the token
 		### symbolically in a web-based introspection interface.
@@ -180,7 +180,7 @@ module Arrow
 
 
 	### Class for tokens output by Arrow::HTMLTokenizer for HTML comments.
-	class HTMLComment < HTMLToken
+	class HTMLComment < HTMLToken # :nodoc:
 		CommentPattern =  /^<!--((?:[^-]|-(?!-))*)-->$/
 
 		def initialize( raw )
@@ -200,7 +200,7 @@ module Arrow
 
 	### Class for tokens output by Arrow::HTMLTokenizer for the tags in an HTML
 	### document.
-	class HTMLTag < HTMLToken
+	class HTMLTag < HTMLToken # :nodoc:
 
 		# The pattern for matching tag attribute key-value pairs
 		AttributePattern = %r{
@@ -326,7 +326,7 @@ module Arrow
 
 	### Class for tokens output by Arrow::HTMLTokenizer for the processing
 	### instructions contained in an HTML document.
-	class ProcessingInstruction < HTMLToken
+	class ProcessingInstruction < HTMLToken # :nodoc:
 		def initialize( raw )
 			@instruction, @body = raw.gsub(/^\?|\?$/, '').split( /\s+/, 2 )
 			super
@@ -338,7 +338,7 @@ module Arrow
 
 	### Class for tokens output by Arrow::HTMLTokenizer for the doctype
 	### declaration of an HTML document.
-	class DocType < HTMLToken
+	class DocType < HTMLToken # :nodoc:
 	end
 
 

@@ -31,7 +31,7 @@ require 'arrow/template/nodes'
 ### The class which defines the behaviour of the 'attr' template directive. This
 ### is just the AttributeDirective plus some behaviours for interaction with the
 ### template.
-class Arrow::Template::AttrDirective < Arrow::Template::AttributeDirective
+class Arrow::Template::AttrDirective < Arrow::Template::AttributeDirective # :nodoc:
 
 	# SVN Revision
 	SVNRev = %q$Rev$

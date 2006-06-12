@@ -40,7 +40,7 @@ require 'arrow/template/nodes'
 
 ### The class which defines the behaviour of the 'yield'
 ### template directive.
-class Arrow::Template::YieldDirective < Arrow::Template::BracketingDirective
+class Arrow::Template::YieldDirective < Arrow::Template::BracketingDirective # :nodoc:
 	include Arrow::Template::Parser::Patterns
 
 	# SVN Revision

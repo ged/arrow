@@ -24,7 +24,7 @@ require 'arrow/utils'
 require 'arrow/template/nodes'
 
 ### The class which defines the behaviour of the 'elsif' template directive.
-class Arrow::Template::ElsifDirective < Arrow::Template::AttributeDirective
+class Arrow::Template::ElsifDirective < Arrow::Template::AttributeDirective # :nodoc:
 	include Arrow::Template::ConditionalDirective
 
 	# SVN Revision

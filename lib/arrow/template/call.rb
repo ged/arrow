@@ -31,7 +31,7 @@ require 'arrow/template/nodes'
 
 ### The class which defines the behaviour of the 'call'
 ### template directive.
-class Arrow::Template::CallDirective < Arrow::Template::AttributeDirective
+class Arrow::Template::CallDirective < Arrow::Template::AttributeDirective # :nodoc:
 
 	# SVN Revision
 	SVNRev = %q$Rev$
