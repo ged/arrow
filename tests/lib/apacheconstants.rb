@@ -3,7 +3,6 @@
 # when mod_ruby.so is.
 #
 
-require 'breakpoint'
 require 'fileutils'
 require 'uri'
 
