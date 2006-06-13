@@ -243,6 +243,12 @@ module Apache # :nodoc:
     end
 
     class Server < ModRubySimObject
+		def initialize
+			@loglevel = 99 # No logging by default
+		end
+		
+		attr_accessor :loglevel
+	
 		def hostname
 			"localhost"
 		end
