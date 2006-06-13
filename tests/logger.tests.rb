@@ -29,35 +29,35 @@ require 'arrow/logger'
 module Arrow
 
 	module LogDelegators
-		def debugLog( msg )
+		def debug_log( msg )
 			self.log.debug( msg )
 		end
 
-		def infoLog( msg )
+		def info_log( msg )
 			self.log.info( msg )
 		end
 
-		def noticeLog( msg )
+		def notice_log( msg )
 			self.log.notice( msg )
 		end
 
-		def warningLog( msg )
+		def warning_log( msg )
 			self.log.warning( msg )
 		end
 
-		def errorLog( msg )
+		def error_log( msg )
 			self.log.error( msg )
 		end
 
-		def critLog( msg )
+		def crit_log( msg )
 			self.log.crit( msg )
 		end
 
-		def alertLog( msg )
+		def alert_log( msg )
 			self.log.alert( msg )
 		end
 
-		def emergLog( msg )
+		def emerg_log( msg )
 			self.log.emerg( msg )
 		end
 	end
@@ -72,10 +72,10 @@ module Arrow
 
 
 	class TestOutputter < Arrow::Logger::Outputter
-		def initialize
+		def initialize( name="Testing outputter" )
 			@output_calls = []
 			@output = ''
-			super( "Testing outputter" )
+			super( name )
 		end
 
 		attr_reader :output_calls, :output
@@ -98,25 +98,18 @@ module Arrow
 		LogLevels = [ :debug, :info, :notice, :warning, :error, :crit, :alert, :emerg ]
 
 		def teardown
-			Arrow::Logger.global.outputters.clear
+			Arrow::Logger.reset
 		end
 
 
 		#############################################################
-		###	T E S T S
+		### T E S T S
 		#############################################################
-
-		def test_logger_class_is_loaded
-			assert_instance_of Class, Arrow::Logger
-			[ :[], :global, :method_missing ].each {|sym|
-				assert_respond_to Arrow::Logger, sym
-			}
-		end
 
 		def test_global_logger_method_returns_a_logger
 			rval = nil
 
-			assert_nothing_raised { rval = Arrow::Logger.global }
+			assert_nothing_raised do rval = Arrow::Logger.global end
 			assert_instance_of Arrow::Logger, rval
 			assert_equal "", rval.name
 		end
@@ -230,35 +223,167 @@ module Arrow
 			assert_equal :notice, rval
 		end
 
-		
-		def test_messages_sent_at_lower_level_than_logger_level_dont_output_anything
-			testObject = TestObject.new
-			testObject2 = TestObject::SubObject.new
-			testOp = TestOutputter.new
+
+		def test_hierloggers_should_return_the_list_of_more_general_loggers
+			# Make sure both loggers are created
+			logger = Arrow::Logger[ TestObject ] or raise "couldn't create a logger"
+			sublogger = Arrow::Logger[ TestObject::SubObject ]
 			
-			Arrow::Logger.global.outputters << testOp
-			
-			Arrow::Logger[ TestObject ].level = :notice
-			Arrow::Logger[ TestObject::SubObject ].level = :info
-			
-			[ testObject, testObject2 ].each do |obj|
-				obj.debugLog( "debug" )
-				obj.infoLog( "info" )
-				obj.noticeLog( "notice" )
-				obj.critLog( "crit" )
+			hloggers = nil
+			assert_nothing_raised do
+				hloggers = sublogger.hierloggers
 			end
 			
-			calls = testOp.output_calls
-			
-			assert_equal 5, calls.length, 
-				"Output calls = %p" % [calls]
-			assert_equal :notice, calls[0][1]
-			assert_equal :crit, calls[1][1]
-			assert_equal :info, calls[2][1]
-			assert_equal :notice, calls[3][1]
-			assert_equal :crit, calls[4][1]
+			assert_instance_of Array, hloggers
+			assert_equal 4, hloggers.length,
+				"expect 4 hierloggers for Arrow::TestObject::SubObject: %p" %
+				[ hloggers ]
+			assert_include Arrow::Logger[ TestObject::SubObject ], hloggers
+			assert_include Arrow::Logger[ TestObject ], hloggers
+			assert_include Arrow::Logger[ Arrow ], hloggers
+			assert_include Arrow::Logger.global, hloggers
 		end
-	end
-end
+
+
+		def test_hierloggers_with_block_should_yield_each_logger
+			# Make sure both loggers are created
+			logger = Arrow::Logger[ TestObject ]
+			sublogger = Arrow::Logger[ TestObject::SubObject ]
+			
+			hloggers = []
+			assert_nothing_raised do
+				sublogger.hierloggers do |logger|
+					hloggers << logger
+				end
+			end
+
+			assert_equal 4, hloggers.length,
+				"expect 4 hierloggers for Arrow::TestObject::SubObject: %p" %
+				[ hloggers ]
+			assert_include Arrow::Logger[ TestObject::SubObject ], hloggers
+			assert_include Arrow::Logger[ TestObject ], hloggers
+			assert_include Arrow::Logger[ Arrow ], hloggers
+			assert_include Arrow::Logger.global, hloggers
+		end
+		
+
+		def test_hieroutputters_should_return_outputters_for_hierloggers
+			# Make sure both loggers are created
+			logger = Arrow::Logger[ TestObject ]
+			sublogger = Arrow::Logger[ TestObject::SubObject ]
+			outputter1 = TestOutputter.new( "outputter1" )
+			outputter2 = TestOutputter.new( "outputter2" )
+
+			logger.outputters << outputter1
+			Arrow::Logger.global.outputters << outputter2
+			
+			outputters = nil
+			assert_nothing_raised do
+				outputters = sublogger.hieroutputters
+			end
+			
+			assert_instance_of Array, outputters
+			assert_equal 2, outputters.length,
+				"expect 2 hieroutputters for Arrow::TestObject::SubObject: %p" %
+				[ outputters ]
+			assert_include outputter1, outputters
+			assert_include outputter2, outputters
+		end
+	
+		def test_hieroutputters_with_block_should_yield_each_outputter
+			# Make sure both loggers are created
+			logger = Arrow::Logger[ TestObject ]
+			sublogger = Arrow::Logger[ TestObject::SubObject ]
+			outputter1 = TestOutputter.new( "outputter1" )
+			outputter2 = TestOutputter.new( "outputter2" )
+
+			logger.outputters << outputter1
+			Arrow::Logger.global.outputters << outputter2
+			
+			outputters = []
+			loggers = []
+			assert_nothing_raised do
+				sublogger.hieroutputters do |outputter, logger|
+					outputters << outputter
+					loggers << logger
+				end
+			end
+			
+			assert_instance_of Array, outputters
+			assert_equal 2, outputters.length,
+				"expect 2 hieroutputters for Arrow::TestObject::SubObject: %p" %
+				[ outputters ]
+			assert_include outputter1, outputters
+			assert_include outputter2, outputters	
+		end
+	
+		def test_writing_to_a_sublogger_should_output_to_superlogger_with_lower_or_equal_level
+			baselogger = Arrow::Logger[ Arrow ]
+			baselogger.level = :debug
+			baseoutputter = TestOutputter.new( "base outputter" )
+			baselogger.outputters << baseoutputter
+			
+			superlogger = Arrow::Logger[ TestObject ]
+			superlogger.level = :info
+			superoutputter = TestOutputter.new( "superlogger outputter" )
+			superlogger.outputters << superoutputter
+			
+			sublogger = Arrow::Logger[ TestObject::SubObject ]
+			sublogger.level = :notice
+			suboutputter = TestOutputter.new( "sublogger outputter" )
+			sublogger.outputters << suboutputter
+			
+			obj = TestObject::SubObject.new
+			
+			obj.debug_log  "debug message"
+			obj.info_log   "info message"
+			obj.notice_log "notice message"
+			
+			assert_equal 1, suboutputter.output_calls.nitems
+			assert_include "notice message", suboutputter.output
+			
+			assert_equal 2, superoutputter.output_calls.nitems
+			assert_include "notice message", superoutputter.output
+			assert_include "info message", superoutputter.output
+			
+			assert_equal 3, baseoutputter.output_calls.nitems
+			assert_include "notice message", baseoutputter.output
+			assert_include "info message", baseoutputter.output
+			assert_include "debug message", baseoutputter.output
+		end
+		
+		def test_messages_should_only_be_output_once_per_outputter
+			outputter = TestOutputter.new( "single outputter" )
+			
+			for klass in [Arrow, Arrow::TestObject, Arrow::TestObject::SubObject]
+				Arrow::Logger[ klass ].level = :debug
+				Arrow::Logger[ klass ].outputters << outputter
+			end
+
+			Arrow::Logger.global.level = :debug
+			Arrow::Logger.global.outputters << outputter
+
+			Arrow::TestObject::SubObject.new.debug_log "message"
+			
+			assert_equal 1, outputter.output_calls.nitems
+		end
+		
+		def test_logging_an_exception_should_include_its_backtrace
+			outputter = TestOutputter.new
+			Arrow::Logger.global.outputters << outputter
+
+			obj = TestObject.new
+
+			begin
+				throw "Glah."
+			rescue => err
+				obj.error_log( err )
+			end
+
+			assert_include self.name.sub( /\(.*/, '' ), outputter.output
+		end
+		
+	end # class LogTestCase
+end # module Arrow
 
 

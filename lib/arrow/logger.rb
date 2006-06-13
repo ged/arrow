@@ -75,20 +75,20 @@ class Arrow::Logger
 
 	# Constant for debugging the logger - set to true to output internals to
 	# $stderr.
-	DebugLogger = false
+	module DebugLogger
+		def debug_msg( *parts ) # :nodoc:
+			#$stderr.puts parts.join('') if $DEBUG
+		end
+	end
 
+	include DebugLogger
+	extend DebugLogger
 
 	#############################################################
 	###	C L A S S   M E T H O D S
 	#############################################################
 
-	@loggers = {}
-
-	class << self
-		# The hierarchy of all Arrow::Logger objects.
-		attr_reader :loggers
-	end
-
+	@global_logger = nil
 
 	### Return the Arrow::Logger for the given module +mod+, which can be a
 	### Module object, a Symbol, or a String.
@@ -96,25 +96,33 @@ class Arrow::Logger
 		modname = mod.to_s
 		return self.global if modname.empty?
 
-		modname = '::' + modname unless /^::/ =~ modname #/
 		names = modname.split( /::/ )
 
 		# Create the global logger if it isn't already created
-		@loggers[ '' ] ||= new( '' )
+		self.global
 
-		names.inject( @loggers ) {|logger,key| logger[key]}
+		names.inject( @global_logger ) {|logger,key| logger[key]}
 	end
 
 
 	### Return the global Arrow logger, setting it up if it hasn't been
 	### already.
-	def self.global
-		@loggers[ '' ] ||= new( '' )
+	def self::global
+		# debug_msg "Creating the global logger" unless @global_logger
+		@global_logger ||= new( '' )
 	end
 
 
+	### Reset the logging subsystem. Clears out any registered loggers and 
+	### their associated outputters.
+	def self::reset
+		# debug_msg "Resetting the global logger"
+		@global_logger = nil
+	end
+	
+
 	### Autoload global logging methods for the log levels
-	def self.method_missing( sym, *args )
+	def self::method_missing( sym, *args )
 		return super unless Levels.key?( sym )
 
 		self.global.debug( "Autoloading class log method '#{sym}'." )
@@ -150,9 +158,9 @@ class Arrow::Logger
 	### +outputters+ that are specified will be added.
 	def initialize( name, level=:info, superlogger=nil, *outputters )
 		if name.empty?
-			debugMsg "Creating global logger"
+			# debug_msg "Creating global logger"
 		else
-			debugMsg "Creating logger for #{name}"
+			# debug_msg "Creating logger for #{name}"
 		end
 
 		@name = name
@@ -207,8 +215,8 @@ class Arrow::Logger
 	### Set the level of this logger to +level+. The +level+ can be a
 	### String, a Symbol, or an Integer.
 	def level=( level )
-		debugMsg ">>> Setting log level for %s to %p" %
-			[ self.name.empty? ? "[Global]" : self.name, level ]
+		# debug_msg ">>> Setting log level for %s to %p" %
+			# [ self.name.empty? ? "[Global]" : self.name, level ]
 
 		case level
 		when String
@@ -237,14 +245,14 @@ class Arrow::Logger
 	### block, it will be called once for each Logger object. If +level+ is
 	### specified, only those loggers whose level is +level+ or lower will be
 	### selected.
-	def hierloggers( level=0 )
+	def hierloggers( level=Levels[:emerg] )
 		loggers = []
 		logger = self
 		lastlogger = nil
 		level = Levels[ level ] if level.is_a?( Symbol )
 
-		debugMsg "Searching for loggers in the hierarchy above %s" % 
-			[ logger.name.empty? ? "[Global]" : logger.name ]
+		# debug_msg "Searching for loggers in the hierarchy above %s" % 
+			# [ logger.name.empty? ? "[Global]" : logger.name ]
 
 		# Traverse the logger hierarchy upward (more general), looking for ones
 		# whose level is below the argument.
@@ -254,7 +262,7 @@ class Arrow::Logger
 
 			# When one is found, add it to the ones being returned and yield it
 			# if there's a block
-			debugMsg "hierloggers: added %s" % logger.readable_name
+			# debug_msg "hierloggers: added %s" % logger.readable_name
 			loggers.push( logger )
 			yield( logger ) if block_given?
 
@@ -268,7 +276,7 @@ class Arrow::Logger
 	### the loggers above it in the logging hierarchy. If called with a block,
 	### it will be called once for each outputter and the first logger to which
 	### it is attached.
-	def hieroutputters( level=0 )
+	def hieroutputters( level=Levels[:emerg] )
 		outputters = []
 
 		# Look for loggers which are higher in the hierarchy
@@ -279,8 +287,8 @@ class Arrow::Logger
 			# If there are any outputters which haven't already been seen,
 			# output to them.
 			unless newoutpary.empty?
-				debugMsg "hieroutputters: adding: %s" %
-					newoutpary.collect {|outp| outp.description}.join(", ")
+				# debug_msg "hieroutputters: adding: %s" %
+					# newoutpary.collect {|outp| outp.description}.join(", ")
 				if block_given?
 					newoutpary.each {|outputter| yield(outputter, logger)}
 				end
@@ -299,7 +307,7 @@ class Arrow::Logger
 	### with the remaining items. Otherwise, the message will be formed by
 	### catenating the results of calling #formatObject on each of them.
 	def write( level, *args )
-		debugMsg "Writing message at %p: %p" % [ level, args ]
+		# debug_msg "Writing message at %p: %p" % [ level, args ]
 
 		msg, frame = nil, nil
 		time = Time.now
@@ -313,8 +321,8 @@ class Arrow::Logger
 
 		# Find the outputters that need to be written to, then write to them.
 		self.hieroutputters( level ) do |outp, logger|
-			debugMsg "Got outputter %p" % outp
-			msg ||= args.collect {|obj| self.stringifyObject(obj)}.join
+			# debug_msg "Got outputter %p" % outp
+			msg ||= args.collect {|obj| self.stringify_object(obj)}.join
 			outp.write( time, level, self.readable_name, frame, msg )
 		end
 	end
@@ -324,6 +332,7 @@ class Arrow::Logger
 	### or a Symbol) under this logger. A new one will instantiated if it
 	### does not already exist.
 	def []( mod )
+		# debug_msg "creating sublogger for '#{mod}'" unless @subloggers.key?( mod.to_s )
 		@subloggers[ mod.to_s ] ||=
 			self.class.new( @name + "::" + mod.to_s, self.level, self )
 	end
@@ -334,10 +343,10 @@ class Arrow::Logger
 	#########
 
 	### Dump the given object for output in the log.
-	def stringifyObject( obj )
+	def stringify_object( obj )
 		return case obj
 			   when Exception
-				   "%s:\n    %s" % [ obj.message, obj.backtrace("\n    ") ]
+				   "%s:\n    %s" % [ obj.message, obj.backtrace.join("\n    ") ]
 			   when String
 				   obj
 			   else
@@ -351,29 +360,13 @@ class Arrow::Logger
 	def method_missing( id, *args )
 		super unless Arrow::Logger::Levels.member?( id )
 
-		debugMsg "Autoloading instance log method '#{id}'"
+		# debug_msg "Autoloading instance log method '#{id}'"
 		self.class.class_eval {
 			define_method( id ) {|*args| self.write(id, *args)}
 		}
 
 		self.send( id, *args )
 	end
-
-
-	#######
-	private
-	#######
-
-	### Output a debugging message if DebugLogger is true.
-	if DebugLogger
-		def debugMsg( *parts ) # :nodoc:
-			$stderr.puts parts.join('')
-		end
-	else
-		def debugMsg( *parts ); end # :nodoc:
-	end
-
-
 
 end # class Arrow::Logger
 
