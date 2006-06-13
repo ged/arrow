@@ -23,7 +23,6 @@ unless defined? Arrow::TestCase
 	require 'arrowtestcase'
 end
 
-require 'breakpoint'
 require 'arrow/broker'
 require 'arrow/utils'
 require 'ostruct'
