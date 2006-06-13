@@ -90,7 +90,7 @@ class Arrow::Transaction < Arrow::Object
 
 		# Check for a "RubyOption root_dispatcher true"
 		if @request.options.key?('root_dispatcher') &&
-			!@request.options['root_dispatcher'].match( /false|0/i )
+			@request.options['root_dispatcher'].match( /^(true|yes|1)$/i )
 			@root_dispatcher = true
 		else
 			@root_dispatcher = false

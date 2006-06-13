@@ -140,17 +140,13 @@ class Arrow::BrokerTestCase < Arrow::TestCase
 		unparsed_uri = [ root, uri ].compact.join("/")
 		
 		FlexMock.use( "transaction", "request", "applet" ) do |txn, req, applet|
-			txn.should_receive( :request ).and_return( req ).at_least.once
-			req.should_receive( :unparsed_uri ).and_return( unparsed_uri ).once
-			req.should_receive( :path_info ).and_return( uri ).once
+			txn.should_receive( :path ).and_return( uri ).once
+			txn.should_receive( :applet_path= ).at_least.once
+			txn.should_receive( :unparsed_uri ).and_return( unparsed_uri ).once
 			
 			sig = Arrow::Applet::SignatureStruct.new
 			sig.name = "MockApplet"
 			applet.should_receive( :signature ).and_return( sig )
-
-			txn.should_ignore_missing
-			req.should_ignore_missing
-			applet.should_ignore_missing
 
 			yield( txn, req, applet )
 		end

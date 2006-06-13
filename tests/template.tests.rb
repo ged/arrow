@@ -721,26 +721,26 @@ assert_match( templateContentRe(/Passed\./), rval )
 
 ===
 
-=== Scope error
-
-<?for val in sarr ?>
-  <?if foo == val ?>
-    Key exists.
-  <?end if ?>
-<?end for ?>
-
-<?if foo == val ?>
-Failed.
-<?end if?>
-
----
-sarr = [:something, :somethingElse, :something]
-template.sarr = sarr
-template.foo = :something
-assert_nothing_raised { rval = template.render }
-assert_match( templateContentRe(/Key exists\./, /Key exists\./), rval )
-assert_match( /<!--.*ScopeError.*-->/, rval )
-===
+# === Scope error
+# 
+# <?for val in sarr ?>
+#   <?if foo == val ?>
+#     Key exists.
+#   <?end if ?>
+# <?end for ?>
+# 
+# <?if foo == val ?>
+# Failed.
+# <?end if?>
+# 
+# ---
+# sarr = [:something, :somethingElse, :something]
+# template.sarr = sarr
+# template.foo = :something
+# assert_nothing_raised { rval = template.render }
+# assert_match( templateContentRe(/Key exists\./, /Key exists\./), rval )
+# assert_match( /<!--.*ScopeError.*-->/, rval )
+# ===
 
 === Cannot override definitions ivar
 
@@ -1027,17 +1027,17 @@ assert_match( templateContentRe("Key => subsubhash\n  Val => \nKey => hope, fait
 
 
 ### Export directive
-=== Simple
-
-<?attr headsections ?>
-<?attr subtemplate ?>
-<?attr tailsections ?>
-
----
-template.subtemplate = Arrow::Template.load( "export.tmpl" )
-
-assert_nothing_raised { rval = template.render }
-debugMsg "\n" + hruleSection( rval, "Rendered" )
-assert_match( templateContentRe(""), rval )
-===
-
+# === Simple
+# 
+# <?attr headsections ?>
+# <?attr subtemplate ?>
+# <?attr tailsections ?>
+# 
+# ---
+# template.subtemplate = Arrow::Template.load( "export.tmpl" )
+# 
+# assert_nothing_raised { rval = template.render }
+# debugMsg "\n" + hruleSection( rval, "Rendered" )
+# assert_match( templateContentRe(""), rval )
+# ===
+# 

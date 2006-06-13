@@ -43,12 +43,12 @@ class Arrow::AppletRegistry::TestCase < Arrow::TestCase
 				"/missing"			=> "NoSuchAppletHandler",
 				"/error"			=> "ErrorHandler",
 				"/status"			=> "ServerStatus",
-				"/hello"			=> "HelloWorld",
+				"/hello"			=> "Hello",
 				"/args"				=> "ArgumentTester",
 				"/protected"		=> "ProtectedDelegator",
-				"/protected/hello"	=> "HelloWorld",
+				"/protected/hello"	=> "Hello",
 				"/counted"			=> "AccessCounter",
-				"/counted/hello"	=> "HelloWorld",
+				"/counted/hello"	=> "Hello",
 
 				"/test"				=> "TestingApplet",
 				"/foo"				=> "BargleApplet",
@@ -77,12 +77,12 @@ class Arrow::AppletRegistry::TestCase < Arrow::TestCase
     TestUris = {
 		"/"					=> ["Setup"],
 		""					=> ["Setup"],
-		"/hello"			=> ["Setup", "HelloWorld"],
+		"/hello"			=> ["Setup", "Hello"],
 		"/args"				=> ["Setup", "ArgumentTester"],
 		"/protected"		=> ["Setup", "ProtectedDelegator"],
-		"/protected/hello"	=> ["Setup", "ProtectedDelegator", "HelloWorld"],
+		"/protected/hello"	=> ["Setup", "ProtectedDelegator", "Hello"],
 		"/counted"			=> ["Setup", "AccessCounter"],
-		"/counted/hello"	=> ["Setup", "AccessCounter", "HelloWorld"],
+		"/counted/hello"	=> ["Setup", "AccessCounter", "Hello"],
     }
 
     def test_registry_should_create_chain_for_valid_uris

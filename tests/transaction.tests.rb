@@ -41,13 +41,10 @@ class Arrow::TransactionTestCase < Arrow::TestCase
 	end
 
 
-	def test_transaction_for_root_uri_should_return_empty_app_root
+	def test_approot_with_root_dispatcher_should_return_empty_string
 		rval = ''
 		
-		with_fixtured_request do |txn, req, config, broker|
-			req.should_receive( :uri ).and_return( "/" ).once
-			req.should_receive( :path_info ).and_return( "" ).once
-			
+		with_fixtured_request( "/", 'root_dispatcher' => "true" ) do |txn, req, config, broker|
 			rval = txn.app_root
 		end
 		
@@ -56,6 +53,49 @@ class Arrow::TransactionTestCase < Arrow::TestCase
 	end
 
 
+	def test_root_dispatcher_option_in_options_should_set_up_root_dispatched_transaction
+		rval = ''
+		
+		with_fixtured_request( "/", 'root_dispatcher' => "true" ) do |txn, req, config, broker|
+			rval = txn.root_dispatcher?
+		end
+		
+		assert_equal true, rval, "root_dispatcher? should be true"
+	end
+
+
+	def test_root_dispatcher_option_false_in_options_should_not_set_up_root_dispatched_transaction
+		rval = ''
+		
+		with_fixtured_request( "/", 'root_dispatcher' => "false" ) do |txn, req, config, broker|
+			rval = txn.root_dispatcher?
+		end
+		
+		assert_equal false, rval, "root_dispatcher? should be false"
+	end
+
+
+	def test_root_dispatcher_option_no_in_options_should_not_set_up_root_dispatched_transaction
+		rval = ''
+		
+		with_fixtured_request( "/", 'root_dispatcher' => "no" ) do |txn, req, config, broker|
+			rval = txn.root_dispatcher?
+		end
+		
+		assert_equal false, rval, "root_dispatcher? should be false"
+	end
+
+
+	def test_root_dispatcher_option_0_in_options_should_not_set_up_root_dispatched_transaction
+		rval = ''
+		
+		with_fixtured_request( "/", 'root_dispatcher' => "" ) do |txn, req, config, broker|
+			rval = txn.root_dispatcher?
+		end
+		
+		assert_equal false, rval, "root_dispatcher? should be false"
+	end
+
 
 	#######
 	private
@@ -63,9 +103,12 @@ class Arrow::TransactionTestCase < Arrow::TestCase
 
 	### Set up mocks for the request, config, and broker and yield them to
 	### the given block.
-	def with_fixtured_request( uri="/" )
+	def with_fixtured_request( uri="/", options={} )
+		debugMsg "Request uri = %p, options = %p" % [ uri, options ]
+		
 		FlexMock.use( "request", "config", "broker" ) do |req, config, broker|
 			req.should_receive( :hostname ).and_return( "hostname" ).once
+			req.should_receive( :options ).and_return( options ).at_least.once
 
 			txn = Arrow::Transaction.new( req, config, broker )
 			
