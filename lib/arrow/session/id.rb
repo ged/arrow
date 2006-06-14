@@ -51,7 +51,7 @@ class Arrow::Session::Id < Arrow::Object
 	### Create a new Arrow::Session::Id object for the given +request+ (an
 	### Apache::Request) of the type specified by +uri+.
 	def self.create( uri, request, idstring=nil )
-		uri = Arrow::Session.parseUri( uri ) if uri.is_a?( String )
+		uri = Arrow::Session.parse_uri( uri ) if uri.is_a?( String )
 		super( uri.scheme.dup, uri, request, idstring )
 	end
 

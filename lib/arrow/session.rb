@@ -53,8 +53,8 @@ class Arrow::Session < Arrow::Object
 
 	### Parse the given string into a URI object, appending the path part if
 	### it doesn't exist.
-	def self.parseUri( str )
-		return str if str.is_a?( URI )
+	def self.parse_uri( str )
+		return str if str.is_a?( URI::Generic )
 		str += ":." if /^\w+$/ =~ str
 		URI.parse( str )
 	end
@@ -132,7 +132,7 @@ class Arrow::Session < Arrow::Object
 	### Create an Arrow::Session::Lock object for the specified +store+ and +id+.
 	def self.create_lock( config, store, id )
 	    
-		lockuri = Arrow::Session.parseUri( config.lockType )
+		lockuri = Arrow::Session.parse_uri( config.lockType )
         lock = nil
 
 		# If the configuration says to use the recommended locker, ask the

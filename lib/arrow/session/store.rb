@@ -140,7 +140,7 @@ class Arrow::Session::Store < Arrow::Object
 
 	### Overridden factory method: handle a URI object or a name
 	def self::create( uri, idobj )
-		uri = Arrow::Session.parseUri( uri ) if uri.is_a?( String )
+		uri = Arrow::Session.parse_uri( uri ) if uri.is_a?( String )
 		super( uri.scheme.dup, uri, idobj )
 	end
 
@@ -325,7 +325,7 @@ class Arrow::Session::Store < Arrow::Object
 			raise SessionError, "Could not fetch RecommendedLocker constant"
 
 		self.log.debug "Creating recommeded lock %s" % uri
-		uri = Arrow::Session.parseUri( uri ) if
+		uri = Arrow::Session.parse_uri( uri ) if
 			uri.is_a?( String )
 
 		lock = Arrow::Session::Lock.create( uri, idobj )

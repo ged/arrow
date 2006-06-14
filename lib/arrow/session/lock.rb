@@ -83,7 +83,7 @@ class Arrow::Session::Lock < Arrow::Object
 	### Create a new Arrow::Session::Lock object for the given +id+ of the
 	### type specified by +uri+.
 	def self::create( uri, id )
-		uri = Arrow::Session.parseUri( uri ) if
+		uri = Arrow::Session.parse_uri( uri ) if
 			uri.is_a?( String )
 		super( uri.scheme.dup, uri, id )
 	end
