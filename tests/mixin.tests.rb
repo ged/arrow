@@ -39,8 +39,9 @@ class Arrow::MixinsTestCase < Arrow::TestCase
 		
 		@config = nil
 		
-		def self::configure( config )
+		def self::configure( config, dispatcher )
 			config.passed
+			dispatcher.passed
 		end
 	end
 	
@@ -61,7 +62,7 @@ class Arrow::MixinsTestCase < Arrow::TestCase
 	def test_mixing_in_configurable_should_add_default_configure_class_method
 		assert_respond_to TestObject, :configure
 		assert_raises( NotImplementedError ) do
-			TestObject.configure( nil )
+			TestObject.configure( nil, nil )
 		end
 	end
 
@@ -93,11 +94,8 @@ class Arrow::MixinsTestCase < Arrow::TestCase
         assert_equal :foo, rval
     end
 
-    def test_configure_modules_
-        FlexMock.use( "config", "foosection" ) do |config, foosection|
-            config.should_receive( :member? ).
-                with( :mixinstestcase_testobject ).
-                and_return( false ).once
+    def test_configure_modules_should_pass_requested_section_to_modules_if_it_exists
+        FlexMock.use( "config", "foosection", "dispatcher" ) do |config, foosection, dispatcher|
             config.should_receive( :member? ).
                 with( :foo ).
                 and_return( true ).once
@@ -105,9 +103,14 @@ class Arrow::MixinsTestCase < Arrow::TestCase
                 with( :foo ).
                 and_return( foosection ).once
 
+			config.should_receive( :member? ).
+				with( Symbol ).
+				and_return( false )
+
             foosection.should_receive( :passed ).once
+			dispatcher.should_receive( :passed ).once
             
-            Arrow::Configurable.configure_modules( config )
+            Arrow::Configurable.configure_modules( config, dispatcher )
         end
     end
 

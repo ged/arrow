@@ -88,7 +88,7 @@ module Arrow
 		### Configure Configurable classes with the sections of the specified
 		### +config+ that correspond to their +config_key+, if present.
 		### (Undocumented)
-		def self::configure_modules( config )
+		def self::configure_modules( config, dispatcher )
 		    @modules.each do |mod|
 		        key = mod.config_key
 		        
@@ -96,7 +96,7 @@ module Arrow
 		            Arrow::Logger[ self ].debug \
 		                "Configuring %s with the %s section of the config" %
 		                [ mod.name, key ]
-		            mod.configure( config[key] )
+		            mod.configure( config[key], dispatcher )
 	            else
 	                Arrow::Logger[ self ].debug \
 	                    "Skipping %s: no %s section in the config" %
@@ -123,7 +123,7 @@ module Arrow
 		end
 		
 		### Default configuration method.
-		def configure( config )
+		def configure( config, dispatcher )
 			raise NotImplementedError,
 				"#{self.name} does not implement required method 'configure'"
 		end
