@@ -16,11 +16,9 @@
 #	The URI of the applet which should handle untrapped exceptions raised
 #	from other applets. A value of '(builtin)' (the default) will cause a
 #	builtin handler to be invoked.
-# [<b>logLevels</b>]
-#	The verbosity level of logging for various classes. Each key in this hash
-#	should be the name of an Arrow class or 'global'. Possible values are the
-#	same as the Apache logging levels: debug, info, notice, warn, error, crit,
-#	alert, and emerg.
+# [<b>logging</b>]
+#	Arrow::Logger configuration. See arrow/logger.rb for specifics about this
+#   section.
 # [<b>applets</b>]
 #	Applet configuration values:
 #	[<b>path</b>]
@@ -136,9 +134,9 @@ class Arrow::Config < Arrow::Object
 
 	# Define the layout and defaults for the underlying structs
 	Defaults = {
-		:startMonitor			=> false,
+		:startMonitor		=> false,
 
-		:logLevels				=> { :global => 'notice' },
+		:logging			=> { :global => 'notice' },
 
 		:applets => {
 			:path			=> Arrow::Path.new( "applets:/www/applets" ),
