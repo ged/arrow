@@ -52,6 +52,7 @@ require 'apache/fakerequest'
 require 'test/unit/assertions'
 require 'test/unit/testcase'
 require 'pathname'
+require 'flexmock'
 
 require 'arrow'
 require 'arrow/applet'
