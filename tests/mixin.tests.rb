@@ -20,7 +20,7 @@ unless defined? Arrow::TestCase
 	$LOAD_PATH.unshift "#{basedir}/tests/lib" unless
 		$LOAD_PATH.include?( "#{basedir}/tests/lib" )
 
-	require 'arrowtestcase'
+	require 'arrow/testcase'
 end
 
 require 'flexmock'
@@ -114,6 +114,23 @@ class Arrow::MixinsTestCase < Arrow::TestCase
         end
     end
 
+
+
+    ### Injectable
+    def test_load_class_loads_derivative_class
+		rval = rval2 = nil
+		
+		assert_nothing_raised do
+			rval = Arrow::Injectable.load_class( 'InjectableObject' )
+			rval2 = Arrow::Injectable.load_class( 'InjectableObject' )
+		end
+		
+		assert_instance_of Class, rval
+		assert_equal "InjectableObject", rval.name
+		assert_instance_of Class, rval2
+		assert_equal "InjectableObject", rval2.name
+	end
+	
 end
 
 

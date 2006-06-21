@@ -47,11 +47,15 @@
 #
 
 require 'arrow/utils'
+require 'arrow/mixins'
 
 ### A log class for Arrow systems.
 class Arrow::Logger
-
 	require 'arrow/logger/outputter'
+
+    include Arrow::Configurable
+    config_key :logging
+
 
 	# SVN Revision
 	SVNRev = %q$Rev$
@@ -84,11 +88,75 @@ class Arrow::Logger
 	include DebugLogger
 	extend DebugLogger
 
+
+
 	#############################################################
 	###	C L A S S   M E T H O D S
 	#############################################################
 
 	@global_logger = nil
+
+    ### Configure logging from the 'logging' section of the config.
+    def self::configure( config, dispatcher )
+
+		self.reset
+		apacheoutputter = Arrow::Logger::Outputter.create( 'apache' )
+
+		config.each do |klass, setting|
+			level, uri = self.parse_log_setting( setting )
+
+			# Use the Apache log as the outputter if none is configured
+			if uri.nil?
+				outputter = apacheoutputter
+			else
+				outputter = Arrow::Logger::Outputter.create( uri )
+			end
+
+			# The 'global' entry configured the global logger
+			if klass == :global
+				self.global.level = level
+				self.global.outputters << outputter
+				next
+			end
+
+			# If the class bit is something like 'applet', then transform
+			# it into 'Arrow::Applet'
+			if klass.to_s.match( /^[a-z][a-zA-Z]+$/ )
+				realclass = "Arrow::%s" % klass.to_s.sub(/^([a-z])/){ $1.upcase }
+			else
+				realclass = klass.to_s
+			end
+
+			# 
+			Apache.request.server.log_info \
+				"Setting log level for %p to %p" % [realclass, level]
+			Arrow::Logger[ realclass ].level = level
+			Arrow::Logger[ realclass ].outputters << outputter
+		end
+		
+    end
+
+
+	### Parse the configuration for a given class's logger. The configuration
+	### is in the form:
+	###   <level> [<outputter_uri>]
+	### where +level+ is one of the logging levels defined by this class (see
+	### the Levels constant), and the optional +outputter_uri+ indicates which
+	### outputter to use, and how it should be configured. See 
+	### Arrow::Logger::Outputter for more info.
+	###
+	### Examples:
+	###   notice
+	###   debug file:///tmp/broker-debug.log
+	###   error dbi://www:password@localhost/www.errorlog?driver=postgresql
+	###
+	def self::parse_log_setting( setting )
+		level, rawuri = setting.split( ' ', 2 )
+		uri = rawuri.nil? ? nil : URI.parse( rawuri )
+		
+		return level.to_sym, uri
+	end
+	
 
 	### Return the Arrow::Logger for the given module +mod+, which can be a
 	### Module object, a Symbol, or a String.
@@ -135,19 +203,6 @@ class Arrow::Logger
 		self.global.send( sym, *args )
 	end
 
-
-	### Return a human-readable string representation of the object.
-	def inspect
-		"#<%s:0x%0x %s [level: %s, outputters: %d, trace: %s]>" % [
-			self.class.name,
-			self.object_id * 2,
-			self.readable_name,
-			self.readable_level,
-			self.outputters.length,
-			self.trace ? "on" : "off",
-		]
-	end
-	
 
 	#############################################################
 	###	I N S T A N C E   M E T H O D S
@@ -196,6 +251,19 @@ class Arrow::Logger
 	# The integer level of the logger.
 	attr_reader :level
 
+
+	### Return a human-readable string representation of the object.
+	def inspect
+		"#<%s:0x%0x %s [level: %s, outputters: %d, trace: %s]>" % [
+			self.class.name,
+			self.object_id * 2,
+			self.readable_name,
+			self.readable_level,
+			self.outputters.length,
+			self.trace ? "on" : "off",
+		]
+	end
+	
 
 	### Return the name of the logger formatted to be suitable for reading.
 	def readable_name

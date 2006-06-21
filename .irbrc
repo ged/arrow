@@ -31,7 +31,7 @@ begin
 		puts "Turning on logging..."
 		format = colored( %q{#{time} [#{level}]: }, 'cyan' ) +
 			colored( %q{#{name} #{frame ? '('+frame+')' : ''}: #{msg[0,1024]}}, 'white' )
-		outputter = Arrow::Logger::Outputter::create( 'file', $deferr, ".irbrc", format )
+		outputter = Arrow::Logger::Outputter::create( 'file:deferr', ".irbrc", format )
 		Arrow::Logger::global.outputters << outputter
 		Arrow::Logger::global.level = :debug
 

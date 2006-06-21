@@ -39,7 +39,7 @@ class Arrow::Logger::ApacheOutputter < Arrow::Logger::Outputter
 	# The default interpolatable string that's used to build the message to
 	# output
 	DefaultFormat =
-		%q{#{name} #{frame ? '('+frame+')' : ''}: #{msg[0,1024]}}
+		%q{#{name}#{frame ? '('+frame+')' : ''}: #{msg[0,2048]}}
 
 	# The Logger log levels (copied for easy access)
 	Levels = Arrow::Logger::Levels
@@ -51,7 +51,7 @@ class Arrow::Logger::ApacheOutputter < Arrow::Logger::Outputter
 
 	### Create a new Arrow::Logger::ApacheOutputter object that will write
 	### to the apache log, and use the given +description+ and +format+.
-	def initialize( description=DefaultDescription, format=DefaultFormat )
+	def initialize( uri, description=DefaultDescription, format=DefaultFormat )
 		super
 	end
 

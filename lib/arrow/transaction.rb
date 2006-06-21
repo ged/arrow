@@ -83,16 +83,17 @@ class Arrow::Transaction < Arrow::Object
 		# Stuff that may be filled in later
 		@session		= nil # Lazily-instantiated
 		@applet_path	= nil # Added by the broker
-		@templates		= nil # Filled in by the applet
-		@vargs			= nil #          "
+		@vargs			= nil # Filled in by the applet
 		@status			= Apache::OK
 		@data			= {}
 
 		# Check for a "RubyOption root_dispatcher true"
 		if @request.options.key?('root_dispatcher') &&
 			@request.options['root_dispatcher'].match( /^(true|yes|1)$/i )
+		    self.log.debug "Dispatching from root path"
 			@root_dispatcher = true
 		else
+		    self.log.debug "Dispatching from sub-path"
 			@root_dispatcher = false
 		end
 
@@ -120,10 +121,6 @@ class Arrow::Transaction < Arrow::Object
 	# The Arrow::Broker that is responsible for delegating the Transaction
 	# to one or more Arrow::Applet objects.
 	attr_reader :broker
-
-	# The hash of templates used by the applet this transaction is
-	# bound for.
-	attr_accessor :templates # :nodoc:
 
 	# The argument validator (a FormValidator object)
 	attr_accessor :vargs

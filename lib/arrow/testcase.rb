@@ -10,7 +10,7 @@
 # == Synopsis
 # 
 #	$LOAD_PATH.unshift "tests/lib" unless $LOAD_PATH.include?("tests/lib")
-#	require 'arrowtestcase'
+#	require 'arrow/testcase'
 #
 #	class MySomethingTest < Arrow::TestCase
 #		def set_up
@@ -63,23 +63,9 @@ require 'test/unit/assertions'
 require 'test/unit/util/backtracefilter'
 
 require 'flexmock'
+require 'apache/fakerequest'
 
-require 'net/http'
-require 'filewhich'
-require 'apacheconstants'
-
-require 'arrow/exceptions'
-require 'arrow/mixins'
-require 'arrow/logger'
-require 'arrow/object'
-require 'arrow/broker'
-require 'arrow/dispatcher'
-
-require 'arrow/applet'
-require 'arrow/datasource'
-require 'arrow/monitor'
-require 'arrow/template'
-require 'arrow/config'
+require 'arrow'
 
 
 ### Test case class

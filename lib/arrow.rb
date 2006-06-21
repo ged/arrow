@@ -39,23 +39,11 @@ module Arrow
 	# Yaml stuff
 	YamlDomain = "rubycrafters.com,2003-10-22"
 
+	require 'arrow/applet'
+	require 'arrow/dispatcher'
+	require 'arrow/broker'
 	require 'arrow/exceptions'
 	require 'arrow/mixins'
-	require 'arrow/logger'
-	require 'arrow/object'
-
-	require 'arrow/broker'
-	require 'arrow/dispatcher'
-	require 'arrow/applet'
-	require 'arrow/appletregistry'
-	require 'arrow/datasource'
-	require 'arrow/monitor'
-	require 'arrow/template'
-	require 'arrow/config'
-	require 'arrow/session'
-
-	require 'arrow/fallbackhandler'
-
 
 	### Load one or more arrow configurations from a YAML file, which lists each
 	### config file under the key which will be used to fetch the request

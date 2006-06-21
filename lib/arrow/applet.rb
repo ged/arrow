@@ -270,8 +270,6 @@ class Arrow::Applet < Arrow::Object
 		### Inheritance callback: register any derivative classes so they can be
 		### looked up later.
 		def inherited( klass )
-			Arrow::Logger[self].debug "#{self.name} inherited by #{klass.name}"
-
 			if defined?( @newly_loaded )
 				@newly_loaded.push( klass )
 				super
@@ -296,7 +294,6 @@ class Arrow::Applet < Arrow::Object
 			self.newly_loaded.clear
 
 			rval = Kernel.load( filename, true )
-			Arrow::Logger[self].debug "Kernel.load returned: %p" % rval
 
 			newderivatives = @newly_loaded.dup
 			@derivatives -= @newly_loaded
@@ -604,13 +601,8 @@ class Arrow::Applet < Arrow::Object
 	### method sets the content type of the response to 'text/html', turns off
 	### buffering for the header, and adds the applet's templates.
 	def prep_transaction( txn )
-
 		txn.request.content_type = "text/html"
 		txn.request.sync_header = true
-
-		# Backward-compatibility hack. Relies on the fact that Method#[] works just
-		# like a Hash accessor. Mmmm... hacquery.
-		txn.templates = method( :load_template )
 	end
 
 

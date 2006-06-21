@@ -228,10 +228,33 @@ module Apache # :nodoc:
             @uri = uri
 			@server = nil
 			@allowed = Apache::M_GET | Apache::M_POST
+			@paramtable = {}
+			@sync_header = false
+			@content_type = 'text/html'
+			@hostname = 'localhost'
+			@options = {}
+			@uploads = {}
         end
 
 		attr_writer :server
-		attr_accessor :allowed
+		attr_accessor :allowed, :sync_header, :content_type
+		attr_reader :hostname, :paramtable, :cookies, :options, :uploads
+		alias_method :params, :paramtable
+
+		def paramtable=( hash )
+			# :TODO: Munge the hash into an Apache::Table object
+			@paramtable = @params = hash.stringify_keys
+		end
+		alias_method :params=, :paramtable=
+
+		def param( key )
+			@paramtable[ key ]
+		end
+
+		def cookies=( hash )
+			# :TODO: Munge the hash into a hash of Apache::Cookie objects
+			@cookies = hash
+		end
 
 		def server
 			@server ||= Apache::Server.new
@@ -264,10 +287,13 @@ module Apache # :nodoc:
 			:alert,
 			:emerg,
 		].each do |sym|
-			define_method( "log_#{sym}" ) {|msg| $deferr.puts "#{sym.to_s.upcase}: #{msg}" }
+			define_method( "log_#{sym}" ) {|msg|
+			 	$deferr.puts "#{sym.to_s.upcase}: #{msg}" if $DEBUG
+			}
 		end
 		
 		def admin
+			"jrandomhacker@localhost"
 		end
     end
 

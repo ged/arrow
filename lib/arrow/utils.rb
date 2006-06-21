@@ -23,7 +23,10 @@
 # Please see the file COPYRIGHT in the 'docs' directory for licensing details.
 #
 
+require 'rbconfig'
 require 'forwardable'
+require 'pathname'
+
 
 ### Add some operator methods to regular expression objects for catenation,
 ### union, etc.
@@ -249,6 +252,37 @@ module Arrow
 		end
 
 	end # class Path
+
+
+	###############
+	module_function
+	###############
+
+	### Search for and require ruby module files from subdirectories of the
+	### $LOAD_PATH specified by +subdir+. If excludePattern is a Regexp or a
+	### String, it will be used as a pattern to exclude matching module files.
+	def require_all_from_path( subdir="arrow", excludePattern=nil )
+		excludePattern = Regexp::compile( excludePattern.to_s ) unless
+			excludePattern.nil? || excludePattern.is_a?( Regexp )
+
+		subdir = Pathname.new( subdir ) unless subdir.is_a?( Pathname )
+
+		$LOAD_PATH.
+			collect {|dir| Pathname.new(dir) + subdir }.
+			find_all {|dir| dir.directory? }.
+			inject([]) {|files,dir|
+				files += dir.entries.find_all {|file|
+					/^[-.\w]+\.(rb|#{Config::CONFIG['DLEXT']})$/.match( file )
+				}
+			}.
+			uniq.
+			reject {|file| 
+				excludePattern.match(file) unless excludePattern.nil?
+			}.
+			each do |file|
+				require subdir + file
+			end
+	end
 
 end # module Arrow
 

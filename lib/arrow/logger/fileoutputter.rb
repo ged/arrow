@@ -19,6 +19,7 @@
 # Please see the file COPYRIGHT in the 'docs' directory for licensing details.
 #
 
+require 'stringio'
 require 'arrow/logger'
 
 ### This is an Arrow::Logger::Outputter that writes to an IO object.
@@ -47,20 +48,23 @@ class Arrow::Logger::FileOutputter < Arrow::Logger::Outputter
 	### to File.open, or an Integer file descriptor, in which case a new IO
 	### object is created which appends to the file handle matching that
 	### descriptor.
-	def initialize( io, description=DefaultDescription, format=DefaultFormat )
-		case io
-		when IO, StringIO
-			@io = io
-		when String
-			@io = File.open( io, File::WRONLY )
-		when Integer
-			@io = IO.new( io, 'a' )
+	def initialize( uri, description=DefaultDescription, format=DefaultFormat )
+		if uri.hierarchical?
+			@io = File.open( uri.path, File::WRONLY|File::CREAT )
 		else
-			raise TypeError, "Illegal argument 1: %p" %
-				io.class.name
+			case uri.opaque
+			when /(std|def)err/i
+				@io = $deferr
+			when /(std|def)out/i
+				@io = $defout
+			when /^(\d+)$/
+				@io = IO.for_fd( Integer($1), "w" )
+			else
+				raise "Unrecognized log URI '#{uri}'"
+			end
 		end
 
-		super( description, format )
+		super
 	end
 
 
@@ -74,9 +78,7 @@ class Arrow::Logger::FileOutputter < Arrow::Logger::Outputter
 
 	### Write the given +level+, +name+, +frame+, and +msg+ to the logfile.
 	def write( time, level, name, frame, msg )
-		super {|msg|
-			@io.puts( msg )
-		}
+		super {|msg| @io.puts(msg) }
 	end
 
 end # class Arrow::Logger::FileOutputter

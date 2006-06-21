@@ -5,7 +5,7 @@
 #
 
 BEGIN {
-	$basedir = File.dirname( __FILE__ )
+	$basedir = File.expand_path( File.dirname(__FILE__) )
 	["lib", "tests/lib", "redist"].each do |subdir|
 		$LOAD_PATH.unshift File.join( $basedir, subdir )
 	end
@@ -15,12 +15,10 @@ BEGIN {
 
 	verboseOff {
 		require "arrow/logger"
-		logpath = File.join( $basedir, "test.log" )
-		logfile = File.open( logpath, File::CREAT|File::WRONLY|File::TRUNC )
-		logfile.sync = true
+		loguri = 'file://' + File.join( $basedir, "test.log" )
 
 		Arrow::Logger.global.outputters <<
-			Arrow::Logger::Outputter.create('file', logfile)
+			Arrow::Logger::Outputter.create( loguri )
 		Arrow::Logger.global.level = :debug
 	}
 }
@@ -47,7 +45,7 @@ ARGV.options {|oparser|
 			puts "Turned debugging on for %p." % $DebugPattern
 		else
 			Arrow::Logger.global.outputters <<
-				Arrow::Logger::Outputter.create( 'file', $stderr, "STDERR" )
+				Arrow::Logger::Outputter.create( 'file:stderr', "STDERR" )
 			Arrow::Logger.global.level = :debug
 			$DEBUG = true
 			debugMsg "Turned debugging on globally."
@@ -69,7 +67,7 @@ ARGV.options {|oparser|
 }
 
 verboseOff {
-	require 'arrowtestcase'
+	require 'arrow/testcase'
 	require 'find'
 	require 'test/unit'
 	require 'test/unit/testsuite'
@@ -106,7 +104,7 @@ end
 class ArrowTests
 	class << self
 		def suite
-			suite = Test::Unit::TestSuite.new( "Arrow Web Application Test Suite" )
+			suite = Test::Unit::TestSuite.new( "Arrow Web Application Framework" )
 
 			if suite.respond_to?( :add )
 				ObjectSpace.each_object( Class ) {|klass|

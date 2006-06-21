@@ -114,9 +114,6 @@ class Arrow::Dispatcher < Arrow::Object
 			raise ArgumentError, "Invalid config hash %p" % configspec
 		end
 
-		# Set up global logging
-		setup_logging()
-
 		# Create the dispatchers and return the first one to support the
 		# old-style create, i.e.,
 		#   dispatcher = Arrow::Dispatcher.create( configfile )
@@ -133,7 +130,7 @@ class Arrow::Dispatcher < Arrow::Object
 			err.backtrace.join("\n  ")
 		]
 
-		logfile = File.join( Dir.tmpdir, "arrow-fatal.log" )
+		logfile = File.join( Dir.tmpdir, "arrow-fatal.log.#{$$}" )
 		File.open( logfile, IO::WRONLY|IO::TRUNC|IO::CREAT ) {|ofh|
 			ofh.puts( errmsg )
 			ofh.flush
@@ -172,17 +169,6 @@ class Arrow::Dispatcher < Arrow::Object
 	end
 
 
-	### Set up a global logger if one isn't already set up
-	def self::setup_logging
-		if Arrow::Logger.global.outputters.empty?
-			outputter = Arrow::Logger::Outputter.create( 'apache' )
-			Arrow::Logger.global.outputters << outputter
-			Arrow::Logger.global.level = :notice
-			Arrow::Logger[Arrow::Template].level = :notice
-		end
-	end
-
-
 	### Create dispatchers for the config files given in +configspec+ and return
 	### them in a Hash keyed by both the configname key and the expanded path to
 	### the configuration file.
@@ -203,7 +189,6 @@ class Arrow::Dispatcher < Arrow::Object
 
 			# If a config file is given, load it. If it's not, just use the
 			# default config.
-			Arrow::Logger.notice "Arrow config file is %p" % configfile
 			if configfile
 				config = Arrow::Config.load( configfile )
 			else
@@ -254,6 +239,9 @@ class Arrow::Dispatcher < Arrow::Object
 		self.log.notice "Configuring a dispatcher for '%s' from '%s': child server %d" %
 			[ Apache.request.server.hostname, config.name, Process.pid ]
 
+        # Configure any modules that have mixed in Arrow::Configurable
+        Arrow::Configurable.configure_modules( config, self )
+
 		# Start the monitor backend if enabled
 		if config.startMonitor?
 			self.log.info "Starting Monitor backend"
@@ -262,25 +250,6 @@ class Arrow::Dispatcher < Arrow::Object
 			self.log.info "Monitor skipped by configuration"
 		end
 
-		# Set up the logging level
-		self.log.info "Configuring log levels: %p" % config.logLevels
-		config.logLevels.each do |klass, level|
-			if klass == :global
-				Arrow::Logger.global.level = level
-				next
-			end
-
-			if klass.to_s.match( /^[a-z][a-zA-Z]+$/ )
-				realclass = "Arrow::%s" % klass.to_s.sub(/^([a-z])/){ $1.upcase }
-			else
-				realclass = klass.to_s
-			end
-
-			Apache.request.server.log_info \
-				"Setting log level for %p to %p" % [realclass, level]
-			Arrow::Logger[ realclass ].level = level
-		end
-		
 		# Apache.request.server.log_notice( "Loggers: %p" % [Arrow::Logger.loggers] )
 
 		# Set up the session class
@@ -378,8 +347,6 @@ class Arrow::Dispatcher < Arrow::Object
 			@config.name,
 		]
 	end
-
-
 
 
 end # class Arrow::Dispatcher

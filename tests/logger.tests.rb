@@ -20,7 +20,7 @@ unless defined? Arrow::TestCase
 	$LOAD_PATH.unshift "#{basedir}/tests/lib" unless
 		$LOAD_PATH.include?( "#{basedir}/tests/lib" )
 
-	require 'arrowtestcase'
+	require 'arrow/testcase'
 end
 
 require 'arrow/logger'
@@ -381,6 +381,82 @@ module Arrow
 			end
 
 			assert_include self.name.sub( /\(.*/, '' ), outputter.output
+		end
+
+
+		def test_parse_log_setting_should_just_return_level_if_its_a_single_word
+			level = uri = nil
+			
+			assert_nothing_raised do
+				level, uri = Arrow::Logger.parse_log_setting( "debug" )
+			end
+			
+			assert_equal :debug, level
+			assert_equal nil, uri
+		end
+		
+		
+		def test_parse_log_setting_should_return_a_uri_if_setting_has_two_words
+			level = uri = nil
+			
+			assert_nothing_raised do
+				level, uri = Arrow::Logger.parse_log_setting( "info apache" )
+			end
+			
+			assert_equal :info, level
+			assert_kind_of URI::Generic, uri
+		end
+		
+		def test_parse_log_setting_should_return_a_uri_if_setting_includes_complex_uri
+			level = uri = nil
+			complexuri = 'dbi://www:password@localhost/www.errorlog?driver=postgresql'
+			
+			assert_nothing_raised do
+				level, uri = Arrow::Logger.parse_log_setting( "error #{complexuri}" )
+			end
+			
+			assert_equal :error, level
+			assert_kind_of URI::Generic, uri
+		end
+
+		def test_configure_should_use_apache_log_outputter_if_none_specified
+			Arrow::Logger.configure( {:global => 'debug'}, nil )
+
+			assert_instance_of Arrow::Logger::ApacheOutputter,
+				Arrow::Logger.global.outputters.first
+			assert_equal :debug, Arrow::Logger.global.readable_level
+		end
+		
+		def test_configure_with_file_uri_should_use_fileouputter
+			Arrow::Logger.configure( {:global => 'error file:stderr'}, nil )
+			
+			assert_instance_of Arrow::Logger::FileOutputter,
+				Arrow::Logger.global.outputters.first
+			assert_equal :error, Arrow::Logger.global.readable_level
+		end
+		
+		def test_configure_with_simple_class_name_should_prepend_arrow_namespace
+			Arrow::Logger.configure( {:applet => 'notice file:stderr'}, nil )
+			
+			assert_instance_of Arrow::Logger::FileOutputter,
+				Arrow::Logger[Arrow::Applet].outputters.first
+			assert_equal :notice, Arrow::Logger[Arrow::Applet].readable_level
+		end
+
+		def test_configure_with_full_class_name_should_create_a_logger_for_that_class
+			Arrow::Logger.configure( {:"Arrow::Applet" => 'info file:stderr'}, nil )
+			
+			assert_instance_of Arrow::Logger::FileOutputter,
+				Arrow::Logger[Arrow::Applet].outputters.first
+			assert_equal :info, Arrow::Logger[Arrow::Applet].readable_level
+		end
+		
+		def test_configure_with_full_class_name_should_create_a_logger_for_non_arrow_class
+			Arrow::Logger.configure( {:"String" => 'warning file:stderr'}, nil )
+			
+			assert_instance_of Arrow::Logger::FileOutputter,
+				Arrow::Logger[String].outputters.first
+			assert_equal :warning, Arrow::Logger[String].readable_level
 		end
 		
 	end # class LogTestCase

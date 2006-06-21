@@ -52,20 +52,36 @@ class Arrow::Logger::Outputter
 	#############################################################
 
 	### Specify the directory to look for the derivatives of this class in.
-	def self.derivativeDirs
+	def self::derivativeDirs
 		["arrow/logger"]
 	end
+
+
+	### Parse the given string into a URI object, appending the path part if
+	### it doesn't exist.
+	def self::parse_uri( str )
+		return str if str.is_a?( URI::Generic )
+		str += ":." if str.match( /^\w+$/ )
+		URI.parse( str )
+	end
+
+
+	### Create a new Arrow::Logger::Outputter object of the type specified 
+	### by +uri+.
+	def self::create( uri, *args )
+		uri = self.parse_uri( uri ) if uri.is_a?( String )
+		super( uri.scheme.dup, uri, *args )
+	end
+
 
 
 	#############################################################
 	###	I N S T A N C E   M E T H O D S
 	#############################################################
 
-	### Create a new Arrow::Logger::Outputter object that will write to the
-	### specified +io+ object, using the given +formatter+ (an
-	### Arrow::Logger::Formatter object). The specified +description+ will
-	### be used for introspection tools.
-	def initialize( description=DefaultDescription, format=DefaultFormat )
+	### Create a new Arrow::Logger::Outputter object with the given +uri+,
+	### +description+ and sprintf-style +format+.
+	def initialize( uri, description=DefaultDescription, format=DefaultFormat )
 		@description = description
 		@format = format
 	end

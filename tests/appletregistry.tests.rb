@@ -20,7 +20,7 @@ unless defined? Arrow::TestCase
 	$LOAD_PATH.unshift "#{basedir}/tests/lib" unless
 		$LOAD_PATH.include?( "#{basedir}/tests/lib" )
 
-	require 'arrowtestcase'
+	require 'arrow/testcase'
 end
 
 require 'arrow/appletregistry'

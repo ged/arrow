@@ -168,7 +168,8 @@ class Arrow::Broker < Arrow::Object
 			[ applet.signature.name, rest ]
 		return applet.run( txn, *rest )
 	rescue ::Exception => err
-		self.log.error "Error running %s (%s): %s:\n\t%s" % [
+		self.log.error "[%s]: Error running %s (%s): %s:\n\t%s" % [
+		    txn.serial,
 			applet.signature.name,
 			applet.class.filename,
 			err.message,

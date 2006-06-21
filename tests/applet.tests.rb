@@ -1,4 +1,4 @@
-``#!/usr/bin/ruby -w
+#!/usr/bin/ruby -w
 #
 # Unit test for the Arrow::Applet class
 # $Id$
@@ -20,7 +20,7 @@ unless defined? Arrow::TestCase
 	$LOAD_PATH.unshift "#{basedir}/tests/lib" unless
 		$LOAD_PATH.include?( "#{basedir}/tests/lib" )
 
-	require 'arrowtestcase'
+	require 'arrow/testcase'
 end
 
 
@@ -429,7 +429,6 @@ class Arrow::AppletTestCase < Arrow::TestCase
 	def with_run_fixtured_transaction
 		FlexMock.use( "transaction", "request" ) do |txn, req|
 			txn.should_receive( :request ).and_return( req ).at_least.twice
-			txn.should_receive( :templates= ).once
 			txn.should_receive( :vargs= ).once
 
 			req.should_receive( :content_type= ).with( "text/html" ).once
@@ -440,5 +439,4 @@ class Arrow::AppletTestCase < Arrow::TestCase
 		end
 	end
 end
-
 
