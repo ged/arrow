@@ -406,6 +406,15 @@ class Arrow::Logger
 	end
 
 
+	### Append the given +obj+ to the logger at +:debug+ level. This is for 
+	### compatibility with objects that append to $stderr for their logging
+	### (e.g., net/protocols-based libraries).
+	def <<( obj )
+		self.write( :debug, obj )
+		return self
+	end
+	
+
 	#########
 	protected
 	#########

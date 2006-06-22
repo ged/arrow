@@ -56,17 +56,52 @@ require 'flexmock'
 
 require 'arrow'
 require 'arrow/applet'
+require 'arrow/mixins'
+
+
+### Provide a useful representation of a mock in an error message if one 
+### isn't already provided.
+unless FlexMock.instance_methods(false).include?("inspect")
+	class FlexMock
+		def inspect
+			"#<%s:0x%x %s>" % [
+				self.class.name,
+				self.object_id * 2,
+			 	self.mock_name
+			]
+		end
+
+		def method_missing(sym, *args, &block)
+			mock_wrap do
+				if handler = @expectations[sym]
+					args << block  if block_given?
+					handler.call(*args)
+				else
+					raise NoMethodError, "undefined method `%s' for %p" %
+						[ sym, self ] unless @ignore_missing
+				end
+			end
+		end
+
+	end
+end
 
 
 ### Test case class
 class Arrow::AppletTestCase < Test::Unit::TestCase
-	include Test::Unit::Assertions, FlexMock::TestCase
+	include Arrow::Loggable, Test::Unit::Assertions, FlexMock::TestCase
 
 	# The default path to the directory where applets live
 	APPLET_PATH = Pathname.getwd + "applets"
 	
 	class << self
 		attr_accessor :appletclass, :appletname, :fixture_data
+	end
+
+
+	def self::debug_msg( message, *args )
+		msg = format( message, *args )
+		Arrow::Logger[self].debug( msg )
 	end
 
 
@@ -195,10 +230,16 @@ class Arrow::AppletTestCase < Test::Unit::TestCase
 	### Set up faked request and transaction objects, yield to the given 
 	### block with them, then run the applet under test with them when
 	### the block returns.
-	def with_fixtured_action( action=nil, *args )
+	def with_fixtured_action( action=nil, *args, &block )
 		@action = action
-		txn, req, *args = setup_fixtured_request( action, *args )
-		yield( txn, req )
+		txn, req, vargs, *args = setup_fixtured_request( action, *args )
+		
+		if block.arity == 3
+			block.call( txn, req, vargs )
+		else
+			block.call( txn, req )
+		end
+		
 		return @applet.run( txn, action.to_s, *args )
 	ensure
 		@action = nil
@@ -210,13 +251,17 @@ class Arrow::AppletTestCase < Test::Unit::TestCase
 	### under test. Unless otherwise indicated (via a call to 
 	### #should_not_delegate), the expectation will be set up that the applet
 	### under test should call its delegate.
-	def with_fixtured_delegation( chain=[], *args )
-		txn, req = setup_fixtured_request( "delegated_action", *args )
+	def with_fixtured_delegation( chain=[], *args, &block )
+		txn, req, vargs, *args = setup_fixtured_request( "delegated_action", *args )
 
 		# Set delegation expectation
 		@delegate_behavior ||= should_delegate()
 
-		yield( txn, req )
+		if block.arity == 3
+			block.call( txn, req, vargs )
+		else
+			block.call( txn, req )
+		end
 		
 		rval = @applet.delegate( txn, chain, *args, &@delegate_behavior )
 		
@@ -280,8 +325,13 @@ class Arrow::AppletTestCase < Test::Unit::TestCase
 		txn.should_receive( :vargs= ).
 		    with( Arrow::FormValidator ).at_least.once
 		
+		vargs = flexmock( "form validator" )
+		txn.should_receive( :vargs ).
+			and_return( vargs ).
+			zero_or_more_times
+		
 		debug_msg "Transaction is: %p" % [txn]
-		return txn, req, *args
+		return txn, req, vargs, *args
 	end
 
 
@@ -299,6 +349,8 @@ class Arrow::AppletTestCase < Test::Unit::TestCase
 			with( tname ).and_return( mock_template ).at_least.once
 
 		yield( mock_template ) if block_given?
+		
+		return mock_template
 	end
 
 
@@ -312,10 +364,8 @@ class Arrow::AppletTestCase < Test::Unit::TestCase
 	### Set up a mock object as the given transaction's session.
 	def fixture_session( txn )
 		session = create_mock( "session" )
-		#txn.instance_variable_set( :@session, session )
 		txn.should_receive( :session ).
-		    and_return( session ).at_least.once
-
+		    and_return( session ).zero_or_more_times
 		
 		return session
 	end

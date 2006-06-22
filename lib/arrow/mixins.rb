@@ -122,7 +122,11 @@ module Arrow
 		            Arrow::Logger[ self ].debug \
 		                "Configuring %s with the %s section of the config" %
 		                [ mod.name, key ]
-		            mod.configure( config[key], dispatcher )
+					if mod.method(:configure).arity == 2
+						mod.configure( config[key], dispatcher )
+					else
+						mod.configure( config[key] )
+					end
 	            else
 	                Arrow::Logger[ self ].debug \
 	                    "Skipping %s: no %s section in the config" %
@@ -191,7 +195,7 @@ module Arrow
 			
 			unless Arrow::Injectable.derivatives.include?( classname )
 				modname = classname.downcase.gsub( /::/, '/' )
-				Arrow::Logger[self].debug "Class loaded yet. Trying to " +
+				Arrow::Logger[self].debug "Class not loaded yet. Trying to " +
 					"load it from #{modname}"
 				require modname
 				Arrow::Logger[self].debug "Loaded %s: %p" %
@@ -210,7 +214,7 @@ module Arrow
         ### Injectable, too.
 		def inherited( klass )
 			Arrow::Logger[self].debug "making %s Injectable" % [ klass.name ]
-			Arrow::Injectable.derivatives[ klass.name ] = klass
+			klass.extend( Arrow::Injectable )
 			super
 		end
 		
@@ -228,7 +232,7 @@ module Arrow
 
 		### Return the Arrow::Logger object for the receiving class.
 		def log 
-			Arrow::Logger[ self.class.name ] || Arrow::Logger.new( self.class.name )
+			Arrow::Logger[ self.class.name ]
 		end
 
 	end # module Loggable
