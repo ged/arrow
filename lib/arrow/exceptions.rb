@@ -78,7 +78,7 @@ module Arrow
 
 	# Datasource errors
 	def_exception :TypeError,				"Data type incompatible"
-	def_exception :Loaderror,				"Loading failed"
+	def_exception :LoadError,				"Loading failed"
 
 end # module Arrow
 
