@@ -62,16 +62,6 @@ class Arrow::SessionTestCase < Arrow::TestCase
 	end
 
 
-	def test_session_configure_should_fetch_session_config_from_main_config_object
-		FlexMock.use( "config" ) do |config|
-		    config.should_receive( :session ).and_return( DefaultConfigHash ).once
-			Arrow::Session.configure( config )
-		end
-
-        assert_equal DefaultConfigHash, Arrow::Session.config
-	end
-
-
     def test_create_id_should_use_id_from_cookie_if_present
         rval = nil
         

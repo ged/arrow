@@ -3,33 +3,33 @@
 # This file contains mixins which are used throughout the Arrow framework:
 #
 # == Arrow::Loggable
-#    A mixin that adds a #log method to including classes that calls
-#    Arrow::Logger with the class of the receiving object.
+#	 A mixin that adds a #log method to including classes that calls
+#	 Arrow::Logger with the class of the receiving object.
 #
 # === Usage
 # 
-#   require "arrow/mixins"
+#	require "arrow/mixins"
 #
-#   class MyClass
-#     include Arrow::Loggable
+#	class MyClass
+#	  include Arrow::Loggable
 #	end
 # 
 # == Arrow::Configurable
-#    A mixin that collects classes that expect to be configured by an 
-#    Arrow::Config instance.
+#	 A mixin that collects classes that expect to be configured by an 
+#	 Arrow::Config instance.
 #
 # === Usage
 # 
-#   require "arrow/mixins"
+#	require "arrow/mixins"
 #
-#   class MyClass
-#     include Arrow::Configurable
+#	class MyClass
+#	  include Arrow::Configurable
 # 
-#     config_key :myclass
+#	  config_key :myclass
 #
-#     def self::configure( config )
-#       @@host = config.host
-#     end
+#	  def self::configure( config )
+#		@@host = config.host
+#	  end
 #	end
 # 
 # == Arrow::Injectable
@@ -47,15 +47,15 @@
 #
 # === Usage
 # 
-#   # in myclass.rb
-#   require 'arrow/mixins'
+#	# in myclass.rb
+#	require 'arrow/mixins'
 #
-#   class MyClass
-#     include Arrow::Injectable
-#   end
+#	class MyClass
+#	  include Arrow::Injectable
+#	end
 #
-#   # somewhere else
-#   myclass = Arrow::Injectable.load_class( "myclass" )
+#	# somewhere else
+#	myclass = Arrow::Injectable.load_class( "myclass" )
 #
 #
 # == Subversion Id
@@ -115,29 +115,47 @@ module Arrow
 		### +config+ that correspond to their +config_key+, if present.
 		### (Undocumented)
 		def self::configure_modules( config, dispatcher )
-		    @modules.each do |mod|
-		        key = mod.config_key
-		        
-		        if config.member?( key )
-		            Arrow::Logger[ self ].debug \
-		                "Configuring %s with the %s section of the config" %
-		                [ mod.name, key ]
+			
+			# Have to keep messages from being logged before logging is 
+			# configured.
+			logmessages = []
+			logmessages << [
+				:debug, "Propagating config to Configurable classes: %p" %
+				[@modules] ]
+
+			@modules.each do |mod|
+				key = mod.config_key
+				
+				if config.member?( key )
+					value = config.send( key )
+					logmessages << [
+						:debug, 
+						"Configuring %s with the %s section of the config: %p" %
+							[mod.name, key, value] ]
+
 					if mod.method(:configure).arity == 2
-						mod.configure( config[key], dispatcher )
+						mod.configure( value, dispatcher )
 					else
-						mod.configure( config[key] )
+						mod.configure( value )
 					end
-	            else
-	                Arrow::Logger[ self ].debug \
-	                    "Skipping %s: no %s section in the config" %
-		                [ mod.name, key ]
-	            end
-	        end
+				else
+					logmessages << [
+						:debug,
+						"Skipping %s: no %s section in the config" %
+						[mod.name, key] ]
+				end
+			end
+			
+			logmessages.each do |lvl, message|
+				Arrow::Logger[ self ].send( lvl, message )
+			end
+
+			return @modules
 		end
 		
 		
 		#############################################################
-		###	A P P E N D E D   M E T H O D S
+		### A P P E N D E D	  M E T H O D S
 		#############################################################
 
 		### The symbol which corresponds to the section of the configuration
@@ -197,7 +215,9 @@ module Arrow
 				modname = classname.downcase.gsub( /::/, '/' )
 				Arrow::Logger[self].debug "Class not loaded yet. Trying to " +
 					"load it from #{modname}"
-				require modname
+				require modname or
+					raise "%s didn't register with Injectable for some reason" %
+					classname
 				Arrow::Logger[self].debug "Loaded %s: %p" %
 					[ classname, Arrow::Injectable.derivatives ]
 			end
@@ -207,11 +227,11 @@ module Arrow
 
 
 		#############################################################
-		###	A P P E N D E D   M E T H O D S
+		### A P P E N D E D	  M E T H O D S
 		#############################################################
 
 		### Classes which inherit from Injectable classes should be
-        ### Injectable, too.
+		### Injectable, too.
 		def inherited( klass )
 			Arrow::Logger[self].debug "making %s Injectable" % [ klass.name ]
 			klass.extend( Arrow::Injectable )

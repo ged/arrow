@@ -33,16 +33,17 @@ suggestions or complaints.
 
 === Requirements
 
-* Apache (1.3 or 2.0) - http://httpd.apache.org/
-* Apache Request Library (libapreq) - http://httpd.apache.org/apreq/
-* mod_ruby (>= 1.2.0) - http://modruby.net/
+* Apache (2.0 or 2.2) - http://httpd.apache.org/
+* mod_ruby (>= 1.2.6) - http://modruby.net/
 
 === (Non-Standard) Ruby Library Dependencies
 
-Ruby-Cache::    http://raa.ruby-lang.org/project/ruby-cache
-FormValidator:: http://raa.ruby-lang.org/project/formvalidator
-PluginFactory:: http://raa.ruby-lang.org/project/pluginfactory
-HashSlice::     http://raa.ruby-lang.org/project/hashslice
+Appropriate versions are included under redist/ for your convenience.
+
+ruby-cache-0.3::      http://raa.ruby-lang.org/project/ruby-cache
+formvalidator-0.1.4:: http://raa.ruby-lang.org/project/formvalidator
+PluginFactory-1.0.1:: http://raa.ruby-lang.org/project/pluginfactory
+flexmock-0.3.2::      http://raa.ruby-lang.org/project/hashslice
 
 
 ==== Quickstart
@@ -51,15 +52,13 @@ Install:
 
   $ install.rb
 
-The install script will check for dependencies, install the libraries, and then
-offer to install the demo applets that come with the distribution.
+The install script will check for dependencies, install the libraries, and then offer to install the demo applets that come with the distribution.
 
 
 == Current Status
 
 This is a beta release. Things will probably break, but the APIs are fairly
-fixed and it's feature-complete for the 1.0.0 release. If you do find something
-broken, please let us know.
+fixed and it's feature-complete for the 1.0.0 release. If you do find something broken, please let us know.
 
 We'd love to hear from you if you try Arrow out. If it isn't your cup of tea,
 let us know why. Of course if you love it, we'd like to hear that, too.
@@ -67,9 +66,8 @@ let us know why. Of course if you love it, we'd like to hear that, too.
 
 == Contact
 
-* Project Page: http://www.rubycrafters.com/projects/Arrow/
+* Project Page: http://deveiate.org/projects/Arrow
 * Online Manual: http://www.rubycrafters.com/arrow-manual/
-* Tracker: http://rubyforge.org/tracker/?group_id=231
 
 
 == Legal

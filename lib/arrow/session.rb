@@ -28,7 +28,9 @@ require 'arrow/logger'
 
 ### This provides a container for maintaining state across multiple transactions..
 class Arrow::Session < Arrow::Object
-	include PluginFactory, Enumerable
+	include PluginFactory, Enumerable, Arrow::Configurable
+
+	config_key :session
 
 	require 'arrow/session/store'
 	require 'arrow/session/lock'
@@ -63,7 +65,7 @@ class Arrow::Session < Arrow::Object
 	### Configure the session class's factory with the given Arrow::Config
 	### object.
 	def self.configure( config )
-		@config = config.session.dup
+		@config = config.dup
 		Arrow::Logger[self].debug "Done. Session config is: %p" % @config
 	end
 
@@ -74,6 +76,7 @@ class Arrow::Session < Arrow::Object
 	
 		# Merge the incoming config with the factory's
 		sconfig = @config.merge( configHash )
+		Arrow::Logger[self].debug "Merged config is: %p" % sconfig
 
 		# Create a new id and backing store object
         idobj = self.create_id( sconfig, request )
@@ -89,17 +92,14 @@ class Arrow::Session < Arrow::Object
 
     ### Set the session cookie if we're really running under Apache.
     def self.create_session_cookie( txn, config, id, store, lock )
-        return nil unless defined?( Apache )
-        
-		scookie = Apache::Cookie.new(
-			    txn.request,
-				:name => config.idName,
-				:value => id.to_s,
+		scookie = Arrow::Cookie.new(
+				config.idName,
+				id.to_s,
 				:expires => config.expires,
 				:path => txn.app_root
 				)
 
-		Arrow::Logger[self].debug "Created cookie: %p" % scookie
+		Arrow::Logger[self].debug "Created cookie: %p" % scookie.to_s
         return scookie
     end
 
@@ -110,12 +110,17 @@ class Arrow::Session < Arrow::Object
         # Fetch the id from the request, either from the session cookie or
 		# as a parameter if the cookie doesn't exist.
 		if request.cookies.key?( config.idName )
+			Arrow::Logger[self].debug "Found an existing session cookie (%s)" %
+				[ config.idName ]
 			idstring = request.cookies[ config.idName ].value
 		else
+			Arrow::Logger[self].debug \
+				"No existing session cookie (%s); looking for one in a request parameter" %
+				[ config.idName]
 			idstring = request.param( config.idName )
 		end
 
-		Arrow::Logger[self].debug "Creating a session id: %p" % config.idType
+		Arrow::Logger[self].debug "Creating a session id object: %p" % config.idType
 		return Arrow::Session::Id.create( config.idType, request, idstring )
 	end
 	
@@ -258,7 +263,7 @@ class Arrow::Session < Arrow::Object
 			self.log.debug "Saving session data"
 			@store.save
 			self.log.debug "Writing session cookie"
-			@cookie.bake
+			return @cookie.to_s
 		ensure
 			self.log.debug "Releasing all locks"
 			@lock.release_all_locks

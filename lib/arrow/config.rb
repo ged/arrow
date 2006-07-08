@@ -299,8 +299,8 @@ class Arrow::Config < Arrow::Object
 	######
 
 	# Define delegators to the inner data structure
-	def_delegators :@struct, :to_h, :member?, :members, :merge, :merge!, :each,
-		:[], :[]=
+	def_delegators :@struct, :to_hash, :to_h, :member?, :members, :merge, 
+		:merge!, :each, :[], :[]=
 
 	# The underlying config data structure
 	attr_reader :struct

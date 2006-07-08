@@ -154,18 +154,25 @@ class Arrow::AppletTestCase < Test::Unit::TestCase
 			self.appletname = applet.signature.name
 		else
 			debug_msg "Setting applet under test for testcase: %p" % [self]
-		
+
 			if Arrow::Applet.derivatives.empty?
 	            Pathname.glob( APPLET_PATH + '**/*.rb' ).each do |appletfile|
 	    		    debug_msg "Trying to load #{appletfile}"
-	    		    Arrow::Applet.load( appletfile )
+					begin
+						Arrow::Applet.load( appletfile )
+					rescue LoadError
+					end
 	    	    end
 	        end
 
+			# :view_template becomes /view[-_]template/
+			applet_pat = Regexp.new( applet.to_s.gsub(/_/, '[-_]?') )
+		
 			self.appletclass = Arrow::Applet.derivatives.find {|klass|
-				debug_msg "  Checking applet '#{klass.name.downcase}' =~ #{applet}..."
-				klass.name.downcase[ applet.to_s ] # string-match
-			} or raise "Failed to load applet '#{@appletname}' from #{applet}"
+				debug_msg "  Checking applet '#{klass.name.downcase}' =~ #{applet_pat}..."
+				applet_pat.match( klass.name.downcase ) or
+					applet_pat.match( klass.filename )
+			} or raise "Failed to load applet matching #{applet_pat}"
 			self.appletname = applet.to_s
 
 			debug_msg "Applet under test is: #{self.appletclass}"
@@ -173,7 +180,13 @@ class Arrow::AppletTestCase < Test::Unit::TestCase
 	end
 
 
-    def initialize( *args )
+	#################################################################
+	###	I N S T A N C E   M E T H O D S
+	#################################################################
+
+	### Check to be sure an applet has been associated before 
+	### instantiation.
+    def initialize( *args ) # :notnew:
         throw :invalid_test unless self.class.appletclass
         super
     end
@@ -209,7 +222,7 @@ class Arrow::AppletTestCase < Test::Unit::TestCase
 		@mock_dataclasses = Hash.new {|h,k|
 			h[ k ] = flexmock( "#{k} data class" )
 		}
-		@applet.instance_variable_set( :@dataclasses, @mock_dataclasses )
+		@applet.class.instance_variable_set( :@dataclasses, @mock_dataclasses )
 		
 		@delegate_behavior = nil
 		@delegate_should_be_called = true
@@ -371,6 +384,8 @@ class Arrow::AppletTestCase < Test::Unit::TestCase
 	end
 
 
+	### Extract parameters for the given +key+ from the given +queryhash+
+	### using the form validator for the current action and return it.
 	def extract_parameters( queryhash, key=nil )
 		profile = @applet.signature.validator_profiles[ @action ] ||
 			@applet.signature_profiles[ :__default__ ]

@@ -83,7 +83,9 @@ class Arrow::Session::Id < Arrow::Object
 		@new = true
 
 		if idstring
+			self.log.debug "Validating id %p" % [ idstring ]
 			@str = self.class.validate( uri, idstring )
+			self.log.debug "  validation %s" % [ @str ? "succeeded" : "failed" ]
 			@new = false
 		end
 		

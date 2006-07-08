@@ -25,6 +25,7 @@ require 'uri'
 require 'arrow/mixins'
 require 'arrow/exceptions'
 require 'arrow/object'
+require 'arrow/cookie'
 
 ### The transaction class for Arrow web applications.
 class Arrow::Transaction < Arrow::Object
@@ -86,6 +87,7 @@ class Arrow::Transaction < Arrow::Object
 		@vargs			= nil # Filled in by the applet
 		@status			= Apache::OK
 		@data			= {}
+		@cookies		= parse_cookies( request )
 
 		# Check for a "RubyOption root_dispatcher true"
 		if @request.options.key?('root_dispatcher') &&
@@ -377,6 +379,12 @@ class Arrow::Transaction < Arrow::Object
 			request.hostname,
 		]
 	end
+
+
+    ### Parse cookies from the specified request and return them in a Hash.
+    def parse_cookies( request )
+    	Arrow::Cookie.parse( request.headers_in['cookie'] )
+    end
     
 
 end # class Arrow::Transaction

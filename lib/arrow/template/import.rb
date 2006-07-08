@@ -102,22 +102,22 @@ class Arrow::Template::ImportDirective < Arrow::Template::Directive # :nodoc:
 		super
 
 		state.scanner.skip( WHITESPACE )
-		self.log.debug "Scanning for tag middle at: '%20s'" % state.scanner.rest
+		#self.log.debug "Scanning for tag middle at: '%20s'" % state.scanner.rest
 
 		body = state.scanner.scan( state.tag_middle ) or return nil
-		self.log.debug "Found body = %p" % body
+		#self.log.debug "Found body = %p" % body
 
 		body.strip.split( /\s*,\s*/ ).each do |import|
-			self.log.debug "Parsing import: %p" % import
+			#self.log.debug "Parsing import: %p" % import
 			case import
 			when ALIASIMPORT
 				@imports[ $1 ] = $2
-				self.log.debug "Alias import: %s => %s" % 
-					[ $1, $2 ]
+				#self.log.debug "Alias import: %s => %s" % 
+				#	[ $1, $2 ]
 
 			when SIMPLEIMPORT
 				@imports[ $1 ] = $1
-				self.log.debug "Simple import: %s" % $1
+				#self.log.debug "Simple import: %s" % $1
 
 			else
 				raise Arrow::ParseError, "Failed to parse body: %p" % body

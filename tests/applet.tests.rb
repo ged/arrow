@@ -25,7 +25,7 @@ end
 
 
 ### Collection of tests for the Arrow::Applet class.
-class Arrow::AppletTestCase < Arrow::TestCase
+class Arrow::Applet::TestCase < Arrow::TestCase
 
 
     def setup

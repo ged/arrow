@@ -3,7 +3,7 @@
 # Unit test for the Arrow::Transaction class
 # $Id: TEMPLATE.rb.tpl,v 1.3 2003/09/17 22:30:08 deveiant Exp $
 #
-# Copyright (c) (>>>YEAR<<<) RubyCrafters, LLC. Most rights reserved.
+# Copyright (c) 2006 RubyCrafters, LLC. Most rights reserved.
 # 
 # This work is licensed under the Creative Commons Attribution-ShareAlike
 # License. To view a copy of this license, visit
@@ -23,7 +23,7 @@ unless defined? Arrow::TestCase
 	require 'arrow/testcase'
 end
 
-### Collection of tests for the (>>>target<<<) class.
+### Collection of tests for the Arrow::Transaction class.
 class Arrow::TransactionTestCase < Arrow::TestCase
 
 
@@ -107,8 +107,12 @@ class Arrow::TransactionTestCase < Arrow::TestCase
 		debugMsg "Request uri = %p, options = %p" % [ uri, options ]
 		
 		FlexMock.use( "request", "config", "broker" ) do |req, config, broker|
-			req.should_receive( :hostname ).and_return( "hostname" ).once
-			req.should_receive( :options ).and_return( options ).at_least.once
+			req.should_receive( :hostname ).
+				and_return( "hostname" ).once
+			req.should_receive( :options ).
+				and_return( options ).at_least.once
+			req.should_receive( :headers_in ).
+				and_return({}).at_least.once
 
 			txn = Arrow::Transaction.new( req, config, broker )
 			

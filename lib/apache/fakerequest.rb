@@ -232,13 +232,15 @@ module Apache # :nodoc:
 			@sync_header = false
 			@content_type = 'text/html'
 			@hostname = 'localhost'
+			@path_info = ''
 			@options = {}
 			@uploads = {}
         end
 
 		attr_writer :server
-		attr_accessor :allowed, :sync_header, :content_type
-		attr_reader :hostname, :paramtable, :cookies, :options, :uploads
+		attr_accessor :allowed, :sync_header, :content_type, :uri,
+			:hostname, :paramtable, :cookies, :options, :uploads,
+			:path_info
 		alias_method :params, :paramtable
 
 		def paramtable=( hash )
@@ -259,10 +261,6 @@ module Apache # :nodoc:
 		def server
 			@server ||= Apache::Server.new
 		end
-		
-        def path_info( ); end
-        def uri(  ); end
-        def hostname(  ); end
     end
 
     class Server < ModRubySimObject

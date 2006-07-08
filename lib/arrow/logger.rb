@@ -81,7 +81,7 @@ class Arrow::Logger
 	# $stderr.
 	module DebugLogger
 		def debug_msg( *parts ) # :nodoc:
-			#$stderr.puts parts.join('') if $DEBUG
+			#$deferr.puts parts.join('') if $DEBUG
 		end
 	end
 
@@ -375,7 +375,7 @@ class Arrow::Logger
 	### with the remaining items. Otherwise, the message will be formed by
 	### catenating the results of calling #formatObject on each of them.
 	def write( level, *args )
-		# debug_msg "Writing message at %p: %p" % [ level, args ]
+		debug_msg "Writing message at %p: %p" % [ level, args ]
 
 		msg, frame = nil, nil
 		time = Time.now
@@ -389,7 +389,7 @@ class Arrow::Logger
 
 		# Find the outputters that need to be written to, then write to them.
 		self.hieroutputters( level ) do |outp, logger|
-			# debug_msg "Got outputter %p" % outp
+			debug_msg "Got outputter %p" % outp
 			msg ||= args.collect {|obj| self.stringify_object(obj)}.join
 			outp.write( time, level, self.readable_name, frame, msg )
 		end

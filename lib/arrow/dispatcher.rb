@@ -213,7 +213,7 @@ class Arrow::Dispatcher < Arrow::Object
 	def initialize( name, config )
 		@name = name
 		@config = config
-		@broker = nil
+		@broker = Arrow::Broker.new( config )
 
 		self.configure( config )
 	rescue ::Exception => err
@@ -242,23 +242,6 @@ class Arrow::Dispatcher < Arrow::Object
         # Configure any modules that have mixed in Arrow::Configurable
         Arrow::Configurable.configure_modules( config, self )
 
-		# Start the monitor backend if enabled
-		if config.startMonitor?
-			self.log.info "Starting Monitor backend"
-			Arrow::Monitor.startBackend( config )
-		else
-			self.log.info "Monitor skipped by configuration"
-		end
-
-		# Apache.request.server.log_notice( "Loggers: %p" % [Arrow::Logger.loggers] )
-
-		# Set up the session class
-		self.log.info "Configuring the Session class with %s" % [ config.name ]
-		Arrow::Session.configure( config )
-
-		# Create a new broker to handle applets
-		self.log.info "Creating request broker"
-		@broker = Arrow::Broker.new( config )
 	end
 
 
@@ -270,14 +253,16 @@ class Arrow::Dispatcher < Arrow::Object
         return Apache::OK
     end
 
+
 	### The content handler method. Dispatches requests to registered
 	### applets based on the requests PATH_INFO.
 	def handler( req )
 		self.log.debug "--- Dispatching request %p ---------------" % req
 
 		if @config.changed?
-			self.log.notice "Reloading configuration "
+			self.log.notice "** Reloading configuration ***"
 			@config.reload
+			@broker = Arrow::Broker.new( @config )
 			self.configure( @config )
 		end
 
@@ -306,7 +291,11 @@ class Arrow::Dispatcher < Arrow::Object
 			# If the transaction has a session, save it
 			if txn.session?
 				self.log.debug "Saving session state"
-				txn.session.save
+				cookie = txn.session.save
+				if cookie
+					self.log.debug "Session cookie is: %p" % [cookie]
+					req.headers_out['Set-Cookie'] = cookie
+				end
 			end
 
 			# :FIXME: Figure out what cache-control settings work
@@ -323,6 +312,7 @@ class Arrow::Dispatcher < Arrow::Object
 		end
 
 		self.log.debug "Returning status %d" % txn.status
+		self.log.debug "Response headers were: %s" % untable(req.headers_out)
 		self.log.debug "--- Done with request %p ---------------" % req
 
 		return txn.status
@@ -348,6 +338,15 @@ class Arrow::Dispatcher < Arrow::Object
 		]
 	end
 
+
+	def untable( table )
+		lines = []
+		table.each do |k,v|
+			lines << "%s: %s" % [ k, v ]
+		end
+		
+		return lines.join( "; " )
+	end
 
 end # class Arrow::Dispatcher
 

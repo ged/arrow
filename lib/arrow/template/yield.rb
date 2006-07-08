@@ -135,13 +135,13 @@ class Arrow::Template::YieldDirective < Arrow::Template::BracketingDirective # :
 		callback = Proc.new {|*blockArgs|
 			res = []
 			attributes = {}
-			blockArgs.zip( self.pureargs ) {|pair|
+			blockArgs.zip( self.pureargs ) do |pair|
 				attributes[ pair[1] ] = pair[0]
-			}
+			end
 			#self.log.debug "  override attributes are: %p" % [ attributes ]
-			template.with_overridden_attributes( scope, attributes ) {|template|
+			template.with_overridden_attributes( scope, attributes ) do |template|
 				res << template.render( @subnodes, scope )
-			}
+			end
 
 			res
 		}

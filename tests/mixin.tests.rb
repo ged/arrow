@@ -99,8 +99,7 @@ class Arrow::MixinsTestCase < Arrow::TestCase
             config.should_receive( :member? ).
                 with( :foo ).
                 and_return( true ).once
-            config.should_receive( :[] ).
-                with( :foo ).
+            config.should_receive( :foo ).
                 and_return( foosection ).once
 
 			config.should_receive( :member? ).
