@@ -148,7 +148,7 @@ class Arrow::CookieTestCase < Arrow::TestCase
 		rval = nil
 		
 		assert_nothing_raised do
-			rval = Arrow::Cookie.parse( %{$Version="1"; a="b"} )
+			rval = Arrow::Cookie.parse( %{$Version=1; a="b"} )
 		end
 		
 		assert_instance_of Hash, rval
@@ -168,7 +168,7 @@ class Arrow::CookieTestCase < Arrow::TestCase
 		rval = nil
 		
 		assert_nothing_raised do
-			rval = Arrow::Cookie.parse( %{a=b; $Path="/arrow"} )
+			rval = Arrow::Cookie.parse( %{a=b; $Path=/arrow} )
 		end
 		
 		assert_instance_of Hash, rval
@@ -188,7 +188,7 @@ class Arrow::CookieTestCase < Arrow::TestCase
 		rval = nil
 		
 		assert_nothing_raised do
-			rval = Arrow::Cookie.parse( %{a=b; $domain="rubycrafters.com"} )
+			rval = Arrow::Cookie.parse( %{a=b; $domain=rubycrafters.com} )
 		end
 		
 		assert_instance_of Hash, rval
@@ -240,7 +240,7 @@ class Arrow::CookieTestCase < Arrow::TestCase
 			rval = @cookie.to_s
 		end
 		
-		assert_equal %{by_rickirac=9917eb; Version="1"}, rval
+		assert_equal %{by_rickirac=9917eb; Version=1}, rval
 	end
 
 	def test_explicitly_specified_domain_must_always_start_with_a_dot
@@ -250,7 +250,7 @@ class Arrow::CookieTestCase < Arrow::TestCase
 			rval = @cookie.to_s
 		end
 		
-		assert_equal %{by_rickirac=9917eb; Domain=".foo.com"}, rval
+		assert_equal %{by_rickirac=9917eb; Domain=.foo.com}, rval
 	end
 
 	def test_domain_eq_shouldnt_prepend_a_dot_if_it_already_has_one
@@ -259,7 +259,7 @@ class Arrow::CookieTestCase < Arrow::TestCase
 		assert_nothing_raised do
 			rval = @cookie.to_s
 		end
-		assert_equal %{by_rickirac=9917eb; Domain=".rubycrafters.com"}, rval
+		assert_equal %{by_rickirac=9917eb; Domain=.rubycrafters.com}, rval
 	end
 	
 	def test_value_with_semicolon_is_escaped

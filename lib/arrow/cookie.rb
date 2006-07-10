@@ -301,7 +301,7 @@ class Arrow::Cookie < Arrow::Object
 		
 		return "; %s=%s" % [
 			field_name.capitalize,
-			quote( value )
+			value
 		]
 	end
 	
