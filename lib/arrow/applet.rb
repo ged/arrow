@@ -108,7 +108,7 @@ class Arrow::Applet < Arrow::Object
 	SignatureStructDefaults = {
 		:name				=> proc {|rawsig, klass| klass.name},
 		:description		=> "(none)",
-		:maintainer			=> nil, # Workaround for RDoc
+		:maintainer			=> "", # Workaround for RDoc
 		:version			=> nil, # Wordaround for RDoc
 		:default_action		=> '_default',
 		:config				=> {},
@@ -121,14 +121,6 @@ class Arrow::Applet < Arrow::Object
 				},
 			},
 		},
-	}
-
-	SignatureStructDefaults[:maintainer] = proc {|rawsig, klass|
-		if defined?( Apache )
-			Apache.request.server.admin
-		else
-			""
-		end
 	}
 
 	SignatureStructDefaults[:version] = proc {|rawsig, klass|
