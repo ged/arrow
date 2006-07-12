@@ -219,11 +219,6 @@ class Arrow::AppletTestCase < Test::Unit::TestCase
 
 		@applet = @appletclass.new( @config, @template_factory, "/#{@appletname}" )
 	
-		@mock_dataclasses = Hash.new {|h,k|
-			h[ k ] = flexmock( "#{k} data class" )
-		}
-		@applet.class.instance_variable_set( :@dataclasses, @mock_dataclasses )
-		
 		@delegate_behavior = nil
 		@delegate_should_be_called = true
 		@delegate_called = false
@@ -234,11 +229,6 @@ class Arrow::AppletTestCase < Test::Unit::TestCase
 	#################################################################
 	###	T E S T   U T I L I T Y   M E T H O D S
 	#################################################################
-
-	### Access the applet's dataclasses
-	attr_reader :mock_dataclasses
-	alias_method :dataclasses, :mock_dataclasses
-
 
 	### Set up faked request and transaction objects, yield to the given 
 	### block with them, then run the applet under test with them when

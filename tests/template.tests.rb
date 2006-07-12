@@ -92,7 +92,7 @@ class Arrow::TemplateTestCase < Arrow::TestCase
 			# === Simple
 			when /^===\s*(.+)/
 				next unless section
-				template = $1.downcase.gsub( /\s+(.)/ ) {|match| $1.upcase}.intern
+				template = $1.downcase.gsub( /\W+/, '_' ).intern
 				TestTemplates[section][template] = {
 					:template => '',
 					:code => '',
@@ -637,6 +637,205 @@ Failed.
 # Nothing special about an exception -- it's just a class that can be
 # instantiated easily.
 obj = Arrow::Exception.new
+assert_nothing_raised { template.test = obj }
+assert_nothing_raised { rval = template.render }
+debugMsg "\n" + hruleSection( rval, "Rendered" )
+assert_match( templateContentRe('Passed.'), rval )
+===
+
+### Unless directive
+=== Simple
+
+<?unless test?>
+Passed.
+<?end?>
+
+---
+assert_nothing_raised { template.test = false }
+assert_nothing_raised { rval = template.render }
+debugMsg "\n" + hruleSection( rval, "Rendered" )
+assert_match( templateContentRe('Passed.'), rval )
+===
+
+=== Simple with explicit end
+
+<?unless test?>
+Passed.
+<?end unless?>
+
+---
+assert_nothing_raised { template.test = false }
+assert_nothing_raised { rval = template.render }
+debugMsg "\n" + hruleSection( rval, "Rendered" )
+assert_match( templateContentRe('Passed.'), rval )
+===
+
+=== Simple with mismatched end
+
+<?unless test?>
+Passed.
+<?end for?>
+
+---
+assert_nothing_raised { template.test = false }
+assert_nothing_raised { rval = template.render }
+debugMsg "\n" + hruleSection( rval, "Rendered" )
+assert_match( templateContentRe('Passed.'), rval )
+===
+
+=== With no match
+
+<?unless test.match(/foo/) ?>
+Passed.
+<?end?>
+
+---
+assert_nothing_raised { template.test = "bar" }
+assert_nothing_raised { rval = template.render }
+debugMsg "\n" + hruleSection( rval, "Rendered" )
+assert_match( templateContentRe('Passed.'), rval )
+===
+
+=== With match
+
+<?unless test.match(/foo/) ?>
+Failed.
+<?end?>
+
+---
+assert_nothing_raised { template.test = "foo" }
+assert_nothing_raised { rval = template.render }
+debugMsg "\n" + hruleSection( rval, "Rendered" )
+assert_match( templateContentRe(), rval )
+===
+
+=== Match with binding operator
+
+<?unless test =~ /foo/ ?>
+Passed.
+<?end?>
+
+---
+assert_nothing_raised { template.test = "bar" }
+assert_nothing_raised { rval = template.render }
+debugMsg "\n" + hruleSection( rval, "Rendered" )
+assert_match( templateContentRe('Passed.'), rval )
+===
+
+=== Simple with unexecuted else
+
+<?unless test?>
+Passed.
+<?else?>
+Failed.
+<?end?>
+
+---
+assert_nothing_raised { template.test = false }
+assert_nothing_raised { rval = template.render }
+debugMsg "\n" + hruleSection( rval, "Rendered" )
+assert_match( templateContentRe('Passed.'), rval )
+===
+
+
+=== Simple with executed else
+
+<?unless test?>
+Failed.
+<?else?>
+Passed.
+<?end?>
+
+---
+assert_nothing_raised { template.test = true }
+assert_nothing_raised { rval = template.render }
+debugMsg "\n" + hruleSection( rval, "Rendered" )
+assert_match( templateContentRe('Passed.'), rval )
+===
+
+=== Complex with success
+
+<?unless test > 5?>
+Passed.
+<?else?>
+Failed.
+<?end?>
+
+---
+assert_nothing_raised { template.test = 2 }
+assert_nothing_raised { rval = template.render }
+debugMsg "\n" + hruleSection( rval, "Rendered" )
+assert_match( templateContentRe('Passed.'), rval )
+===
+
+=== Complex with failure
+
+<?unless test <= 5?>
+Failed.
+<?else?>
+Passed.
+<?end?>
+
+---
+assert_nothing_raised { template.test = 2 }
+assert_nothing_raised { rval = template.render }
+debugMsg "\n" + hruleSection( rval, "Rendered" )
+assert_match( templateContentRe('Passed.'), rval )
+===
+
+=== Complex2
+
+<?unless test > 5 or test == 0?>
+Failed.
+<?else?>
+Passed.
+<?end?>
+
+---
+assert_nothing_raised { template.test = 0 }
+assert_nothing_raised { rval = template.render }
+debugMsg "\n" + hruleSection( rval, "Rendered" )
+assert_match( templateContentRe('Passed.'), rval )
+===
+
+=== Inside iterator
+<?yield foo from test.each?>
+<?unless foo?>
+Passed.
+<?else?>
+Failed.
+<?end?>
+<?end yield?>
+---
+assert_nothing_raised { template.test = [false] }
+assert_nothing_raised { rval = template.render }
+debugMsg "\n" + hruleSection( rval, "Rendered" )
+assert_match( templateContentRe('Passed.'), rval )
+===
+
+=== Inside iterator with comparison
+<?yield foo from test.each?>
+<?unless foo == "bar"?>
+Passed.
+<?else?>
+Failed.
+<?end?>
+<?end yield?>
+---
+assert_nothing_raised { template.test = ["foo"] }
+assert_nothing_raised { rval = template.render }
+debugMsg "\n" + hruleSection( rval, "Rendered" )
+assert_match( templateContentRe('Passed.'), rval )
+===
+
+=== Methodchain with question mark
+<?unless test.is_a?( Arrow::Exception ) ?>
+Passed.
+<?else?>
+Failed.
+<?end?>
+---
+obj = Object.new
 assert_nothing_raised { template.test = obj }
 assert_nothing_raised { rval = template.render }
 debugMsg "\n" + hruleSection( rval, "Rendered" )
