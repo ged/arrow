@@ -457,6 +457,22 @@ class Arrow::Template
 			true
 		end
 		
+		
+		### Try to pre-render any attributes which correspond to this node.
+		def before_rendering( template )
+			if attrib = template[ self.name ]
+				if attrib.respond_to?( :prerender )
+					# self.log.debug "  pre-rendering attribute %p" % [attrib]
+					attrib.prerender
+				elsif attrib.respond_to?( :each )
+					# self.log.debug "  iterating over attribute %p" % [attrib]
+					attrib.each do |obj|
+						obj.prerender if obj.respond_to?( :prerender )
+					end
+				end
+			end
+		end
+		
 
 		### Render the directive node's contents as a String and return it.
 		def render( template, scope )

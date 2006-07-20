@@ -23,6 +23,7 @@ unless defined? Arrow::TestCase
 	require 'arrow/testcase'
 end
 
+require 'flexmock'
 require 'arrow/template'
 
 ### Collection of tests for the Arrow::Template class.
@@ -265,6 +266,43 @@ class Arrow::TemplateTestCase < Arrow::TestCase
 		assert_equal "foobar", rval
 	end
 
+	def test_render_calls_pre_and_post_render_hook_for_nodes_that_respond_to_them
+		template = Arrow::Template.new
+		rval = nil
+		
+		FlexMock.use( "node object" ) do |node|
+			node.should_receive( :respond_to? ).with( :before_rendering ).
+				and_return( true )
+			node.should_receive( :before_rendering ).
+				with( template )
+			node.should_receive( :respond_to? ).with( :after_rendering ).
+				and_return( true )
+			node.should_receive( :after_rendering ).
+				with( template )
+				
+			template.render( [node] )
+		end
+	end
+
+
+	def test_render_uses_string_separator_when_joining_rendered_nodes
+		rval = nil
+		template = Arrow::Template.new( "<?attr foo ?><?attr bar ?>" )
+		template.foo = "[foo]"
+		template.bar = "[bar]"
+		
+		begin
+			sep = $,
+			$, = ':'
+			assert_nothing_raised do
+				rval = template.render
+			end
+		ensure
+			$, = sep
+		end
+		
+		assert_equal "[foo]:[bar]", rval
+	end
 end
 
 
@@ -1226,17 +1264,18 @@ assert_match( templateContentRe("Key => subsubhash\n  Val => \nKey => hope, fait
 
 
 ### Export directive
-# === Simple
-# 
-# <?attr headsections ?>
-# <?attr subtemplate ?>
-# <?attr tailsections ?>
-# 
-# ---
-# template.subtemplate = Arrow::Template.load( "export.tmpl" )
-# 
-# assert_nothing_raised { rval = template.render }
-# debugMsg "\n" + hruleSection( rval, "Rendered" )
-# assert_match( templateContentRe(""), rval )
-# ===
-# 
+=== Simple
+
+<?attr headsections ?>
+<?attr subtemplate ?>
+<?attr tailsections ?>
+
+---
+template.subtemplate = Arrow::Template.load( "export.tmpl" )
+
+assert_nothing_raised { rval = template.render }
+#pp template
+debugMsg "\n" + hruleSection( rval, "Rendered" )
+assert_match( templateContentRe("head", "content", "tail"), rval )
+===
+

@@ -521,7 +521,7 @@ class Arrow::TestCase < Test::Unit::TestCase
 		olddb = nil
 		if $DebugPattern && $DebugPattern =~ @method_name
 			Arrow::Logger.global.outputters <<
-				Arrow::Logger::Outputter.create( 'file', $stderr, "STDERR" )
+				Arrow::Logger::Outputter.create( 'file:stderr' )
 			Arrow::Logger.global.level = :debug
 
 			olddb = $DEBUG

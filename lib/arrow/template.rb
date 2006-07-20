@@ -314,6 +314,8 @@ class Arrow::Template < Arrow::Object
 		@file = nil
 		@creation_time = Time.now
 		@load_path = self.class.load_path.dup
+		@prerender_done = false
+		@postrender_done = false
 
 		@enclosing_template = nil
 
@@ -443,6 +445,22 @@ class Arrow::Template < Arrow::Object
 	end
 
 
+	### Returns +true+ if this template has already been through a pre-render.
+	def prerender_done?
+		return @prerender_done
+	end
+
+
+	### Prep the template for rendering, calling each of its nodes' 
+	### #before_rendering hook.
+	def prerender
+		@syntax_tree.each do |node|
+			node.before_rendering( self ) if
+				node.respond_to?( :before_rendering )
+		end
+	end
+	
+
 	### Render the template to text and return it as a String. If called with an
 	### Array of +nodes+, the template will render them instead of its own
 	### syntax_tree. If given a scope (a Module object), a Binding of its
@@ -452,21 +470,18 @@ class Arrow::Template < Arrow::Object
 	### rendering for variable-sharing, etc. Returns the results of each nodes'
 	### render joined together with the default string separator (+$,+).
 	def render( nodes=nil, scope=nil, enclosing_template=nil )
+		rval = []
 		oldSuper = @enclosing_template
 		@enclosing_template = enclosing_template
 
-		# If no nodes were given, fetch a prepped copy of this template's
-		# syntax tree
 		nodes ||= self.get_prepped_nodes
-
-		# Set up a rendering scope if none was specified
 		scope ||= self.make_rendering_scope
+		
+		self.prerender
 
-		# Catenate the results of rendering each node
-		rval = []
+		# Render each node
 		nodes.each do |node|
-			#self.log.debug "Rendering a %s: %p" % 
-			#	[ node.class.name, node ]
+			#self.log.debug "  rendering %p" % [ node ]
 			begin
 				rval << node.render( self, scope )
 			rescue ::Exception => err
@@ -474,11 +489,30 @@ class Arrow::Template < Arrow::Object
 			end
 		end
 
+		self.postrender
+
 		return self.render_objects( *rval )
 	ensure
 		@enclosing_template = oldSuper
 	end
 	alias_method :to_s, :render
+
+
+	### Returns +true+ if this template has already been through a post-render.
+	def postrender_done?
+		return @postrender_done
+	end
+
+	
+	### Clean up after template rendering, calling each of its nodes' 
+	### #after_rendering hook.
+	def postrender
+		@syntax_tree.each do |node|
+			node.after_rendering( self ) if
+				node.respond_to?( :after_rendering )
+		end
+	end
+	
 
 
 	### Create an anonymous module to act as a scope for any evals that take
@@ -489,7 +523,7 @@ class Arrow::Template < Arrow::Object
 	end
 
 
-	### Render the specified object into text.
+	### Render the specified objects into text.
 	def render_objects( *objs )
 		objs.collect do |obj|
 			rval = nil
@@ -508,7 +542,7 @@ class Arrow::Template < Arrow::Object
 			else
 				rval = obj.to_s
 			end
-		end.join('')
+		end.join
 	end
 
 
@@ -556,58 +590,53 @@ class Arrow::Template < Arrow::Object
 	protected
 	#########
 
-	### Returns the syntax tree with its nodes prepped in accordance with
+	### Returns the syntax tree with its nodes prerendered in accordance with
 	### the template's configuration.
 	def get_prepped_nodes
 		tree = @syntax_tree.dup
 
+		self.strip_directive_whitespace( tree ) if
+		 	@config[:elideDirectiveLines]
+
+		return tree
+	end
+
+
+	### Strip whitespace from the tails of textnodes before and the head
+	### of textnodes after lines consisting only of non-rendering directives 
+	### in the given template syntax +tree+.
+	def strip_directive_whitespace( tree )
 		# Make a flat list of all nodes
 		nodes = tree.collect {|node| node.to_a}.flatten
 
-		# Elide directive lines. Match node lists like:
+		# Elide non-rendering directive lines. Match node lists like:
 		#   <TextNode> =~ /\n\s*$/
 		#   <NonRenderingNode>*
 		#   <TextNode> =~ /^\n/
 		# removing one "\n" from the tail of the leading textnode and the
 		# head of the trailing textnode. Trailing textnode can also be a
 		# leading textnode for another series.
+		nodes.each_with_index do |node,i|
+			leadingNode = nodes[i-1]
 
-		if @config[:elideDirectiveLines]
-			nodes.each_with_index do |node,i|
-				#self.log.debug "Examining node #%d: %p" % [ i, node ]
-				leadingNode = nodes[i-1]
+			# If both the leading node and the current one match the
+			# criteria, look for a trailing node.
+			if i.nonzero? && leadingNode.is_a?( TextNode ) &&
+					leadingNode =~ /\n\s*$/s
 
-				# If both the leading node and the current one match the
-				# criteria, look for a trailing node.
-				if i.nonzero? && leadingNode.is_a?( TextNode ) &&
-						leadingNode =~ /\n\s*$/s
-					#self.log.debug "Found candidate leading node: %p" % leadingNode
-
-					# Find the trailing node. Abandon the search on any
-					# rendering directive or text node that 
-					trailingNode = nodes[i..-1].find do |node|
-						if node.rendering?
-							#self.log.debug "Stopping search: Found a rendering node."
-							break nil
-						end
-
-						node.is_a?( TextNode ) && node =~ /^\n/
-					end
-
-					if trailingNode
-						leadingNode.body.sub!( /\n\s*$/, '' )
-						# trailingNode.body.sub!( /^\n/, '' )
-					else
-						#self.log.debug "No trailing node. Skipping"
-					end
+				# Find the trailing node. Abandon the search on any
+				# rendering directive or text node that includes a blank line.
+				trailingNode = nodes[i..-1].find do |node|
+					break nil if node.rendering?
+					node.is_a?( TextNode ) && node =~ /^\n/
 				end
+
+				leadingNode.body.sub!( /\n\s*$/, '' ) if trailingNode
 			end
 		end
-
-		return tree
 	end
-
-
+	
+	
 	### Autoload accessor/mutator methods for attributes.
 	def method_missing( sym, *args, &block )
 		name = sym.to_s.gsub( /=$/, '' )

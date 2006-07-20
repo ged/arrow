@@ -99,9 +99,9 @@ class Arrow::Template::IncludeDirective < Arrow::Template::Directive # :nodoc:
 			targetTemplate = template
 		end
 
-		@nodes.each {|node|
+		@nodes.each do |node|
 			targetTemplate.install_node( node )
-		}
+		end
 	end
 
 
@@ -194,6 +194,7 @@ class Arrow::Template::IncludeDirective < Arrow::Template::Directive # :nodoc:
 
 				#self.log.debug "initialData is: %p" % initialData
 				@nodes = parser.parse( content, state.template, initialData )
+				initialData[:includeStack].pop
 			end
 
 		# Some errors just turn into comment nodes
@@ -206,7 +207,7 @@ class Arrow::Template::IncludeDirective < Arrow::Template::Directive # :nodoc:
 		# If the directive has an "as <id>" part, create the subtemplate
 		# that will be associated with that identifier.
 		if @identifier
-				@subtemplate = Arrow::Template.new( @nodes, state.template._config )
+			@subtemplate = Arrow::Template.new( @nodes, state.template._config )
 		end
 
 		return true

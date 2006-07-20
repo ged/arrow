@@ -53,8 +53,6 @@ class LogoGenerator < Arrow::Applet
 
 		@background= GD::Image.trueColorAlpha( "#ffffff", GD::AlphaTransparent )
 		@foreground = GD::Image.trueColorAlpha( "#000000", GD::AlphaOpaque )
-
-		Arrow::Logger[ self.class ].level = :debug
 	end
 
 

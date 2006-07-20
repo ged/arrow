@@ -312,7 +312,7 @@ class Arrow::Template::Parser < Arrow::Object
 	### indicates a recursive call for the directive named. The +node+ will
 	### be used as the branch node in the parse state.
 	def scan_for_nodes( state, context=nil, node=nil )
-		return state.branch( node ) {
+		return state.branch( node ) do
 			scanner = state.scanner
 
 			# Scan until the scanner reaches the end of its string. Early exits
@@ -348,7 +348,7 @@ class Arrow::Template::Parser < Arrow::Object
 					end
 				end
 			}
-		}
+		end
 	end
 
 
@@ -360,6 +360,7 @@ class Arrow::Template::Parser < Arrow::Object
 		# Set the patterns in the parse state to compliment the
 		# opening tag.
 		state.set_tag_patterns( scanner.matched )
+		tag_begin = state.line
 
 		# Scan for the directive name; if no valid name can be
 		# found, handle an unknown PI/directive.
@@ -421,8 +422,9 @@ class Arrow::Template::Parser < Arrow::Object
 
 		# Skip to the end of the tag
 		self.scan_for_tag_ending( state ) or
-			raise Arrow::ParseError, "malformed tag: no closing tag "\
-			"delimiters %p found" % state.tag_close
+			raise Arrow::ParseError,
+				"malformed tag starting at line %d: no closing tag "\
+				"delimiters %p found" % [ tag_begin, state.tag_close ]
 
 		return node
 	end
@@ -580,7 +582,7 @@ class Arrow::Template::Parser < Arrow::Object
 		pre = str[ scanner.pos < 40 ? 0 : scanner.pos - 40, 39 ]
 		post = scanner.rest[ 0, 40 ]
 		
-		return "#{pre}^#{post}"
+		return "#{pre}[*** ERROR ***]#{post}"
 	end
 
 end # class Arrow::Template::Parser

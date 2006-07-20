@@ -242,10 +242,10 @@ class Arrow::AppletRegistry < Arrow::Object
 
 		# Now search the applet path for applet files
 		filelist.each do |appletfile|
-			self.log.debug "Found applet file %p" % appletfile
+			# self.log.debug "Found applet file %p" % appletfile
 			self.load_applets_from_file( appletfile )
-			self.log.debug "After %s, registry has %d entries" %
-				[ appletfile, @urispace.length ]
+			#self.log.debug "After %s, registry has %d entries" %
+			#	[ appletfile, @urispace.length ]
 		end
 
 		@loadTime = Time.now
@@ -281,7 +281,7 @@ class Arrow::AppletRegistry < Arrow::Object
         # map the name of each applet to a uri via the classmap, and delete
         # the entries by uri
         missing_files.flatten.each do |filename|
-            self.log.info "Unregistering applets from %p" % [ filename ]
+            self.log.info "Unregistering old applets from %p" % [ filename ]
 
             @filemap[ filename ].uris.each do |classname|
                 self.log.debug "  Removing %p, registered at %p" % [ @urispace[uri], uri ]
@@ -305,7 +305,7 @@ class Arrow::AppletRegistry < Arrow::Object
                 self.log.info "File %p has changed since loaded. Reloading." % [path]
                 self.purge_deleted_applets( path )
             else
-                self.log.debug "File %p has not changed." % [path]
+                #self.log.debug "File %p has not changed." % [path]
                 return nil
             end
         end
@@ -314,7 +314,7 @@ class Arrow::AppletRegistry < Arrow::Object
 		@filemap[ path ] = AppletFile.new( path )
 	
 	    @filemap[ path ].appletclasses.each do |appletclass|
-	        self.log.debug "Registering applet class %s from %p" % [appletclass.name, path]
+	        #self.log.debug "Registering applet class %s from %p" % [appletclass.name, path]
             begin
                 self.register_applet_class( appletclass )
             rescue ::Exception => err

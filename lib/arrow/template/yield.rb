@@ -94,7 +94,7 @@ class Arrow::Template::YieldDirective < Arrow::Template::BracketingDirective # :
 
 	### Parse the contents of the directive, looking for an optional format
 	### for tags like <?directive "%-15s" % foo ?>, then a required
-	### identifier, then an optional methodchain attached to the indetifier.
+	### identifier, then an optional methodchain attached to the identifier.
 	def parse_directive_contents( parser, state )
 		@args, @pureargs = parser.scan_for_arglist( state )
 		return nil unless @args
