@@ -222,6 +222,7 @@ class Arrow::Transaction < Arrow::Object
 	def app_root_url
 		return construct_url( self.app_root )
 	end
+	alias_method :approot_url, :app_root_url
 	
 
 	### Return an absolute uri that refers back to the applet the transaction is
