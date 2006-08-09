@@ -411,13 +411,13 @@ class Arrow::Applet < Arrow::Object
 		@template_factory	= template_factory
 		@uri				= uri
 
-		@signature			= self.class.signature
+		@signature			= self.class.signature.dup
 		@run_count			= 0
 		@total_utime		= 0
 		@total_stime		= 0
 
 		# Make a regexp out of all public <something>_action methods
-		@actions = self.public_methods( false ).
+		@actions = self.public_methods( true ).
 			select {|meth| /^(\w+)_action$/ =~ meth }.
 			collect {|meth| meth.gsub(/_action/, '') }
 		@actions_regexp	= Regexp.new( "^(" + actions.join( '|' ) + ")$" )
@@ -584,7 +584,7 @@ class Arrow::Applet < Arrow::Object
 	### Run an action with a duped transaction (e.g., from another action)
 	def subrun( action, txn, *args )
 		self.log.debug "Running subordinate action '%s' from '%s'" %
-			[ action, caller ]
+			[ action, caller[0] ]
 		return self.send( "#{action}_action", txn, *args )
 	end
 

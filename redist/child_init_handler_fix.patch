@@ -1,0 +1,42 @@
+Index: mod_ruby.c
+===================================================================
+--- mod_ruby.c	(revision 125)
++++ mod_ruby.c	(working copy)
+@@ -1177,7 +1177,7 @@
+ 	    restore_env(r->pool, rconf->saved_env);
+     }
+     rb_progname = Qnil;
+-    if (dconf->gc_per_request)
++    if (dconf && dconf->gc_per_request)
+ 	rb_gc();
+ }
+ 
+Index: request.c
+===================================================================
+--- request.c	(revision 125)
++++ request.c	(working copy)
+@@ -192,14 +192,16 @@
+     data->cookies = rb_hash_new();
+     data->param_table = Qnil;
+     data->options = rb_hash_new();
+-    opts_arr = apr_table_elts(dconf->options);
+-    opts = (table_entry *) opts_arr->elts;
+-    for (i = 0; i < opts_arr->nelts; i++) {
+-        if (opts[i].key == NULL)
+-	    continue;
+-	rb_hash_aset(data->options,
+-		     rb_tainted_str_new2(opts[i].key),
+-		     rb_tainted_str_new2(opts[i].val));
++    if (dconf) {
++        opts_arr = apr_table_elts(dconf->options);
++        opts = (table_entry *) opts_arr->elts;
++        for (i = 0; i < opts_arr->nelts; i++) {
++            if (opts[i].key == NULL)
++                continue;
++            rb_hash_aset(data->options,
++                         rb_tainted_str_new2(opts[i].key),
++                         rb_tainted_str_new2(opts[i].val));
++        }
+     }
+     
+     rb_apache_register_object(obj);

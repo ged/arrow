@@ -1279,3 +1279,45 @@ debugMsg "\n" + hruleSection( rval, "Rendered" )
 assert_match( templateContentRe("head", "content", "tail"), rval )
 ===
 
+
+### Selectlist directive
+=== Simple
+<?selectlist categories ?>
+<?end?>
+---
+template.categories = %w[code rant music]
+assert_nothing_raised { rval = template.render }
+debugMsg "\n" + hruleSection( rval, "Rendered" )
+
+list = <<EOF
+<select name="categories">
+  <option value="code">code</option>
+  <option value="rant">rant</option>
+  <option value="music">music</option>
+</select>
+EOF
+
+assert_match( templateContentRe(list), rval )
+===
+
+
+=== Named
+<?selectlist categories as category ?>
+<?end?>
+---
+template.categories = %w[code rant music parrots]
+assert_nothing_raised { rval = template.render }
+debugMsg "\n" + hruleSection( rval, "Rendered" )
+
+list = <<EOF
+<select name="category">
+  <option value="code">code</option>
+  <option value="rant">rant</option>
+  <option value="music">music</option>
+</select>
+EOF
+
+assert_match( templateContentRe(list), rval )
+===
+
+

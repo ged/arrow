@@ -43,8 +43,6 @@
 # Please see the file COPYRIGHT in the 'docs' directory for licensing details.
 #
 
-require 'strscan'
-require 'forwardable'
 require 'pluginfactory'
 
 require 'arrow/utils'
@@ -522,13 +520,11 @@ class Arrow::Template
 
 		### Parse the contents of the directive, looking for an optional format
 		### for tags like <?directive "%-15s" % foo ?>, then a required
-		### identifier, then an optional methodchain attached to the indetifier.
+		### identifier, then an optional methodchain attached to the identifier.
 		def parse_directive_contents( parser, state )
 			super
 
 			# Look for a format
-			# :TODO: This check for format allowability should be a bit more
-			# graceful, but I can't currently see how it might be done.
 			if self.class.allows_format?
 				if fmt = parser.scan_for_quoted_string( state )
 					state.scanner.skip( /\s*%\s*/ ) or

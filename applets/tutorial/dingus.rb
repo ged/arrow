@@ -28,26 +28,13 @@ class BlueClothDingus < Arrow::Applet
 	SVNId = %q$Id$
 
 	# Applet signature
-	Signature = {
-		:name => "BlueCloth Dingus",
-		:description => "It presents a text box into which one can input " \
+	applet_name "BlueCloth Dingus"
+	applet_description "It presents a text box into which one can input " \
 			"Markdown text, which when submitted will be transformed into " \
-			"HTML via the BlueCloth library and displayed.",
-		:maintainer => "ged@FaerieMUD.org",
-		:default_action => 'display',
-		:templates => {
-			:display => 'dingus.tmpl',
-		},
-		:validator_profiles => {
-			:display => {
-				:required	=> :source,
-				:constraints	=> {
-					:source	=> /^[\x20-\x7f\r\n]+$/,
-				},
-			},
-
-		}
-	}
+			"HTML via the BlueCloth library and displayed."
+	applet_maintainer "ged@FaerieMUD.org"
+	
+	default_action :display
 
 
 
@@ -72,6 +59,13 @@ class BlueClothDingus < Arrow::Applet
 
 		return templ
 	end
+	template  :display => 'dingus.tmpl'
+	validator :display => {
+		:required	=> :source,
+		:constraints	=> {
+			:source	=> /^[\x20-\x7f\r\n]+$/,
+		},
+	}
 
 
 end # class BlueClothDingus

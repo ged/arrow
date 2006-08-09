@@ -43,10 +43,6 @@
 #
 # 
 
-basedir = File.dirname(File.dirname( __FILE__ ))
-$LOAD_PATH.unshift "#{basedir}/ext", "#{basedir}/lib" unless
-	$LOAD_PATH.include?( "#{basedir}/lib" )
-
 begin 
 	require "readline"
 	include Readline

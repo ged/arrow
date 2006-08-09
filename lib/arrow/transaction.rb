@@ -300,8 +300,31 @@ class Arrow::Transaction < Arrow::Object
 	### Set the result's 'Content-Disposition' header to 'attachment' and set
 	### the attachment's +filename+.
 	def attachment=( filename )
+		
+		# IE flubs attachments of any mimetype it handles directly.
+		if self.browser_is_ie?
+			self.content_type = 'application/octet-stream'
+		end
+			
 		val = %q{attachment; filename="%s"} % [ filename ]
 		self.headers_out['Content-Disposition'] = val
+	end
+
+
+	### Returns true if the User-Agent header indicates that the remote
+	### browser is Internet Explorer. Useful for making the inevitable IE 
+	### workarounds.
+	def browser_is_ie?
+		agent = self.headers_in['user-agent'] || ''
+		return agent =~ /MSIE/ ? true : false
+	end
+	
+	
+	### Execute a block if the User-Agent header indicates that the remote
+	### browser is Internet Explorer. Useful for making the inevitable IE 
+	### workarounds.
+	def for_ie_users
+		yield if self.browser_is_ie?
 	end
 	
 

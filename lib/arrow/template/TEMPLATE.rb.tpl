@@ -1,12 +1,12 @@
 #!/usr/bin/ruby
 # 
-# This file contains the Arrow::Template::(>>>class<<<) class, a derivative of
-# Arrow::Template::(>>>superclass<<<). This is the class which defines the
-# behaviour of the '(>>>directive<<<)' template directive.
+# This file contains the Arrow::Template::#{vars[:class]} class, a derivative of
+# Arrow::Template::#{vars[:superclass]}. This is the class which defines the
+# behaviour of the '#{vars[:directive]}' template directive.
 #
 # == Syntax
 #
-#	(>>>POINT<<<)
+#	
 #
 # == Subversion Id
 # 
@@ -14,7 +14,7 @@
 # 
 # == Authors
 # 
-# * (>>>USER_NAME<<<) <(>>>AUTHOR<<<)>
+# * #{user.gecos} <#{vars[:user_email]}>
 # 
 #:include: COPYRIGHT
 #
@@ -27,9 +27,9 @@ require 'arrow/exceptions'
 require 'arrow/utils'
 require 'arrow/template/nodes'
 
-### The class which defines the behaviour of the '(>>>directive<<<)'
+### The class which defines the behaviour of the '#{vars[:directive]}'
 ### template directive.
-class Arrow::Template::(>>>class<<<) < Arrow::Template::(>>>superclass<<<)
+class Arrow::Template::#{vars[:class]} < Arrow::Template::#{vars[:superclass]}
 
 	# SVN Revision
 	SVNRev = %q$Rev: 183 $
@@ -38,13 +38,7 @@ class Arrow::Template::(>>>class<<<) < Arrow::Template::(>>>superclass<<<)
 	SVNId = %q$Id: import.rb 183 2004-08-23 06:10:32Z ged $
 	
 
-	(>>>MARK<<<)
+	
 
-end # class Arrow::Template::(>>>class<<<)
-
->>>TEMPLATE-DEFINITION-SECTION<<<
-("class" "Class: Arrow::Template::")
-("superclass" "Derives from: Arrow::Template::")
-("directive" "Which directive does this class implement: ")
-
+end # class Arrow::Template::#{vars[:class]}
 

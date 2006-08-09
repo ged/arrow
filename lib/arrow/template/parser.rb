@@ -20,7 +20,6 @@
 #
 
 require 'strscan'
-StringScanner.must_C_version
 require 'forwardable'
 require 'pluginfactory'
 
@@ -242,8 +241,8 @@ class Arrow::Template::Parser < Arrow::Object
 
 	# Default configuration hash
 	Defaults = {
-		:strictEndTags			=> false,
-		:ignoreUnknownPIs		=> true,
+		:strict_end_tags			=> false,
+		:ignore_unknown_PIs		=> true,
 	}
 
 
@@ -254,10 +253,10 @@ class Arrow::Template::Parser < Arrow::Object
 	### Create a new parser using the specified +config+. The +config+ can
 	### contain one or more of the following keys:
 	###
-	### [<b>:strictEndTags</b>]
+	### [<b>:strict_end_tags</b>]
 	###   Raise an error if the optional name associated with an <?end?> tag
 	###   doesn't match the directive it closes. Defaults to +false+.
-	### [<b>:ignoreUnknownPIs</b>]
+	### [<b>:ignore_unknown_PIs</b>]
 	###   When this is set to +true+, any processing instructions found in a
 	###   template that don't parse will be kept as-is in the output. If
 	###   this is +false+, unrecognized PIs will raise an error at parse
@@ -399,18 +398,18 @@ class Arrow::Template::Parser < Arrow::Object
 			# match at the end of the loop that opened this recursion.
 			if context
 				scanner.skip( WHITESPACE )
-				closedTag = scanner.scan( IDENTIFIER )
-				#self.log.debug "End found for #{closedTag}"
+				closed_tag = scanner.scan( IDENTIFIER )
+				#self.log.debug "End found for #{closed_tag}"
 
 				# If strict end tags is turned on, check to be sure we
 				# got the correct 'end'.
-				if @config[:strictEndTags]
+				if @config[:strict_end_tags]
 					raise Arrow::ParseError,
 						"missing or malformed closing tag name" if
-						closedTag.nil?
+						closed_tag.nil?
 					raise Arrow::ParseError,
-						"mismatched closing tag name '#{closedTag}'" unless
-						closedTag.downcase == context.downcase
+						"mismatched closing tag name '#{closed_tag}'" unless
+						closed_tag.downcase == context.downcase
 				end
 
 				# Jump out of the loop in #scan_for_nodes...
@@ -431,14 +430,14 @@ class Arrow::Template::Parser < Arrow::Object
 
 
 	### Given the specified +state+ (an Arrow::Template::Parser::State
-	### object), scan for and return an indentifier. If +skipWhitespace+ is
+	### object), scan for and return an indentifier. If +skip_whitespace+ is
 	### +true+, any leading whitespace characters will be skipped. Returns
 	### +nil+ if no identifier is found.
-	def scan_for_identifier( state, skipWhitespace=true )
+	def scan_for_identifier( state, skip_whitespace=true )
 		#self.log.debug "Scanning for identifier at %p" %
 		#	state.scanner.rest[0,20]
 
-		state.scanner.skip( WHITESPACE ) if skipWhitespace
+		state.scanner.skip( WHITESPACE ) if skip_whitespace
 		rval = state.scanner.scan( IDENTIFIER ) or return nil
 
 		#self.log.debug "Found identifier %p" % rval
@@ -448,14 +447,14 @@ class Arrow::Template::Parser < Arrow::Object
 
 	### Given the specified +state+ (an Arrow::Template::Parser::State
 	### object), scan for and return a quoted string, including the
-	### quotes. If +skipWhitespace+ is +true+, any leading whitespace
+	### quotes. If +skip_whitespace+ is +true+, any leading whitespace
 	### characters will be skipped. Returns +nil+ if no quoted string is
 	### found.
-	def scan_for_quoted_string( state, skipWhitespace=true )
+	def scan_for_quoted_string( state, skip_whitespace=true )
 		#self.log.debug "Scanning for quoted string at %p" %
 		#	state.scanner.rest[0,20]
 
-		state.scanner.skip( WHITESPACE ) if skipWhitespace
+		state.scanner.skip( WHITESPACE ) if skip_whitespace
 
 		rval = state.scanner.scan( QUOTEDSTRING ) or return nil
 
@@ -484,12 +483,12 @@ class Arrow::Template::Parser < Arrow::Object
 	### Given the specified +state+ (an Arrow::Template::Parser::State
 	### object), scan for and return the current tag ending. Returns +nil+
 	### if no tag ending is found.
-	def scan_for_tag_ending( state, skipWhitespace=true )
+	def scan_for_tag_ending( state, skip_whitespace=true )
 		scanner = state.scanner
 		#self.log.debug "Scanning for tag ending at %p" %
 		#	scanner.rest[0,20]
 
-		scanner.skip( WHITESPACE ) if skipWhitespace
+		scanner.skip( WHITESPACE ) if skip_whitespace
 		rval = scanner.scan( state.tag_close ) or
 			return nil
 
@@ -509,14 +508,14 @@ class Arrow::Template::Parser < Arrow::Object
 	### and
 	###   ["foo", "bar", "bim", "boozle"]
 	### respectively.
-	def scan_for_arglist( state, skipWhitespace=true )
+	def scan_for_arglist( state, skip_whitespace=true )
 		scanner = state.scanner
 		#self.log.debug "Scanning for arglist at %p" %
 		#	scanner.rest[0,20]
 
 		args = []
 		pureargs = []
-		scanner.skip( WHITESPACE ) if skipWhitespace
+		scanner.skip( WHITESPACE ) if skip_whitespace
 		while (( rval = scanner.scan(ARGUMENT) ))
 			args << rval
 			pureargs << rval.gsub( /\W+/, '' )
@@ -537,12 +536,12 @@ class Arrow::Template::Parser < Arrow::Object
 
 	### Given the specified +state+ (an Arrow::Template::Parser::State
 	### object), scan for and return a valid-looking file pathname.
-	def scan_for_pathname( state, skipWhitespace=true )
+	def scan_for_pathname( state, skip_whitespace=true )
 		scanner = state.scanner
 		#self.log.debug "Scanning for file path at %p" %
 		#	scanner.rest[0,20]
 
-		scanner.skip( WHITESPACE ) if skipWhitespace
+		scanner.skip( WHITESPACE ) if skip_whitespace
 		rval = scanner.scan( PATHNAME ) or
 			return nil
 
@@ -561,7 +560,7 @@ class Arrow::Template::Parser < Arrow::Object
 		
 		# If the configuration doesn't say to ignore unknown PIs or it's an
 		# [?alternate-synax?] directive, raise an error.
-		if state.tag_open == '[?' || !@config[:ignoreUnknownPIs]
+		if state.tag_open == '[?' || !@config[:ignore_unknown_PIs]
 			raise Arrow::ParseError, "unknown directive"
 		end
 

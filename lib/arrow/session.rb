@@ -96,7 +96,7 @@ class Arrow::Session < Arrow::Object
 				config.idName,
 				id.to_s,
 				:expires => config.expires,
-				:path => txn.app_root
+				:path => '/'
 				)
 
 		Arrow::Logger[self].debug "Created cookie: %p" % scookie.to_s

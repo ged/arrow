@@ -28,7 +28,7 @@ require 'forwardable'
 ### Arrow::Applets in an application..
 class Arrow::AppletRegistry < Arrow::Object
 	extend Forwardable
-	include Enumerable
+	include Enumerable, Arrow::Loggable
 	
 	# SVN Revision
 	SVNRev = %q$Rev$
@@ -283,7 +283,7 @@ class Arrow::AppletRegistry < Arrow::Object
         missing_files.flatten.each do |filename|
             self.log.info "Unregistering old applets from %p" % [ filename ]
 
-            @filemap[ filename ].uris.each do |classname|
+            @filemap[ filename ].uris.each do |uri|
                 self.log.debug "  Removing %p, registered at %p" % [ @urispace[uri], uri ]
                 @urispace.delete( uri )
             end
@@ -316,7 +316,8 @@ class Arrow::AppletRegistry < Arrow::Object
 	    @filemap[ path ].appletclasses.each do |appletclass|
 	        #self.log.debug "Registering applet class %s from %p" % [appletclass.name, path]
             begin
-                self.register_applet_class( appletclass )
+                uris = self.register_applet_class( appletclass )
+				@filemap[ path ].uris << uris
             rescue ::Exception => err
         		frames = filter_backtrace( err.backtrace )
         		self.log.error "%s loaded, but failed to initialize: %s" % [
@@ -332,8 +333,10 @@ class Arrow::AppletRegistry < Arrow::Object
 
 
 	### Register an instance of the given +klass+ with the broker if the 
-	### classmap includes it.
+	### classmap includes it, returning the URIs which were mapped to 
+	### instances of the +klass+.
 	def register_applet_class( klass )
+		uris = []
 
 		# Trim the Module serving as private namespace from the
 		# class name
@@ -344,16 +347,20 @@ class Arrow::AppletRegistry < Arrow::Object
 		# if there is one.
 		if @classmap.key?( appletname )
 			self.log.debug "  Found one or more uris for '%s'" % appletname
+			
 
 			# Create a new instance of the applet for each uri it's
 			# registered under, then wrap that in a RegistryEntry
 			# and put it in the entries hash we'll return later.
 			@classmap[ appletname ].each do |uri|
 				@urispace[ uri ] = klass.new( @config, @template_factory, uri )
+				uris << uri
 			end
 		else
 			self.log.debug "No uri for '%s': Not instantiated" % appletname
 		end
+		
+		return uris
 	end
 
 

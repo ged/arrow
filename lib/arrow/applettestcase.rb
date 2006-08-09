@@ -92,7 +92,7 @@ class Arrow::AppletTestCase < Test::Unit::TestCase
 	include Arrow::Loggable, Test::Unit::Assertions, FlexMock::TestCase
 
 	# The default path to the directory where applets live
-	APPLET_PATH = Pathname.getwd + "applets"
+	APPLET_PATH = Pathname.new( $0 ).expand_path.dirname + "applets"
 	
 	class << self
 		attr_accessor :appletclass, :appletname, :fixture_data
@@ -217,7 +217,7 @@ class Arrow::AppletTestCase < Test::Unit::TestCase
 			and_return( false )
 		@template_factory = flexmock( "mock template factory" )
 
-		@applet = @appletclass.new( @config, @template_factory, "/#{@appletname}" )
+		@applet = @appletclass.new( @config, @template_factory, "#{@appletname}" )
 	
 		@delegate_behavior = nil
 		@delegate_should_be_called = true
@@ -324,14 +324,15 @@ class Arrow::AppletTestCase < Test::Unit::TestCase
 		#txn = Arrow::Transaction.new( req, @config, nil )
 		txn = flexmock( "transaction" )
 		txn.should_receive( :request ).
-		    and_return( req ).at_least.once
+		    and_return( req ).zero_or_more_times
 		txn.should_receive( :vargs= ).
-		    with( Arrow::FormValidator ).at_least.once
+		    with( Arrow::FormValidator ).zero_or_more_times
 		
 		vargs = flexmock( "form validator" )
 		txn.should_receive( :vargs ).
 			and_return( vargs ).
 			zero_or_more_times
+		vargs.should_receive( :[] ).zero_or_more_times
 		
 		debug_msg "Transaction is: %p" % [txn]
 		return txn, req, vargs, *args
@@ -350,6 +351,7 @@ class Arrow::AppletTestCase < Test::Unit::TestCase
 		mock_template = flexmock( "'#{key.inspect}' template")
 		@template_factory.should_receive( :get_template ).
 			with( tname ).and_return( mock_template ).at_least.once
+		mock_template.should_ignore_missing
 
 		yield( mock_template ) if block_given?
 		
@@ -369,6 +371,8 @@ class Arrow::AppletTestCase < Test::Unit::TestCase
 		session = create_mock( "session" )
 		txn.should_receive( :session ).
 		    and_return( session ).zero_or_more_times
+		session.should_receive( :[] ).and_return( nil ).zero_or_more_times
+		session.should_receive( :[]= ).and_return( nil ).zero_or_more_times
 		
 		return session
 	end
