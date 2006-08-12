@@ -317,7 +317,7 @@ class Arrow::Template::Parser < Arrow::Object
 			# Scan until the scanner reaches the end of its string. Early exits
 			# 'break' of this loop.
 			catch( :endscan ) {
-				until scanner.empty?
+				until scanner.eos?
 					startpos = scanner.pos
 					#self.log.debug %{Scanning from %d:%p} %
 					#	[ scanner.pos, scanner.rest[0,20] + '..' ]
