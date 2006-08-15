@@ -420,6 +420,31 @@ class Arrow::Applet::TestCase < Arrow::TestCase
 	end
 
 
+	def test_subrun_from_delegation_populates_txn_vargs
+		
+		# Define the delegator and an action to subrun
+		@appletclass.class_eval do
+			def delegate( txn, chain, *args )
+				self.subrun( :test_vargs, txn, *args )
+			end
+			def test_vargs_action( txn, *args )
+			end
+		end
+		
+		applet = @appletclass.new( nil, nil, nil )
+		
+		# Even though it's not a real #run, the transaction should be
+		# set up the same way passing through #subrun
+		with_run_fixtured_transaction do |txn, req|
+			txn.should_receive( :vargs ).and_return(nil).at_least.once
+
+			assert_nothing_raised do
+				applet.delegate( txn, nil )
+			end
+		end
+
+	end
+
 
 	#######
 	private

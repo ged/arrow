@@ -545,7 +545,7 @@ class Arrow::Applet < Arrow::Object
 		self.log.debug "In action_missing_action with: raction = %p, args = %p" %
 			[ raction, args ]
 
-		if raction && @signature.templates.key?( raction.intern )
+		if raction && @signature.templates.key?( raction.to_s.intern )
 			self.log.debug "Using template sender default action for %s" % raction
 			txn.vargs = self.make_validator( raction, txn )
 			tmpl = self.load_template( raction.intern )
@@ -585,7 +585,17 @@ class Arrow::Applet < Arrow::Object
 	def subrun( action, txn, *args )
 		self.log.debug "Running subordinate action '%s' from '%s'" %
 			[ action, caller[0] ]
-		return self.send( "#{action}_action", txn, *args )
+
+		# Make sure the transaction has stuff loaded. This is necessary when
+		# #subrun is called without going through #run first (e.g., via 
+		# #delegate)
+		if txn.vargs.nil?
+			self.prep_transaction( txn )
+			txn.vargs = self.make_validator( action, txn )
+		end
+
+		meth, *args = self.lookup_action_method( action, *args )
+		return meth.call( txn, *args )
 	end
 
 
