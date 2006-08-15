@@ -1263,23 +1263,6 @@ assert_match( templateContentRe("Key => subsubhash\n  Val => \nKey => hope, fait
 ===
 
 
-### Export directive
-=== Simple
-
-<?attr headsections ?>
-<?attr subtemplate ?>
-<?attr tailsections ?>
-
----
-template.subtemplate = Arrow::Template.load( "export.tmpl" )
-
-assert_nothing_raised { rval = template.render }
-#pp template
-debugMsg "\n" + hruleSection( rval, "Rendered" )
-assert_match( templateContentRe("head", "content", "tail"), rval )
-===
-
-
 ### Selectlist directive
 === Simple
 <?selectlist categories ?>
@@ -1302,7 +1285,7 @@ assert_match( templateContentRe(list), rval )
 
 
 === Named
-<?selectlist categories as category ?>
+<?selectlist category FROM categories ?>
 <?end?>
 ---
 template.categories = %w[code rant music parrots]
@@ -1314,6 +1297,7 @@ list = <<EOF
   <option value="code">code</option>
   <option value="rant">rant</option>
   <option value="music">music</option>
+  <option value="parrots">parrots</option>
 </select>
 EOF
 
