@@ -27,26 +27,12 @@ class TemplateViewer < Arrow::Applet
 
 
 	# Applet signature
-	Signature = {
-		:name => "Template Viewer",
-		:description => "It is an introspection applet that displays "\
-			"Arrow templates with syntax highlighting.",
-		:maintainer => "ged@FaerieMUD.org",
-		:default_action => 'default',
-		:templates => {
-			:display	=> 'view-template.tmpl',
-			:default	=> 'templateviewer.tmpl',
-		},
-		:vargs => {
-			:__default__ => {
-				:optional		=> [:template],
-				:constraints	=> {
-					:username	=> %r{^([\w/](?:[\w/]|\.(?!\.)))$},
-				},
-				:untaint_constraint_fields => %w{template},
-			},
-		}
-	}
+	applet_name "Template Viewer"
+	applet_description "It is an introspection applet that displays "\
+			"Arrow templates with syntax highlighting."
+	applet_maintainer "ged@FaerieMUD.org"
+
+	default_action :default
 
 
 
@@ -91,10 +77,17 @@ class TemplateViewer < Arrow::Applet
 			end
 		end
 
-		txn.print( templ )
-
-		return true
+		return templ
 	end
+	template :display	=> 'view-template.tmpl',
+		:default	=> 'templateviewer.tmpl'
+	validator :display, {
+		:optional		=> [:template],
+		:constraints	=> {
+			:template	=> %r{^([\w./-]+)$},
+		},
+		:untaint_constraint_fields => %w{template},
+	}
 
 
 end # class TemplateViewer

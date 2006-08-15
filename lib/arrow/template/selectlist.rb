@@ -70,8 +70,13 @@ class Arrow::Template::SelectListDirective < Arrow::Template::BracketingDirectiv
 
 	### Parse the contents of the directive
 	def parse_directive_contents( parser, state )
+		state.scanner.skip( WHITESPACE )
+		
 		if state.scanner.scan( NAMEDLIST )
-			@select_name = state.scanner.
+			@select_name = state.scanner[1]
+		end
+
+		super
 
 		return true
 	end
