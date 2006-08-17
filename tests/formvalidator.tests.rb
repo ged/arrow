@@ -29,10 +29,13 @@ class Arrow::FormValidatorTestCase < Arrow::TestCase
 
 	TestProfile = {
 		:required		=> [ :required ],
-		:optional		=> %w{optional number alpha},
+		:optional		=> %w{optional number alpha int_constraint 
+			bool_constraint},
 		:constraints	=> {
-			:number	=> /^(\d+)$/,
-			:alpha	=> /^(\w+)$/,
+			:number				=> /^(\d+)$/,
+			:alpha				=> /^(\w+)$/,
+			:int_constraint		=> :integer,
+			:bool_constraint	=> :boolean,
 		},
 		:untaint_all_constraints => true
 	}
@@ -197,7 +200,191 @@ class Arrow::FormValidatorTestCase < Arrow::TestCase
 	end
 
 
+	def test_boolean_constraint_should_accept_true_string
+		rval = nil
+		params = {'required' => '1', 'bool_constraint' => 'true'}
+
+		assert_nothing_raised do
+			@validator.validate( params )
+			rval = @validator[:bool_constraint]
+		end
+
+		assert_equal false, @validator.errors?
+		assert_equal true, rval
+	end
 
 
+	def test_boolean_constraint_should_accept_t_as_true
+		rval = nil
+		params = {'required' => '1', 'bool_constraint' => 't'}
+
+		assert_nothing_raised do
+			@validator.validate( params )
+			rval = @validator[:bool_constraint]
+		end
+
+		assert_equal false, @validator.errors?
+		assert_equal true, rval
+	end
+
+	def test_boolean_constraint_should_accept_yes_as_true
+		rval = nil
+		params = {'required' => '1', 'bool_constraint' => 'yes'}
+
+		assert_nothing_raised do
+			@validator.validate( params )
+			rval = @validator[:bool_constraint]
+		end
+
+		assert_equal false, @validator.errors?
+		assert_equal true, rval
+	end
+
+	def test_boolean_constraint_should_accept_y_as_true
+		rval = nil
+		params = {'required' => '1', 'bool_constraint' => 'y'}
+
+		assert_nothing_raised do
+			@validator.validate( params )
+			rval = @validator[:bool_constraint]
+		end
+
+		assert_equal false, @validator.errors?
+		assert_equal true, rval
+	end
+
+	def test_boolean_constraint_should_accept_false_string
+		rval = nil
+		params = {'required' => '1', 'bool_constraint' => 'false'}
+
+		assert_nothing_raised do
+			@validator.validate( params )
+			rval = @validator[:bool_constraint]
+		end
+
+		assert_equal false, @validator.errors?
+		assert_equal false, rval
+	end
+
+
+	def test_boolean_constraint_should_accept_f_as_false
+		rval = nil
+		params = {'required' => '1', 'bool_constraint' => 'f'}
+
+		assert_nothing_raised do
+			@validator.validate( params )
+			rval = @validator[:bool_constraint]
+		end
+
+		assert_equal false, @validator.errors?
+		assert_equal false, rval
+	end
+
+	def test_boolean_constraint_should_accept_no_as_false
+		rval = nil
+		params = {'required' => '1', 'bool_constraint' => 'no'}
+
+		assert_nothing_raised do
+			@validator.validate( params )
+			rval = @validator[:bool_constraint]
+		end
+
+		assert_equal false, @validator.errors?
+		assert_equal false, rval
+	end
+
+	def test_boolean_constraint_should_accept_n_as_false
+		rval = nil
+		params = {'required' => '1', 'bool_constraint' => 'n'}
+
+		assert_nothing_raised do
+			@validator.validate( params )
+			rval = @validator[:bool_constraint]
+		end
+
+		assert_equal false, @validator.errors?
+		assert_equal false, rval
+	end
+
+	def test_boolean_constraint_should_reject_nonboolean_string
+		rval = nil
+		params = {'required' => '1', 'bool_constraint' => 'peanut'}
+
+		assert_nothing_raised do
+			@validator.validate( params )
+			rval = @validator[:bool_constraint]
+		end
+
+		assert_equal true, @validator.errors?
+		assert_equal nil, rval
+	end
+
+
+	def test_integer_constraint_should_accept_11
+		rval = nil
+		params = {'required' => '1', 'int_constraint' => '11'}
+
+		assert_nothing_raised do
+			@validator.validate( params )
+			rval = @validator[:int_constraint]
+		end
+
+		assert_equal false, @validator.errors?
+		assert_equal 11, rval
+	end
+
+	def test_integer_constraint_should_accept_0
+		rval = nil
+		params = {'required' => '1', 'int_constraint' => '0'}
+
+		assert_nothing_raised do
+			@validator.validate( params )
+			rval = @validator[:int_constraint]
+		end
+
+		assert_equal false, @validator.errors?
+		assert_equal 0, rval
+	end
+
+	def test_integer_constraint_should_accept_negative_11
+		rval = nil
+		params = {'required' => '1', 'int_constraint' => '-11'}
+
+		assert_nothing_raised do
+			@validator.validate( params )
+			rval = @validator[:int_constraint]
+		end
+
+		assert_equal false, @validator.errors?
+		assert_equal -11, rval
+	end
+
+	def test_integer_constraint_should_reject_noninteger_string
+		rval = nil
+		params = {'required' => '1', 'int_constraint' => '11.1'}
+
+		assert_nothing_raised do
+			@validator.validate( params )
+			rval = @validator[:int_constraint]
+		end
+
+		assert_equal true, @validator.errors?
+		assert_equal nil, rval
+	end
+
+	def test_integer_constraint_should_reject_noninteger_string2
+		rval = nil
+		params = {'required' => '1', 'int_constraint' => '88licks'}
+
+		assert_nothing_raised do
+			@validator.validate( params )
+			rval = @validator[:int_constraint]
+		end
+
+		assert_equal true, @validator.errors?
+		assert_equal nil, rval
+	end
+
+	
 end
 

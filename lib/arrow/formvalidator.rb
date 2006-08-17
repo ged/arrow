@@ -276,7 +276,7 @@ class Arrow::FormValidator < ::FormValidator
 
 	### Constraint methods
 	
-	### Constrain a value to +true+ and +false+.
+	### Constrain a value to +true+ (or +yes+) and +false+ (or +no+).
 	def match_boolean( val )
 		rval = nil
 		if ( val =~ /^(t(?:rue)?|y(?:es)?)$/i )
@@ -288,6 +288,12 @@ class Arrow::FormValidator < ::FormValidator
 		return rval
 	end
 
+
+	### Constrain a value to an integer
+	def match_integer( val )
+		return Integer( val ) rescue nil
+	end
+	
 
 	# Applies a builtin constraint to form[key]
 	def apply_string_constraint(key, constraint)
