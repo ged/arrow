@@ -257,7 +257,8 @@ class Arrow::Dispatcher < Arrow::Object
 	### The content handler method. Dispatches requests to registered
 	### applets based on the requests PATH_INFO.
 	def handler( req )
-		self.log.debug "--- Dispatching request %p ---------------" % req
+		self.log.info "--- Dispatching request %p ---------------" % req
+		self.log.debug "Request headers are: %s" % untable(req.headers_in)
 
 		if @config.changed?
 			self.log.notice "** Reloading configuration ***"
@@ -313,7 +314,7 @@ class Arrow::Dispatcher < Arrow::Object
 
 		self.log.debug "Returning status %d" % txn.status
 		self.log.debug "Response headers were: %s" % untable(req.headers_out)
-		self.log.debug "--- Done with request %p ---------------" % req
+		self.log.info "--- Done with request %p ---------------" % req
 
 		return txn.status
 	rescue ::Exception => err
