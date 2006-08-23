@@ -363,7 +363,7 @@ class Arrow::Session::Store < Arrow::Object
 	#######
 	
 	### Return a copy of the given +hash+ with all non-serializable
-	### objects stipped out of it.
+	### objects stripped out of it.
 	def strip_hash( hash, cloned=true )
 		newhash = cloned ? hash.dup : hash
 		newhash.default = nil if newhash.default_proc

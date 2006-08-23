@@ -41,6 +41,7 @@ class Arrow::Cookie < Arrow::Object
 	# SVN Id
 	SVNId = %q$Id$
 
+	CookieDateFormat = '%a, %d-%b-%Y %H:%M:%S GMT'
 
 	### Strip surrounding double quotes from a copy of the specified string 
 	### and return it.
@@ -278,7 +279,7 @@ class Arrow::Cookie < Arrow::Object
 
 		rval << make_field( "Version", self.version ) if self.version.nonzero?
 		rval << make_field( "Domain", self.domain )
-		rval << make_field( "Expires", self.expires.rfc822 ) if self.expires
+		rval << make_field( "Expires", make_cookiedate(self.expires) ) if self.expires
 		rval << make_field( "Max-Age", self.max_age )
 		rval << make_field( "Comment", self.comment )
 		rval << make_field( "Path", self.path )
@@ -336,10 +337,18 @@ class Arrow::Cookie < Arrow::Object
 	end
 
 
+	### Make an RFC2109-formatted date out of +date+.
+	def make_cookiedate( date )
+		return date.strftime( CookieDateFormat )
+	end
+	
+
 	### Quote a copy of the given string and return it.
 	def quote( val )
 		%q{"%s"} % [ val.to_s.gsub(/"/, '\\"') ]
 	end
+
+
 
 
 

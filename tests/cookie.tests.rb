@@ -272,5 +272,19 @@ class Arrow::CookieTestCase < Arrow::TestCase
 		assert_equal %{by_rickirac=9917eb&%22modern%20technology} +
 			%{%22%3B%20ain't%20it%20a%20paradox%3F}, rval
 	end
+
+	def test_expires_value_is_in_correct_format
+		rval = nil
+		now = Time.now
+		nowstring = now.strftime( "%a, %d-%b-%Y %H:%M:%S GMT" )
+		@cookie.expires = now
+
+		assert_nothing_raised do
+			rval = @cookie.to_s
+		end
+		
+		assert_include nowstring, rval
+	end
+
 end
 
