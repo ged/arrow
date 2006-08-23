@@ -101,7 +101,8 @@ class Arrow::Applet < Arrow::Object
 	###	  per action. See the documentation for FormValidator for the format
 	###	  of each profile hash.
 	SignatureStruct = Struct.new( :name, :description, :maintainer,
-		:version, :config, :default_action, :templates, :validator_profiles )
+		:version, :config, :default_action, :templates, :validator_profiles,
+		:appicon )
 
 	# Default-generators for Signatures which are missing one or more of the
 	# optional pairs.
@@ -121,6 +122,7 @@ class Arrow::Applet < Arrow::Object
 				},
 			},
 		},
+		:appicon			=> 'application-x-executable.png',
 	}
 
 	SignatureStructDefaults[:version] = proc {|rawsig, klass|
@@ -139,6 +141,49 @@ class Arrow::Applet < Arrow::Object
 			end
 		end
 	}
+
+
+	### Proxy into the Applet's signature for a given action.
+	class SigProxy
+
+		### Create a new proxy into the given +klass+'s Signature for the
+		### specified +action_name+.
+		def initialize( action_name, klass )
+			@action_name = action_name.to_s.intern
+			@signature = klass.signature
+			@signature[:templates] ||= {}
+			@signature[:validator_profiles] ||= {}
+		end
+
+
+		### Get the template associated with the same name as the proxied
+		### action.
+		def template
+			@signature[:templates][@action_name]
+		end
+
+
+		### Set the template associated with the same name as the proxied
+		### action to +tmpl+.
+		def template=( tmpl )
+			@signature[:templates][@action_name] = tmpl
+		end
+
+		
+		### Get the validator profile associated with the same name as the
+		### proxied action.
+		def validator_profile
+			@signature[:validator_profiles][@action_name]
+		end
+
+
+		### Set the validator profile associated with the same name as the
+		### proxied action to +hash+.
+		def validator_profile=( hash )
+			@signature[:validator_profiles][@action_name] = hash
+		end
+
+	end # class SigProxy
 
 
 	### Set the path for the template specified by +sym+ to +path+.
@@ -193,47 +238,10 @@ class Arrow::Applet < Arrow::Object
 	end
 
 
-	### Proxy into the Applet's signature for a given action.
-	class SigProxy
-
-		### Create a new proxy into the given +klass+'s Signature for the
-		### specified +action_name+.
-		def initialize( action_name, klass )
-			@action_name = action_name.to_s.intern
-			@signature = klass.signature
-			@signature[:templates] ||= {}
-			@signature[:validator_profiles] ||= {}
-		end
-
-
-		### Get the template associated with the same name as the proxied
-		### action.
-		def template
-			@signature[:templates][@action_name]
-		end
-
-
-		### Set the template associated with the same name as the proxied
-		### action to +tmpl+.
-		def template=( tmpl )
-			@signature[:templates][@action_name] = tmpl
-		end
-
-		
-		### Get the validator profile associated with the same name as the
-		### proxied action.
-		def validatorProfile
-			@signature[:validator_profiles][@action_name]
-		end
-
-
-		### Set the validator profile associated with the same name as the
-		### proxied action to +hash+.
-		def validatorProfile=( hash )
-			@signature[:validator_profiles][@action_name] = hash
-		end
-
-	end # class SigProxy
+	### Set the appicon for the applet to +imgfile+.
+	def self::appicon( imgfile )
+		self.signature.appicon = imgfile
+	end
 
 
 	# The array of loaded applet classes (derivatives) and an array of

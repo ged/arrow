@@ -240,6 +240,18 @@ class Arrow::Applet::TestCase < Arrow::TestCase
 		assert_equal "foo", @appletclass.signature.maintainer
 	end
 
+	def test_applet_appicon_directive_should_set_signature_appicon
+		assert_not_equal "foo.png", @appletclass.signature.appicon
+
+		assert_nothing_raised do
+			@appletclass.class_eval do
+				applet_maintainer "foo.png"
+			end
+		end
+		
+		assert_equal "foo.png", @appletclass.signature.maintainer
+	end
+
 	def test_applet_version_directive_should_set_signature_version
 		assert_not_equal "200.1", @appletclass.signature.version
 
