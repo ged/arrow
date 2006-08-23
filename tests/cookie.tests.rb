@@ -276,7 +276,7 @@ class Arrow::CookieTestCase < Arrow::TestCase
 	def test_expires_value_is_in_correct_format
 		rval = nil
 		now = Time.now
-		nowstring = now.strftime( "%a, %d-%b-%Y %H:%M:%S GMT" )
+		nowstring = now.gmtime.strftime( "%a, %d-%b-%Y %H:%M:%S GMT" )
 		@cookie.expires = now
 
 		assert_nothing_raised do

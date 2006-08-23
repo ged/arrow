@@ -339,7 +339,7 @@ class Arrow::Cookie < Arrow::Object
 
 	### Make an RFC2109-formatted date out of +date+.
 	def make_cookiedate( date )
-		return date.strftime( CookieDateFormat )
+		return date.gmtime.strftime( CookieDateFormat )
 	end
 	
 
@@ -347,9 +347,5 @@ class Arrow::Cookie < Arrow::Object
 	def quote( val )
 		%q{"%s"} % [ val.to_s.gsub(/"/, '\\"') ]
 	end
-
-
-
-
 
 end # class Arrow::Cookie
