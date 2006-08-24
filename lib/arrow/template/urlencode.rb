@@ -22,6 +22,7 @@
 require 'arrow/exceptions'
 require 'arrow/utils'
 require 'arrow/template/nodes'
+require 'arrow/template/call'
 
 ### The class which defines the behaviour of the 'urlencode'
 ### template directive.
@@ -51,11 +52,11 @@ class Arrow::Template::URLEncodeDirective < Arrow::Template::CallDirective # :no
 			rary.push( rawary.shift ) if /^<!--.*-->$/ =~ rawary.first
 		end
 
-		rawary.each {|line|
+		rawary.each do |line|
 			rary << line.to_s.gsub( NonUricRegexp ) do |match|
 				"%%%x" % match[0]
 			end
-		}
+		end
 
 		return rary
 	end
