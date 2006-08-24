@@ -30,12 +30,13 @@ class Arrow::FormValidatorTestCase < Arrow::TestCase
 	TestProfile = {
 		:required		=> [ :required ],
 		:optional		=> %w{optional number alpha int_constraint 
-			bool_constraint},
+			bool_constraint email_constraint},
 		:constraints	=> {
 			:number				=> /^(\d+)$/,
 			:alpha				=> /^(\w+)$/,
 			:int_constraint		=> :integer,
 			:bool_constraint	=> :boolean,
+			:email_constraint	=> :email,
 		},
 		:untaint_all_constraints => true
 	}
@@ -385,6 +386,89 @@ class Arrow::FormValidatorTestCase < Arrow::TestCase
 		assert_equal nil, rval
 	end
 
+	def test_email_constraint_should_match_simple_address
+		rval = nil
+		params = {
+			'required' => '1',
+			'email_constraint' => 'jrandom@hacker.ie',
+		}
+
+		assert_nothing_raised do
+			@validator.validate( params )
+			rval = @validator[:email_constraint]
+		end
+
+		assert_equal false, @validator.errors?
+		assert_equal 'jrandom@hacker.ie', rval
+	end
+	
+	def test_email_constraint_should_match_address_with_hyphened_host
+		rval = nil
+		params = {
+			'required' => '1',
+			'email_constraint' => 'jrandom@just-another-hacquer.fr',
+		}
+
+		assert_nothing_raised do
+			@validator.validate( params )
+			rval = @validator[:email_constraint]
+		end
+
+		assert_equal false, @validator.errors?
+		assert_equal 'jrandom@just-another-hacquer.fr', rval
+	end
+	
+	ComplexAddresses = [
+		'ruby+hacker@random-example.org',
+		'"ruby hacker"@ph8675309.org',
+		'jrandom@[ruby hacquer].com',
+		'abcdefghijklmnopqrstuvwxyz@abcdefghijklmnopqrstuvwxyz',
+	]
+	def test_email_constraint_should_match_complex_addresses
+		rval = nil
+
+		ComplexAddresses.each do |addr|
+			params = {
+				'required' => '1',
+				'email_constraint' => addr,
+			}
+
+			assert_nothing_raised do
+				@validator.validate( params )
+				rval = @validator[:email_constraint]
+			end
+
+			assert_equal false, @validator.errors?,
+				@validator.error_messages
+			assert_equal addr, rval
+		end
+	end
+
+	BogusAddresses = [
+		'jrandom@hacquer com',
+		'jrandom@ruby hacquer.com',
+		'j random@rubyhacquer.com',
+		'j random@ruby|hacquer.com',
+		'j:random@rubyhacquer.com',
+	]
+	def test_email_constraint_should_reject_bogus_addresses
+		rval = nil
+
+		BogusAddresses.each do |addr|
+			params = {
+				'required' => '1',
+				'email_constraint' => addr,
+			}
+
+			assert_nothing_raised do
+				@validator.validate( params )
+				rval = @validator[:email_constraint]
+			end
+
+			#assert_equal true, @validator.errors?, addr
+			assert_equal nil, rval
+		end
+	end
 	
 end
 
