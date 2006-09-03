@@ -284,6 +284,39 @@ class Arrow::Transaction < Arrow::Object
 	# Header convenience methods
 	#
 
+	### :TODO: Need to override Apache::Request#construct_url to use Apache2's 
+	### X-Forwarded-Host or X-Forwarded-Server when constructing 
+	### self-refererential URLs.
+
+	### Overridden from Apache::Request to take Apache mod_proxy headers into
+	### account. If the 'X-Forwarded-Host' or 'X-Forwarded-Server' headers
+	### exist in the request, the hostname specified is used instead of the
+	### canonical host.
+	def construct_url( uri )
+		url = @request.construct_url( uri )
+
+		# If the request came through a proxy, rewrite the url's host to match
+		# the hostname the proxy is forwarding for.
+		if (( host = self.proxied_host ))
+			uriobj = URI.parse( url )
+			uriobj.host = host
+			url = uriobj.to_s
+		end
+		
+		return url
+	end
+
+
+	### If the request came from a reverse proxy (i.e., the X-Forwarded-Host 
+	### or X-Forwarded-Server headers are present), return the hostname that 
+	### the proxy is forwarding for. If no proxy headers are present, return
+	### nil.
+	def proxied_host
+		headers = @request.headers_in
+		return headers['x-forwarded-host'] || headers['x-forwarded-server']
+	end
+	
+
 	### Fetch the client's IP, either from proxy headers or the connection's IP.
 	def remote_ip
 		return self.headers_in['X-Forwarded-For'] || self.connection.remote_ip

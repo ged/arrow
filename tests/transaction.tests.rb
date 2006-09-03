@@ -97,6 +97,103 @@ class Arrow::TransactionTestCase < Arrow::TestCase
 	end
 
 
+	# Simulate Apache::Table
+	class HeaderTable
+		def initialize( hash={} )
+			hash.each {|k,v| hash[k.downcase] = v}
+			@hash = hash
+		end
+		
+		def []( key )
+			@hash[ key.downcase ]
+		end
+		
+		def []=( key, val )
+			@hash[ key.downcase ] = val
+		end
+		
+		def key?( key )
+			@hash.key?( key.downcase )
+		end
+	end
+
+
+	def test_proxied_host_should_return_x_forwarded_host_if_present
+		rval = ''
+		headers = HeaderTable.new({
+			'X-Forwarded-Host' => 'foo.bar.com',
+			'X-Forwarded-Server' => 'bar.foo.com',
+		})
+		
+		FlexMock.use( "request", "config", "broker" ) do |req, config, broker|
+			req.should_receive( :hostname ).
+				and_return( "hostname" ).once
+			req.should_receive( :options ).
+				and_return( {} ).at_least.once
+			req.should_receive( :headers_in ).
+				and_return( headers ).
+				at_least.once
+
+			txn = Arrow::Transaction.new( req, config, broker )
+			rval = txn.proxied_host
+		end
+		
+		assert_equal 'foo.bar.com', rval
+	end
+	
+
+	def test_proxied_host_should_return_x_forwarded_server_if_x_forwarded_host_not_present
+		rval = ''
+		headers = HeaderTable.new({
+			'X-Forwarded-Server' => 'bar.foo.com',
+		})
+		FlexMock.use( "request", "config", "broker" ) do |req, config, broker|
+			req.should_receive( :hostname ).
+				and_return( "hostname" ).once
+			req.should_receive( :options ).
+				and_return( {} ).
+				and_return(headers).
+				at_least.once
+				req.should_receive( :headers_in ).
+					and_return( headers ).
+					at_least.once
+
+			txn = Arrow::Transaction.new( req, config, broker )
+			rval = txn.proxied_host
+		end
+		
+		assert_equal 'bar.foo.com', rval
+	end
+	
+
+	def test_construct_url_with_x_forwarded_host_uses_proxy_header
+		rval = ''
+		headers = HeaderTable.new({
+			'X-Forwarded-Host' => 'foo.bar.com',
+			'X-Forwarded-Server' => 'bar.foo.com',
+		})
+		
+		FlexMock.use( "request", "config", "broker" ) do |req, config, broker|
+			req.should_receive( :hostname ).
+				and_return( "hostname" ).once
+			req.should_receive( :options ).
+				and_return( {} ).at_least.once
+			req.should_receive( :headers_in ).
+				and_return( headers ).
+				at_least.once
+			req.should_receive( :construct_url ).
+				with( "/bar" ).
+				and_return( "http://hostname/bar").once
+			
+			txn = Arrow::Transaction.new( req, config, broker )
+			rval = txn.construct_url( "/bar" )
+		end
+		
+		assert_equal 'http://foo.bar.com/bar', rval
+	end
+
+
+
 	#######
 	private
 	#######
