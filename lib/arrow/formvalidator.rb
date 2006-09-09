@@ -295,13 +295,6 @@ class Arrow::FormValidator < ::FormValidator
 	end
 	
 	
-    # Sloppy matches a valid email address.
-    def match_email(email)
-      regexp = Regexp.new('^\S+@\w+(\.\w+)*$')
-      match = regexp.match(email)
-      match ? match[0] : nil
-    end
-
 	#
 	# RFC822 Email Address Regex
 	# --------------------------
