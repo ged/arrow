@@ -136,7 +136,7 @@ class Arrow::Applet < Arrow::Object
 			return klass.const_get( :Rcsid )
 		else
 			begin
-				File.stat( klass.sourcefile ).mtime
+				File.stat( klass.sourcefile ).mtime.strftime('%Y%m%d-%M:%H')
 			rescue
 			end
 		end
@@ -591,6 +591,7 @@ class Arrow::Applet < Arrow::Object
 
 	### Run an action with a duped transaction (e.g., from another action)
 	def subrun( action, txn, *args )
+		action, txn = txn, action if txn.is_a?( Arrow::Transaction )
 		self.log.debug "Running subordinate action '%s' from '%s'" %
 			[ action, caller[0] ]
 
