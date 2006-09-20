@@ -591,7 +591,7 @@ class Arrow::Applet < Arrow::Object
 
 	### Run an action with a duped transaction (e.g., from another action)
 	def subrun( action, txn, *args )
-		action, txn = txn, action if txn.is_a?( Arrow::Transaction )
+		action, txn = txn, action if action.is_a?( Arrow::Transaction )
 		self.log.debug "Running subordinate action '%s' from '%s'" %
 			[ action, caller[0] ]
 
