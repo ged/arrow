@@ -381,7 +381,7 @@ class Arrow::Config < Arrow::Object
 	### Handle calls to struct-members
 	def method_missing( sym, *args )
 		key = sym.to_s.sub( /(=|\?)$/, '' ).intern
-		return super unless @struct.member?( key )
+		return nil unless @struct.member?( key )
 
 		self.log.debug( "Autoloading #{key} accessors." )
 

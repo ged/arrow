@@ -162,6 +162,12 @@ module Arrow
 		### used to configure the Configurable class.
 		attr_writer :config_key
 
+		### :TODO:
+		### * Change #config_key to #class_config_key and #instance_config_key
+		### * Add a ::configure_instances method that would iterate over
+		###   instances that had marked themselves as configurable in the same
+		###   way the classed do now.
+
 
 		### Get (and optionally set) the +config_key+.
 		def config_key( sym=nil )

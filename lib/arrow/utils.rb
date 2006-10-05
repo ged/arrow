@@ -200,7 +200,12 @@ module Arrow
 				return @valid_dirs
 			end
 
-			@valid_dirs = @dirs.find_all {|dir|
+			@valid_dirs = @dirs.find_all do |dir|
+				if dir.tainted?
+					self.log.info "Discarding tainted directory entry %p" % [ dir ]
+					next
+				end
+
 				begin
 					stat = File.stat(dir)
 					if stat.directory? && stat.readable?
@@ -210,12 +215,15 @@ module Arrow
 							dir
 						false
 					end
-				rescue Errno::ENOENT, ::SecurityError => err
-					self.log.debug "Discarded invalid directory %p: %s" %
+				rescue Errno::ENOENT => err
+					self.log.notice "Discarded invalid directory %p: %s" %
 						[ dir, err.message ]
 					false
+				rescue ::SecurityError => err
+					self.log.error "Discarded unsafe directory %p: %s" %
+						[ dir, err.message ]
 				end
-			}
+			end
 			@last_stat = Time.now
 
 			return @valid_dirs

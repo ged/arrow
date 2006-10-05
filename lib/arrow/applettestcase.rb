@@ -215,6 +215,7 @@ class Arrow::AppletTestCase < Test::Unit::TestCase
 		@config.should_receive( :member? ).
 			with( :model ).
 			and_return( false )
+		@config.should_ignore_missing
 		@template_factory = flexmock( "mock template factory" )
 
 		@applet = @appletclass.new( @config, @template_factory, "#{@appletname}" )
@@ -348,7 +349,7 @@ class Arrow::AppletTestCase < Test::Unit::TestCase
 				"Expected applet to load the '#{key.inspect}' template\n" +
 				"but there was no such template registered by the application." )
 		
-		mock_template = flexmock( "'#{key.inspect}' template")
+		mock_template = flexmock( "#{key.inspect} template")
 		@template_factory.should_receive( :get_template ).
 			with( tname ).and_return( mock_template ).at_least.once
 		mock_template.should_ignore_missing

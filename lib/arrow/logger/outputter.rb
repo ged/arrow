@@ -44,7 +44,8 @@ class Arrow::Logger::Outputter
 	# The default interpolatable string that's used to build the message to
 	# output
 	DefaultFormat =
-		%q{#{time} [#{level}]: #{name} #{frame ? '('+frame+')' : ''}: #{msg[0,1024]}}
+		%q{#{time.strftime('%Y/%m/%d %H:%M:%S')} [#{level}]: #{name} } +
+			%q{#{frame ? '('+frame+')' : ''}: #{msg[0,1024]}}
 
 
 	#############################################################

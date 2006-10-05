@@ -349,7 +349,7 @@ class Arrow::Logger
 
 		# Look for loggers which are higher in the hierarchy
 		self.hierloggers( level ) do |logger|
-			outpary = logger.outputters
+			outpary = logger.outputters || []
 			newoutpary = outpary - (outpary & outputters)
 
 			# If there are any outputters which haven't already been seen,

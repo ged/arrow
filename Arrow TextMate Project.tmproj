@@ -225,20 +225,6 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
-		<key>lib/arrow/session/dbilock.rb</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>17</integer>
-				<key>line</key>
-				<integer>81</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>53</integer>
-		</dict>
 		<key>lib/arrow/session/filelock.rb</key>
 		<dict>
 			<key>caret</key>
@@ -616,6 +602,6 @@
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{45, 0}, {863, 1002}}</string>
+	<string>{{37, 26}, {863, 1002}}</string>
 </dict>
 </plist>

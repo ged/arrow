@@ -129,7 +129,9 @@ class Arrow::Session::PosixLock < Arrow::Session::Lock
 			path = @lockfile.path
 			@lockfile.close
 			@lockfile = nil
-			File.delete( path.untaint )
+			if File.exist?( path.untaint )
+				File.delete( path.untaint )
+			end
 		end
 	end
 

@@ -5,6 +5,7 @@
 
 require 'fileutils'
 require 'uri'
+require 'forwardable'
 
 class Integer
 	def of
@@ -124,6 +125,37 @@ module Apache # :nodoc:
     USE_LOCAL_COPY = 304
     VARIANT_ALSO_VARIES = 506
 
+	# Simulate Apache::Table
+	class Table
+		extend Forwardable
+		def initialize( hash={} )
+			hash.each {|k,v| hash[k.downcase] = v}
+			@hash = hash
+		end
+
+		def_delegators :@hash, :clear, :each, :each_key, :each_value
+		
+		def []( key )
+			@hash[ key.downcase ]
+		end
+		alias_method :get, :[]
+		
+		def []=( key, val )
+			@hash[ key.downcase ] = val
+		end
+		alias_method :set, :[]=
+		
+		def key?( key )
+			@hash.key?( key.downcase )
+		end
+		
+		def merge( key, val )
+			key = key.downcase
+			@hash[key] = [@hash[key]] unless @hash[key].is_a?( Array )
+			@hash[key] << val
+		end
+	end
+
 
     ### Dummy mod_ruby object base class
     class ModRubySimObject
@@ -187,7 +219,7 @@ module Apache # :nodoc:
     ###############
 
     # Add a token to Apache's version string.
-    def add_version_component
+    def add_version_component( *args )
     end
 
     # Change the server's current working directory to the directory part of the specified filename.
@@ -224,6 +256,7 @@ module Apache # :nodoc:
     
     # Apache::Request
     class Request < ModRubySimObject
+	
         def initialize( uri=nil )
             @uri = uri
 			@server = nil
@@ -233,6 +266,8 @@ module Apache # :nodoc:
 			@content_type = 'text/html'
 			@hostname = 'localhost'
 			@path_info = ''
+			@headers_in = Apache::Table.new
+			@headers_out = Apache::Table.new
 			@options = {}
 			@uploads = {}
         end
@@ -240,7 +275,7 @@ module Apache # :nodoc:
 		attr_writer :server
 		attr_accessor :allowed, :sync_header, :content_type, :uri,
 			:hostname, :paramtable, :cookies, :options, :uploads,
-			:path_info
+			:path_info, :headers_in, :headers_out
 		alias_method :params, :paramtable
 
 		def paramtable=( hash )
@@ -295,9 +330,6 @@ module Apache # :nodoc:
 		end
     end
 
-    class Table < ModRubySimObject
-    end   
-          
     class Connection < ModRubySimObject
     end   
           
