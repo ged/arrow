@@ -50,12 +50,13 @@ class Arrow::Template::EscapeDirective < Arrow::Template::CallDirective # :nodoc
 			rary.push( rawary.shift ) if /^<!--.*-->$/ =~ rawary.first
 		end
 
-		rawary.each {|line|
+		rawary.each do |line|
 			rary << line.to_s.
 				gsub( /&/, '&amp;' ).
 				gsub( /</, '&lt;' ).
-				gsub( />/, '&gt;' )
-		}
+				gsub( />/, '&gt;' ).
+				gsub( /"/, '&quot;' )
+		end
 
 		return rary
 	end
