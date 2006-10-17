@@ -373,6 +373,7 @@ class Arrow::Config < Arrow::Object
 	### changed. Returns +true+ if it was reloaded and +false+ otherwise.
 	def reload
 		return false unless @loader && @name
+		self.createTime = Time.now
 		confighash = @loader.load( @name )
 		ihash = self.class.internifyKeys( self.class.untaintValues(confighash) )
 		mergedhash = Defaults.merge( ihash, &Arrow::HashMergeFunction )
