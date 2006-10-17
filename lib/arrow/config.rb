@@ -350,18 +350,24 @@ class Arrow::Config < Arrow::Object
 	### loaded, either by setting one of its members or changing the file
 	### from which it was loaded.
 	def changed?
-		if @struct.modified?
-			self.log.debug "Struct was modified"
-			return true
-		end
-		return false unless self.name
-		if self.loader.isNewer?( self.name, self.createTime )
-			self.log.debug "Config source (%s) has been updated since %s" %
-				[ self.name, self.createTime ]
-			return true
-		end
+		return self.changed_reason ? true : false
 	end
 
+
+	### If the configuration has changed, return the reason. If it hasn't,
+	### returns nil.
+	def changed_reason
+		if @struct.modified?
+			return "Struct was modified"
+		end
+		return nil unless self.name
+		if self.loader.isNewer?( self.name, self.createTime )
+			return "Config source (%s) has been updated since %s" %
+				[ self.name, self.createTime ]
+		end
+		
+	end
+	
 
 	### Reload the configuration from the original source if it has
 	### changed. Returns +true+ if it was reloaded and +false+ otherwise.

@@ -33,7 +33,7 @@ class Arrow::PathTestCase < Arrow::TestCase
 	TestStringPath = TestArrayPath.join( File::PATH_SEPARATOR )
 	ExtantDirs = TestArrayPath.find_all {|dir|
 		File.directory?(dir) && File.readable?(dir)
-	}
+	}.uniq
 	warn "No extant directories in the array of test paths." if ExtantDirs.empty?
 
 
@@ -131,12 +131,12 @@ class Arrow::PathTestCase < Arrow::TestCase
 	def test_14_PushArrayDelegate
 		printTestHeader "Arrow::Path: Array Delegate: Push"
 
-		assert_nothing_raised {
+		assert_nothing_raised do
 			@path.push Dir.pwd
-		}
+		end
 		
-		newpath = ExtantDirs + [Dir.pwd]
-		assert_equal newpath, @path.valid_dirs
+		newpath = ExtantDirs | [Dir.pwd]
+		assert_equal newpath.sort, @path.valid_dirs.sort
 	end
 
 	### Test Array method delegation for #unshift
@@ -147,8 +147,8 @@ class Arrow::PathTestCase < Arrow::TestCase
 			@path.unshift( Dir.pwd, File.dirname(Dir.pwd) )
 		}
 		
-		newpath = [Dir.pwd, File.dirname(Dir.pwd)] + ExtantDirs 
-		assert_equal newpath, @path.valid_dirs
+		newpath = [Dir.pwd, File.dirname(Dir.pwd)] | ExtantDirs 
+		assert_equal newpath.sort, @path.valid_dirs.sort
 	end
 
 	

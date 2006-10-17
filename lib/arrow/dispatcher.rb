@@ -260,8 +260,8 @@ class Arrow::Dispatcher < Arrow::Object
 		self.log.info "--- Dispatching request %p ---------------" % req
 		self.log.debug "Request headers are: %s" % untable(req.headers_in)
 
-		if @config.changed?
-			self.log.notice "** Reloading configuration ***"
+		if (( reason = @config.changed_reason ))
+			self.log.notice "** Reloading configuration: #{reason} ***"
 			@config.reload
 			@broker = Arrow::Broker.new( @config )
 			self.configure( @config )
