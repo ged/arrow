@@ -1,56 +1,38 @@
 #!/usr/bin/ruby
 # 
-# This file contains the Arrow::(>>>class<<<) class, a derivative of
-# (>>>superclass<<<). (>>>description<<<)
+# #{vars[:description]}
 # 
-# == Rcsid
+# == Synopsis
 # 
-# $Id$
+#   
 # 
 # == Authors
 # 
-# * (>>>USER_NAME<<<) <(>>>AUTHOR<<<)>
+# * #{user.gecos} <#{tm[:user_email]}>
 # 
-#:include: COPYRIGHT
+# == Copyright
 #
-#---
+# Copyright (c) #{date.year} #{tm[:organization_name]}
+# 
+# This work is proprietary source code, and may not be copied or transferred
+# without permission.
+# 
+# == Version
 #
-# Please see the file COPYRIGHT in the 'docs' directory for licensing details.
-#
+#  $Id$
+# 
 
-(>>>MARK<<<)
 
-### (>>>description<<<).
-class Arrow::(>>>class<<<) < (>>>superclass<<<)
+### #{vars[:description]}
+class #{ vars[:class] } < #{ vars[:superclass] }
 
 	# SVN Revision
-	SVNRev = %q$Rev$
+	SVNRev = %q$Rev: 173 $
 
 	# SVN Id
 	SVNId = %q$Id$
 
 
-	### Create a new Arrow::(>>>class<<<) object.
-	def initialize
-	end
 
-
-	######
-	public
-	######
-
-
-	#########
-	protected
-	#########
-
-
-end # class Arrow::(>>>class<<<)
-
-
->>>TEMPLATE-DEFINITION-SECTION<<<
-("class" "Class: Arrow:: ")
-("superclass" "Derives from: ")
-("description" "File/class description: ")
-
+end # class #{ vars[:class] }
 

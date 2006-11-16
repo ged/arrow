@@ -78,7 +78,11 @@ class Arrow::Logger::FileOutputter < Arrow::Logger::Outputter
 
 	### Write the given +level+, +name+, +frame+, and +msg+ to the logfile.
 	def write( time, level, name, frame, msg )
-		super {|msg| @io.puts(msg) }
+		if block_given?
+			super
+		else
+			super {|msg| @io.puts(msg) }
+		end
 	end
 
 end # class Arrow::Logger::FileOutputter

@@ -545,7 +545,7 @@ class Arrow::Config < Arrow::Object
 		### Handle calls to key-methods
 		def method_missing( sym, *args )
 			key = sym.to_s.sub( /(=|\?)$/, '' ).intern
-			super unless @hash.key?( key )
+			return nil unless @hash.key?( key )
 
 			self.class.class_eval {
 				define_method( key ) {
