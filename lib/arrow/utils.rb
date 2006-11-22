@@ -169,7 +169,7 @@ module Arrow
 						path.to_a.flatten
 					end
 
-			path.each {|dir| dir.untaint}
+			@dirs.each {|dir| dir.untaint}
 
 			@valid_dirs = []
 			@cache_lifespan = cache_lifespan
