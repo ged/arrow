@@ -212,28 +212,38 @@ class Arrow::FormValidator < ::FormValidator
 	def error_fields
 		return self.missing | self.invalid.keys
 	end
+
+
+	### Get the description for the specified field.
+	def get_description( field )
+		return @profile[:descriptions][ field.to_s ] if
+			@profile[:descriptions].key?( field.to_s )
+		
+		desc = field.to_s.
+			gsub( /.*\[(\w+)\]/, "\\1" ).
+			gsub( /_(.)/ ) {|m| m[1,1].upcase }.
+			capitalize
+		return desc
+	end
 	
 
 	### Return an error message for each missing or invalid field; if
 	### +includeUnknown+ is +true+, also include messages for unknown fields.
-	def error_messages( includeUnknown=false )
+	def error_messages( include_unknown=false )
 		self.log.debug "Building error messages from descriptions: %p" %
 			[ @profile[:descriptions] ]
 		msgs = []
 		self.missing.each do |field|
-			desc = @profile[:descriptions][ field.to_s ] || field
-			msgs << "Missing value for '#{desc}'"
+			msgs << "Missing value for '%s'" % self.get_description( field )
 		end
 
 		self.invalid.each do |field, constraint|
-			desc = @profile[:descriptions][ field.to_s ] || field
-			msgs << "Invalid value for field '#{desc}'"
+			msgs << "Invalid value for field '%s'" % self.get_description( field )
 		end
 
-		if includeUnknown
+		if include_unknown
 			self.unknown.each do |field|
-				desc = @profile[:descriptions][ field.to_s ] || field
-				msgs << "Unknown field '#{desc}'"
+				msgs << "Unknown field '%s'" % self.get_description( field )
 			end
 		end
 
