@@ -383,8 +383,8 @@ class Arrow::Logger
 		# If tracing is turned on, pick the first frame in the stack that
 		# isn't in this file, or the last one if that fails to yield one.
 		if @trace
-			re = Regexp.new( Regexp.quote(__FILE__) + ":\d+:" )
-			frame = caller(1).find {|fr| re !~ fr } || caller(1).last
+			frame = caller(1).find {|fr| fr !~ %r{arrow/logger\.rb} } ||
+			 	caller(1).last
 		end
 
 		# Find the outputters that need to be written to, then write to them.
