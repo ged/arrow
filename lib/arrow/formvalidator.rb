@@ -84,6 +84,7 @@
 
 require 'forwardable'
 require 'formvalidator'
+require 'date'
 
 require 'arrow/mixins'
 require 'arrow/exceptions'
@@ -303,6 +304,19 @@ class Arrow::FormValidator < ::FormValidator
 	def match_integer( val )
 		return Integer( val ) rescue nil
 	end
+	
+	
+	### Contrain a value to a Float
+	def match_float( val )
+		return Float( val ) rescue nil
+	end
+	
+	
+	### Constrain a value to a parseable Date
+	def match_date( val )
+		return Date.parse( val ) rescue nil
+	end
+	
 	
 	
 	#
