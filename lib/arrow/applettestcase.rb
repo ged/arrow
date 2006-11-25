@@ -99,9 +99,61 @@ class Arrow::AppletTestCase < Test::Unit::TestCase
 	end
 
 
-	def self::debug_msg( message, *args )
-		msg = format( message, *args )
-		Arrow::Logger[self].debug( msg )
+	# Set some ANSI escape code constants (Shamelessly stolen from Perl's
+	# Term::ANSIColor by Russ Allbery <rra@stanford.edu> and Zenin
+	# <zenin@best.com>
+	AnsiAttributes = {
+		'clear'      => 0,
+		'reset'      => 0,
+		'bold'       => 1,
+		'dark'       => 2,
+		'underline'  => 4,
+		'underscore' => 4,
+		'blink'      => 5,
+		'reverse'    => 7,
+		'concealed'  => 8,
+
+		'black'      => 30,   'on_black'   => 40, 
+		'red'        => 31,   'on_red'     => 41, 
+		'green'      => 32,   'on_green'   => 42, 
+		'yellow'     => 33,   'on_yellow'  => 43, 
+		'blue'       => 34,   'on_blue'    => 44, 
+		'magenta'    => 35,   'on_magenta' => 45, 
+		'cyan'       => 36,   'on_cyan'    => 46, 
+		'white'      => 37,   'on_white'   => 47
+	}
+
+	### Returns a String containing the specified ANSI escapes suitable for
+	### inclusion in another string. The <tt>attributes</tt> should be one
+	### or more of the keys of AnsiAttributes.
+	def self::ansicode( *attributes )
+		return '' unless /(?:xterm(?:-color)?|eterm|linux)/i =~ ENV['TERM']
+
+		attr = attributes.collect {|a|
+			AnsiAttributes[a] ? AnsiAttributes[a] : nil
+		}.compact.join(';')
+		if attr.empty? 
+			return ''
+		else
+			return "\e[%sm" % attr
+		end
+	end
+
+
+	### Output the specified <tt>msgs</tt> joined together to
+	### <tt>STDERR</tt> if <tt>$DEBUG</tt> is set.
+	def self::debug_msg( *msgs )
+		return unless $DEBUG
+		self.message "%sDEBUG>>> %s %s" %
+			[ ansicode('dark', 'white'), msgs.join(''), ansicode('reset') ]
+	end
+
+
+	### Output the specified <tt>msgs</tt> joined together to
+	### <tt>STDOUT</tt>.
+	def self::message( *msgs )
+		$stderr.puts msgs.join('')
+		$stderr.flush
 	end
 
 
@@ -225,6 +277,60 @@ class Arrow::AppletTestCase < Test::Unit::TestCase
 		@delegate_called = false
 	end
 
+	### Output the name of the test as it's running if in verbose mode, and
+	### support per-test debugging settings.
+	def run( result )
+		print_test_header self.name
+		super
+	end
+	
+	
+
+	#################################################################
+	###	M E S S A G E   M E T H O D S
+	#################################################################
+
+	### Instance alias for the like-named class method.
+	def message( *msgs )
+		self.class.message( *msgs )
+	end
+
+
+	### Instance-alias for the like-named class method
+	def ansicode( *attributes )
+		self.class.ansicode( *attributes )
+	end
+
+
+	### Instance alias for the like-named class method
+	def debug_msg( *msgs )
+		self.class.debug_msg( *msgs )
+	end
+
+
+	### Return a separator line made up of <tt>length</tt> of the specified
+	### <tt>char</tt>.
+	def hrule( length=75, char="-" )
+		return (char * length ) + "\n"
+	end
+
+	### Return a section delimited by hrules with the specified +caption+ and
+	### +content+.
+	def hrule_section( content, caption='' )
+		caption << ' ' unless caption.empty?
+		return caption +
+			hrule( 75 - caption.length ) +
+			content.chomp + "\n" +
+			hrule()
+	end
+
+
+	### Output a header for delimiting tests
+	def print_test_header( desc )
+		return unless $VERBOSE || $DEBUG
+		message "%s>>> %s <<<%s" % 
+			[ ansicode('bold','yellow','on_blue'), desc, ansicode('reset') ]
+	end
 
 
 	#################################################################

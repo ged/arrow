@@ -128,7 +128,7 @@ class Arrow::FormValidatorTestCase < Arrow::TestCase
 			"error messages should be contained in an Array"
 		assert_equal 2, rval.nitems, "should be 2 error messages"
 		assert_equal \
-			["Missing value for 'required'", "Invalid value for field 'number'"],
+			["Missing value for 'Required'", "Invalid value for field 'Number'"],
 			rval,
 			"default error messages"
 	end
@@ -143,8 +143,8 @@ class Arrow::FormValidatorTestCase < Arrow::TestCase
 			"error messages should be contained in an Array"
 		assert_equal 3, rval.nitems, "should be 3 error messages"
 		assert_equal \
-			["Missing value for 'required'", "Invalid value for field 'number'",
-			 "Unknown field 'unknown'"],
+			["Missing value for 'Required'", "Invalid value for field 'Number'",
+			 "Unknown field 'Unknown'"],
 			rval,
 			"default error messages"
 	end
@@ -171,10 +171,21 @@ class Arrow::FormValidatorTestCase < Arrow::TestCase
 		
 	end
 	
+	def test_hash_field_descriptions_should_use_the_keyname_by_default
+		@validator.validate( {'required' => 'provided'}, :required => ['rodent[size]'] )
+		rval = nil
+		
+		assert_nothing_raised { rval = @validator.error_messages }
+		assert_equal 1, rval.nitems, "should be 1 error message"
+		assert_equal ["Missing value for 'Size'"], rval, "error messages"
+	end
+
+	
 	def test_valid_should_return_valid_params_after_transforming_them_into_hash_one_dimension
 		@validator.validate( {'rodent[size]' => 'unusual'}, :optional => ['rodent[size]'] )
 		assert_equal( {"rodent" => {"size" => 'unusual'}}, @validator.valid )
 	end
+
 
 	def test_valid_should_return_valid_params_after_transforming_them_into_hash_two_dimension
 		profile = {
@@ -469,6 +480,7 @@ class Arrow::FormValidatorTestCase < Arrow::TestCase
 			assert_equal nil, rval
 		end
 	end
+	
 	
 end
 

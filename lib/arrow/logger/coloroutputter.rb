@@ -59,9 +59,9 @@ class Arrow::Logger::ColorOutputter < Arrow::Logger::FileOutputter
 
 	# Default color map: :level => %w{color scheme}
 	DEFAULT_COLOR_SCHEME = {
-		:debug		=> %w{dark cyan},
-		:info		=> %w{white},
-		:notice		=> %w{underline white},
+		:debug		=> %w{dark white},
+		:info		=> %w{cyan},
+		:notice		=> %w{bold cyan},
 		:warning	=> %w{bold yellow},
 		:error		=> %w{bold red},
 		:crit		=> %w{bold white on_red},
