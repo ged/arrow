@@ -171,13 +171,51 @@ class Arrow::FormValidatorTestCase < Arrow::TestCase
 		
 	end
 	
-	def test_hash_field_descriptions_should_use_the_keyname_by_default
-		@validator.validate( {'required' => 'provided'}, :required => ['rodent[size]'] )
+	def test_get_description_should_return_capitalized_word_for_simple_field
+		@validator.validate( {} )
 		rval = nil
 		
-		assert_nothing_raised { rval = @validator.error_messages }
-		assert_equal 1, rval.nitems, "should be 1 error message"
-		assert_equal ["Missing value for 'Size'"], rval, "error messages"
+		assert_nothing_raised do
+			rval = @validator.get_description( 'required' )
+		end
+		
+		assert_equal 'Required', rval
+	end
+
+	
+	def test_get_description_should_return_two_capitalized_words_for_underbarred_field
+		@validator.validate( {}, :required => ['rodent_size'] )
+		rval = nil
+		
+		assert_nothing_raised do
+			rval = @validator.get_description( 'rodent_size' )
+		end
+		
+		assert_equal 'Rodent Size', rval
+	end
+
+	
+	def test_get_description_should_return_capitalized_key_word_for_hash_field
+		@validator.validate( {}, :required => ['rodent[size]'] )
+		rval = nil
+		
+		assert_nothing_raised do
+			rval = @validator.get_description( 'rodent[size]' )
+		end
+		
+		assert_equal 'Size', rval
+	end
+
+	
+	def test_get_description_should_return_two_capitalized_key_words_for_hash_field_with_underbarred_key
+		@validator.validate( {}, :required => ['castle[baron_id]'] )
+		rval = nil
+		
+		assert_nothing_raised do
+			rval = @validator.get_description( 'castle[baron_id]' )
+		end
+		
+		assert_equal 'Baron Id', rval
 	end
 
 	
