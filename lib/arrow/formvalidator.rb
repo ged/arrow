@@ -222,8 +222,8 @@ class Arrow::FormValidator < ::FormValidator
 		
 		desc = field.to_s.
 			gsub( /.*\[(\w+)\]/, "\\1" ).
-			gsub( /_(.)/ ) {|m| m[1,1].upcase }.
-			capitalize
+			gsub( /_(.)/ ) {|m| " " + m[1,1].upcase }.
+			gsub( /^(.)/ ) {|m| m.upcase }
 		return desc
 	end
 	
