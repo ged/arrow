@@ -23,11 +23,14 @@ require 'cache'
 
 require 'arrow/config'
 require 'arrow/logger'
+require 'arrow/mixins'
+
 
 ### Instances of this class are LRU caches for disk-based objects which keep
 ### track of the cached object's modification time, expiring the cached
 ### version when the disk-based version changes..
 class Arrow::Cache < ::Cache
+	include Arrow::Loggable
 
 	# Default configuration values
 	DefaultConfig = {
@@ -90,6 +93,39 @@ class Arrow::Cache < ::Cache
 
 	# The name of the cache; used in introspection
 	attr_reader :name
+	
+	# Total count of cache hits
+	attr_reader :hits
+	
+	# Total count of cache misses
+	attr_reader :misses
+	
+	# Cache size in bytes
+	attr_reader :size
+	
+	# The list of cached objects
+	attr_reader :list
+
+
+	### Overridden to provide logging of invalidated keys.
+	def invalidate( key )
+		self.log.debug "invalidating cache key '%p' for %s" % [key, self.name]
+		super
+	end
+
+
+	### Overridden for logging.
+	def invalidate_all
+		self.log.debug "invalidating all cached objects for %s" % [self.name]
+		super
+	end
+	
+
+	### Overridden to provide logging of expire phase.
+	def expire
+		self.log.debug "looking for expired entries in %s" % [self.name]
+		super
+	end
 
 
 	### Overridden from the superclass to prevent .to_s from being called on
