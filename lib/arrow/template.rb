@@ -208,9 +208,11 @@ class Arrow::Template < Arrow::Object
 
 		# Find the file on either the specified or default path
 		path = self.load_path if path.empty?
-		Arrow::Logger[self].debug "Searching for template '%s' in %d directories" % [ source, path.size ]
+		Arrow::Logger[self].debug "Searching for template '%s' in %d directories" %
+		 	[ source, path.size ]
 		filename = self.find_file( source, path )
-		Arrow::Logger[self].debug "Found '%s'; cache contains %d entries" % [ filename, cache.size ]
+		Arrow::Logger[self].debug "Found '%s'; cache contains %d entries" %
+		 	[ filename, cache.length ]
 
 		# Use the cached version if the caller passed one in and it exists.
 		if cache.include?( filename ) && !cache[ filename ].nil?
@@ -317,7 +319,7 @@ class Arrow::Template < Arrow::Object
 		@prerender_done = false
 		@postrender_done = false
 
-		@enclosing_template = nil
+		@enclosing_templates = []
 
 		case content
 		when String
@@ -379,9 +381,27 @@ class Arrow::Template < Arrow::Object
 	attr_underbarred_accessor :_creation_time
 
 	# The template which contains this one (if any) during a render.
-	attr_underbarred_accessor :_enclosing_template
+	attr_underbarred_accessor :_enclosing_templates
 
 
+
+	### Return the template that is enclosing the receiver in the current context,
+	### if any.
+	def _enclosing_template
+		self._enclosing_templates.last
+	end
+
+
+	### Return a human-readable representation of the template object.
+	def inspect
+		"#<%s:0x%0x %s (%d nodes)>" % [
+			self.class.name,
+			self.object_id * 2,
+			@file ? @file : '(anonymous)',
+			@syntax_tree.length,
+		]
+	end
+	
 
 	### Return the approximate size of the template, in bytes. Used by
 	### Arrow::Cache for size thresholds.
@@ -453,12 +473,16 @@ class Arrow::Template < Arrow::Object
 
 	### Prep the template for rendering, calling each of its nodes' 
 	### #before_rendering hook.
-	def prerender
+	def prerender( enclosing_template=nil )
+		@enclosing_templates << enclosing_template
+
 		@syntax_tree.each do |node|
+			# self.log.debug "    pre-rendering %p" % [node]
 			node.before_rendering( self ) if
 				node.respond_to?( :before_rendering )
 		end
 	end
+	alias_method :before_rendering, :prerender
 	
 
 	### Render the template to text and return it as a String. If called with an
@@ -471,17 +495,14 @@ class Arrow::Template < Arrow::Object
 	### render joined together with the default string separator (+$,+).
 	def render( nodes=nil, scope=nil, enclosing_template=nil )
 		rval = []
-		oldSuper = @enclosing_template
-		@enclosing_template = enclosing_template
-
 		nodes ||= self.get_prepped_nodes
 		scope ||= self.make_rendering_scope
 		
-		self.prerender
+		self.prerender( enclosing_template )
 
 		# Render each node
 		nodes.each do |node|
-			#self.log.debug "  rendering %p" % [ node ]
+			# self.log.debug "  rendering %p" % [ node ]
 			begin
 				rval << node.render( self, scope )
 			rescue ::Exception => err
@@ -489,11 +510,9 @@ class Arrow::Template < Arrow::Object
 			end
 		end
 
-		self.postrender
-
 		return self.render_objects( *rval )
 	ensure
-		@enclosing_template = oldSuper
+		self.postrender
 	end
 	alias_method :to_s, :render
 
@@ -506,13 +525,15 @@ class Arrow::Template < Arrow::Object
 	
 	### Clean up after template rendering, calling each of its nodes' 
 	### #after_rendering hook.
-	def postrender
+	def postrender( enclosing_template=nil )
 		@syntax_tree.each do |node|
+			# self.log.debug "    post-rendering %p" % [node]
 			node.after_rendering( self ) if
 				node.respond_to?( :after_rendering )
 		end
+		@enclosing_templates.pop
 	end
-	
+	alias_method :after_rendering, :postrender
 
 
 	### Create an anonymous module to act as a scope for any evals that take

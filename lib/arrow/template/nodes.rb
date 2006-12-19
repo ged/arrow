@@ -459,22 +459,29 @@ class Arrow::Template
 		### Try to pre-render any attributes which correspond to this node.
 		def before_rendering( template )
 			if attrib = template[ self.name ]
-				if attrib.respond_to?( :prerender )
+				# self.log.debug "  got %s attribute in #before_rendering for %p" %
+					# [ attrib.class.name, self.name ]
+
+				if attrib.respond_to?( :before_rendering )
 					# self.log.debug "  pre-rendering attribute %p" % [attrib]
-					attrib.prerender
+					attrib.before_rendering( template )
 				elsif attrib.respond_to?( :each )
 					# self.log.debug "  iterating over attribute %p" % [attrib]
 					attrib.each do |obj|
-						obj.prerender if obj.respond_to?( :prerender )
+						obj.before_rendering if obj.respond_to?( :before_rendering )
 					end
 				end
+			else
+				# No-op
+				# self.log.debug "  no value for node %p in #before_rendering" %
+					# self.name
 			end
 		end
 		
 
 		### Render the directive node's contents as a String and return it.
 		def render( template, scope )
-			#self.log.debug "Rendering %p" % self
+			# self.log.debug "Rendering %p" % self
 			rary = super
 
 			rary.push( *(self.render_contents( template, scope )) )
@@ -583,13 +590,13 @@ class Arrow::Template
 		### and succeeding arguments. Returns the results of the call.
 		def call_methodchain( template, scope, *args )
 			chain = self.build_rendering_proc( template, scope )
-			#self.log.debug "Rendering proc is: %p" % chain
+			# self.log.debug "Rendering proc is: %p" % chain
 
-			#self.log.debug "Fetching attribute %p of template %p" %
-			#	[ self.name, template ]
+			# self.log.debug "Fetching attribute %p of template %p" %
+				# [ self.name, template ]
 			attribute = template.send( self.name )
-			#self.log.debug "Attribute to be rendered (%s) is: %p" %
-			#	[ self.name, attribute ]
+			# self.log.debug "Attribute to be rendered (%s) is: %p" %
+				# [ self.name, attribute ]
 
 			if chain
 				return chain.call( attribute, *args )
