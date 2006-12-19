@@ -20,6 +20,7 @@
 #
 
 require 'cache'
+require 'forwardable'
 
 require 'arrow/config'
 require 'arrow/logger'
@@ -30,6 +31,7 @@ require 'arrow/mixins'
 ### track of the cached object's modification time, expiring the cached
 ### version when the disk-based version changes..
 class Arrow::Cache < ::Cache
+	extend Forwardable
 	include Arrow::Loggable
 
 	# Default configuration values
@@ -90,6 +92,10 @@ class Arrow::Cache < ::Cache
 	######
 	public
 	######
+	
+	# Delegate some methods to the underlying hash
+	def_delegators :@objs, :length, :keys, :values
+	
 
 	# The name of the cache; used in introspection
 	attr_reader :name

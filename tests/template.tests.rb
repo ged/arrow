@@ -1215,7 +1215,8 @@ assert_nothing_raised { template.something = "sasquatch" }
 
 assert_nothing_raised { rval = template.render }
 debugMsg "\n" + hruleSection( rval, "Rendered" )
-assert_match( templateContentRe(/Something: sasquatch/,/Bar: baz and sasquatch/), rval )
+assert_match( templateContentRe('Something:', 'sasquatch','Bar:', 
+                                'baz and sasquatch'), rval )
 ===
 
 === Recursion
@@ -1260,6 +1261,23 @@ assert_nothing_raised { template.pairs = pairs }
 assert_nothing_raised { rval = template.render }
 debugMsg "\n" + hruleSection( rval, "Rendered" )
 assert_match( templateContentRe("Key => subsubhash\n  Val => \nKey => hope, faith\n  Val => and charity\n\n\nKey => foo\n  Val => 2\nKey => bar\n  Val => 1"), rval )
+===
+
+
+### Export directive
+=== Simple
+
+<?attr headsections ?>
+<?attr subtemplate ?>
+<?attr tailsections ?>
+
+---
+template.subtemplate = Arrow::Template.load( "export.tmpl" )
+
+assert_nothing_raised { rval = template.render }
+#pp template
+debugMsg "\n" + hruleSection( rval, "Rendered" )
+assert_match( templateContentRe("head", "content", "tail"), rval )
 ===
 
 
