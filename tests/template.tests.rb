@@ -1280,6 +1280,20 @@ debugMsg "\n" + hruleSection( rval, "Rendered" )
 assert_match( templateContentRe("head", "content", "tail"), rval )
 ===
 
+=== Upwards Through Multiple Templates
+
+<?attr headsections ?>
+<?attr subtemplate ?>
+<?attr tailsections ?>
+
+---
+template.subtemplate = Arrow::Template.load( "reexport.tmpl" )
+
+assert_nothing_raised { rval = template.render }
+debugMsg "\n" + hruleSection( rval, "Rendered" )
+assert_match( templateContentRe("head", "content", "tail"), rval )
+===
+
 
 ### Selectlist directive
 === Simple

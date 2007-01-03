@@ -6,11 +6,11 @@
 # 
 # == Syntax
 #
-# <!-- Include a subtemplate directly -->
-# <?include subtemplate.tmpl ?>
+#   <!-- Include a subtemplate directly -->
+#   <?include subtemplate.tmpl ?>
 #
-# <!-- Include a subtemplate as a callable sub-entity -->
-# <?include subtemplate.tmpl as sub ?>
+#   <!-- Include a subtemplate as a callable sub-entity -->
+#   <?include subtemplate.tmpl as sub ?>
 #
 # == Example
 # If 'subtemplate.tmpl' contains:

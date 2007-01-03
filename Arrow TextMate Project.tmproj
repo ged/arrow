@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>lib/arrow/template.rb</string>
+	<string>lib/arrow/template/export.rb</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -102,40 +102,56 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>621</integer>
+				<integer>416</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>600</integer>
+			<integer>388</integer>
 		</dict>
 		<key>lib/arrow/appletregistry.rb</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>9</integer>
+				<integer>18</integer>
 				<key>line</key>
-				<integer>30</integer>
+				<integer>407</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>15</integer>
+			<integer>402</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>13</integer>
+				<key>line</key>
+				<integer>407</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>18</integer>
+				<key>line</key>
+				<integer>407</integer>
+			</dict>
 		</dict>
 		<key>lib/arrow/applettestcase.rb</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>54</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>457</integer>
+				<integer>485</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>423</integer>
+			<integer>449</integer>
 		</dict>
 		<key>lib/arrow/broker.rb</key>
 		<dict>
@@ -195,19 +211,19 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
-		<key>lib/arrow/formvalidator.rb</key>
+		<key>lib/arrow/logger.rb</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>205</integer>
+				<integer>0</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>239</integer>
+			<integer>56</integer>
 		</dict>
 		<key>lib/arrow/logger/fileoutputter.rb</key>
 		<dict>
@@ -252,20 +268,6 @@
 				<key>line</key>
 				<integer>114</integer>
 			</dict>
-		</dict>
-		<key>lib/arrow/mixins.rb</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>45</integer>
-				<key>line</key>
-				<integer>241</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>195</integer>
 		</dict>
 		<key>lib/arrow/session/filelock.rb</key>
 		<dict>
@@ -379,20 +381,6 @@
 			<key>firstVisibleLine</key>
 			<integer>6</integer>
 		</dict>
-		<key>lib/arrow/template.rb</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>211</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>203</integer>
-		</dict>
 		<key>lib/arrow/template/call.rb</key>
 		<dict>
 			<key>caret</key>
@@ -421,19 +409,19 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
-		<key>lib/arrow/template/for.rb</key>
+		<key>lib/arrow/template/export.rb</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>4</integer>
+				<integer>69</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>34</integer>
 		</dict>
 		<key>lib/arrow/template/import.rb</key>
 		<dict>
@@ -449,19 +437,33 @@
 			<key>firstVisibleLine</key>
 			<integer>74</integer>
 		</dict>
-		<key>lib/arrow/template/nodes.rb</key>
+		<key>lib/arrow/template/include.rb</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>75</integer>
+				<integer>18</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>446</integer>
+			<integer>0</integer>
+		</dict>
+		<key>lib/arrow/template/nodes.rb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>8</integer>
+				<key>line</key>
+				<integer>434</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>386</integer>
 		</dict>
 		<key>lib/arrow/template/parser.rb</key>
 		<dict>
@@ -490,20 +492,6 @@
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>98</integer>
-		</dict>
-		<key>lib/arrow/templatefactory.rb</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>60</integer>
-				<key>line</key>
-				<integer>52</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>60</integer>
 		</dict>
 		<key>lib/arrow/transaction.rb</key>
 		<dict>
@@ -575,19 +563,33 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
-		<key>tests/formvalidator.tests.rb</key>
+		<key>tests/data/export.tmpl</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>6</integer>
+				<key>line</key>
+				<integer>5</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>tests/data/reexport.tmpl</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>146</integer>
+				<integer>2</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>120</integer>
+			<integer>0</integer>
 		</dict>
 		<key>tests/session.tests.rb</key>
 		<dict>
@@ -610,12 +612,12 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>1301</integer>
+				<integer>1292</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>1267</integer>
+			<integer>1243</integer>
 		</dict>
 		<key>utils.rb</key>
 		<dict>
@@ -650,10 +652,10 @@
 	</dict>
 	<key>openDocuments</key>
 	<array>
-		<string>lib/arrow/applettestcase.rb</string>
-		<string>lib/arrow/applet.rb</string>
-		<string>lib/arrow/templatefactory.rb</string>
-		<string>lib/arrow/template.rb</string>
+		<string>lib/arrow/template/export.rb</string>
+		<string>tests/data/export.tmpl</string>
+		<string>tests/data/reexport.tmpl</string>
+		<string>tests/template.tests.rb</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>

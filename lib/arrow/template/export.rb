@@ -57,11 +57,14 @@ class Arrow::Template::ExportDirective < Arrow::Template::BracketingDirective # 
 	
 	### Add the imported attributes when this node is rendered.
 	def before_rendering( template )
-		st = template._enclosing_template or return nil
-		surrogate = template.class.new( self.subnodes )
+		st = template
 		
-		# :TODO: Does appending to the attribute make more sense?
-		st._attributes[ self.name ] = surrogate
+		while st = st._enclosing_template
+			surrogate = template.class.new( self.subnodes )
+		
+			# :TODO: Does appending to the attribute make more sense?
+			st._attributes[ self.name ] = surrogate
+		end
 	end
 
 

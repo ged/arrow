@@ -30,13 +30,14 @@ class Arrow::FormValidatorTestCase < Arrow::TestCase
 	TestProfile = {
 		:required		=> [ :required ],
 		:optional		=> %w{optional number alpha int_constraint 
-			bool_constraint email_constraint},
+			bool_constraint email_constraint host_constraint},
 		:constraints	=> {
 			:number				=> /^(\d+)$/,
 			:alpha				=> /^(\w+)$/,
 			:int_constraint		=> :integer,
 			:bool_constraint	=> :boolean,
 			:email_constraint	=> :email,
+			:host_constraint	=> :hostname,
 		},
 		:untaint_all_constraints => true
 	}
@@ -514,7 +515,66 @@ class Arrow::FormValidatorTestCase < Arrow::TestCase
 				rval = @validator[:email_constraint]
 			end
 
-			#assert_equal true, @validator.errors?, addr
+			assert_equal true, @validator.errors?, addr
+			assert_equal nil, rval
+		end
+	end
+	
+	def test_hostname_constraint_should_match_simple_host
+		rval = nil
+		params = {
+			'required' => '1',
+			'host_constraint' => 'deveiate.org',
+		}
+
+		assert_nothing_raised do
+			@validator.validate( params )
+			rval = @validator[:host_constraint]
+		end
+
+		assert_equal false, @validator.errors?
+		assert_equal 'deveiate.org', rval
+	end
+	
+	def test_hostname_constraint_should_match_hostname_with_hyphen
+		rval = nil
+		params = {
+			'required' => '1',
+			'host_constraint' => 'your-characters-can-fly.kr',
+		}
+
+		assert_nothing_raised do
+			@validator.validate( params )
+			rval = @validator[:host_constraint]
+		end
+
+		assert_equal false, @validator.errors?, @validator.error_messages
+		assert_equal 'your-characters-can-fly.kr', rval
+	end
+
+
+	BogusHosts = [
+		'.',
+		'glah ',
+		'glah[lock]',
+		'glah.be$',
+		'indus«tree».com',
+	]
+	def test_hostname_constraint_should_reject_bogus_hostnames
+		rval = nil
+
+		BogusHosts.each do |addr|
+			params = {
+				'required' => '1',
+				'host_constraint' => addr,
+			}
+
+			assert_nothing_raised do
+				@validator.validate( params )
+				rval = @validator[:host_constraint]
+			end
+
+			assert_equal true, @validator.errors?, addr.inspect
 			assert_equal nil, rval
 		end
 	end

@@ -355,6 +355,23 @@ class Arrow::FormValidator < ::FormValidator
 		return match ? match[0] : nil
 	end
 	
+	
+	RFC1738Hostname = begin
+		alphadigit = /[a-z0-9]/i
+	    # toplabel       = alpha | alpha *[ alphadigit | "-" ] alphadigit
+		toplabel = /[a-z]((#{alphadigit}|-)*#{alphadigit})?/i
+	    # domainlabel    = alphadigit | alphadigit *[ alphadigit | "-" ] alphadigit
+		domainlabel = /#{alphadigit}((#{alphadigit}|-)*#{alphadigit})?/i
+	    # hostname       = *[ domainlabel "." ] toplabel
+		hostname = /\A(#{domainlabel}\.)*#{toplabel}\z/
+	end
+
+	### Match valid hostnames according to the rules of the URL RFC.
+	def match_hostname( val )
+		match = RFC1738Hostname.match( val )
+		return match ? match[0] : nil
+	end
+
 
 	# Applies a builtin constraint to form[key]
 	def apply_string_constraint(key, constraint)
