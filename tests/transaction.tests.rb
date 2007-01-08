@@ -193,6 +193,71 @@ class Arrow::TransactionTestCase < Arrow::TestCase
 	end
 
 
+	def test_ajax_request_returns_true_when_requested_with_header_is_xmlhttprequest
+		rval = ''
+		headers = HeaderTable.new({
+			'X-Requested-With' => 'XMLHttpRequest',
+		})
+		
+		FlexMock.use( "request", "config", "broker" ) do |req, config, broker|
+			req.should_receive( :hostname ).
+				and_return( "hostname" ).once
+			req.should_receive( :options ).
+				and_return( {} ).at_least.once
+			req.should_receive( :headers_in ).
+				and_return( headers ).
+				at_least.once
+			
+			txn = Arrow::Transaction.new( req, config, broker )
+			rval = txn.is_ajax_request?
+		end
+		
+		assert_equal true, rval
+	end
+
+	def test_ajax_request_returns_false_when_requested_with_header_is_missing
+		rval = ''
+		headers = HeaderTable.new({
+		})
+		
+		FlexMock.use( "request", "config", "broker" ) do |req, config, broker|
+			req.should_receive( :hostname ).
+				and_return( "hostname" ).once
+			req.should_receive( :options ).
+				and_return( {} ).at_least.once
+			req.should_receive( :headers_in ).
+				and_return( headers ).
+				at_least.once
+			
+			txn = Arrow::Transaction.new( req, config, broker )
+			rval = txn.is_ajax_request?
+		end
+		
+		assert_equal false, rval
+	end
+
+	def test_ajax_request_returns_false_when_requested_with_header_is_not_xmlhttprequest
+		rval = ''
+		headers = HeaderTable.new({
+			'X-Requested-With' => 'magic jellybeans of doom',
+		})
+		
+		FlexMock.use( "request", "config", "broker" ) do |req, config, broker|
+			req.should_receive( :hostname ).
+				and_return( "hostname" ).once
+			req.should_receive( :options ).
+				and_return( {} ).at_least.once
+			req.should_receive( :headers_in ).
+				and_return( headers ).
+				at_least.once
+			
+			txn = Arrow::Transaction.new( req, config, broker )
+			rval = txn.is_ajax_request?
+		end
+		
+		assert_equal false, rval
+	end
+
 
 	#######
 	private

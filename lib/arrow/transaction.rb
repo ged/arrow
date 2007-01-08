@@ -359,6 +359,15 @@ class Arrow::Transaction < Arrow::Object
 	def for_ie_users
 		yield if self.browser_is_ie?
 	end
+
+
+	### Return +true+ if the request is from XMLHttpRequest (as indicated by the
+	### 'X-Requested-With' header from Scriptaculous or jQuery)
+	def is_ajax_request?
+		xrw_header = self.headers_in['x-requested-with']
+		return true if !xrw_header.nil? && xrw_header =~ /xmlhttprequest/i
+		return false
+	end
 	
 
 	#
