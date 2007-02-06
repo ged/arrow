@@ -94,6 +94,7 @@ require 'arrow/object'
 module FormValidator::ConstraintHelpers # :nodoc:
     def do_constraint(key, constraints)
 		constraints.each do |constraint|
+			# next unless(untaint?(key))
 			case constraint
 			when String
 				apply_string_constraint(key, constraint)
@@ -106,6 +107,93 @@ module FormValidator::ConstraintHelpers # :nodoc:
 			end
 		end
     end
+
+    # A hash allows you to send multiple arguments to a constraint.
+    # constraint can be a builtin constraint, regexp, or a proc object.
+    # params is a list of form fields to be fed into the constraint or proc.
+    # If an optional name field is specified then it will be listed as
+    # the failed constraint in the invalid_fields hash.
+	def apply_hash_constraint(key, constraint)
+		return unless(untaint?(key))
+		untainting_successful = false
+		action = constraint["constraint"]
+		case action
+		when String
+			untainting_successful = apply_string_constraint(key, constraint)
+		when Regexp
+			untainting_successful = apply_regexp_constraint(key, constraint) 
+		when Proc
+			args = constraint["params"].map {|p| @form[p] }
+			untainting_successful = apply_proc_constraint(key, constraint, args)
+		end
+		unless(untainting_successful)
+			if(constraint["name"])
+				@invalid_fields[key] = constraint["name"]
+			end
+		end
+		return untainting_successful
+	end
+
+    # applies a proc constraint to form[key]
+	def apply_proc_constraint(key, constraint, *args)
+		return unless(untaint?(key))
+		untainted_value = ''
+		if(args)
+			untainted_value = constraint.call(args)
+		else
+			untainted_value = constraint.call(@form[key])
+		end
+		set_untainted_form_value( key,
+		                          constraint,
+		                          untainted_value )
+	end
+
+    # Applies a builtin constraint to form[key]
+	def apply_string_constraint(key, constraint)
+		return unless(untaint?(key))
+		untainted_value = self.send("match_#{constraint}".to_sym, 
+		                            @form[key].to_s)
+		set_untainted_form_value( key,
+		                          constraint,
+		                          untainted_value )
+	end
+
+    # Applies regexp constraint to form[key]
+	def apply_regexp_constraint(key, constraint)
+		return unless(untaint?(key))
+		untainted_value = ''
+		user_value_array = Array(@form[key].to_s)
+		user_value_array.flatten!
+		user_value_array.each do |user_value|
+			if(matched = constraint.match(user_value))
+				untainted_value += matched[0]
+			end
+		end
+		set_untainted_form_value( key,
+		                          constraint,
+		                          untainted_value )
+	end
+
+	# A helper method which overwrites the form's field by the key
+	# if it has been successfully validated,
+	# or deletes it fromt he form hash, and adds it to an
+	# invalid fields has if it has not been validated.
+	def set_untainted_form_value(key, constraint, untainted_value)
+		if(untainted_value.length > 0)
+			@form[key] = untainted_value
+			@form[key].untaint
+			return true
+		else
+			@form.delete(key)
+			@invalid_fields = {} if @invalid_fields.nil?
+			@invalid_fields[key] = [] unless @invalid_fields.has_key?(key)
+
+			unless @invalid_fields[key].include?(constraint.inspect)
+				@invalid_fields[key].push(constraint.inspect)
+			end
+			return false
+		end
+	end
 end
 
 ### Add some Hash-ish methods for convenient access to FormValidator#valid.
@@ -391,6 +479,34 @@ class Arrow::FormValidator < ::FormValidator
 			nil
 		end
 	end
+
+	### Formvalidator hack:
+	### The formvalidator filters method has a bug where he assumes an array
+	###  when it is in fact a string for multiple values (ie anytime you have a 
+	###  text-area with newlines in it).
+    def filters
+	  @filters_array = Array(@profile[:filters]) unless(@filters_array)
+      @filters_array.each do |filter|
+        if respond_to?("filter_#{filter}".intern)
+          @form.keys.each do |field|
+            # If a key has multiple elements, apply filter to each element
+			@field_array = Array(@form[field])
+            if @field_array.length > 1
+              @field_array.each_index do |i|
+                elem = @field_array[i]
+                @field_array[i] = self.send("filter_#{filter}".intern, elem)
+              end
+            else
+              if not @form[field].to_s.empty?
+                @form[field] =
+                  self.send("filter_#{filter}".intern, @form[field].to_s)
+              end
+            end
+          end
+        end
+      end
+      @form
+    end
 
 
 	#######
