@@ -54,7 +54,7 @@ class Arrow::Template::URLEncodeDirective < Arrow::Template::CallDirective # :no
 
 		rawary.each do |line|
 			rary << line.to_s.gsub( NonUricRegexp ) do |match|
-				"%%%x" % match[0]
+				"%%%02x" % [ match[0] ]
 			end
 		end
 
