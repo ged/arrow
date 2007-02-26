@@ -36,6 +36,10 @@ class Arrow::AppletRegistry < Arrow::Object
 	# SVN Id
 	SVNId = %q$Id$
 
+	# Pattern for matching valid components of the uri
+	IDENTIFIER = /^\w[-\w]*/
+	
+
 	# Link in an applet chain
 	ChainLink = Struct.new( 'ArrowAppletChainLink', :applet, :path, :args )
 
@@ -255,10 +259,11 @@ class Arrow::AppletRegistry < Arrow::Object
 	### For example, a URI of "/admin/create/job/1" which maps to an applet 
 	### at "/admin", will return the chain:
 	###	  [ #<AdminApplet:0x2c78cbc>, "/admin", ["create", "job", "1"] ]
-	def find_applet_chain( uri, allow_internal=false )
+	def find_applet_chain( uri )
 		self.log.debug "Searching urispace %p for appletchain for %p" %
 		 	[@urispace.keys.sort, uri]
-		uri_parts = uri.sub(%r{^/(?=.)}, '').split(%r{/})
+
+		uri_parts = uri.sub(%r{^/(?=.)}, '').split(%r{/}).grep( IDENTIFIER )
 		appletchain = []
 		args = []
 
@@ -272,20 +277,10 @@ class Arrow::AppletRegistry < Arrow::Object
 		# Only allow reference to internal handlers (handlers mapped to 
 		# directories that start with '_') if allow_internal is set.
 		self.log.debug "Split URI into parts: %p" % [uri_parts]
-		if allow_internal
-			ident_pat = /^\w[-\w]*/
-		else
-			ident_pat = /^[a-zA-Z][-\w]*/
-		end
 
 		# Map uri fragments onto registry entries, stopping at any element 
 		# which isn't a valid Ruby identifier.
 		uri_parts.each_index do |i|
-			unless ident_pat.match( uri_parts[i] )
-				self.log.debug "Stopping at %s: Not an identifier" % uri_parts[i]
-				break
-			end
-
 			newuri = uri_parts[0,i+1].join("/")
 			self.log.debug "Testing %s against %p" % [ newuri, @urispace.keys.sort ]
 			appletchain << ChainLink.new( @urispace[newuri], newuri, uri_parts[(i+1)..-1] ) if

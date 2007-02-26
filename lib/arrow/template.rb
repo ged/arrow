@@ -231,8 +231,8 @@ class Arrow::Template < Arrow::Object
 			obj.parse( source )
 		end
 
-		Arrow::Logger[self].debug "Returning template object. Cache has %d entries" % 
-			[ cache.size ]
+		Arrow::Logger[self].debug "Template cache: %d entries @%0.1fk [%d hits/%d misses]" % 
+			cache.statistics.values_at( 1, 0, 2, 3 ) unless cache.is_a?( Hash )
 		return obj
 	end
 
@@ -550,18 +550,25 @@ class Arrow::Template < Arrow::Object
 			rval = nil
 			key = (@renderers.keys & obj.class.ancestors).sort {|a,b| a <=> b}.first
 
-			if key
-				case @renderers[ key ]
-				when Proc, Method
-					rval = @renderers[ key ].call( obj, self )
-				when Symbol
-					rval = obj.send( @renderers[ key ] )
+			begin
+				if key
+					case @renderers[ key ]
+					when Proc, Method
+						rval = @renderers[ key ].call( obj, self )
+					when Symbol
+						methodname = @renderers[ key ]
+						rval = obj.send( methodname )
+					else
+						raise TypeError, "Unknown renderer type '%s' for %p" %
+							[ @renderers[key], obj ]
+					end
 				else
-					raise TypeError, "Unknown renderer type '%s' for %p" %
-						[ @renderers[key], obj ]
+					rval = obj.to_s
 				end
-			else
-				rval = obj.to_s
+			rescue => err
+				self.log.error "rendering error while rendering %p (a %s): %s" % 
+					[obj, obj.class.name, err.message]
+				@renderers[ ::Exception ].call( err, self )
 			end
 		end.join
 	end

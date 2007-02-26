@@ -63,22 +63,17 @@ class Arrow::Cache < ::Cache
 		@name = name
 
 		# Merge defaults and specified values
-		merged = nil
-		if config.is_a?( Arrow::Config::ConfigStruct )
-			merged = DefaultConfig.merge( config.to_h )
-		else
-			merged = DefaultConfig.merge( config )
-		end
+		merged = DefaultConfig.merge( config )
 
 		# Transform the config hash into the form the superclass expects
-		merged.each_key {|key|
+		merged.each_key do |key|
 			lckey = key.to_s.gsub( /(.)([A-Z])/ ) {|match|
 				match[0,1] + "_" + match[1,1].downcase
 			}.intern
 
 			next if key == lckey
 			merged[ lckey ] = merged.delete( key )
-		}
+		end
 
 		# Register this instance with the class for introspection (costs
 		# much less than ObjectSpace.each_object).

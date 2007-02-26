@@ -276,7 +276,7 @@ class Arrow::Dispatcher < Arrow::Object
 
 		self.log.debug "Delegating transaction %p" % txn
 		output = @broker.delegate( txn )
-		# self.log.debug "Output = %p" % output
+		self.log.debug "Output = %p" % output
 
 		# If the transaction succeeded, set up the Apache::Request object, add
 		# headers, add session state, etc. If it failed, log the failure and let

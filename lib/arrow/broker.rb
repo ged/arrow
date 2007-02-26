@@ -187,7 +187,7 @@ class Arrow::Broker < Arrow::Object
 
 		# Build an applet chain for user-configured handlers
 		if handlerUri != "(builtin)"
-			appletchain = @registry.find_applet_chain( handlerUri, true )
+			appletchain = @registry.find_applet_chain( handlerUri )
 			self.log.error "Configured MissingApplet handler (%s) doesn't exist" %
 				handlerUri if appletchain.empty?
 		end
