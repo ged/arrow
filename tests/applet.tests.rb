@@ -284,8 +284,12 @@ class Arrow::Applet::TestCase < Arrow::TestCase
 		@applet.def_action_body do |txn|
 			# This will hopefully take more than 0.0 seconds on any machine.
 			10_000.times do
-				a = Array.new(200, "A")
-				a.sort
+#				a = Array.new(200, "A")
+#				a.sort
+				# This causes a system access, which makes for stime
+				# the above was only usertime on my linux machine -JJ
+				d = Dir.open('.')
+				d.close
 			end
 		end
 
