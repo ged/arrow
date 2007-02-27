@@ -95,9 +95,6 @@ class Arrow::Dispatcher < Arrow::Object
 	SVNId = %q$Id$
 
 
-	private_class_method :new
-
-
 	### Set up one or more new Arrow::Dispatcher objects. The +configspec+
 	### argument can either be the path to a config file, or a hash of config
 	### files. See the .instance method for more about how to use this method.
