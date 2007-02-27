@@ -136,6 +136,10 @@ context "A CookieSet with a 'foo' cookie" do
 		@cookieset[:wof] = Digest::MD5.hexdigest( Time.now.to_s )
 	end
 	
+	specify "should be able to set a cookie with a Symbol key" do
+		@cookieset[:wof] = Arrow::Cookie.new( :wof, "something" )
+	end
+	
 end
 
 # vim: set nosta noet ts=4 sw=4:
