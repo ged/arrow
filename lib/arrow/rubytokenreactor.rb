@@ -54,7 +54,7 @@ class Arrow::RubyTokenReactor < Ripper
 
 	### Parse the specified +source+ and call the +callback+ when any of the
 	### given +events+ are seen.
-	def self.parse( source, *events, &callback )
+	def self::parse( source, *events, &callback )
 		reactor = self.new( source )
 		if callback.nil?
 			tokens = Hash.new {|h,k| h[k] = []}
@@ -72,7 +72,7 @@ class Arrow::RubyTokenReactor < Ripper
 
 	### Returns <tt>true</tt> if the Ripper parser loaded okay. If this is
 	### false, the token reactor will not be functional.
-	def self.loaded?
+	def self::loaded?
 		return ! $fakedRipper
 	end
 

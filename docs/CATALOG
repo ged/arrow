@@ -1,8 +1,8 @@
 #
 # Title:  Arrow Web Application Framework API
 # Main:   README
-# Upload: ssh://yhaliwell/usr/local/www/RubyCrafters.com/public/Arrow-api/
-# Webcvs: http://deveiate.org/browse/trunk/
+# Upload: ssh://deveiate.org/usr/local/trac/Arrow/htdocs/api
+# Webcvs: http://deveiate.org/projects/Arrow/browse/trunk/
 #
 lib/arrow.rb
 lib/**/*.rb

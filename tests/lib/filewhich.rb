@@ -44,7 +44,7 @@
 class File
 	Win32Exts = %w{.exe .com .bat}
 
-	def self.which( prog, path=ENV['PATH'] )
+	def self::which( prog, path=ENV['PATH'] )
 		path.split(File::PATH_SEPARATOR).each {|dir|
 			# If running under Windows, look for prog + extensions
 			if File::ALT_SEPARATOR

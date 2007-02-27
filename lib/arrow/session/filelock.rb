@@ -52,7 +52,7 @@ class Arrow::Session::FileLock < Arrow::Session::Lock
 
 	### Clean the specified +directory+ of lock files older than +threshold+
 	### seconds.
-	def self.clean( directory=DefaultLockDir, threshold=3600 )
+	def self::clean( directory=DefaultLockDir, threshold=3600 )
 		pat = File.join( directory, LockfileFormat.gsub(/%s/, '*') )
 		threshold = Time.now - threshold
 		Dir[ pat ].each do |file|

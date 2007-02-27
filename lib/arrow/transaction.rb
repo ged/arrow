@@ -26,6 +26,8 @@ require 'arrow/mixins'
 require 'arrow/exceptions'
 require 'arrow/object'
 require 'arrow/cookie'
+require 'arrow/cookieset'
+
 
 ### The transaction class for Arrow web applications.
 class Arrow::Transaction < Arrow::Object
@@ -140,6 +142,8 @@ class Arrow::Transaction < Arrow::Object
 	# User-data hash. Can be used to pass data between applets in a chain.
 	attr_reader :data
 
+	# The Arrow::CookieSet that contains the transaction's cookies
+	attr_reader :cookies
 
 
 	### Returns a human-readable String representation of the transaction,
@@ -164,6 +168,7 @@ class Arrow::Transaction < Arrow::Object
 	def session( config={} )
 		@session ||= Arrow::Session.create( self, config )
 	end
+
 
 
 	# Apache::Request attributes under various conditions. Need to determine 
@@ -283,6 +288,14 @@ class Arrow::Transaction < Arrow::Object
 	#
 	# Header convenience methods
 	#
+
+	### Add a 'Set-Cookie' header to the response for each cookie that
+	### currently exists the transaction's cookieset.
+	def add_cookie_headers
+		self.headers_out['Set-Cookie'] = 
+			self.cookies.collect {|c| c.to_s }.join(';')
+	end
+	
 
 	### :TODO: Need to override Apache::Request#construct_url to use Apache2's 
 	### X-Forwarded-Host or X-Forwarded-Server when constructing 
@@ -449,7 +462,8 @@ class Arrow::Transaction < Arrow::Object
 
     ### Parse cookies from the specified request and return them in a Hash.
     def parse_cookies( request )
-    	Arrow::Cookie.parse( request.headers_in['cookie'] )
+    	cookies = Arrow::Cookie.parse( request.headers_in['cookie'] )
+		return Arrow::CookieSet.new( cookies.values )
     end
     
 

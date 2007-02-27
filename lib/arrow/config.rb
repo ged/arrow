@@ -127,7 +127,7 @@ class Arrow::Config < Arrow::Object
 
 
 	# Output a debugging message to STDERR
-	def self.debugMsg( *msgs )
+	def self::debugMsg( *msgs )
 		$stderr.puts msgs.join
 	end
 
@@ -187,7 +187,7 @@ class Arrow::Config < Arrow::Object
 
 	### Get the loader by the given name, creating a new one if one is not
 	### already instantiated.
-	def self.getLoader( name=nil )
+	def self::getLoader( name=nil )
 		name ||= self.defaultLoader
 		self.loaders[name] ||= Arrow::Config::Loader.create( name )
 	end
@@ -195,7 +195,7 @@ class Arrow::Config < Arrow::Object
 
 	### Read and return an Arrow::Config object from the given file or
 	### configuration source using the specified +loader+.
-	def self.load( source, loaderObj=nil )
+	def self::load( source, loaderObj=nil )
 		loaderObj = self.getLoader( loaderObj ) unless
 			loaderObj.is_a?( Arrow::Config::Loader )
 		confighash = loaderObj.load( source )
@@ -210,7 +210,7 @@ class Arrow::Config < Arrow::Object
 
 	### Return a copy of the specified +hash+ with all of its values
 	### untainted.
-	def self.untaintValues( hash )
+	def self::untaintValues( hash )
 		newhash = {}
 		hash.each {|key,val|
 			case val
@@ -243,7 +243,7 @@ class Arrow::Config < Arrow::Object
 
 	### Return a duplicate of the given +hash+ with its identifier-like keys
 	### transformed into symbols from whatever they were before.
-	def self.internifyKeys( hash )
+	def self::internifyKeys( hash )
 		newhash = {}
 		hash.each {|key,val|
 			if val.is_a?( Hash )
@@ -259,7 +259,7 @@ class Arrow::Config < Arrow::Object
 
 	### Return a version of the given +hash+ with its keys transformed
 	### into Strings from whatever they were before.
-	def self.stringifyKeys( hash )
+	def self::stringifyKeys( hash )
 		newhash = {}
 		hash.each {|key,val|
 			if val.is_a?( Hash )
@@ -578,7 +578,7 @@ class Arrow::Config < Arrow::Object
 		#########################################################
 
 		### Returns a list of directories to search for deriviatives.
-		def self.derivativeDirs
+		def self::derivativeDirs
 			["arrow/config-loaders"]
 		end
 

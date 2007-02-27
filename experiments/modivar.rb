@@ -4,7 +4,7 @@
 # classes.
 
 module Foo
-	def self.included( mod )
+	def self::included( mod )
 		mod.module_eval {
 			@registry = {}
 			class << self
@@ -18,7 +18,7 @@ end
 class Bar
 	include Foo
 
-	def self.preg
+	def self::preg
 		self.registry
 	end
 

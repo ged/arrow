@@ -50,7 +50,7 @@ class Arrow::Template::ImportDirective < Arrow::Template::Directive # :nodoc:
 	#############################################################
 	
 	### Disallow formats
-	def self.allows_format?; false; end
+	def self::allows_format?; false; end
 
 
 	#############################################################

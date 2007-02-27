@@ -47,8 +47,8 @@ class Arrow::Template::ExportDirective < Arrow::Template::BracketingDirective # 
 	#############################################################
 	
 	### Disallow formats and methodchains
-	def self.allows_format?; false; end
-	def self.allows_method_chains?; false; end
+	def self::allows_format?; false; end
+	def self::allows_method_chains?; false; end
 
 
 	#############################################################

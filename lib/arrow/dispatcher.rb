@@ -290,14 +290,10 @@ class Arrow::Dispatcher < Arrow::Object
 			outputString = output.to_s if output && output != true
 
 			# If the transaction has a session, save it
-			if txn.session?
-				self.log.debug "Saving session state"
-				cookie = txn.session.save
-				if cookie
-					self.log.debug "Session cookie is: %p" % [cookie]
-					req.headers_out['Set-Cookie'] = cookie
-				end
-			end
+			txn.session.save if txn.session?
+
+			# Add cookies to the response headers
+			txn.add_cookie_headers
 
 			# :FIXME: Figure out what cache-control settings work
 			#req.header_out( 'Cache-Control', "max-age=5" )

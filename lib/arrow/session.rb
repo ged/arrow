@@ -55,7 +55,7 @@ class Arrow::Session < Arrow::Object
 
 	### Parse the given string into a URI object, appending the path part if
 	### it doesn't exist.
-	def self.parse_uri( str )
+	def self::parse_uri( str )
 		return str if str.is_a?( URI::Generic )
 		str += ":." if /^\w+$/ =~ str
 		URI.parse( str )
@@ -64,14 +64,14 @@ class Arrow::Session < Arrow::Object
 
 	### Configure the session class's factory with the given Arrow::Config
 	### object.
-	def self.configure( config )
+	def self::configure( config )
 		@config = config.dup
 		Arrow::Logger[self].debug "Done. Session config is: %p" % @config
 	end
 
 
 	### Create a new session for the specified +request+.
-	def self.create( txn, configHash={} )
+	def self::create( txn, configHash={} )
 		request = txn.request
 	
 		# Merge the incoming config with the factory's
@@ -91,7 +91,7 @@ class Arrow::Session < Arrow::Object
 
 
     ### Set the session cookie if we're really running under Apache.
-    def self.create_session_cookie( txn, config, id, store, lock )
+    def self::create_session_cookie( txn, config, id, store, lock )
 		scookie = Arrow::Cookie.new(
 				config.idName,
 				id.to_s,
@@ -106,7 +106,7 @@ class Arrow::Session < Arrow::Object
 
     ### Create an Arrow::Session::Id object for the given +request+, with the 
     ### particulars dictated by the specified +config+.
-    def self.create_id( config, request )
+    def self::create_id( config, request )
         # Fetch the id from the request, either from the session cookie or
 		# as a parameter if the cookie doesn't exist.
 		if request.cookies.key?( config.idName )
@@ -128,14 +128,14 @@ class Arrow::Session < Arrow::Object
 	### Create an Arrow::Session::Store object with the given +id+. The type 
 	### and configuration of the store will be dictated by the specified 
 	### +config+ object.
-    def self.create_store( config,  id )
+    def self::create_store( config,  id )
         Arrow::Logger[self].debug "Creating a session store: %p" % config.storeType
 		return Arrow::Session::Store.create( config.storeType, id )
     end
     
 
 	### Create an Arrow::Session::Lock object for the specified +store+ and +id+.
-	def self.create_lock( config, store, id )
+	def self::create_lock( config, store, id )
 	    
 		lockuri = Arrow::Session.parse_uri( config.lockType )
         lock = nil
@@ -156,6 +156,12 @@ class Arrow::Session < Arrow::Object
 	end
 	
 	
+	### Return the configured name of the session cookie.
+	def self::session_cookie_name
+		return @config.idName
+	end
+	
+	
 
 	#########
 	protected
@@ -163,7 +169,7 @@ class Arrow::Session < Arrow::Object
 
 	### Create delegators that readlock the session store before accessing
 	### it.
-	def self.def_delegated_readers( *syms )
+	def self::def_delegated_readers( *syms )
 		syms.each do |sym|
 			define_method( sym ) do |*args|
 				@lock.read_lock
@@ -175,7 +181,7 @@ class Arrow::Session < Arrow::Object
 
 	### Create delegators that writelock the session store before accessing
 	### it.
-	def self.def_delegated_writers( *syms )
+	def self::def_delegated_writers( *syms )
 		syms.each do |sym|
 			define_method( sym ) do |*args|
 				@lock.write_lock
@@ -263,7 +269,7 @@ class Arrow::Session < Arrow::Object
 			self.log.debug "Saving session data"
 			@store.save
 			self.log.debug "Writing session cookie"
-			return @cookie.to_s
+			@txn.cookies[ self.class.session_cookie_name ] = @cookie
 		ensure
 			self.log.debug "Releasing all locks"
 			@lock.release_all_locks

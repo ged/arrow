@@ -315,14 +315,14 @@ class Arrow::Template
 		#############################################################
 
 		### Return the list of subdirectories to search for template nodes.
-		def self.derivativeDirs
+		def self::derivativeDirs
 			["arrow/template"]
 		end
 
 
 		### Factory method: overridden from PluginFactory.create to
 		### pass the name into constructors for parsing context.
-		def self.create( tag, parser, state )
+		def self::create( tag, parser, state )
 			super( tag, tag, parser, state )
 		end
 
@@ -413,7 +413,7 @@ class Arrow::Template
 
 		### Returns +true+ for classes that support a prepended format. (e.g.,
 		### <?call "%15s" % foo ?>).
-		def self.allows_format?
+		def self::allows_format?
 			true
 		end
 

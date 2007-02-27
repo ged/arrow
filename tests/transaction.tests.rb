@@ -259,6 +259,52 @@ class Arrow::TransactionTestCase < Arrow::TestCase
 	end
 
 
+	def test_transaction_cookies_should_return_a_cookieset_parsed_from_the_request
+		headers = HeaderTable.new({
+			'Cookie' => 'foo=12',
+		})
+		rval = nil
+
+		FlexMock.use( "request", "config", "broker" ) do |req, config, broker|
+			req.should_receive( :hostname ).and_return( "hostname" ).once
+			req.should_receive( :options ).and_return( {} ).at_least.once
+			req.should_receive( :headers_in ).and_return( headers ).at_least.once
+			
+			txn = Arrow::Transaction.new( req, config, broker )
+			rval = txn.cookies
+		end
+		
+		assert_instance_of Arrow::CookieSet, rval
+		assert_instance_of Arrow::Cookie, rval['foo']
+		assert_equal '12', rval['foo'].value
+	end
+
+
+	def test_transaction_should_add_cookie_headers_to_its_response_for_each_cookie
+		headers = HeaderTable.new({})
+		headers_out = HeaderTable.new({})
+		
+		cookie_pattern = /((glah=locke|foo=bar|pants=velcro!).*){3}/
+		
+		FlexMock.use( "request", "config", "broker", "outheaders" ) do |req, config, broker, outhdrs|
+			req.should_receive( :hostname ).and_return( "hostname" ).once
+			req.should_receive( :options ).and_return( {} ).at_least.once
+			req.should_receive( :headers_in ).and_return( headers ).at_least.once
+			
+			req.should_receive( :headers_out ).and_return( outhdrs )
+			outhdrs.should_receive( :[]= ).with( 'Set-Cookie', cookie_pattern ) 
+			
+			txn = Arrow::Transaction.new( req, config, broker )
+			txn.cookies['glah'] = 'locke'
+			txn.cookies['foo'] = 'bar'
+			txn.cookies['pants'] = 'velcro!'
+			txn.cookies['pants'].expires = "Sat Nov 12 22:04:00 1955"
+
+			txn.add_cookie_headers
+		end
+	end
+	
+
 	#######
 	private
 	#######

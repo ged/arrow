@@ -694,7 +694,7 @@ class Arrow::Template < Arrow::Object
 		name = sym.to_s.sub( /=$/, '' )
 
 		code = %Q{
-			def self.#{name}
+			def self::#{name}
 				@attributes[#{name.inspect}]
 			end
 		}
@@ -710,7 +710,7 @@ class Arrow::Template < Arrow::Object
 		name = sym.to_s.sub( /=$/, '' )
 
 		code = %Q{
-			def self.#{name}=( arg )
+			def self::#{name}=( arg )
 				@attributes[ #{name.inspect} ] = arg
 			end
 		}

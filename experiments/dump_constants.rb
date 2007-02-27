@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 class ConstantDumper
-    def self.handler( req )
+    def self::handler( req )
         req.content_type = "text/plain"
     
         map = ["# Apache constants"]

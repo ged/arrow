@@ -285,6 +285,26 @@ class Arrow::CookieTestCase < Arrow::TestCase
 		
 		assert_include nowstring, rval
 	end
+	
+	def test_cookies_with_the_same_name_should_be_considered_equal
+		other_cookie = Arrow::Cookie.new( "by_rickirac", "something else" )
+		assert @cookie.eql?( other_cookie ), 
+			"%p should be eql? to %p" % [ @cookie, other_cookie ]
+	end
+
+	def test_cookie_expire_bang_should_set_the_expiration_date_to_a_time_in_the_past
+		assert_nothing_raised do
+			@cookie.expire!
+		end
+		
+		expiration = @cookie.expires
+		assert expiration < Time.now - (25 * 60)
+	end
+
+
+	def test_cookie_hash_should_use_the_hash_of_the_cookies_name
+		assert_equal @cookie.name.hash, @cookie.hash
+	end
 
 end
 

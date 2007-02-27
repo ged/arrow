@@ -42,7 +42,7 @@ class Arrow::TemplateFactory < Arrow::Object
 
 	### Given an Arrow::Config object (+config+), attempt to load and
 	### instantiate the configured template loader object.
-	def self.build_template_loader( config )
+	def self::build_template_loader( config )
 
 		# Resolve the loader name into the Class object by traversing
 		# constants.

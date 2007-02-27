@@ -91,7 +91,7 @@ class Arrow::Monitor < Object
 
 	
 	### Start the backend monitor server
-	def self.startBackend( config )
+	def self::startBackend( config )
 		# No-op currently
 		return false
 	end
@@ -99,7 +99,7 @@ class Arrow::Monitor < Object
 
 	### Register a +module+ with the monitoring system, specifying the
 	### available monitoring subjects in the +subjectHash+.
-	def self.register( mod, subjectHash )
+	def self::register( mod, subjectHash )
 		@instances[ mod ] = new( subjectHash )
 	end
 

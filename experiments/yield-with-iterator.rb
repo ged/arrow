@@ -55,7 +55,7 @@ class Arrow::Template::YieldDirective < Arrow::Template::BracketingDirective
 	#############################################################
 
 	### Returns +false+; disallows prepended formats.
-	def self.allows_format?
+	def self::allows_format?
 		false
 	end
 	

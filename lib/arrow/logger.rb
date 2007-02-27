@@ -20,7 +20,7 @@
 #
 #	class MyClass < Arrow::Object
 #
-#		def self.fooMethod
+#		def self::fooMethod
 #			Arrow::Logger.debug( "In server start routine" )
 #			Arrow::Logger.info( "Server is not yet configured." )
 #			Arrow::Logger.notice( "Server is starting up." )

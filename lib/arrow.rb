@@ -51,7 +51,7 @@ module Arrow
 	### can eliminate the startup lag for the first request each child
 	### handles. See the docs for dispatcher.rb for an example of how to use
 	### this.
-	def self.load_dispatchers( hosts_file )
+	def self::load_dispatchers( hosts_file )
 		hosts_file.untaint
 		configs = YAML.load( File.read(hosts_file) )
 

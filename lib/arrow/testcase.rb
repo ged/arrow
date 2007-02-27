@@ -98,7 +98,7 @@ class Arrow::TestCase < Test::Unit::TestCase
 
 	### Inheritance callback -- adds @setupMethods and @teardownMethods ivars
 	### and accessors to the inheriting class.
-	def self.inherited( klass )
+	def self::inherited( klass )
 		klass.module_eval {
 			@setupMethods = []
 			@teardownMethods = []
@@ -114,7 +114,7 @@ class Arrow::TestCase < Test::Unit::TestCase
 	### Returns a String containing the specified ANSI escapes suitable for
 	### inclusion in another string. The <tt>attributes</tt> should be one
 	### or more of the keys of AnsiAttributes.
-	def self.ansiCode( *attributes )
+	def self::ansiCode( *attributes )
 		return '' unless /(?:xterm(?:-color)?|eterm|linux)/i =~ ENV['TERM']
 
 		attr = attributes.collect {|a|
@@ -130,7 +130,7 @@ class Arrow::TestCase < Test::Unit::TestCase
 
 	### Output the specified <tt>msgs</tt> joined together to
 	### <tt>STDERR</tt> if <tt>$DEBUG</tt> is set.
-	def self.debugMsg( *msgs )
+	def self::debugMsg( *msgs )
 		return unless $DEBUG
 		self.message "%sDEBUG>>> %s %s" %
 			[ ansiCode('dark', 'white'), msgs.join(''), ansiCode('reset') ]
@@ -139,13 +139,13 @@ class Arrow::TestCase < Test::Unit::TestCase
 
 	### Output the specified <tt>msgs</tt> joined together to
 	### <tt>STDOUT</tt>.
-	def self.message( *msgs )
+	def self::message( *msgs )
 		$stderr.puts msgs.join('')
 		$stderr.flush
 	end
 
 	### Append a setup block for the current testcase
-	def self.addSetupBlock( &block )
+	def self::addSetupBlock( &block )
 		@@methodCounter += 1
 		newMethodName = "setup_#{@@methodCounter}".intern
 		define_method( newMethodName, &block )
@@ -154,7 +154,7 @@ class Arrow::TestCase < Test::Unit::TestCase
 
 
 	### Prepend a teardown block for the current testcase
-	def self.addTeardownBlock( &block )
+	def self::addTeardownBlock( &block )
 		@@methodCounter += 1
 		newMethodName = "teardown_#{@@methodCounter}".intern
 		define_method( newMethodName, &block )

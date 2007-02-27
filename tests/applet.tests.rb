@@ -310,7 +310,7 @@ class Arrow::Applet::TestCase < Arrow::TestCase
 	def test_running_against_action_method_with_inappropriate_arity_should_raise_appleterror
 		# We have to sneak a method past the ::method_added check...
 		@appletclass.class_eval do
-			def self.method_added(sym); end
+			def self::method_added(sym); end
 			def malformed_action; end
 		end
 

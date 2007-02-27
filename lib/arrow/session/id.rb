@@ -43,21 +43,21 @@ class Arrow::Session::Id < Arrow::Object
 
 	### Returns the Array of directories to search for derivatives; part of
 	### the PluginFactory interface.
-	def self.derivativeDirs
+	def self::derivativeDirs
 		[ 'arrow/session', 'arrow/session/id' ]
 	end
 
 
 	### Create a new Arrow::Session::Id object for the given +request+ (an
 	### Apache::Request) of the type specified by +uri+.
-	def self.create( uri, request, idstring=nil )
+	def self::create( uri, request, idstring=nil )
 		uri = Arrow::Session.parse_uri( uri ) if uri.is_a?( String )
 		super( uri.scheme.dup, uri, request, idstring )
 	end
 
 
 	### Generate a new id string for the given +request+.
-	def self.generate( uri, request )
+	def self::generate( uri, request )
 		raise NotImplementedError, "%s does not implement #generate" %
 			self.name
 	end
@@ -65,7 +65,7 @@ class Arrow::Session::Id < Arrow::Object
 
 	### Validate the given +idstring+, returning an untainted copy of it if
 	### it's valid, or +nil+ if it's not.
-	def self.validate( uri, idstring )
+	def self::validate( uri, idstring )
 		raise NotImplementedError, "%s does not implement #validate" %
 			self.name
 	end

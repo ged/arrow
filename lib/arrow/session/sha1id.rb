@@ -47,7 +47,7 @@ class Arrow::Session::SHA1Id < Arrow::Session::Id
 	#############################################################
 
 	### Generate a new id
-	def self.generate( uri, request )
+	def self::generate( uri, request )
 		salt = uri.opaque || DEFAULT_SALT
 		seed = [
 			salt,
@@ -61,7 +61,7 @@ class Arrow::Session::SHA1Id < Arrow::Session::Id
 
 	### Returns the validated id if the given id is in the expected form for
 	### this type, or +nil+ if it is not.
-	def self.validate( uri, idstr )
+	def self::validate( uri, idstr )
 		rval = idstr[/^([a-f0-9]{40})$/]
 		rval.untaint
 		return rval

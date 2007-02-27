@@ -79,7 +79,7 @@ class Arrow::Object < ::Object
 	### not, it is being removed, and the target method will be aliased to
 	### an internal method and wrapped in a warning method with the original
 	### name.
-	def self.deprecate_method( oldSym, newSym=oldSym )
+	def self::deprecate_method( oldSym, newSym=oldSym )
 		warningMessage = ''
 
 		# If the method is being removed, alias it away somewhere and build
@@ -115,7 +115,7 @@ class Arrow::Object < ::Object
 
 
 	### Like Object.deprecate_method, but for class methods.
-	def self.deprecate_class_method( oldSym, newSym=oldSym )
+	def self::deprecate_class_method( oldSym, newSym=oldSym )
 		warningMessage = ''
 
 		# If the method is being removed, alias it away somewhere and build
@@ -134,7 +134,7 @@ class Arrow::Object < ::Object
 		# Build the method that logs a warning and then calls the true
 		# method.
 		class_eval %Q{
-			def self.#{oldSym.to_s}( *args, &block )
+			def self::#{oldSym.to_s}( *args, &block )
 				Arrow::Logger.notice "warning: %s: #{warningMessage}" % [ caller(1) ]
 				send( #{newSym.inspect}, *args, &block )
 			rescue => err
@@ -147,7 +147,7 @@ class Arrow::Object < ::Object
 
 	### Store the name of the file from which the inheriting +klass+ is
 	### being loaded.
-	def self.inherited( klass )
+	def self::inherited( klass )
 		unless klass.instance_variables.include?( "@sourcefile" )
 			sourcefile = caller(1).find {|frame|
 				/inherited/ !~ frame

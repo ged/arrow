@@ -47,7 +47,7 @@ class Arrow::Template::RenderDirective < Arrow::Template::AttributeDirective # :
 	#############################################################
 
 	### Disallow formats
-	def self.allows_format?; false; end
+	def self::allows_format?; false; end
 
 
 	#############################################################

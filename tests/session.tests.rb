@@ -56,12 +56,6 @@ class Arrow::SessionTestCase < Arrow::TestCase
 	###	T E S T S
 	#################################################################
 
-	def test_session_class_should_be_defined_and_be_a_class
-		assert_block( "Arrow::Session defined?" ) { defined? Arrow::Session }
-		assert_instance_of Class, Arrow::Session
-	end
-
-
     def test_create_id_should_use_id_from_cookie_if_present
         rval = nil
         
@@ -77,6 +71,38 @@ class Arrow::SessionTestCase < Arrow::TestCase
         assert_kind_of Arrow::Session::Id, rval
         assert_equal TestSessionId, rval.to_s
     end        
+
+	def test_the_session_class_should_know_what_the_session_cookie_name_is
+		rval = nil
+		
+		FlexMock.use( "config" ) do |config|
+			config.should_receive( :idName ).and_return( 'cookie-name' )
+			Arrow::Session.configure( config )
+			rval = Arrow::Session.session_cookie_name
+		end
+		
+		assert_equal 'cookie-name', rval
+	end
+
+	def test_saving_should_add_the_session_cookie_to_the_request_via_the_transaction
+		cookieset = Arrow::CookieSet.new
+		config = Arrow::Config.new
+		config.session.idName = 'cookie-name'
+		Arrow::Session.configure( config.session )
+		
+		FlexMock.use( "config", "store", "txn", "lock" ) do |config, store, txn, lock|
+			store.should_receive( :[]= ).with( :_session_id, 'id' )
+			store.should_receive( :save )
+			
+			lock.should_receive( :release_all_locks )
+			txn.should_receive( :cookies ).and_return( cookieset )
+			
+			session = Arrow::Session.new( :id, lock, store, txn )
+			session.save
+		end
+
+		assert cookieset.include?( 'cookie-name' )
+	end
 
 end
 

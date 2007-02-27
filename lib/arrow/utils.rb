@@ -144,7 +144,7 @@ module Arrow
 		#############################################################
 
 		### Return the YAML type for this class
-		def self.to_yaml_type
+		def self::to_yaml_type
 			"!%s/arrowPath" % Arrow::YamlDomain
 		end
 

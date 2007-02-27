@@ -272,6 +272,13 @@ class Arrow::Cookie < Arrow::Object
 		raise err, caller(1)
 	end
 
+
+	### Set the cookie expiration to a time in the past
+	def expire!
+		self.expires = Time.at(0)
+	end
+	
+
 	
 	### Return the cookie as a String
 	def to_s
@@ -289,6 +296,19 @@ class Arrow::Cookie < Arrow::Object
 		return rval
 	end
 
+
+	### Return +true+ if other_cookie has the same name as the receiver.
+	def eql?( other_cookie )
+		return (self.name == other_cookie.name) ? true : false
+	end
+	
+
+	### Generate a Fixnum hash value for this object. Uses the hash of the cookie's name.
+	def hash
+		return self.name.hash
+	end
+	
+	
 
 	#######
 	private
