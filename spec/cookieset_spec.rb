@@ -10,6 +10,7 @@ BEGIN {
 }
 
 begin
+	require 'digest/md5'
 	require 'spec/runner'
 	require 'arrow'
 	require 'arrow/cookieset'
@@ -131,6 +132,9 @@ context "A CookieSet with a 'foo' cookie" do
 		end
 	end
 
+	specify "should be able to set a cookie's value symbolically to something other than a String" do
+		@cookieset[:wof] = Digest::MD5.hexdigest( Time.now.to_s )
+	end
 	
 end
 

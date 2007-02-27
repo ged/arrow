@@ -89,7 +89,7 @@ class Arrow::CookieSet < Arrow::Object
 	### to +value+. If +value+ is not an Arrow::Cookie, one with be created and its
 	### value set to +value+.
 	def []=( name, value )
-		value = Arrow::Cookie.new( name, value ) unless value.is_a?( Arrow::Cookie )
+		value = Arrow::Cookie.new( name.to_s, value ) unless value.is_a?( Arrow::Cookie )
 		raise ArgumentError, "cannot set a cookie named '%s' with a key of '%s'" %
 			[ value.name, name ] if value.name != name.to_s
 
