@@ -57,7 +57,7 @@ RELEASE_FILES = TEXT_FILES + LIB_FILES + SPEC_FILES
 task :default  => [:all_tests, :verify, :package]
 
 ### New and legacy tests
-task :all_tests => [:test, :spec]
+task :all_tests => [:test, "spec:quiet"]
 
 
 ### Task: test
@@ -85,6 +85,12 @@ namespace :spec do
 		$v = true
 		$vcs = 'svn'
 		RspecAutotest.run
+	end
+	
+	desc "Run rspec with default (quieter) output"
+	Spec::Rake::SpecTask.new( :quiet ) do |task|
+		task.spec_files = SPEC_FILES
+		task.spec_opts = []
 	end
 	
 	desc "Generate HTML output for a spec run"

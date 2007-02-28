@@ -186,6 +186,29 @@ class Arrow::Applet < Arrow::Object
 	end # class SigProxy
 
 
+	# The array of loaded applet classes (derivatives) and an array of
+	# newly-loaded ones.
+	@derivatives = []
+	@newly_loaded = []
+
+
+	#############################################################
+	###	C L A S S   M E T H O D S
+	#############################################################
+
+	class << self
+		# The Array of loaded applet classes (derivatives)
+		attr_reader :derivatives
+
+		# The Array of applet classes that were loaded by the most recent call
+		# to .load.
+		attr_reader :newly_loaded
+
+		# The file containing the applet's class definition
+		attr_accessor :filename
+	end
+
+
 	### Set the path for the template specified by +sym+ to +path+.
 	def self::template( sym, path=nil )
 		case sym
@@ -244,163 +267,139 @@ class Arrow::Applet < Arrow::Object
 	end
 
 
-	# The array of loaded applet classes (derivatives) and an array of
-	# newly-loaded ones.
-	@derivatives = []
-	@newly_loaded = []
+	### Inheritance callback: register any derivative classes so they can be
+	### looked up later.
+	def self::inherited( klass )
+		if defined?( @newly_loaded )
+			@newly_loaded.push( klass )
+			super
+		else
+			Arrow::Applet.inherited( klass )
+		end
+	end
 
 
-	#############################################################
-	###	C L A S S   M E T H O D S
-	#############################################################
-
-	class << self
-
-		# The Array of loaded applet classes (derivatives)
-		attr_reader :derivatives
-
-		# The Array of applet classes that were loaded by the most recent call
-		# to .load.
-		attr_reader :newly_loaded
-
-		# The file containing the applet's class definition
-		attr_accessor :filename
+	### Method definition callback: Check newly-defined action methods for
+	### appropriate arity.
+	def self::method_added( sym )
+		if /^(\w+)_action$/.match( sym.to_s ) &&
+				self.instance_method( sym ).arity.zero?
+			raise ScriptError, "Inappropriate arity for #{sym}", caller(1)
+		end
+	end
 
 
-		### Inheritance callback: register any derivative classes so they can be
-		### looked up later.
-		def inherited( klass )
-			if defined?( @newly_loaded )
-				@newly_loaded.push( klass )
-				super
-			else
-				Arrow::Applet.inherited( klass )
-			end
+	### Load any applet classes in the given file and return them.
+	def self::load( filename )
+		self.newly_loaded.clear
+
+		rval = Kernel.load( filename, true )
+
+		newderivatives = @newly_loaded.dup
+		@derivatives -= @newly_loaded
+		@derivatives.push( *@newly_loaded )
+
+		newderivatives.each do |applet|
+			applet.filename = filename
 		end
 
+		return newderivatives
+	end
 
-		### Method definition callback: Check newly-defined action methods for
-		### appropriate arity.
-		def method_added( sym )
-			if /^(\w+)_action$/.match( sym.to_s ) &&
-					self.instance_method( sym ).arity.zero?
-				raise ScriptError, "Inappropriate arity for #{sym}", caller(1)
-			end
+
+	### Return the name of the applet class after stripping off any 
+	### namespace-safe prefixes.
+	def self::normalized_name
+	    self.name.sub( /#<Module:0x\w+>::/, '' )
+	end
+
+
+	### Get the applet's signature (an
+	### Arrow::Applet::SignatureStruct object).
+	def self::signature
+		@signature ||= make_signature()
+	end
+
+
+	### Returns +true+ if the applet class has a signature.
+	def self::signature?
+		!self.signature.nil?
+	end
+
+
+	### Signature lookup: look for either a constant or an instance
+	### variable of the class that contains the raw signature hash, and
+	### convert it to an Arrow::Applet::SignatureStruct object.
+	def self::make_signature
+		rawsig = nil
+		if self.instance_variables.include?( "@signature" )
+			rawsig = self.instance_variable_get( :@signature )
+		elsif self.constants.include?( "Signature" )
+			rawsig = self.const_get( :Signature )
+		elsif self.constants.include?( "SIGNATURE" )
+			rawsig = self.const_get( :SIGNATURE )
+		else
+			rawsig = {}
 		end
 
+		# Backward-compatibility: Rewrite the 'vargs' member as
+		# 'validator_profiles' if 'vargs' exists and 'validator_profiles'
+		# doesn't. 'vargs' member will be deleted regardless.
+		rawsig[ :validator_profiles ] ||= rawsig.delete( :vargs ) if
+			rawsig.key?( :vargs )
 
-		### Load any applet classes in the given file and return them.
-		def load( filename )
-			self.newly_loaded.clear
-
-			rval = Kernel.load( filename, true )
-
-			newderivatives = @newly_loaded.dup
-			@derivatives -= @newly_loaded
-			@derivatives.push( *@newly_loaded )
-
-			newderivatives.each do |applet|
-				applet.filename = filename
-			end
-
-			return newderivatives
-		end
-
-
-        ### Return the name of the applet class after stripping off any 
-        ### namespace-safe prefixes.
-        def normalized_name
-            self.name.sub( /#<Module:0x\w+>::/, '' )
-        end
-
-
-		### Get the applet's signature (an
-		### Arrow::Applet::SignatureStruct object).
-		def signature
-			@signature ||= make_signature()
-		end
-
-
-		### Returns +true+ if the applet class has a signature.
-		def signature?
-			!self.signature.nil?
-		end
-
-
-		### Signature lookup: look for either a constant or an instance
-		### variable of the class that contains the raw signature hash, and
-		### convert it to an Arrow::Applet::SignatureStruct object.
-		def make_signature
-			rawsig = nil
-			if self.instance_variables.include?( "@signature" )
-				rawsig = self.instance_variable_get( :@signature )
-			elsif self.constants.include?( "Signature" )
-				rawsig = self.const_get( :Signature )
-			elsif self.constants.include?( "SIGNATURE" )
-				rawsig = self.const_get( :SIGNATURE )
-			else
-				rawsig = {}
-			end
-
-			# Backward-compatibility: Rewrite the 'vargs' member as
-			# 'validator_profiles' if 'vargs' exists and 'validator_profiles'
-			# doesn't. 'vargs' member will be deleted regardless.
-			rawsig[ :validator_profiles ] ||= rawsig.delete( :vargs ) if
-				rawsig.key?( :vargs )
-
-			# If the superclass has a signature, inherit values from it for
-			# pairs that are missing.
-			if self.superclass < Arrow::Applet && self.superclass.signature?
-				self.superclass.signature.each_pair do |member,value|
-					if rawsig[member].nil?
-						rawsig[ member ] = value.dup rescue value
-					end
+		# If the superclass has a signature, inherit values from it for
+		# pairs that are missing.
+		if self.superclass < Arrow::Applet && self.superclass.signature?
+			self.superclass.signature.each_pair do |member,value|
+				next if [:name, :description, :version].include?( member )
+				if rawsig[member].nil?
+					rawsig[ member ] = value.dup rescue value
 				end
 			end
-
-			# Apply sensible defaults for members that aren't defined
-			SignatureStructDefaults.each do |key,val|
-				next if rawsig[ key ]
-				case val
-				when Proc, Method
-					rawsig[ key ] = val.call( rawsig, self )
-				when Numeric, NilClass, FalseClass, TrueClass
-					rawsig[ key ] = val
-				else
-					rawsig[ key ] = val.dup
-				end
-			end
-
-			# Signature = Struct.new( :name, :description, :maintainer,
-			# 	:version, :config, :default_action, :templates, :validatorArgs,
-			# 	:monitors )
-			members = SignatureStruct.members.collect {|m| m.intern}
-			return SignatureStruct.new( *rawsig.values_at(*members) )
 		end
 
-
-		### Define an action for the applet. Transactions which include the
-		### specified +name+ as the first directory of the uri after the one the
-		### applet is assigned to will be passed to the given +block+. The
-		### return value from this method is an Arrow::Applet::SigProxy which
-		### can be used to set associated values in the applet's Signature; see
-		### the Synopsis in lib/arrow/applet.rb for examples of how to use this.
-		def def_action( name, &block )
-			name = '_default' if name.to_s.empty?
-			
-			# Action must accept at least a transaction argument
-			unless block.arity.nonzero?
-				raise ScriptError,
-					"Malformed action #{name}: must accept at least one argument"
+		# Apply sensible defaults for members that aren't defined
+		SignatureStructDefaults.each do |key,val|
+			next if rawsig[ key ]
+			case val
+			when Proc, Method
+				rawsig[ key ] = val.call( rawsig, self )
+			when Numeric, NilClass, FalseClass, TrueClass
+				rawsig[ key ] = val
+			else
+				rawsig[ key ] = val.dup
 			end
-
-			methodName = "#{name}_action"
-			define_method( methodName, &block )
-			SigProxy.new( name, self )
 		end
 
+		# Signature = Struct.new( :name, :description, :maintainer,
+		# 	:version, :config, :default_action, :templates, :validatorArgs,
+		# 	:monitors )
+		members = SignatureStruct.members.collect {|m| m.intern}
+		return SignatureStruct.new( *rawsig.values_at(*members) )
+	end
 
-	end # class << self
+
+	### Define an action for the applet. Transactions which include the
+	### specified +name+ as the first directory of the uri after the one the
+	### applet is assigned to will be passed to the given +block+. The
+	### return value from this method is an Arrow::Applet::SigProxy which
+	### can be used to set associated values in the applet's Signature; see
+	### the Synopsis in lib/arrow/applet.rb for examples of how to use this.
+	def self::def_action( name, &block )
+		name = '_default' if name.to_s.empty?
+		
+		# Action must accept at least a transaction argument
+		unless block.arity.nonzero?
+			raise ScriptError,
+				"Malformed action #{name}: must accept at least one argument"
+		end
+
+		methodName = "#{name}_action"
+		define_method( methodName, &block )
+		SigProxy.new( name, self )
+	end
+
 
     deprecate_class_method :action, :def_action
 

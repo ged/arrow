@@ -32,6 +32,10 @@ class Arrow::Applet::TestCase < Arrow::TestCase
         @appletclass = Class.new( Arrow::Applet ) {
 			applet_maintainer "ged@FaerieMUD.org"
 			default_action :test
+			
+			applet_name "SuperApplet"
+			applet_description "A superclass applet"
+			applet_version 177
 	
 			def test_action( txn, *args )
 				if defined? @action_body
@@ -46,7 +50,9 @@ class Arrow::Applet::TestCase < Arrow::TestCase
 		@appletclass.filename = __FILE__
 		@applet = @appletclass.new( nil, nil, nil )
 
-		@appletsubclass = Class.new( @appletclass )
+		@appletsubclass = Class.new( @appletclass ) {
+			const_set( :SVNRev, "Rev: 1" )
+		}
 		@subapplet = @appletsubclass.new( nil, nil, nil )
     end
 
@@ -84,6 +90,14 @@ class Arrow::Applet::TestCase < Arrow::TestCase
 		assert_equal "ged@FaerieMUD.org", sig.maintainer
 		assert_not_same @appletclass.signature.maintainer,
 			@appletsubclass.signature.maintainer
+	end
+
+	def test_applet_subclass_should_not_inherit_some_signature_values
+		sig = @appletsubclass.signature
+		
+		assert_equal "r1", sig.version
+		assert_equal @appletsubclass.name, sig.name
+		assert_equal "(none)", sig.description
 	end
 
 	def test_action_function_should_install_an_action_method
