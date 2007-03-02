@@ -60,7 +60,8 @@ class Arrow::SessionTestCase < Arrow::TestCase
         rval = nil
         
         FlexMock.use( "config", "txn", "request", "cookie" ) do |config, txn, request, cookie|
-            txn.should_receive( :cookies ).and_return({ "test_id" => cookie }).at_least.twice
+            txn.should_receive( :request_cookies ).
+				and_return({ "test_id" => cookie }).at_least.twice
             txn.should_receive( :request ).and_return( request )
 
             config.should_receive( :idName ).and_return( "test_id" ).at_least.once

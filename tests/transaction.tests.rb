@@ -259,7 +259,7 @@ class Arrow::TransactionTestCase < Arrow::TestCase
 	end
 
 
-	def test_transaction_cookies_should_return_a_cookieset_parsed_from_the_request
+	def test_transaction_request_cookies_should_return_a_hash_of_cookies
 		headers = HeaderTable.new({
 			'Cookie' => 'foo=12',
 		})
@@ -271,10 +271,10 @@ class Arrow::TransactionTestCase < Arrow::TestCase
 			req.should_receive( :headers_in ).and_return( headers ).at_least.once
 			
 			txn = Arrow::Transaction.new( req, config, broker )
-			rval = txn.cookies
+			rval = txn.request_cookies
 		end
 		
-		assert_instance_of Arrow::CookieSet, rval
+		assert_instance_of Hash, rval
 		assert_instance_of Arrow::Cookie, rval['foo']
 		assert_equal '12', rval['foo'].value
 	end
@@ -283,8 +283,6 @@ class Arrow::TransactionTestCase < Arrow::TestCase
 	def test_transaction_should_add_cookie_headers_to_its_response_for_each_cookie
 		headers = HeaderTable.new({})
 		headers_out = HeaderTable.new({})
-		
-		cookie_pattern = /((glah=locke|foo=bar|pants=velcro!).*){3}/
 		
 		FlexMock.use( "request", "config", "broker", "outheaders" ) do |req, config, broker, outhdrs|
 			req.should_receive( :hostname ).and_return( "hostname" ).once
