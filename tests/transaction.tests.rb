@@ -292,7 +292,9 @@ class Arrow::TransactionTestCase < Arrow::TestCase
 			req.should_receive( :headers_in ).and_return( headers ).at_least.once
 			
 			req.should_receive( :headers_out ).and_return( outhdrs )
-			outhdrs.should_receive( :[]= ).with( 'Set-Cookie', cookie_pattern ) 
+			outhdrs.should_receive( :[]= ).with( 'Set-Cookie', /glah=locke/i ) 
+			outhdrs.should_receive( :[]= ).with( 'Set-Cookie', /foo=bar/i ) 
+			outhdrs.should_receive( :[]= ).with( 'Set-Cookie', /pants=velcro/i ) 
 			
 			txn = Arrow::Transaction.new( req, config, broker )
 			txn.cookies['glah'] = 'locke'

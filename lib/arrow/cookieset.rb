@@ -93,7 +93,7 @@ class Arrow::CookieSet < Arrow::Object
 		raise ArgumentError, "cannot set a cookie named '%s' with a key of '%s'" %
 			[ value.name, name ] if value.name.to_s != name.to_s
 
-		@cookie_set << value
+		self << value
 	end
 	
 

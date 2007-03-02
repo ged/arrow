@@ -292,8 +292,11 @@ class Arrow::Transaction < Arrow::Object
 	### Add a 'Set-Cookie' header to the response for each cookie that
 	### currently exists the transaction's cookieset.
 	def add_cookie_headers
-		self.headers_out['Set-Cookie'] = 
-			self.cookies.collect {|c| c.to_s }.join(';')
+		self.cookies.each do |cookie|
+			self.log.debug "Adding 'Set-Cookie' header: %p (%p)" % 
+				[cookie, cookie.to_s]
+			self.headers_out['Set-Cookie'] = cookie.to_s
+		end
 	end
 	
 

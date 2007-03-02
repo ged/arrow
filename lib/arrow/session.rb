@@ -72,14 +72,12 @@ class Arrow::Session < Arrow::Object
 
 	### Create a new session for the specified +request+.
 	def self::create( txn, configHash={} )
-		request = txn.request
-	
 		# Merge the incoming config with the factory's
 		sconfig = @config.merge( configHash )
 		Arrow::Logger[self].debug "Merged config is: %p" % sconfig
 
 		# Create a new id and backing store object
-        idobj = self.create_id( sconfig, request )
+        idobj = self.create_id( sconfig, txn )
         store = self.create_store( sconfig, idobj )
         lock = self.create_lock( sconfig, store, idobj )
 
@@ -97,31 +95,33 @@ class Arrow::Session < Arrow::Object
 				id.to_s,
 				:expires => config.expires,
 				:path => '/'
-				)
+			)
 
 		Arrow::Logger[self].debug "Created cookie: %p" % scookie.to_s
         return scookie
     end
 
 
-    ### Create an Arrow::Session::Id object for the given +request+, with the 
+    ### Create an Arrow::Session::Id object for the given +txn+, with the 
     ### particulars dictated by the specified +config+.
-    def self::create_id( config, request )
+    def self::create_id( config, txn )
+		cookie_name = config.idName
+	
         # Fetch the id from the request, either from the session cookie or
 		# as a parameter if the cookie doesn't exist.
-		if request.cookies.key?( config.idName )
+		if txn.cookies.include?( cookie_name )
 			Arrow::Logger[self].debug "Found an existing session cookie (%s)" %
-				[ config.idName ]
-			idstring = request.cookies[ config.idName ].value
+				[ cookie_name ]
+			idstring = txn.cookies[ cookie_name ].value
 		else
 			Arrow::Logger[self].debug \
 				"No existing session cookie (%s); looking for one in a request parameter" %
-				[ config.idName]
-			idstring = request.param( config.idName )
+				[ cookie_name]
+			idstring = txn.param( cookie_name )
 		end
 
 		Arrow::Logger[self].debug "Creating a session id object: %p" % config.idType
-		return Arrow::Session::Id.create( config.idType, request, idstring )
+		return Arrow::Session::Id.create( config.idType, txn.request, idstring )
 	end
 	
 
@@ -268,7 +268,7 @@ class Arrow::Session < Arrow::Object
 		begin
 			self.log.debug "Saving session data"
 			@store.save
-			self.log.debug "Writing session cookie"
+			self.log.debug "Writing session cookie (%p)" % [ @cookie ]
 			@txn.cookies[ self.class.session_cookie_name ] = @cookie
 		ensure
 			self.log.debug "Releasing all locks"

@@ -59,13 +59,15 @@ class Arrow::SessionTestCase < Arrow::TestCase
     def test_create_id_should_use_id_from_cookie_if_present
         rval = nil
         
-        FlexMock.use( "config", "request", "cookie" ) do |config, request, cookie|
-            request.should_receive( :cookies ).and_return({ "test_id" => cookie }).at_least.twice
-            config.should_receive( :idName ).and_return( "test_id" ).at_least.twice
+        FlexMock.use( "config", "txn", "request", "cookie" ) do |config, txn, request, cookie|
+            txn.should_receive( :cookies ).and_return({ "test_id" => cookie }).at_least.twice
+            txn.should_receive( :request ).and_return( request )
+
+            config.should_receive( :idName ).and_return( "test_id" ).at_least.once
             cookie.should_receive( :value ).and_return( TestSessionId ).once
             config.should_receive( :idType ).and_return( DefaultIdUri )
             
-            rval = Arrow::Session.create_id( config, request )
+            rval = Arrow::Session.create_id( config, txn )
         end
         
         assert_kind_of Arrow::Session::Id, rval
