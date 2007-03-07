@@ -136,7 +136,7 @@ context "A CookieSet with a 'foo' cookie" do
 		@cookieset << new_cookie
 		
 		@cookieset.length.should == 2
-		@cookieset.should_include( new_cookie )
+		@cookieset.should include( new_cookie )
 	end
 
 
@@ -145,8 +145,8 @@ context "A CookieSet with a 'foo' cookie" do
 		@cookieset << new_cookie
 		
 		@cookieset.length.should == 1
-		@cookieset.should_include( new_cookie )
-		@cookieset['foo'].should == new_cookie
+		@cookieset.should include( new_cookie )
+		@cookieset['foo'].should equal( new_cookie )
 	end
 
 	specify "replaces any existing same-named cookie set via the index operator" do
