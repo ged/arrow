@@ -95,7 +95,7 @@ require 'arrow/session/lock'
 # than the URI can provide, you can also override the #create_recommended_lock
 # method, which should return an instance of the locker that should be used.
 # 
-# The method will be given the instantiated Arrow::Session::Lock object that
+# The method will be given the instantiated Arrow::Session::Id object that
 # identifies the session so that you can derive a filename, primary key, etc.
 #
 # Example:
