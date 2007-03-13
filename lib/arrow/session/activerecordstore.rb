@@ -59,7 +59,12 @@ class Arrow::Session::ActiveRecordStore < Arrow::Session::Store
 
 	def update
 		super {|data|
-			@instance = @klass.find( @id.to_s )
+			begin
+				@instance = @klass.find( @id.to_s )
+			rescue ActiveRecord::RecordNotFound
+				@instance = @klass.new
+				@instance.session_id = @id.to_s
+			end
 			@instance.session_data = data 
 			unless(@instance.save)
 				raise Arrow::SessionError,
