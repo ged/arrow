@@ -35,10 +35,6 @@ class Arrow::Session::ActiveRecordStore < Arrow::Session::Store
 	def initialize(klass_uri, idobj)
 		klass_string = klass_uri.to_s
 		klass_string.gsub!(/activerecord:/, '')
-#		sections = klass_string.split('::')
-#		klass_name = sections.pop
-#		sections.each
-#		@klass = Kernel.const_get(klass_string)
 		@klass = find_constant(Kernel, klass_string)
 		super
 	end
@@ -100,6 +96,7 @@ class Arrow::Session::ActiveRecordStore < Arrow::Session::Store
     end
 
     def serialized_data=( data )
+	  data ||= ''
       @data = YAML::load( data )
     end
 
