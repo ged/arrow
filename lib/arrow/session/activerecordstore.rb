@@ -100,7 +100,7 @@ class Arrow::Session::ActiveRecordStore < Arrow::Session::Store
 		begin
 			@data = YAML::load( data )
 		rescue TypeError
-			@data = []
+			@data = {}
 		end
 	end
 
