@@ -47,12 +47,12 @@ class Arrow::Session::ActiveRecordStore < Arrow::Session::Store
 			rescue ActiveRecord::RecordNotFound
 				@instance = @klass.new
 			end
-			@instance.session_id = @id.to_s  # we get @id from the parent class
+			@instance.session_id = @id.to_s	 # we get @id from the parent class
 			@instance.session_data = data 
 			unless(@instance.save)
 				raise Arrow::SessionError, 
-				      "Could not save session %p" % @instance.errors.full_messages,
-			          caller
+					  "Could not save session %p" % @instance.errors.full_messages,
+					  caller
 			end
 		}
 	end
@@ -63,8 +63,8 @@ class Arrow::Session::ActiveRecordStore < Arrow::Session::Store
 			@instance.session_data = data 
 			unless(@instance.save)
 				raise Arrow::SessionError,
-				      "Could not save session %p" % @instance.errors.full_messages,
-			          caller
+					  "Could not save session %p" % @instance.errors.full_messages,
+					  caller
 			end
 		}
 	end
@@ -91,14 +91,18 @@ class Arrow::Session::ActiveRecordStore < Arrow::Session::Store
 
 	protected
 
-    def serialized_data
-      @data.to_yaml
-    end
+	def serialized_data
+		@data.to_yaml
+	end
 
-    def serialized_data=( data )
-	  data ||= ''
-      @data = YAML::load( data )
-    end
+	def serialized_data=( data )
+		data ||= ''
+		begin
+			@data = YAML::load( data )
+		rescue TypeError
+			@data = []
+		end
+	end
 
 
 	private
