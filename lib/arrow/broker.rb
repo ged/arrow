@@ -47,6 +47,7 @@ class Arrow::Broker < Arrow::Object
 	def initialize( config )
 		@config = config
 		@registry = Arrow::AppletRegistry.new( config )
+		@start_time = Time.now
 	end
 
 
@@ -57,6 +58,10 @@ class Arrow::Broker < Arrow::Object
 	# The Hash of RegistryEntry structs keyed by uri
 	attr_reader :registry
 
+	# The Time when the Broker was started
+	attr_reader :start_time
+	
+	
 
 	### Dispatch the specified transaction +txn+ to the appropriate handler
 	### based on the request's path_info.
