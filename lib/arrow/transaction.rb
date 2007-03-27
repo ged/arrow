@@ -240,6 +240,7 @@ class Arrow::Transaction < Arrow::Object
 		return [ self.app_root, self.applet_path ].join("/").gsub( %r{//+}, '/' )
 	end
 	deprecate_method :action, :applet
+	alias_method :applet_uri, :applet
 
 
 	### Returns a fully-qualified URI String to the current applet using the
