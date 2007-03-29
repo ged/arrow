@@ -270,13 +270,15 @@ module Apache # :nodoc:
 			@headers_out = Apache::Table.new
 			@options = {}
 			@uploads = {}
+			@request_method = 'GET'
         end
 
 		attr_writer :server
 		attr_accessor :allowed, :sync_header, :content_type, :uri,
 			:hostname, :paramtable, :cookies, :options, :uploads,
-			:path_info, :headers_in, :headers_out
+			:path_info, :headers_in, :headers_out, :request_method
 		alias_method :params, :paramtable
+		alias_method :unparsed_uri, :uri
 
 		def paramtable=( hash )
 			# :TODO: Munge the hash into an Apache::Table object

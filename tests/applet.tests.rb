@@ -484,6 +484,7 @@ class Arrow::Applet::TestCase < Arrow::TestCase
 	def with_run_fixtured_transaction
 		FlexMock.use( "transaction", "request" ) do |txn, req|
 			txn.should_receive( :request ).and_return( req ).at_least.twice
+			txn.should_receive( :form_request? ).and_return( true ).zero_or_more_times
 			txn.should_receive( :vargs= ).once
 
 			req.should_receive( :content_type= ).with( "text/html" ).once

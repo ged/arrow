@@ -69,12 +69,17 @@ class Arrow::TemplateFactory < Arrow::Object
 	### which should specify a loader class for templates.
 	def initialize( config )
 		@config = config
-		@cache = Arrow::Cache.new(
-			"Template Factory",
-			config.templates.cacheConfig,
-			&method(:template_expiration_hook) )
+		@cache = nil
+		
+		if config.templates.cache
+			@cache = Arrow::Cache.new(
+				"Template Factory",
+				config.templates.cacheConfig,
+				&method(:template_expiration_hook) )
+		end
+
 		@loader = self.class.build_template_loader( config )
-		@path = @config.templates.path
+		@path = config.templates.path
 
 		super()
 	end
@@ -85,28 +90,42 @@ class Arrow::TemplateFactory < Arrow::Object
 	######
 
 	# The Arrow::Cache object used to cache template objects.
-	attr_reader :cache
+	attr_accessor :cache
+	
+	# The loader object that the factory uses to load templates
+	attr_accessor :loader
 
+	# The path to search for templates
+	attr_accessor :path
+	
 
 	### Load a template object with the specified name.
 	def get_template( name )
 		self.log.debug "Fetching template '#{name}'"
-		tmpl = @cache.fetch( name, &method(:load_from_file) )
 
-		if tmpl.changed?
-			self.log.debug "Template has changed on disk: reloading"
-			tmpl = self.load_from_file( name )
+		if @cache
+			self.log.debug "Doing cached fetch."
+			tmpl = @cache.fetch( name, &method(:load_from_file) )
+
+			if tmpl.changed?
+				self.log.debug "Template has changed on disk: reloading"
+				@cache.invalidate( name )
+				tmpl = @cache.fetch( name, &method(:load_from_file) )
+			end
+
+			return tmpl.dup
+		else
+			self.log.debug "Caching disabled. Loading from file."
+			return self.load_from_file( name )
 		end
-
-		return tmpl.dup
 	end
 
 
 	### Load a template from its source file (ie., if caching is turned off
 	### or if the cached version is either expired or not yet seen)
 	def load_from_file( name )
-		self.log.debug "Loading template #{name}"
-		@loader.load( name, @path, @cache )
+		self.log.debug "Loading template #{name} from the filesystem"
+		return @loader.load( name, @path )
 	end
 
 

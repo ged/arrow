@@ -204,35 +204,28 @@ class Arrow::Template < Arrow::Object
 
 
 	### Load a template from a file.
-	def self::load( source, path=[], cache={} )
+	def self::load( name, path=[] )
 
 		# Find the file on either the specified or default path
 		path = self.load_path if path.empty?
 		Arrow::Logger[self].debug "Searching for template '%s' in %d directories" %
-		 	[ source, path.size ]
-		filename = self.find_file( source, path )
-		Arrow::Logger[self].debug "Found '%s'; cache contains %d entries" %
-		 	[ filename, cache.length ]
+		 	[ name, path.size ]
+		filename = self.find_file( name, path )
+		Arrow::Logger[self].debug "Found '%s'" % [ filename ]
 
-		# Use the cached version if the caller passed one in and it exists.
-		if cache.include?( filename ) && !cache[ filename ].nil?
-			Arrow::Logger[self].debug "Cloning cached object for %p" % [ filename ]
-			obj = cache[ filename ].clone
-		else
-			Arrow::Logger[self].debug "No cached version: Loading %p anew" % [ filename ]
-			source = File.read( filename )
-			source.untaint
+		# Read the template source
+		source = File.read( filename )
+		source.untaint
 
-			# Create a new template object, set its path and filename, then tell it
-			# to parse the loaded source to define its behaviour.
-			obj = cache[ filename ] = new()
-			obj._file = filename
-			obj._load_path.replace( path )
-			obj.parse( source )
-		end
+		# Create a new template object, set its path and filename, then tell it
+		# to parse the loaded source to define its behaviour. Parse is called
+		# after the file and path are set so directives in the template can
+		# use them.
+		obj = new()
+		obj._file = filename
+		obj._load_path.replace( path )
+		obj.parse( source )
 
-		Arrow::Logger[self].debug "Template cache: %d entries @%0.1fk [%d hits/%d misses]" % 
-			cache.statistics.values_at( 1, 0, 2, 3 ) unless cache.is_a?( Hash )
 		return obj
 	end
 

@@ -47,6 +47,9 @@ class Arrow::Transaction < Arrow::Object
 	</html>
 	EOF
 
+	# Status code constants
+	APACHE_OK = 0
+
 	# Status names
 	StatusName = {
 		300		=> "Multiple Choices",
@@ -60,16 +63,43 @@ class Arrow::Transaction < Arrow::Object
 
 
 	# Methods that the transaction delegates to the underlying request
-	# object.
+	# object. If we're running inside mod_ruby, get the list from the class.
 	if defined?( Apache ) && defined?( Apache::Request )
 		DelegatedMethods = Apache::Request.instance_methods(false) - [
-			"inspect", "to_s", "status"
+			"inspect", "to_s", "status", "status="
 		]
+		
+	# Otherwise, just use the ones that were define when this was written (2007/03/20)
+	else
+		DelegatedMethods = %w{
+			<< add_cgi_vars add_common_vars all_params allow_options allow_overrides
+			allowed allowed= args args= attributes auth_name auth_name= auth_type
+			auth_type= binmode bytes_sent cache_resp cache_resp= cancel connection
+			construct_url content_encoding content_encoding= content_languages
+			content_languages= content_length content_type content_type= cookies
+			cookies= custom_response default_charset default_type disable_uploads=
+			disable_uploads? dispatch_handler dispatch_handler= eof eof? err_headers_out
+			error_message escape_html exception filename filename= finfo
+			get_basic_auth_pw get_client_block getc hard_timeout header_only? headers_in
+			headers_out hostname initial? internal_redirect kill_timeout last log_reason
+			lookup_file lookup_uri main main? method_number next note_auth_failure
+			note_basic_auth_failure note_digest_auth_failure notes options output_buffer
+			param params params_as_string paramtable parse path_info path_info= post_max
+			post_max= prev print printf protocol proxy? proxy_pass? putc puts read
+			register_cleanup remote_host remote_logname replace request_method
+			request_time requires reset_timeout satisfies script_name script_path
+			send_fd send_http_header sent_http_header? server server_name server_port
+			setup_cgi_env setup_client_block should_client_block should_client_block?
+			signature soft_timeout status_line status_line= subprocess_env sync=
+			sync_header sync_header= sync_output sync_output= temp_dir temp_dir=
+			the_request unparsed_uri upload_hook upload_hook= upload_hook_data
+			upload_hook_data= uploads uploads_disabled? uri uri= user user= write
+		}
 	end
 
 
 	#############################################################
-	###	I N S T A N C E   M E T H O D S
+	### I N S T A N C E	  M E T H O D S
 	#############################################################
 
 	### Create a new Arrow::Transaction object with the specified +request+
@@ -87,7 +117,7 @@ class Arrow::Transaction < Arrow::Object
 		@session			= nil # Lazily-instantiated
 		@applet_path		= nil # Added by the broker
 		@vargs				= nil # Filled in by the applet
-		@status				= Apache::OK
+		@status				= APACHE_OK
 		@data				= {}
 		@request_cookies	= parse_cookies( request )
 		@cookies			= Arrow::CookieSet.new()
@@ -95,10 +125,10 @@ class Arrow::Transaction < Arrow::Object
 		# Check for a "RubyOption root_dispatcher true"
 		if @request.options.key?('root_dispatcher') &&
 			@request.options['root_dispatcher'].match( /^(true|yes|1)$/i )
-		    self.log.debug "Dispatching from root path"
+			self.log.debug "Dispatching from root path"
 			@root_dispatcher = true
 		else
-		    self.log.debug "Dispatching from sub-path"
+			self.log.debug "Dispatching from sub-path"
 			@root_dispatcher = false
 		end
 
@@ -111,9 +141,7 @@ class Arrow::Transaction < Arrow::Object
 	######
 
 	# Set up some delegators if running inside Apache
-	if defined?( Apache ) && defined?( Apache::Request )
-		def_delegators :@request, *DelegatedMethods
-	end
+	def_delegators :@request, *DelegatedMethods
 
 
 	# The Apache::Request that initiated this transaction
@@ -180,23 +208,23 @@ class Arrow::Transaction < Arrow::Object
 	# config. It doesn't appear to be possible, since Apache doesn't set 
 	# path_info for handlers mounted at "/":
 	#
-	# Dispatcher mounted on "/foo"                                            
+	# Dispatcher mounted on "/foo"											  
 	# +--------------+-----------+-----------------+-------------+-------------+
-	# | Request      | path_info : unparsed_uri    : uri         : script_name :
+	# | Request		 | path_info : unparsed_uri	   : uri		 : script_name :
 	# +--------------+-----------+-----------------+-------------+-------------+
-	# |/foo          | ""        | "/foo"          | "/foo"      | "/foo"      |
-	# |/foo/?a=b     | "/"       | "/foo/?a=b"     | "/foo/"     | "/foo"      |
-	# |/foo/args     | "/args"   | "/foo/args"     | "/foo/args" | "/foo"      |
-	# |/foo/args?a=b | "/args"   | "/foo/args?a=b" | "/foo/args" | "/foo"      |
+	# |/foo			 | ""		 | "/foo"		   | "/foo"		 | "/foo"	   |
+	# |/foo/?a=b	 | "/"		 | "/foo/?a=b"	   | "/foo/"	 | "/foo"	   |
+	# |/foo/args	 | "/args"	 | "/foo/args"	   | "/foo/args" | "/foo"	   |
+	# |/foo/args?a=b | "/args"	 | "/foo/args?a=b" | "/foo/args" | "/foo"	   |
 	# +--------------+-----------+-----------------+-------------+-------------+
 	# Dispatcher mounted on "/":
 	# +--------------+-----------+-----------------+-------------+-------------+
-	# | Request      | path_info : unparsed_uri    : uri         : script_name :
+	# | Request		 | path_info : unparsed_uri	   : uri		 : script_name :
 	# +--------------+-----------+-----------------+-------------+-------------+
-	# | /            | ""        | "/"             | "/"         | "/"         |
-	# | /?a=b        | ""        | "/?a=b"         | "/"         | "/"         |
-	# | /args        | ""        | "/args"         | "/args"     | "/args"     |
-	# | /args?a=b    | ""        | "/args?a=b"     | "/args"     | "/args"     |
+	# | /			 | ""		 | "/"			   | "/"		 | "/"		   |
+	# | /?a=b		 | ""		 | "/?a=b"		   | "/"		 | "/"		   |
+	# | /args		 | ""		 | "/args"		   | "/args"	 | "/args"	   |
+	# | /args?a=b	 | ""		 | "/args?a=b"	   | "/args"	 | "/args"	   |
 	# +--------------+-----------+-----------------+-------------+-------------+
 	# Note that with the dispatcher at "/", path_info is always empty and
 	# #script_name is always the same as the #uri. Strange.
@@ -267,7 +295,7 @@ class Arrow::Transaction < Arrow::Object
 
 		return subpath
 	end
-    deprecate_method :referringApplet, :referring_applet
+	deprecate_method :referringApplet, :referring_applet
 
 	### If the referer was another applet under the same Arrow instance, return
 	### the name of the action that preceded the current one. If there was no
@@ -365,6 +393,19 @@ class Arrow::Transaction < Arrow::Object
 	end
 
 
+	### Return a URI object that is parsed from the request's URI.
+	def parsed_uri
+		return URI.parse( self.request.unparsed_uri )
+	end
+	
+	
+	### Return the Content-type header given in the request's headers, if any
+	def request_content_type
+		return self.headers_in['Content-type']
+	end
+	
+	
+
 	### Returns true if the User-Agent header indicates that the remote
 	### browser is Internet Explorer. Useful for making the inevitable IE 
 	### workarounds.
@@ -390,6 +431,26 @@ class Arrow::Transaction < Arrow::Object
 		return false
 	end
 	
+	
+	FORM_CONTENT_TYPES = %r{application/x-www-form-urlencoded|multipart/form-data}i
+	
+	### Return +true+ if there are HTML form parameters in the request, either in the
+	### query string with a GET request, or in the body of a POST with a mimetype of 
+	### either 'application/x-www-form-urlencoded' or 'multipart/form-data'.
+	def form_request?
+		case self.request.request_method
+		when 'GET', 'HEAD'
+			return (!self.parsed_uri.query.nil? || 
+				self.request_content_type =~ FORM_CONTENT_TYPES) ? true : false
+			
+		when 'POST'
+			return self.request_content_type =~ FORM_CONTENT_TYPES ? true : false
+			
+		else
+			return false
+		end
+	end
+	
 
 	#
 	# Redirection methods
@@ -411,7 +472,7 @@ class Arrow::Transaction < Arrow::Object
 			body
 		]
 	end
-    deprecate_method :statusDoc, :status_doc
+	deprecate_method :statusDoc, :status_doc
 
 
 	### Set the necessary fields in the request to cause the response to be a
@@ -453,12 +514,12 @@ class Arrow::Transaction < Arrow::Object
 	end
 	deprecate_method :arrowVersion, :arrow_version
 
-    
-    #######
-    private
-    #######
+	
+	#######
+	private
+	#######
 
-    ### Make a transaction serial for the given instance.
+	### Make a transaction serial for the given instance.
 	def make_transaction_serial( request )
 		"%0.3f:%d:%s" % [
 			Time.now.to_f,
@@ -468,11 +529,12 @@ class Arrow::Transaction < Arrow::Object
 	end
 
 
-    ### Parse cookies from the specified request and return them in a Hash.
-    def parse_cookies( request )
-    	return Arrow::Cookie.parse( request.headers_in['cookie'] )
-    end
-    
+	### Parse cookies from the specified request and return them in a Hash.
+	def parse_cookies( request )
+		hash = Arrow::Cookie.parse(request.headers_in['cookie'])
+		return Arrow::CookieSet.new( hash.values )
+	end
+	
 
 end # class Arrow::Transaction
 

@@ -109,7 +109,7 @@ class Arrow::Session < Arrow::Object
 	
         # Fetch the id from the request, either from the session cookie or
 		# as a parameter if the cookie doesn't exist.
-		if txn.request_cookies.key?( cookie_name )
+		if txn.request_cookies.include?( cookie_name )
 			Arrow::Logger[self].debug "Found an existing session cookie (%s)" %
 				[ cookie_name ]
 			idstring = txn.request_cookies[ cookie_name ].value

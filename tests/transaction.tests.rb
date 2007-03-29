@@ -259,7 +259,7 @@ class Arrow::TransactionTestCase < Arrow::TestCase
 	end
 
 
-	def test_transaction_request_cookies_should_return_a_hash_of_cookies
+	def test_transaction_request_cookies_should_return_a_cookieset_parsed_from_the_request
 		headers = HeaderTable.new({
 			'Cookie' => 'foo=12',
 		})
@@ -274,8 +274,9 @@ class Arrow::TransactionTestCase < Arrow::TestCase
 			rval = txn.request_cookies
 		end
 		
-		assert_instance_of Hash, rval
+		assert_instance_of Arrow::CookieSet, rval
 		assert_instance_of Arrow::Cookie, rval['foo']
+		assert_instance_of Arrow::Cookie, rval[:foo]
 		assert_equal '12', rval['foo'].value
 	end
 
@@ -303,7 +304,7 @@ class Arrow::TransactionTestCase < Arrow::TestCase
 			txn.add_cookie_headers
 		end
 	end
-	
+
 
 	#######
 	private

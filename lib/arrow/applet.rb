@@ -648,10 +648,15 @@ class Arrow::Applet < Arrow::Object
 		# Create a new validator object, map the request args into a regular
 		# hash, and then send them to the validaator with the applicable profile
 		self.log.debug "Creating form validator for profile: %p" % profile
+
 		params = {}
-		txn.request.paramtable.each do |key,val|
-			# Multi-valued vs. single params
-			params[key] = val.to_a.length > 1 ? val.to_a : val.to_s
+
+		# Only try to parse form parameters if there's a form
+		if txn.form_request?
+			txn.request.paramtable.each do |key,val|
+				# Multi-valued vs. single params
+				params[key] = val.to_a.length > 1 ? val.to_a : val.to_s
+			end
 		end
 		validator = Arrow::FormValidator.new( profile, params )
 

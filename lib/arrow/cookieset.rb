@@ -104,6 +104,7 @@ class Arrow::CookieSet < Arrow::Object
 		name = name_or_cookie.to_s
 		return self[name] ? true : false
 	end
+	alias_method :key?, :include?
 
 
 	### Append operator: Add the given +cookie+ to the set, replacing an existing

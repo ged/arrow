@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>lib/arrow/cookie.rb</string>
+	<string>lib/arrow/cache.rb</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -95,20 +95,6 @@
 			<key>firstVisibleLine</key>
 			<integer>5</integer>
 		</dict>
-		<key>lib/arrow/applet.rb</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>493</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>464</integer>
-		</dict>
 		<key>lib/arrow/applettestcase.rb</key>
 		<dict>
 			<key>caret</key>
@@ -123,93 +109,33 @@
 			<key>firstVisibleLine</key>
 			<integer>449</integer>
 		</dict>
-		<key>lib/arrow/broker.rb</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>0</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>75</integer>
-		</dict>
 		<key>lib/arrow/cache.rb</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>38</integer>
-				<key>line</key>
 				<integer>2</integer>
+				<key>line</key>
+				<integer>112</integer>
 			</dict>
-			<key>columnSelection</key>
-			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>86</integer>
-			<key>selectFrom</key>
-			<dict>
-				<key>column</key>
-				<integer>32</integer>
-				<key>line</key>
-				<integer>2</integer>
-			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>38</integer>
-				<key>line</key>
-				<integer>2</integer>
-			</dict>
+			<integer>89</integer>
 		</dict>
-		<key>lib/arrow/cookie.rb</key>
+		<key>lib/arrow/cookieset.rb</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>25</integer>
+				<integer>8</integer>
 				<key>line</key>
-				<integer>234</integer>
+				<integer>83</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>210</integer>
-		</dict>
-		<key>lib/arrow/dispatcher.rb</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>296</integer>
-			</dict>
-			<key>columnSelection</key>
-			<false/>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>266</integer>
-			<key>selectFrom</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>295</integer>
-			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>296</integer>
-			</dict>
+			<integer>42</integer>
 		</dict>
 		<key>lib/arrow/fallbackhandler.rb</key>
 		<dict>
@@ -297,6 +223,20 @@
 				<integer>114</integer>
 			</dict>
 		</dict>
+		<key>lib/arrow/session.rb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>32</integer>
+				<key>line</key>
+				<integer>111</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>94</integer>
+		</dict>
 		<key>lib/arrow/session/filelock.rb</key>
 		<dict>
 			<key>caret</key>
@@ -310,20 +250,6 @@
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>52</integer>
-		</dict>
-		<key>lib/arrow/session/filestore.rb</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>111</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>37</integer>
 		</dict>
 		<key>lib/arrow/session/lock.rb</key>
 		<dict>
@@ -339,34 +265,6 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
-		<key>lib/arrow/session/md5id.rb</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>0</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>0</integer>
-		</dict>
-		<key>lib/arrow/session/posixlock.rb</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>0</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>16</integer>
-		</dict>
 		<key>lib/arrow/session/sha1id.rb</key>
 		<dict>
 			<key>caret</key>
@@ -379,7 +277,7 @@
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>8</integer>
+			<integer>12</integer>
 		</dict>
 		<key>lib/arrow/session/store.rb</key>
 		<dict>
@@ -388,12 +286,12 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>0</integer>
+				<integer>181</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>158</integer>
 		</dict>
 		<key>lib/arrow/session/usertrackid.rb</key>
 		<dict>
@@ -408,6 +306,20 @@
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>6</integer>
+		</dict>
+		<key>lib/arrow/template.rb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>30</integer>
+				<key>line</key>
+				<integer>206</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>205</integer>
 		</dict>
 		<key>lib/arrow/template/call.rb</key>
 		<dict>
@@ -493,19 +405,47 @@
 			<key>firstVisibleLine</key>
 			<integer>98</integer>
 		</dict>
-		<key>lib/arrow/transaction.rb</key>
+		<key>lib/arrow/templatefactory.rb</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>295</integer>
+				<integer>115</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>264</integer>
+			<integer>87</integer>
+		</dict>
+		<key>spec/cookieset_spec.rb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>31</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>spec/transaction_spec.rb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>7</integer>
+				<key>line</key>
+				<integer>19</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
 		</dict>
 		<key>templates/error-display.tmpl</key>
 		<dict>
@@ -577,47 +517,19 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
-		<key>tests/formvalidator.tests.rb</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>15</integer>
-				<key>line</key>
-				<integer>591</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>549</integer>
-		</dict>
 		<key>tests/session.tests.rb</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>18</integer>
-				<key>line</key>
-				<integer>59</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>50</integer>
-		</dict>
-		<key>tests/transaction.tests.rb</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>286</integer>
+				<integer>0</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>273</integer>
+			<integer>50</integer>
 		</dict>
 		<key>utils.rb</key>
 		<dict>
@@ -652,15 +564,16 @@
 	</dict>
 	<key>openDocuments</key>
 	<array>
-		<string>lib/arrow/transaction.rb</string>
-		<string>lib/arrow/dispatcher.rb</string>
-		<string>tests/transaction.tests.rb</string>
-		<string>lib/arrow/cookie.rb</string>
-		<string>tests/session.tests.rb</string>
+		<string>lib/arrow/templatefactory.rb</string>
+		<string>lib/arrow/cache.rb</string>
+		<string>lib/arrow/template.rb</string>
+		<string>lib/arrow/session.rb</string>
+		<string>lib/arrow/cookieset.rb</string>
+		<string>lib/arrow/session/store.rb</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{37, 0}, {867, 1028}}</string>
+	<string>{{39, 0}, {867, 1028}}</string>
 </dict>
 </plist>
