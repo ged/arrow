@@ -68,6 +68,7 @@
 # Please see the file docs/COPYRIGHT for licensing details.
 #
 
+require 'benchmark'
 require 'tmpdir'
 
 require 'arrow/object'
@@ -108,7 +109,7 @@ class Arrow::Dispatcher < Arrow::Object
 		when Hash
 			configs = configspec
 		else
-			raise ArgumentError, "Invalid config hash %p" % configspec
+			raise ArgumentError, "Invalid config hash %p" % [configspec]
 		end
 
 		# Create the dispatchers and return the first one to support the
@@ -140,6 +141,30 @@ class Arrow::Dispatcher < Arrow::Object
 		Kernel.raise( err )
 	end
 
+
+	### Create one or more dispatchers from the specified +hosts_file+, which is
+	### a YAML file that maps arrow configurations onto a symbol that can be
+	### used to refer to it.
+	def self::create_from_hosts_file( hosts_file )
+		configs = nil
+
+		if hosts_file.respond_to?( :read )
+			configs = YAML.load( hosts_file.read ) 
+		else
+			hosts_file.untaint
+			configs = YAML.load( File.read(hosts_file) )
+		end
+
+		# Convert the keys to Symbols and the values to untainted Strings.
+		configs.each do |key,config|
+			sym = key.to_s.dup.untaint.intern
+			configs[ sym ] = configs.delete( key )
+			configs[ sym ].untaint
+		end
+
+		self.create( configs )
+	end
+	
 
 	### Get the instance of the Dispatcher set up under the given +key+, which
 	### can either be a Symbol or a String containing the path to a
@@ -254,8 +279,8 @@ class Arrow::Dispatcher < Arrow::Object
 	### The content handler method. Dispatches requests to registered
 	### applets based on the requests PATH_INFO.
 	def handler( req )
-		self.log.info "--- Dispatching request %p ---------------" % req
-		self.log.debug "Request headers are: %s" % untable(req.headers_in)
+		self.log.info "--- Dispatching request %p ---------------" % [req]
+		self.log.debug "Request headers are: %s" % [untable(req.headers_in)]
 
 		if (( reason = @config.changed_reason ))
 			self.log.notice "** Reloading configuration: #{reason} ***"
@@ -271,20 +296,28 @@ class Arrow::Dispatcher < Arrow::Object
 
 		txn = Arrow::Transaction.new( req, @config, @broker )
 
-		self.log.debug "Delegating transaction %p" % txn
+		self.log.debug "Delegating transaction %p" % [txn]
 		output = @broker.delegate( txn )
-		self.log.debug "Output = %p" % output
 
 		# If the transaction succeeded, set up the Apache::Request object, add
 		# headers, add session state, etc. If it failed, log the failure and let
 		# the status be returned as-is.
-		if txn.status == Apache::OK
-			self.log.debug "Transaction has OK status"
+		unless txn.is_declined?
+			outputString = nil
+			self.log.debug "Transaction has status %d" % [txn.status]
 
 			# Render the output before anything else, as there might be
 			# session/header manipulation left to be done somewhere in the
 			# render.
-			outputString = output.to_s if output && output != true
+			if output && output != true
+				rendertime = Benchmark.measure do
+					outputString = output.to_s
+				end
+				self.log.debug "Output render time: %s" %
+					rendertime.format( '%8.4us usr %8.4ys sys %8.4ts wall %8.4r' )
+				req.headers_out['content-length'] = outputString.length.to_s unless
+					req.headers_out['content-length']
+			end
 
 			# If the transaction has a session, save it
 			txn.session.save if txn.session?
@@ -292,23 +325,22 @@ class Arrow::Dispatcher < Arrow::Object
 			# Add cookies to the response headers
 			txn.add_cookie_headers
 
-			# :FIXME: Figure out what cache-control settings work
-			#req.header_out( 'Cache-Control', "max-age=5" )
-			#req.header_out( 'Expires', (Time.now + 5).strftime( )
-			req.cache_resp = true
-
 			req.sync = true
 			req.send_http_header
 			req.print( outputString ) if outputString
+
+			self.log.debug "Returning HTTP status %d" % [txn.status]
+			self.log.debug "Response headers were: %s" % [untable(req.headers_out)]
 		else
-			self.log.notice "Transaction has non-OK status: %d" %
-				txn.status
+			self.log.notice "Transaction is declined."
 		end
 
-		self.log.debug "Returning status %d" % txn.status
-		self.log.debug "Response headers were: %s" % untable(req.headers_out)
-		self.log.info "--- Done with request %p ---------------" % req
+		self.log.info "--- Done with request %p (%s)---------------" % 
+			[ req, req.status_line ]
 
+		# Why the fuck this is necessary, I haven't the faintest clue, but
+		# it is. Oh trust me, it is.
+		return Apache::OK if txn.status == Apache::HTTP_OK
 		return txn.status
 	rescue ::Exception => err
 		self.log.error "Dispatcher caught an unhandled %s: %s:\n\t%s" %
@@ -317,9 +349,7 @@ class Arrow::Dispatcher < Arrow::Object
 
 	ensure
 		# Make sure session locks are released
-		if txn && txn.session?
-			txn.session.finish
-		end
+		txn.session.finish if txn && txn.session?
 	end
 
 
