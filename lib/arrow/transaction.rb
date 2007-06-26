@@ -41,14 +41,12 @@ class Arrow::Transaction < Arrow::Object
 
 
 	HTMLDoc = <<-"EOF".gsub(/^\t/, '')
+	<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
 	<html>
 	  <head><title>%d %s</title></head>
 	  <body><h1>%s</h1><p>%s</p></body>
 	</html>
 	EOF
-
-	# Status code constants
-	APACHE_OK = 0
 
 	# Status names
 	StatusName = {
@@ -66,7 +64,7 @@ class Arrow::Transaction < Arrow::Object
 	# object. If we're running inside mod_ruby, get the list from the class.
 	if defined?( Apache ) && defined?( Apache::Request )
 		DelegatedMethods = Apache::Request.instance_methods(false) - [
-			"inspect", "to_s", "status", "status="
+			"inspect", "to_s"
 		]
 		
 	# Otherwise, just use the ones that were define when this was written (2007/03/20)
@@ -117,7 +115,6 @@ class Arrow::Transaction < Arrow::Object
 		@session			= nil # Lazily-instantiated
 		@applet_path		= nil # Added by the broker
 		@vargs				= nil # Filled in by the applet
-		@status				= APACHE_OK
 		@data				= {}
 		@request_cookies	= parse_cookies( request )
 		@cookies			= Arrow::CookieSet.new()
@@ -164,10 +161,6 @@ class Arrow::Transaction < Arrow::Object
 	# The transaction's unique id in the context of the system.
 	attr_reader :serial
 
-	# The Apache status code of the transaction (e.g., Apache::OK,
-	# Apache::DECLINED, etc.)
-	attr_accessor :status
-
 	# User-data hash. Can be used to pass data between applets in a chain.
 	attr_reader :data
 
@@ -181,11 +174,11 @@ class Arrow::Transaction < Arrow::Object
 	### Returns a human-readable String representation of the transaction,
 	### suitable for debugging.
 	def inspect
-		"#<%s:0x%0x serial: %s; status: %d>" % [
+		"#<%s:0x%0x serial: %s; HTTP status: %d>" % [
 			self.class.name,
 			self.object_id * 2,
 			@serial,
-			@status,
+			@status
 		]
 	end
 
@@ -201,6 +194,14 @@ class Arrow::Transaction < Arrow::Object
 		@session ||= Arrow::Session.create( self, config )
 	end
 
+
+	### Returns true if the transaction's server status will cause the 
+	### request to be declined (i.e., not handled by Arrow)
+	def is_declined?
+		self.log.debug "Checking to see if the transaction is declined (%p)" % [self.status]
+		return self.status == Apache::DECLINED ? true : false
+	end
+	
 
 
 	# Apache::Request attributes under various conditions. Need to determine 
@@ -478,20 +479,19 @@ class Arrow::Transaction < Arrow::Object
 	### Set the necessary fields in the request to cause the response to be a
 	### redirect to the given +url+ with the specified +status_code+ (302 by
 	### default).
-	def redirect( uri, status_code=Apache::REDIRECT )
-		
-		# 304 responses don't get a Location or a body
-		return( self.not_modified ) if status_code == Apache::HTTP_NOT_MODIFIED
-		
+	def redirect( uri, status_code=Apache::HTTP_MOVED_TEMPORARILY )
 		self.log.debug "Redirecting to %s" % uri
-
-		# Set the status and Location: header
 		self.headers_out[ 'Location' ] = uri.to_s
 		self.status = status_code
 
-		# Return "a short hypertext note with a hyperlink to the new URI" (from
-		# the RFC).
-		return status_doc( status_code, uri.to_s )
+		return ''
+	end
+
+
+	### Set the necessary header fields in the response to cause a
+	### NOT_MODIFIED response to be sent. 
+	def not_modified
+		return self.redirect( uri, Apache::HTTP_NOT_MODIFIED )
 	end
 
 
