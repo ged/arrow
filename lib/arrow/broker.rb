@@ -90,7 +90,7 @@ class Arrow::Broker < Arrow::Object
 
 		# Set the request status to declined if it hasn't been set yet and
 		# the return value is false.
-		if !rval && txn.status == Apache::OK
+		if !rval
 			self.log.error "Applet returned false value. " +
 				"Setting status to DECLINED"
 			txn.status = Apache::DECLINED
