@@ -298,10 +298,8 @@ class Arrow::Applet::TestCase < Arrow::TestCase
 		@applet.def_action_body do |txn|
 			# This will hopefully take more than 0.0 seconds on any machine.
 			10_000.times do
-#				a = Array.new(200, "A")
-#				a.sort
 				# This causes a system access, which makes for stime
-				# the above was only usertime on my linux machine -JJ
+				# the previous code was only usertime on my linux machine -JJ
 				d = Dir.open('.')
 				d.close
 			end
@@ -415,7 +413,7 @@ class Arrow::Applet::TestCase < Arrow::TestCase
 		args = []
 
 		assert_nothing_raised do
-			rval, *args = @applet.lookup_action_method( "test" )
+			rval, *args = @applet.lookup_action_method( nil, "test" )
 		end
 
 		assert_instance_of Method, rval
@@ -428,7 +426,7 @@ class Arrow::Applet::TestCase < Arrow::TestCase
 		args = []
 
 		assert_nothing_raised do
-			rval, *args = @applet.lookup_action_method( 'pass' )
+			rval, *args = @applet.lookup_action_method( nil, 'pass' )
 		end
 
 		assert_instance_of Method, rval

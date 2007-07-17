@@ -27,8 +27,8 @@ end
 ###	C O N T E X T S
 #####################################################################
 
-context "An instance of an applet" do
-	setup do
+describe "An instance of an applet" do
+	before(:each) do
 		@appletclass = Class.new( Arrow::Applet ) do
 			def test_action( txn, *args )
 				return [txn, *args]
@@ -39,7 +39,7 @@ context "An instance of an applet" do
 	end
 
 	
-	specify "should not use libapreq's param parser for a POST with content-type " +
+	it "should not use libapreq's param parser for a POST with content-type " +
 	        "other than 'application/www-form-url-encoded" do
 		request = mock( "request", :null_object => true )
 		request.should_not_receive( :paramtable )

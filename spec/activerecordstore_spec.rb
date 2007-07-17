@@ -61,53 +61,53 @@ end
 # the plugin gets the argument passed in as the first argument to new,
 # and the id object as the second argument.
 # so we could make a context for that:
-context "An ActiveRecord Store plugin" do
+describe "An ActiveRecord Store plugin" do
 
-	specify "can use activerecord:ClassName as a URI" do
+	it "can use activerecord:ClassName as a URI" do
 		uri = URI.parse('activerecord:ARTestClass')
 		id = Arrow::Session::SHA1Id.new( uri, '/test' )
 
 		lambda {
 			arstore = Arrow::Session::ActiveRecordStore.new( uri, id )
 			arstore.klass.should == ARTestClass
-		}.should_not_raise
+		}.should_not raise_error
 	end
 
-	specify "can use activerecord:ModuleName::ClassName as a URI" do
+	it "can use activerecord:ModuleName::ClassName as a URI" do
 		uri = URI.parse('activerecord:Testy::McTest')
 		id = Arrow::Session::SHA1Id.new( uri, '/test' )
 
 		lambda {
 			arstore = Arrow::Session::ActiveRecordStore.new( uri, id )
 			arstore.klass.should == Testy::McTest
-		}.should_not_raise
+		}.should_not raise_error
 	end
 
-	specify "can use activerecord:ClassName::ClassName as a URI" do
+	it "can use activerecord:ClassName::ClassName as a URI" do
 		uri = URI.parse('activerecord:MyOutie::MyInnie')
 		id = Arrow::Session::SHA1Id.new( uri, '/test' )
 
 		lambda {
 			arstore = Arrow::Session::ActiveRecordStore.new( uri, id )
 			arstore.klass.should == MyOutie::MyInnie
-		}.should_not_raise
+		}.should_not raise_error
 	end
 
-	specify "can use activerecord:ModuleName::ModuleName::ClassName as a URI" do
+	it "can use activerecord:ModuleName::ModuleName::ClassName as a URI" do
 		uri = URI.parse('activerecord:Firsty::Secondy::Thirdy')
 		id = Arrow::Session::SHA1Id.new( uri, '/test' )
 
 		lambda {
 			arstore = Arrow::Session::ActiveRecordStore.new( uri, id )
 			arstore.klass.should == Firsty::Secondy::Thirdy
-		}.should_not_raise
+		}.should_not raise_error
 	end
 
 end
 
-context "A new ActiveRecord session store" do
+describe "A new ActiveRecord session store" do
 
-	setup do
+	before(:each) do
 		uri = URI.parse('activerecord:ARTestClass')
 		@id = Arrow::Session::SHA1Id.new( uri, '/test' )
 
@@ -117,7 +117,7 @@ context "A new ActiveRecord session store" do
 	end
 
 
-	specify "fetches existing session data from the database" do
+	it "fetches existing session data from the database" do
 		mock_data_object = mock( "ar_dataobject" )
 		@arclassmock.should_receive( :find_or_create_by_session_id ).with( @id.to_s ).
 			and_return( mock_data_object )
@@ -127,7 +127,7 @@ context "A new ActiveRecord session store" do
 		@arstore.retrieve
 	end
 
-	specify "creates a new session data hash if the session doesn't already exist in the database" do
+	it "creates a new session data hash if the session doesn't already exist in the database" do
 		mock_data_object = mock( "ar_dataobject" )
 		@arclassmock.should_receive( :find_or_create_by_session_id ).with( @id.to_s ).
 			and_return( mock_data_object )
@@ -138,7 +138,7 @@ context "A new ActiveRecord session store" do
 		@arstore.retrieve
 	end
 
-	specify "writes session data back to the database when updated" do
+	it "writes session data back to the database when updated" do
 		mock_data_object = mock( "ar_dataobject" )
 		mock_data_object.should_receive( :new_record? ).and_return( false )
 		mock_data_object.should_receive( :session_data= ).once
@@ -150,7 +150,7 @@ context "A new ActiveRecord session store" do
 		@arstore.update
 	end
 	
-	specify "will raise an exception if it cannot save the session" do
+	it "will raise an exception if it cannot save the session" do
 		
 		errors_mock = mock("errors")
 		errors_mock.should_receive(:full_messages).once.and_return(['malformed data'])
@@ -164,10 +164,10 @@ context "A new ActiveRecord session store" do
 		@arclassmock.should_receive( :find_or_create_by_session_id ).with( @id.to_s ).
 			and_return( mock_data_object )
 
-		lambda { @arstore.insert }.should_raise( Arrow::SessionError, /malformed data/ )
+		lambda { @arstore.insert }.should raise_error( Arrow::SessionError, /malformed data/)
 	end
 	
-	specify "removes the corresponding record in the database when deleted" do
+	it "removes the corresponding record in the database when deleted" do
 		@arclassmock.should_receive( :delete ).with( @id.to_s )
 		@arstore.remove
 	end

@@ -56,7 +56,7 @@ class Arrow::Broker < Arrow::Object
 	######
 
 	# The Hash of RegistryEntry structs keyed by uri
-	attr_reader :registry
+	attr_accessor :registry
 
 	# The Time when the Broker was started
 	attr_reader :start_time

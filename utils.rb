@@ -84,7 +84,7 @@ module UtilityFunctions
 
 	# Create a string that contains the ANSI codes specified and return it
 	def ansiCode( *attributes )
-		return '' unless /(?:vt10[03]|xterm(?:-color)?|linux|screen)/i =~ ENV['TERM']
+		# return '' unless /(?:vt10[03]|xterm(?:-color)?|linux|screen)/i =~ ENV['TERM']
 		attr = attributes.collect {|a| AnsiAttributes[a] ? AnsiAttributes[a] : nil}.compact.join(';')
 		if attr.empty? 
 			return ''
@@ -98,7 +98,7 @@ module UtilityFunctions
 	def colorize( string, *attributes )
 		ending = string[/(\s)$/] || ''
 		string = string.rstrip
-		return ansiCode( attributes ) + string + ansiCode( 'reset' ) + ending
+		return ansiCode( *attributes ) + string + ansiCode( 'reset' ) + ending
 	end
 
 
@@ -146,12 +146,13 @@ module UtilityFunctions
 	### blue).
 	def header( msg )
 		msg.chomp!
-		$stderr.puts ansiCode( 'bold', 'white', 'on_blue' ) + msg + ansiCode( 'reset' )
+		$stderr.puts colorize( msg, 'bold', 'white' )
 		$stderr.flush
 	end
 
 	### Output <tt>msg</tt> to STDERR and flush it.
 	def message( *msgs )
+		msgs.collect! {|msg| colorize(msg, 'cyan') }
 		$stderr.print( msgs.join("\n") )
 		$stderr.flush
 	end
@@ -173,7 +174,7 @@ module UtilityFunctions
 	def debugMsg( msg )
 		return unless $DEBUG
 		msg.chomp!
-		$stderr.puts ansiCode( 'bold', 'yellow', 'on_blue' ) + ">>> #{msg}" + ansiCode( 'reset' )
+		$stderr.puts colorize( ">>> #{msg}", 'yellow' )
 		$stderr.flush
 	end
 

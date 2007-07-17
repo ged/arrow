@@ -67,43 +67,42 @@ TEST_CONFIG_HASH = {
 	  },
 }
 
-TEST_CONFIG = Arrow::Config.new( TEST_CONFIG_HASH )
 
 
 #####################################################################
 ###	C O N T E X T S
 #####################################################################
 
-context "The Dispatcher class" do
+describe Arrow::Dispatcher do
+	TEST_CONFIG = Arrow::Config.new( TEST_CONFIG_HASH )
 
-	context_setup do
+	before( :all ) do
 		@tmpfile = Tempfile.new( 'test.conf', '.' )
 		TEST_CONFIG.write( @tmpfile.path )
 		@tmpfile.close
 	end
 	
-	context_teardown do
-		@tmpfile.delete
-	end
-
-
-	teardown do
+	after( :each ) do
 		Pathname.glob( "%s/arrow-fatal*" % Dir.tmpdir ).each do |f|
 			f.unlink
 		end
 	end
 
+	after( :all ) do
+		@tmpfile.delete
+	end
+
 
 	### Specs
 	
-	specify "should raise an error when its factory method is called with " +
+	it "raises an error when its factory method is called with " +
 		    "something other than a String or Hash" do
 	    lambda {
 			Arrow::Dispatcher.create( :something )
-		}.should_raise( ArgumentError, /invalid config hash/i )
+		}.should raise_error( ArgumentError, /invalid config hash/i)
 	end
 	
-	specify "should write a crashlog to TMPDIR when create fails" do
+	it "writes a crashlog to TMPDIR when create fails" do
 		crashlog = Pathname.new( Dir.tmpdir + "/arrow-fatal.log.#{$$}" )
 		crashlog.unlink if crashlog.exist?
 		
@@ -113,22 +112,20 @@ context "The Dispatcher class" do
 		end
 		
 		crashlog.exist?.should == true
-		crashlog.ctime.should_be > Time.now - 60
+		crashlog.ctime.should be > Time.now - 60
 	end
 	
-	specify "should assume a string configspec is a default configfile" do
+	it "assumes a string configspec is a default configfile" do
 		dispatcher = Arrow::Dispatcher.create( @tmpfile.path )
-		Arrow::Dispatcher.instance.should_equal( dispatcher )
+		Arrow::Dispatcher.instance.should equal( dispatcher)
 	end
 end
 
-context "A dispatcher" do
-	setup do
-		@config = Arrow::Config.new( TEST_CONFIG )
-		@dispatcher = Arrow::Dispatcher.new( "test", @config )
-	end
 
-	specify "should have an associated name" do
+describe Arrow::Dispatcher, " (an instance)" do
+	it "has an associated name" do
+		@config = Arrow::Config.new( TEST_CONFIG_HASH )
+		@dispatcher = Arrow::Dispatcher.new( "test", @config )
 	    @dispatcher.name.should == "test"
 	end
 end

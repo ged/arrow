@@ -27,14 +27,14 @@ end
 ###	C O N T E X T S
 #####################################################################
 
-context "An instance of an transaction" do
-	setup do
+describe "An instance of an transaction" do
+	before(:each) do
 		@fakerequest = Apache::Request.new( '/test' )
 		@txn = Arrow::Transaction.new( @fakerequest, nil, nil )
 	end
 
 	
-	specify "knows that a form was submitted if there's a urlencoded form content-type header" do
+	it "knows that a form was submitted if there's a urlencoded form content-type header" do
 		@fakerequest.headers_in['content-type'] = 'application/x-www-form-urlencoded'
 		@fakerequest.request_method = 'POST'
 

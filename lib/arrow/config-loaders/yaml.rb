@@ -75,7 +75,7 @@ class Arrow::Config::YamlLoader < Arrow::Config::Loader
 
 	### Return +true+ if the specified +file+ is newer than the given
 	### +time+.
-	def isNewer?( file, time )
+	def is_newer?( file, time )
 		return false unless File.exists?( file )
 		st = File.stat( file )
 		self.log.debug "File mtime is: %s, comparison time is: %s" %

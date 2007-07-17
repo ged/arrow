@@ -126,14 +126,8 @@ class Arrow::Config < Arrow::Object
 	SVNId = %q$Id$
 
 
-	# Output a debugging message to STDERR
-	def self::debugMsg( *msgs )
-		$stderr.puts msgs.join
-	end
-
-
 	# Define the layout and defaults for the underlying structs
-	Defaults = {
+	DEFAULTS = {
 		:startMonitor		=> false,
 
 		:logging			=> { :global => 'notice' },
@@ -169,7 +163,7 @@ class Arrow::Config < Arrow::Object
 			:expires		=> "+48h",
 		},
 	}
-	Defaults.freeze
+	DEFAULTS.freeze
 
 
 
@@ -178,100 +172,34 @@ class Arrow::Config < Arrow::Object
 	#############################################################
 
 	### The default config file loader to use
-	@defaultLoader = 'yaml'
+	@default_loader = 'yaml'
 	@loaders = {}
 	class << self
-		attr_accessor :defaultLoader, :loaders
+		attr_accessor :default_loader, :loaders
 	end
 
 
 	### Get the loader by the given name, creating a new one if one is not
 	### already instantiated.
-	def self::getLoader( name=nil )
-		name ||= self.defaultLoader
+	def self::get_loader( name=nil )
+		name ||= self.default_loader
 		self.loaders[name] ||= Arrow::Config::Loader.create( name )
 	end
 
 
 	### Read and return an Arrow::Config object from the given file or
 	### configuration source using the specified +loader+.
-	def self::load( source, loaderObj=nil )
-		loaderObj = self.getLoader( loaderObj ) unless
-			loaderObj.is_a?( Arrow::Config::Loader )
-		confighash = loaderObj.load( source )
+	def self::load( source, loader_obj=nil )
+		loader_obj = self.get_loader( loader_obj ) unless
+			loader_obj.is_a?( Arrow::Config::Loader )
+		confighash = loader_obj.load( source )
 
-		obj = new( untaintValues(confighash) )
-		obj.loader = loaderObj
+		obj = new( confighash )
+		obj.loader = loader_obj
 		obj.name = source
 
 		return obj
 	end
-
-
-	### Return a copy of the specified +hash+ with all of its values
-	### untainted.
-	def self::untaintValues( hash )
-		newhash = {}
-		hash.each {|key,val|
-			case val
-			when Hash
-				newhash[ key ] = untaintValues( hash[key] )
-
-			when NilClass, TrueClass, FalseClass, Numeric, Symbol
-				newhash[ key ] = val
-
-			when Arrow::Path
-				# Arrow::Logger[ self ].debug "Untainting %p" % val
-				val.untaint
-				newhash[ key ] = val
-
-			when Array
-				# Arrow::Logger[ self ].debug "Untainting array %p" % val
-				newval = val.collect {|v| v.dup.untaint}
-				newhash[ key ] = newval
-
-			else
-				# Arrow::Logger[ self ].debug "Untainting %p" % val
-				newval = val.dup
-				newval.untaint
-				newhash[ key ] = newval
-			end
-		}
-		return newhash
-	end
-
-
-	### Return a duplicate of the given +hash+ with its identifier-like keys
-	### transformed into symbols from whatever they were before.
-	def self::internifyKeys( hash )
-		newhash = {}
-		hash.each {|key,val|
-			if val.is_a?( Hash )
-				newhash[ key.to_s.intern ] = internifyKeys( val )
-			else
-				newhash[ key.to_s.intern ] = val
-			end
-		}
-
-		return newhash
-	end
-
-
-	### Return a version of the given +hash+ with its keys transformed
-	### into Strings from whatever they were before.
-	def self::stringifyKeys( hash )
-		newhash = {}
-		hash.each {|key,val|
-			if val.is_a?( Hash )
-				newhash[ key.to_s ] = stringifyKeys( val )
-			else
-				newhash[ key.to_s ] = val
-			end
-		}
-
-		return newhash
-	end
-
 
 
 	#############################################################
@@ -281,14 +209,13 @@ class Arrow::Config < Arrow::Object
 	### Create a new Arrow::Config object. Values passed in via the
 	### +confighash+ will be used instead of the defaults.
 	def initialize( confighash={} )
-		ihash = self.class.internifyKeys( confighash )
-		# self.log.debug "Ihash is %p" % ihash
-		mergedhash = Defaults.merge( ihash, &Arrow::HashMergeFunction )
-		# self.log.debug "Merged hash is %p" % mergedhash
-		@struct = ConfigStruct.new( mergedhash )
-		@createTime = Time.now
-		@name = nil
-		@loader = self.class.getLoader
+		ihash = internify_keys( untaint_values(confighash) )
+		mergedhash = DEFAULTS.merge( ihash, &Arrow::HashMergeFunction )
+
+		@struct      = ConfigStruct.new( mergedhash )
+		@create_time = Time.now
+		@name        = nil
+		@loader      = self.class.get_loader
 
 		super()
 	end
@@ -306,7 +233,7 @@ class Arrow::Config < Arrow::Object
 	attr_reader :struct
 
 	# The time the configuration was loaded
-	attr_accessor :createTime
+	attr_accessor :create_time
 
 	# The loader that will be used to save this config
 	attr_reader :loader
@@ -316,14 +243,14 @@ class Arrow::Config < Arrow::Object
 	attr_accessor :name
 
 
-	### Change the configuration object's loader. The +newLoader+ argument
+	### Change the configuration object's loader. The +new_loader+ argument
 	### can be either an Arrow::Config::Loader object or the name of one
 	### suitable for passing to Arrow::Config::Loader.create.
-	def loader=( newLoader )
-		if newLoader.is_a?( Arrow::Config::Loader )
-			@loader = newLoader
+	def loader=( new_loader )
+		if new_loader.is_a?( Arrow::Config::Loader )
+			@loader = new_loader
 		else
-			@loader = self.class.getLoader( newLoader )
+			@loader = self.class.get_loader( new_loader )
 		end
 	end
 
@@ -334,7 +261,7 @@ class Arrow::Config < Arrow::Object
 		raise ArgumentError,
 			"No name associated with this config." unless name
 		lobj = self.loader
-		strHash = self.class.stringifyKeys( @struct.to_h )
+		strHash = stringify_keys( @struct.to_h )
 		self.loader.save( strHash, name, *args )
 	end
 
@@ -357,15 +284,14 @@ class Arrow::Config < Arrow::Object
 	### If the configuration has changed, return the reason. If it hasn't,
 	### returns nil.
 	def changed_reason
-		if @struct.modified?
-			return "Struct was modified"
-		end
-		return nil unless self.name
-		if self.loader.isNewer?( self.name, self.createTime )
-			return "Config source (%s) has been updated since %s" %
-				[ self.name, self.createTime ]
-		end
+		return "Struct was modified" if @struct.modified?
 		
+		if self.name && self.loader.is_newer?( self.name, self.create_time )
+			return "Config source (%s) has been updated since %s" %
+				[ self.name, self.create_time ]
+		end
+
+		return nil
 	end
 	
 
@@ -373,11 +299,24 @@ class Arrow::Config < Arrow::Object
 	### changed. Returns +true+ if it was reloaded and +false+ otherwise.
 	def reload
 		return false unless @loader && @name
-		self.createTime = Time.now
+		
+		# Even if reloading fails, reset the creation time so we don't keep
+		# trying to reload a broken config
+		self.create_time = Time.now
+
 		confighash = @loader.load( @name )
-		ihash = self.class.internifyKeys( self.class.untaintValues(confighash) )
-		mergedhash = Defaults.merge( ihash, &Arrow::HashMergeFunction )
+		ihash = internify_keys( untaint_values(confighash) )
+		mergedhash = DEFAULTS.merge( ihash, &Arrow::HashMergeFunction )
+		
 		@struct = ConfigStruct.new( mergedhash )
+
+	rescue => err
+		self.log.error "Error while trying to reload the config: %s" % err.message
+		err.backtrace.each {|frame| self.log.debug "  " + frame }
+		
+		return false
+	else
+		return true
 	end
 
 
@@ -385,7 +324,7 @@ class Arrow::Config < Arrow::Object
 	protected
 	#########
 
-	### Handle calls to struct-members
+	### Hook up delegators to struct-members as they are called
 	def method_missing( sym, *args )
 		key = sym.to_s.sub( /(=|\?)$/, '' ).intern
 		return nil unless @struct.member?( key )
@@ -400,6 +339,80 @@ class Arrow::Config < Arrow::Object
 
 		@struct.__send__( sym, *args )
 	end
+
+
+	#######
+	private
+	#######
+
+	### Return a copy of the specified +hash+ with all of its values
+	### untainted.
+	def untaint_values( hash )
+		newhash = {}
+		
+		hash.each do |key,val|
+			case val
+			when Hash
+				newhash[ key ] = untaint_values( hash[key] )
+
+			when NilClass, TrueClass, FalseClass, Numeric, Symbol
+				newhash[ key ] = val
+
+			when Arrow::Path
+				# Arrow::Logger[ self ].debug "Untainting %p" % val
+				val.untaint
+				newhash[ key ] = val
+
+			when Array
+				# Arrow::Logger[ self ].debug "Untainting array %p" % val
+				newval = val.collect {|v| v.dup.untaint}
+				newhash[ key ] = newval
+
+			else
+				# Arrow::Logger[ self ].debug "Untainting %p" % val
+				newval = val.dup
+				newval.untaint
+				newhash[ key ] = newval
+			end
+		end
+		
+		return newhash
+	end
+
+
+	### Return a duplicate of the given +hash+ with its identifier-like keys
+	### transformed into symbols from whatever they were before.
+	def internify_keys( hash )
+		newhash = {}
+		
+		hash.each do |key,val|
+			if val.is_a?( Hash )
+				newhash[ key.to_s.intern ] = internify_keys( val )
+			else
+				newhash[ key.to_s.intern ] = val
+			end
+		end
+
+		return newhash
+	end
+
+
+	### Return a version of the given +hash+ with its keys transformed
+	### into Strings from whatever they were before.
+	def stringify_keys( hash )
+		newhash = {}
+		
+		hash.each do |key,val|
+			if val.is_a?( Hash )
+				newhash[ key.to_s ] = stringify_keys( val )
+			else
+				newhash[ key.to_s ] = val
+			end
+		end
+
+		return newhash
+	end
+
 
 
 	#############################################################
@@ -612,9 +625,9 @@ class Arrow::Config < Arrow::Object
 		### Returns +true+ if the configuration values in the storage medium
 		### associated with the given +name+ has changed since the given
 		### +time+.
-		def isNewer?( name, time )
+		def is_newer?( name, time )
 			raise NotImplementedError,
-				"required method 'isNewer?' not implemented in '#{self.class.name}'"
+				"required method 'is_newer?' not implemented in '#{self.class.name}'"
 		end
 
 	end # class Loader
@@ -625,7 +638,7 @@ end # class Arrow::Config
 ### If run directly, write a default config file to the current directory
 if __FILE__ == $0
 	filename = ARGV.shift || "default.cfg" 
-	loader = ARGV.shift || Arrow::Config.defaultLoader
+	loader = ARGV.shift || Arrow::Config.default_loader
 
 	$stderr.puts "Dumping default configuration to '%s' using the '%s' loader" %
 		[ filename, loader ]

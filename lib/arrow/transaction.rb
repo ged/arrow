@@ -388,7 +388,7 @@ class Arrow::Transaction < Arrow::Object
 		if self.browser_is_ie?
 			self.content_type = 'application/octet-stream'
 		end
-			
+		
 		val = %q{attachment; filename="%s"} % [ filename ]
 		self.headers_out['Content-Disposition'] = val
 	end

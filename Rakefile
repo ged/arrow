@@ -23,6 +23,7 @@ BEGIN {
 require 'rubygems'
 require 'rake'
 require 'rake/testtask'
+require 'rcov/rcovtask'
 require 'spec/rake/spectask'
 require 'spec/rake/verifytask'
 require 'rake/rdoctask'
@@ -54,7 +55,7 @@ RELEASE_FILES = TEXT_FILES + LIB_FILES + SPEC_FILES
 
 
 ### Default task
-task :default  => [:all_tests, :verify, :package]
+task :default  => [:all_tests, :package]
 
 ### New and legacy tests
 task :all_tests => [:test, "spec:quiet"]
@@ -111,18 +112,22 @@ end
 
 
 ### Task: rcov
-desc "Build test coverage reports"
-Spec::Rake::SpecTask.new( :coverage ) do |task|
+desc "Build RSpec test coverage reports"
+Spec::Rake::SpecTask.new( :spec_coverage ) do |task|
 	task.spec_files = SPEC_FILES
 	task.rcov_opts = ['--exclude', 'spec']
 	task.rcov = true
 end
-task :rcov => [:coverage] do; end
 
+desc "Build Test::Unit test coverage reports"
+Rcov::RcovTask.new( :test_coverage ) do |task|
+	task.test_files = TEST_FILES
+end
 
-### Task: verify_rcov
+task :coverage => [:spec_coverage, :test_coverage]
+
 desc "Build coverage statistics"
-VerifyTask.new( :verify => :rcov ) do |task|
+VerifyTask.new( :verify => :coverage ) do |task|
 	task.threshold = 85.0
 end
 

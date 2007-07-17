@@ -297,51 +297,47 @@ class Arrow::Dispatcher < Arrow::Object
 		txn = Arrow::Transaction.new( req, @config, @broker )
 
 		self.log.debug "Delegating transaction %p" % [txn]
-		output = @broker.delegate( txn )
+		unless output = @broker.delegate( txn )
+			self.log.info "Declining transaction (Applets returned: %p)" % output
+			return Apache::DECLINED
+		end
 
 		# If the transaction succeeded, set up the Apache::Request object, add
 		# headers, add session state, etc. If it failed, log the failure and let
 		# the status be returned as-is.
-		unless txn.is_declined?
-			outputString = nil
-			self.log.debug "Transaction has status %d" % [txn.status]
+		outputString = nil
+		self.log.debug "Transaction has status %d" % [txn.status]
 
-			# Render the output before anything else, as there might be
-			# session/header manipulation left to be done somewhere in the
-			# render.
-			if output && output != true
-				rendertime = Benchmark.measure do
-					outputString = output.to_s
-				end
-				self.log.debug "Output render time: %s" %
-					rendertime.format( '%8.4us usr %8.4ys sys %8.4ts wall %8.4r' )
-				req.headers_out['content-length'] = outputString.length.to_s unless
-					req.headers_out['content-length']
+		# Render the output before anything else, as there might be
+		# session/header manipulation left to be done somewhere in the
+		# render. If the response is true, the applets have handled output
+		# themselves.
+		if output && output != true
+			rendertime = Benchmark.measure do
+				outputString = output.to_s
 			end
-
-			# If the transaction has a session, save it
-			txn.session.save if txn.session?
-
-			# Add cookies to the response headers
-			txn.add_cookie_headers
-
-			req.sync = true
-			req.send_http_header
-			req.print( outputString ) if outputString
-
-			self.log.debug "Returning HTTP status %d" % [txn.status]
-			self.log.debug "Response headers were: %s" % [untable(req.headers_out)]
-		else
-			self.log.notice "Transaction is declined."
+			self.log.debug "Output render time: %s" %
+				rendertime.format( '%8.4us usr %8.4ys sys %8.4ts wall %8.4r' )
+			req.headers_out['content-length'] = outputString.length.to_s unless
+				req.headers_out['content-length']
 		end
+
+		# If the transaction has a session, save it
+		txn.session.save if txn.session?
+
+		# Add cookies to the response headers
+		txn.add_cookie_headers
+
+		self.log.debug "HTTP response status is: %d" % [txn.status]
+		self.log.debug "Response headers were: %s" % [untable(req.headers_out)]
+		txn.send_http_header
+		txn.print( outputString ) if outputString
 
 		self.log.info "--- Done with request %p (%s)---------------" % 
 			[ req, req.status_line ]
 
-		# Why the fuck this is necessary, I haven't the faintest clue, but
-		# it is. Oh trust me, it is.
-		return Apache::OK if txn.status == Apache::HTTP_OK
-		return txn.status
+		req.sync = true
+		return Apache::OK
 	rescue ::Exception => err
 		self.log.error "Dispatcher caught an unhandled %s: %s:\n\t%s" %
 			[ err.class.name, err.message, err.backtrace.join("\n\t") ]

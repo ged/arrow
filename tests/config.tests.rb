@@ -208,7 +208,7 @@ class Arrow::ConfigTestCase < Arrow::TestCase
 		assert_nothing_raised { config = Arrow::Config.new }
 		assert_instance_of Arrow::Config, config
 
-		Arrow::Config::Defaults.each {|key,val|
+		Arrow::Config::DEFAULTS.each {|key,val|
 			assert_nothing_raised { rval = config.send(key) }
 			assert_config_equal val, rval, key
 		}
@@ -232,8 +232,8 @@ class Arrow::ConfigTestCase < Arrow::TestCase
 
 		# The configuration values should be the test config merged with the
 		# defaults for the config class.
-		(TestConfig.keys|Arrow::Config::Defaults.keys).each {|key|
-			val = TestConfig[key] || Arrow::Config::Defaults[key]
+		(TestConfig.keys|Arrow::Config::DEFAULTS.keys).each {|key|
+			val = TestConfig[key] || Arrow::Config::DEFAULTS[key]
 			assert_nothing_raised { rval = config.send(key) }
 			assert_config_equal val, rval, key
 		}

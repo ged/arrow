@@ -253,12 +253,7 @@ class Arrow::AppletRegistry < Arrow::Object
 
 
 	### Find the chain of applets indicated by the given +uri+ and return an
-	### Array of tuples describing the chain. The format of each tuple will
-	### be:
-	###	  [ Arrow::Applet, "<applet_uri>", ["remaining", "uri", "path"] ]
-	### For example, a URI of "/admin/create/job/1" which maps to an applet 
-	### at "/admin", will return the chain:
-	###	  [ #<AdminApplet:0x2c78cbc>, "/admin", ["create", "job", "1"] ]
+	### Array of ChainLink structs. 
 	def find_applet_chain( uri )
 		self.log.debug "Searching urispace %p for appletchain for %p" %
 		 	[@urispace.keys.sort, uri]

@@ -473,7 +473,8 @@ class Arrow::Applet < Arrow::Object
 		# Do any initial preparation of the transaction that can be factored out
 		# of all the actions.
 		self.prep_transaction( txn )
-		meth, *args = self.lookup_action_method( action, *args )
+		meth, *args = self.lookup_action_method( txn, action, *args )
+		self.log.debug "Action method is: %p" % [meth]
 		txn.vargs = self.make_validator( action, txn )
 		
 		# Now either pass control to the block, if given, or invoke the
@@ -490,6 +491,7 @@ class Arrow::Applet < Arrow::Object
 				rval = meth.call( txn, *args )
 			elsif meth.arity >= 1
 				args.unshift( txn )
+				until args.length >= meth.arity do args << nil end
 				rval = meth.call( *(args[0, meth.arity]) )
 			else
 				raise Arrow::AppletError,
@@ -511,8 +513,8 @@ class Arrow::Applet < Arrow::Object
 
 
 	### Given an +action+ name (or +nil+ for the default action), return a
-	### Method for the action method which should be invoked.
-	def lookup_action_method( action, *args )
+	### Method for the action method which should be invoked on the specified +txn+.
+	def lookup_action_method( txn, action, *args )
 
 		# Look up the Method object that needs to be called
 		if (( match = @actions_regexp.match(action.to_s) ))
@@ -602,14 +604,14 @@ class Arrow::Applet < Arrow::Object
 			txn.vargs = self.make_validator( action, txn )
 		end
 
-		meth, *args = self.lookup_action_method( action, *args )
+		meth, *args = self.lookup_action_method( txn, action, *args )
 		return meth.call( txn, *args )
 	end
 
 
 	### Prepares the transaction (+txn+) for applet execution. By default, this
-	### method sets the content type of the response to 'text/html', turns off
-	### buffering for the header, and adds the applet's templates.
+	### method sets the content type of the response to 'text/html' and turns off
+	### buffering for the header.
 	def prep_transaction( txn )
 		txn.request.content_type = "text/html"
 		txn.request.sync_header = true

@@ -44,9 +44,9 @@ end
 ###	C O N T E X T S
 #####################################################################
 
-context "A TemplateFactory instance configured with a loader class" do
+describe "A TemplateFactory instance configured with a loader class" do
 
-	setup do
+	before(:each) do
 		tmplconfig = mock( "templates config", :null_object => true )
 		tmplconfig.stub!( :cache ).and_return( false )
 	    tmplconfig.stub!( :loader ).
@@ -58,11 +58,11 @@ context "A TemplateFactory instance configured with a loader class" do
 	end
 
 
-	specify "has the loader class object registered as its loader" do
+	it "has the loader class object registered as its loader" do
 	    @factory.loader.should == Arrow::TestingClassTemplateLoader
 	end
 	
-	specify "calls the loader's #load method to load templates" do
+	it "calls the loader's #load method to load templates" do
 		loader = mock( "loader", :null_object => true )
 		@factory.loader = loader
 		@factory.path = :path
@@ -74,8 +74,8 @@ context "A TemplateFactory instance configured with a loader class" do
 	end
 end
 
-context "A TemplateFactory instance configured with a loader object" do
-	setup do
+describe "A TemplateFactory instance configured with a loader object" do
+	before(:each) do
 		tmplconfig = mock( "templates config", :null_object => true )
 		tmplconfig.stub!( :cache ).and_return( false )
 	    tmplconfig.stub!( :loader ).
@@ -87,11 +87,11 @@ context "A TemplateFactory instance configured with a loader object" do
 	end
 
 
-	specify "has the loader class object registered as its loader" do
+	it "has the loader class object registered as its loader" do
 	    @factory.loader.should be_an_instance_of( Arrow::TestingInstanceTemplateLoader )
 	end
 	
-	specify "calls the loader's #load method to load templates" do
+	it "calls the loader's #load method to load templates" do
 		loader = mock( "loader", :null_object => true )
 		@factory.loader = loader
 		@factory.path = :path
@@ -104,8 +104,8 @@ context "A TemplateFactory instance configured with a loader object" do
 end
 
 
-context "A TemplateFactory instance configured to use caching" do
-	setup do
+describe "A TemplateFactory instance configured to use caching" do
+	before(:each) do
 		tmplconfig = mock( "templates config", :null_object => true )
 	    tmplconfig.stub!( :loader ).
 			and_return( 'Arrow::TestingInstanceTemplateLoader' )
@@ -120,7 +120,7 @@ context "A TemplateFactory instance configured to use caching" do
 	end
 
 
-	specify "fetches templates through the cache" do
+	it "fetches templates through the cache" do
 		template = stub( "template", :changed? => false, :dup => :template_copy )
 		@mock_cache.should_receive( :fetch ).with( :templatename ).
 			and_return( template )
@@ -128,7 +128,7 @@ context "A TemplateFactory instance configured to use caching" do
 		@factory.get_template( :templatename ).should == :template_copy
 	end
 
-	specify "invalidates cached templates that have changed since loading" do
+	it "invalidates cached templates that have changed since loading" do
 		template = stub( "template", :changed? => true, :dup => :template_copy )
 		@mock_cache.should_receive( :fetch ).twice.with( :templatename ).
 			and_return( template )
@@ -140,8 +140,8 @@ context "A TemplateFactory instance configured to use caching" do
 	
 end
 
-context "A TemplateFactory instance configured to not use caching" do
-	setup do
+describe "A TemplateFactory instance configured to not use caching" do
+	before(:each) do
 		tmplconfig = mock( "templates config", :null_object => true )
 	    tmplconfig.stub!( :loader ).
 			and_return( 'Arrow::TestingInstanceTemplateLoader' )
@@ -155,7 +155,7 @@ context "A TemplateFactory instance configured to not use caching" do
 		@factory.loader = @mock_loader
 	end
 
-	specify "should not fetch templates through the cache" do
+	it "should not fetch templates through the cache" do
 	    @mock_loader.should_receive( :load ).
 			with( :template_name, :path ).
 			and_return( :template )
