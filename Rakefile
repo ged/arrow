@@ -120,14 +120,17 @@ Spec::Rake::SpecTask.new( :spec_coverage ) do |task|
 	task.spec_files = SPEC_FILES
 	task.rcov_opts = ['--exclude', 'spec']
 	task.rcov = true
+	task.rcov_dir = 'spec_coverage'
 end
 
 desc "Build Test::Unit test coverage reports"
 Rcov::RcovTask.new( :test_coverage ) do |task|
 	task.test_files = TEST_FILES
+	task.output_dir = 'test_coverage'
 end
 
 task :coverage => [:spec_coverage, :test_coverage]
+task :clobber_coverage => [:clobber_spec_coverage, :clobber_test_coverage]
 
 desc "Build coverage statistics"
 VerifyTask.new( :verify => :coverage ) do |task|
@@ -189,11 +192,18 @@ gemspec = Gem::Specification.new do |gem|
 
 	gem.authors  	= "Michael Granger, Martin Chase, Dave McCorkhill, Jeremiah Jordan"
 	gem.homepage 	= "http://deveiate.org/projects/Arrow"
+	gem.rubyforge_project = 'arrow'
 
 	gem.has_rdoc 	= true
 
 	gem.files      	= RELEASE_FILES
 	gem.test_files 	= SPEC_FILES + TEST_FILES
+
+	gem.requirements << "mod_ruby >= 1.2.6"
+
+  	gem.add_dependency( 'ruby-cache', '>= 0.3.0' )
+  	gem.add_dependency( 'formvalidator', '>= 0.1.3' )
+  	gem.add_dependency( 'pluginfactory', '>= 1.0.2' )
 
 	gem.autorequire	= 'arrow'
 end
