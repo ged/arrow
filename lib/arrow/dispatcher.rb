@@ -243,6 +243,7 @@ class Arrow::Dispatcher < Arrow::Object
 		msg = "%s while creating dispatcher: %s\n%s" %
 			[ err.class.name, err.message, err.backtrace.join("\n\t") ]
 		self.log.error( msg )
+		msg.gsub!( /%/, '%%' )
 		Apache.request.server.log_crit( msg ) unless !defined?( Apache )
 	end
 

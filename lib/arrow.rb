@@ -85,7 +85,7 @@ module Arrow
 			return Apache::OK
 		rescue ::Exception => err
 			errmsg = "%s failed to load dispatchers (%s): %s: %s" % [
-				self.name,
+				self.class.name,
 				err.class.name,
 				err.message,
 				err.backtrace.join("\n  ")
