@@ -110,11 +110,13 @@ class Arrow::Template < Arrow::Object
 
 		### Add the specified definitions +defs+ to the object.
 		def add_definition_set( defs )
-			#self.log.debug "adding definition set: %p" % [ defs ]
+			# self.log.debug "adding definition set: %p" % [ defs ]
 			@definitions.push( defs )
 
 			defs.each do |name,val|
-				raise ScopeError, "Cannot override @definitions" if
+				raise Arrow::ScopeError, "Cannot add a definition with a blank key" if
+					name.to_s.empty?
+				raise Arrow::ScopeError, "Cannot override @definitions" if
 					name == 'definitions'
 				@definitions.last[ name ] = val
 
@@ -532,6 +534,7 @@ class Arrow::Template < Arrow::Object
 	### Create an anonymous module to act as a scope for any evals that take
 	### place during a single render.
 	def make_rendering_scope
+		# self.log.debug "Making rendering scope with attributes: %p" % [@attributes]
 		scope = RenderingScope.new( @attributes )
 		return scope
 	end

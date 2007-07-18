@@ -11,6 +11,7 @@ BEGIN {
 
 begin
 	require 'spec/runner'
+	require 'apache/fakerequest'
 	require 'arrow'
 	require 'arrow/spechelpers'
 	require 'arrow/broker'

@@ -54,6 +54,11 @@ rescue LoadError
 	end
 end
 
+begin
+	require 'rubygems'
+rescue LoadError
+end
+
 require 'test/unit'
 require 'test/unit/assertions'
 require 'test/unit/util/backtracefilter'

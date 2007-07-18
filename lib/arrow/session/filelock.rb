@@ -129,7 +129,7 @@ class Arrow::Session::FileLock < Arrow::Session::Lock
 			path = @lockfile.path
 			@lockfile.close
 			@lockfile = nil
-			File.delete( path.untaint )
+			File.delete( path.untaint ) if File.exist?( path.untaint )
 		end
 	end
 

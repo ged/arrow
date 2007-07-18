@@ -96,6 +96,31 @@ class Arrow::Dispatcher < Arrow::Object
 	SVNId = %q$Id$
 
 
+	### Get the instance of the Dispatcher set up under the given +key+, which
+	### can either be a Symbol or a String containing the path to a
+	### configfile. If no key is given, it defaults to :__default__, which is
+	### the key assigned when .create is given just a configfile argument.
+	def self::instance( key=:__default__ )
+		rval = nil
+
+		# Fetch the instance which corresponds to the given key
+		if key.is_a?( Symbol )
+			Arrow::Logger.debug "Returning instance for key %p (one of %p): %p" %
+				[key, @@Instance.keys, @@Instance[key]]
+			rval = @@Instance[ key ]
+		else
+			Arrow::Logger.debug "Returning instance for configfile %p" % [key]
+			configfile = File.expand_path( key )
+			self.create( configfile )
+			rval = @@Instance[ configfile ]
+		end
+
+		# Return either a configured Dispatcher instance or a FallbackHandler if
+		# no Dispatcher corresponds to the given key.
+		return rval || Arrow::FallbackHandler.new( key, @@Instance )
+	end
+
+
 	### Set up one or more new Arrow::Dispatcher objects. The +configspec+
 	### argument can either be the path to a config file, or a hash of config
 	### files. See the .instance method for more about how to use this method.
@@ -152,44 +177,20 @@ class Arrow::Dispatcher < Arrow::Object
 			configs = YAML.load( hosts_file.read ) 
 		else
 			hosts_file.untaint
-			configs = YAML.load( File.read(hosts_file) )
+			configs = YAML.load_file( hosts_file )
 		end
 
 		# Convert the keys to Symbols and the values to untainted Strings.
 		configs.each do |key,config|
-			sym = key.to_s.dup.untaint.intern
+			sym = key.to_s.dup.untaint.to_sym
 			configs[ sym ] = configs.delete( key )
 			configs[ sym ].untaint
 		end
 
-		self.create( configs )
+		@@Instance = self.create_configured_dispatchers( configs )
+		return @@Instance
 	end
 	
-
-	### Get the instance of the Dispatcher set up under the given +key+, which
-	### can either be a Symbol or a String containing the path to a
-	### configfile. If no key is given, it defaults to :__default__, which is
-	### the key assigned when .create is given just a configfile argument.
-	def self::instance( key=:__default__ )
-		rval = nil
-
-		# Fetch the instance which corresponds to the given key
-		if key.is_a?( Symbol )
-			Arrow::Logger.debug "Returning instance for key %p (one of %p): %p" %
-				[key, @@Instance.keys, @@Instance[key]]
-			rval = @@Instance[ key ]
-		else
-			Arrow::Logger.debug "Returning instance for configfile %p" % [key]
-			configfile = File.expand_path( key )
-			self.create( configfile )
-			rval = @@Instance[ configfile ]
-		end
-
-		# Return either a configured Dispatcher instance or a FallbackHandler if
-		# no Dispatcher corresponds to the given key.
-		return rval || Arrow::FallbackHandler.new( key, @@Instance )
-	end
-
 
 	### Create dispatchers for the config files given in +configspec+ and return
 	### them in a Hash keyed by both the configname key and the expanded path to

@@ -278,6 +278,41 @@ module Apache # :nodoc:
 	# Apache::Request
 	class Request < ModRubySimObject
 	
+		INSTANCE_METHODS = %w{
+			<< add_cgi_vars add_common_vars all_params allow_options
+            allow_overrides allowed allowed= args args= attributes auth_name
+            auth_name= auth_type auth_type= binmode bytes_sent cache_resp
+            cache_resp= cancel connection construct_url content_encoding
+            content_encoding= content_languages content_languages=
+            content_length content_type content_type= cookies cookies=
+            custom_response default_charset default_type disable_uploads=
+            disable_uploads? dispatch_handler dispatch_handler= eof eof?
+            err_headers_out error_message escape_html exception filename
+            filename= finfo get_basic_auth_pw get_client_block getc
+            hard_timeout header_only? headers_in headers_out hostname
+            initial? internal_redirect kill_timeout last log_reason
+            lookup_file lookup_uri main main? method_number next
+            note_auth_failure note_basic_auth_failure
+            note_digest_auth_failure notes options output_buffer param
+            params params_as_string paramtable parse path_info path_info=
+            post_max post_max= prev print printf protocol proxy? proxy_pass?
+            putc puts read register_cleanup remote_host remote_logname
+            replace request_method request_time requires reset_timeout
+            satisfies script_name script_path send_fd send_http_header
+            sent_http_header? server server_name server_port setup_cgi_env
+            setup_client_block should_client_block should_client_block?
+            signature soft_timeout status status= status_line status_line=
+            subprocess_env sync= sync_header sync_header= sync_output
+            sync_output= temp_dir temp_dir= the_request unparsed_uri
+            upload_hook upload_hook= upload_hook_data upload_hook_data=
+            uploads uploads_disabled? uri uri= user user= write
+		}
+
+		def self::instance_methods( include_superclass=true )
+			return INSTANCE_METHODS
+		end
+
+
 		def initialize( uri=nil )
 			@uri = uri
 			@server = nil

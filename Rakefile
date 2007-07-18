@@ -21,6 +21,8 @@ BEGIN {
 
 
 require 'rubygems'
+gem 'rspec', '>= 0.9.0'
+
 require 'rake'
 require 'rake/testtask'
 require 'rcov/rcovtask'
@@ -31,6 +33,7 @@ require 'rake/packagetask'
 require 'rake/gempackagetask'
 require 'pathname'
 
+require 'apache/fakerequest'
 require 'arrow'
 
 
@@ -140,6 +143,37 @@ Rake::RDocTask.new do |rdoc|
 
 	rdoc.rdoc_files.include TEXT_FILES
 	rdoc.rdoc_files.include LIB_FILES
+end
+
+
+### Task: install gems for development tasks
+DEPENDENCIES = %w[formvalidator ruby-cache flexmock ruby-breakpoint]
+task :install_dependencies do
+	# Check for root
+	if Process.euid != 0
+		$deferr.puts "This probably won't work, as you aren't root, but I'll try anyway"
+	end
+	
+	installer = Gem::RemoteInstaller.new( :include_dependencies => true )
+	gemindex = Gem::SourceIndex.from_installed_gems
+	
+	DEPENDENCIES.each do |gemname|
+		if (( specs = gemindex.search(gemname) )) && ! specs.empty?
+			$deferr.puts "Version %s of %s is already installed; skipping..." % 
+				[ specs.first.version, specs.first.name ]
+			next
+		end
+
+		$deferr.puts "Trying to install #{gemname}..."
+		gems = installer.install( gemname )
+		gems.compact!
+		$deferr.puts "Installed: %s" % [gems.collect {|spec| spec.full_name}.join(', ')]
+
+		gems.each do |gem|
+			Gem::DocManager.new( gem, '-w4 -SNH' ).generate_ri
+			Gem::DocManager.new( gem, '-w4 -SNH' ).generate_rdoc
+		end
+	end
 end
 
 

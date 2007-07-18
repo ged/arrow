@@ -11,6 +11,7 @@ BEGIN {
 
 begin
 	require 'spec/runner'
+	require 'apache/fakerequest'
 	require 'arrow'
 	require 'arrow/applet'
 	require 'arrow/spechelpers'
@@ -27,7 +28,7 @@ end
 ###	C O N T E X T S
 #####################################################################
 
-describe "An instance of an applet" do
+describe Arrow::Applet, " (subclass)" do
 	before(:each) do
 		@appletclass = Class.new( Arrow::Applet ) do
 			def test_action( txn, *args )

@@ -60,7 +60,7 @@ class Arrow::Config::YamlLoader < Arrow::Config::Loader
 	### specified.
 	def load( filename )
 		self.log.info "Loading YAML-format configuration from '%s'" % filename
-		return YAML.load( File.read(filename) )
+		return YAML.load_file( filename )
 	end
 
 

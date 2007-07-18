@@ -33,19 +33,19 @@ $rcsId		= %q$Id$
 RequiredLibraries = [
 	# libraryname, nice name, RAA URL, Download URL
 	[ 'cache', "Ruby-Cache", 
-		'http://www.ruby-lang.org/en/raa-list.rhtml?name=Ruby-Cache',
+		'http://raa.ruby-lang.org/project/Ruby-Cache',
 		'redist/ruby-cache-0.3.tar.gz',
 	],
 	[ 'formvalidator', "FormValidator", 
-		'http://www.ruby-lang.org/en/raa-list.rhtml?name=formvalidator',
+		'http://raa.ruby-lang.org/project/formvalidator',
 		'redist/formvalidator-0.1.3.tar.gz',
 	],
 	[ 'pluginfactory', "PluginFactory", 
-		'http://raa.ruby-lang.org/list.rhtml?name=pluginfactory',
+		'http://raa.ruby-lang.org/project/pluginfactory',
 		'redist/PluginFactory-1.0.0.tar.gz'
 	],
 	[ 'strscan', "Strscan", 
-		'http://www.ruby-lang.org/en/raa-list.rhtml?name=strscan',
+		'http://raa.ruby-lang.org/project/strscan',
 		'http://i.loveruby.net/archive/strscan/strscan-0.6.7.tar.gz',
 	],
 ]
@@ -151,11 +151,6 @@ EOF
 if $0 == __FILE__
 	header "Arrow Installer #$version"
 
-	for lib in RequiredLibraries
-		testForRequiredLibrary( *lib )
-	end
-
-	require 'arrow/config'
 	dryrun = false
 
 	# Parse command-line switches
@@ -180,6 +175,10 @@ if $0 == __FILE__
 
 		oparser.parse!
 	}
+
+	for lib in RequiredLibraries
+		testForRequiredLibrary( *lib )
+	end
 
 	debugMsg "Sitelibdir = '#{CONFIG['sitelibdir']}'"
 	sitelibdir = CONFIG['sitelibdir']
@@ -227,6 +226,8 @@ if $0 == __FILE__
 		if File.exists?( newconfig )
 			message "Not replacing existing config '%s'\n" % newconfig
 		else
+			require 'arrow/config'
+
 			config = Arrow::Config.load( configfile )
 			config.applets.path.dirs = [ appletdir ]
 			config.templates.path.dirs = [ templatedir ]

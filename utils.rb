@@ -26,6 +26,11 @@ BEGIN {
 		end
 	end
 
+	begin
+		require 'rubygems'
+	rescue LoadError
+		# no-op
+	end
 }
 
 
@@ -105,20 +110,24 @@ module UtilityFunctions
 	# Test for the presence of the specified <tt>library</tt>, and output a
 	# message describing the test using <tt>nicename</tt>. If <tt>nicename</tt>
 	# is <tt>nil</tt>, the value in <tt>library</tt> is used to build a default.
-	def testForLibrary( library, nicename=nil, progress=false )
+	def testForLibrary( library, nicename=nil )
 		nicename ||= library
-		message( "Testing for the #{nicename} library..." ) if progress
+		verboseMsg "Testing for the #{nicename} library..."
 		if $LOAD_PATH.detect {|dir|
 				File.exists?(File.join(dir,"#{library}.rb")) ||
 				File.exists?(File.join(dir,"#{library}.#{CONFIG['DLEXT']}"))
 			}
-			message( "found.\n" ) if progress
+			verboseMsg "found."
+			return true
+		elsif Object.const_defined?( :Gem ) && !Gem::cache.search( library ).empty?
+			verboseMsg "found (installed as gem)"
 			return true
 		else
-			message( "not found.\n" ) if progress
+			verboseMsg "not found.\n"
 			return false
 		end
 	end
+
 
 	# Test for the presence of the specified <tt>library</tt>, and output a
 	# message describing the problem using <tt>nicename</tt>. If

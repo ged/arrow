@@ -69,30 +69,8 @@ class Arrow::Transaction < Arrow::Object
 		
 	# Otherwise, just use the ones that were define when this was written (2007/03/20)
 	else
-		DelegatedMethods = %w{
-			<< add_cgi_vars add_common_vars all_params allow_options allow_overrides
-			allowed allowed= args args= attributes auth_name auth_name= auth_type
-			auth_type= binmode bytes_sent cache_resp cache_resp= cancel connection
-			construct_url content_encoding content_encoding= content_languages
-			content_languages= content_length content_type content_type= cookies
-			cookies= custom_response default_charset default_type disable_uploads=
-			disable_uploads? dispatch_handler dispatch_handler= eof eof? err_headers_out
-			error_message escape_html exception filename filename= finfo
-			get_basic_auth_pw get_client_block getc hard_timeout header_only? headers_in
-			headers_out hostname initial? internal_redirect kill_timeout last log_reason
-			lookup_file lookup_uri main main? method_number next note_auth_failure
-			note_basic_auth_failure note_digest_auth_failure notes options output_buffer
-			param params params_as_string paramtable parse path_info path_info= post_max
-			post_max= prev print printf protocol proxy? proxy_pass? putc puts read
-			register_cleanup remote_host remote_logname replace request_method
-			request_time requires reset_timeout satisfies script_name script_path
-			send_fd send_http_header sent_http_header? server server_name server_port
-			setup_cgi_env setup_client_block should_client_block should_client_block?
-			signature soft_timeout status_line status_line= subprocess_env sync=
-			sync_header sync_header= sync_output sync_output= temp_dir temp_dir=
-			the_request unparsed_uri upload_hook upload_hook= upload_hook_data
-			upload_hook_data= uploads uploads_disabled? uri uri= user user= write
-		}
+		raise "No mod_ruby loaded. Try requiring 'apache/fakerequest' " +
+			"to emulate the Apache environment."
 	end
 
 
@@ -108,6 +86,7 @@ class Arrow::Transaction < Arrow::Object
 		@request			= request
 		@config				= config
 		@broker				= broker
+		@handler_status     = Apache::OK
 
 		@serial				= make_transaction_serial( request )
 
@@ -170,6 +149,9 @@ class Arrow::Transaction < Arrow::Object
 	# The Arrow::CookieSet that contains cookies to be added to the response
 	attr_reader :cookies
 
+	# The handler status code to return to Apache
+	attr_accessor :handler_status
+	
 
 	### Returns a human-readable String representation of the transaction,
 	### suitable for debugging.
@@ -177,8 +159,8 @@ class Arrow::Transaction < Arrow::Object
 		"#<%s:0x%0x serial: %s; HTTP status: %d>" % [
 			self.class.name,
 			self.object_id * 2,
-			@serial,
-			@status
+			self.serial,
+			self.status
 		]
 	end
 
@@ -195,11 +177,19 @@ class Arrow::Transaction < Arrow::Object
 	end
 
 
+	### Returns true if the transactions response status is 2xx.
+	def is_success?
+		return nil unless self.status
+		return (self.status / 100) == 2
+	end
+	
+
 	### Returns true if the transaction's server status will cause the 
 	### request to be declined (i.e., not handled by Arrow)
 	def is_declined?
-		self.log.debug "Checking to see if the transaction is declined (%p)" % [self.status]
-		return self.status == Apache::DECLINED ? true : false
+		self.log.debug "Checking to see if the transaction is declined (%p)" %
+		 	[self.handler_status]
+		return self.handler_status == Apache::DECLINED ? true : false
 	end
 	
 
@@ -327,9 +317,15 @@ class Arrow::Transaction < Arrow::Object
 	### currently exists the transaction's cookieset.
 	def add_cookie_headers
 		self.cookies.each do |cookie|
-			self.log.debug "Adding 'Set-Cookie' header: %p (%p)" % 
-				[cookie, cookie.to_s]
-			self.headers_out['Set-Cookie'] = cookie.to_s
+			if self.is_success?
+				self.log.debug "Adding 'Set-Cookie' header: %p (%p)" % 
+					[cookie, cookie.to_s]
+				self.headers_out['Set-Cookie'] = cookie.to_s
+			else
+				self.log.debug "Adding 'Set-Cookie' to the error headers: %p (%p)" %
+					[cookie, cookie.to_s]
+				self.err_headers_out['Set-Cookie'] = cookie.to_s
+			end
 		end
 	end
 	
@@ -439,7 +435,7 @@ class Arrow::Transaction < Arrow::Object
 	### query string with a GET request, or in the body of a POST with a mimetype of 
 	### either 'application/x-www-form-urlencoded' or 'multipart/form-data'.
 	def form_request?
-		case self.request.request_method
+		case self.request_method
 		when 'GET', 'HEAD'
 			return (!self.parsed_uri.query.nil? || 
 				self.request_content_type =~ FORM_CONTENT_TYPES) ? true : false
@@ -483,6 +479,7 @@ class Arrow::Transaction < Arrow::Object
 		self.log.debug "Redirecting to %s" % uri
 		self.headers_out[ 'Location' ] = uri.to_s
 		self.status = status_code
+		self.handler_status = Apache::REDIRECT
 
 		return ''
 	end
@@ -537,5 +534,4 @@ class Arrow::Transaction < Arrow::Object
 	
 
 end # class Arrow::Transaction
-
 

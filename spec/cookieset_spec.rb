@@ -12,6 +12,7 @@ BEGIN {
 begin
 	require 'digest/md5'
 	require 'spec/runner'
+	require 'apache/fakerequest'
 	require 'arrow'
 	require 'arrow/cookieset'
 rescue LoadError
@@ -27,7 +28,7 @@ end
 ###	C O N T E X T S
 #####################################################################
 
-describe "A CookieSet object" do
+describe Arrow::CookieSet do
 	before(:each) do
 		@cookieset = Arrow::CookieSet.new
 	end
@@ -44,8 +45,8 @@ describe "A CookieSet object" do
 		end
 		
 		cookies.length.should == 2
-		cookies.should include( pants_cookie)
-		cookies.should include( shirt_cookie)
+		cookies.should include( pants_cookie )
+		cookies.should include( shirt_cookie )
 	end
 
 	it "is able to add a cookie referenced symbolically" do
@@ -56,20 +57,20 @@ describe "A CookieSet object" do
 	
 
 	it "autos-create a cookie for a non-cookie passed to the index setter" do
-		lambda { @cookieset['bar'] = 'badgerbadgerbadgerbadger' }.should_not raise_error
+		lambda { @cookieset['bar'] = 'badgerbadgerbadgerbadger' }.should_not raise_error()
 
-		@cookieset['bar'].should be_an_instance_of( Arrow::Cookie)
+		@cookieset['bar'].should be_an_instance_of( Arrow::Cookie )
 		@cookieset['bar'].value.should == 'badgerbadgerbadgerbadger'
 	end
 
 	it "raises an exception if the name of a cookie being set doesn't agree with the key it being set with" do
 		pants_cookie = Arrow::Cookie.new( 'pants', 'corduroy' )
-		lambda { @cookieset['shirt'] = pants_cookie }.should raise_error( ArgumentError)
+		lambda { @cookieset['shirt'] = pants_cookie }.should raise_error( ArgumentError )
 	end
 
 	it "implements Enumerable" do
 		Enumerable.instance_methods( false ).each do |meth|
-			@cookieset.should respond_to( meth)
+			@cookieset.should respond_to( meth )
 		end
 	end
 
@@ -83,19 +84,19 @@ describe "A CookieSet object" do
 	
 end
 
-describe "A CookieSet created with an Array of cookies" do
-	it "should flatten that array" do
+describe Arrow::CookieSet, " created with an Array of cookies" do
+	it "should flatten the array" do
 		cookie_array = []
 		cookie_array << Arrow::Cookie.new( 'foo', 'bar' )
 		cookie_array << [Arrow::Cookie.new( 'shmoop', 'torgo!' )]
 		
 		cookieset = nil
-		lambda {cookieset = Arrow::CookieSet.new(cookie_array)}.should_not raise_error
+		lambda {cookieset = Arrow::CookieSet.new(cookie_array)}.should_not raise_error()
 		cookieset.length.should == 2
 	end
 end
 
-describe "A CookieSet with a 'foo' cookie" do
+describe Arrow::CookieSet, " with a 'foo' cookie" do
 	before(:each) do
 		@cookie = Arrow::Cookie.new( 'foo', 'bar' )
 		@cookieset = Arrow::CookieSet.new( @cookie )
@@ -115,19 +116,19 @@ describe "A CookieSet with a 'foo' cookie" do
 	end
 
 	it "knows if it includes a cookie named 'foo'" do
-		@cookieset.should include( 'foo')
+		@cookieset.should include( 'foo' )
 	end
 
 	it "knows if it includes a cookie referenced by :foo" do
-		@cookieset.should include( :foo)
+		@cookieset.should include( :foo )
 	end
 	
 	it "knows that it doesn't contain a cookie named 'lollypop'" do
-		@cookieset.should_not include( 'lollypop')
+		@cookieset.should_not include( 'lollypop' )
 	end
 	
 	it "knows that it includes the 'foo' cookie object" do
-		@cookieset.should include( @cookie)
+		@cookieset.should include( @cookie )
 	end
 	
 	

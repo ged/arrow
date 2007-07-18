@@ -294,6 +294,7 @@ class Arrow::FormValidator < ::FormValidator
 	def errors?
 		return !self.okay?
 	end
+	alias_method :has_errors?, :errors?
 
 
 	### Return +true+ if all required fields were present and validated
@@ -334,12 +335,12 @@ class Arrow::FormValidator < ::FormValidator
 		end
 
 		self.invalid.each do |field, constraint|
-			msgs << "Invalid value for field '%s'" % self.get_description( field )
+			msgs << "Invalid value for '%s'" % self.get_description( field )
 		end
 
 		if include_unknown
 			self.unknown.each do |field|
-				msgs << "Unknown field '%s'" % self.get_description( field )
+				msgs << "Unknown parameter '%s'" % self.get_description( field )
 			end
 		end
 

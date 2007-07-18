@@ -11,6 +11,7 @@ BEGIN {
 
 begin
 	require 'spec/runner'
+	require 'apache/fakerequest'
 	require 'arrow'
 	require 'arrow/templatefactory'
 rescue LoadError
@@ -44,7 +45,7 @@ end
 ###	C O N T E X T S
 #####################################################################
 
-describe "A TemplateFactory instance configured with a loader class" do
+describe Arrow::TemplateFactory, " configured with a loader class" do
 
 	before(:each) do
 		tmplconfig = mock( "templates config", :null_object => true )
@@ -74,7 +75,7 @@ describe "A TemplateFactory instance configured with a loader class" do
 	end
 end
 
-describe "A TemplateFactory instance configured with a loader object" do
+describe Arrow::TemplateFactory, " configured with a loader object" do
 	before(:each) do
 		tmplconfig = mock( "templates config", :null_object => true )
 		tmplconfig.stub!( :cache ).and_return( false )
@@ -88,7 +89,7 @@ describe "A TemplateFactory instance configured with a loader object" do
 
 
 	it "has the loader class object registered as its loader" do
-	    @factory.loader.should be_an_instance_of( Arrow::TestingInstanceTemplateLoader )
+	    @factory.loader.should == Arrow::TestingInstanceTemplateLoader
 	end
 	
 	it "calls the loader's #load method to load templates" do
@@ -104,7 +105,7 @@ describe "A TemplateFactory instance configured with a loader object" do
 end
 
 
-describe "A TemplateFactory instance configured to use caching" do
+describe Arrow::TemplateFactory, " configured to use caching" do
 	before(:each) do
 		tmplconfig = mock( "templates config", :null_object => true )
 	    tmplconfig.stub!( :loader ).
@@ -140,7 +141,7 @@ describe "A TemplateFactory instance configured to use caching" do
 	
 end
 
-describe "A TemplateFactory instance configured to not use caching" do
+describe Arrow::TemplateFactory, " configured to not use caching" do
 	before(:each) do
 		tmplconfig = mock( "templates config", :null_object => true )
 	    tmplconfig.stub!( :loader ).

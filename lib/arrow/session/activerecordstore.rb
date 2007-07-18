@@ -26,7 +26,10 @@
 
 require 'arrow/exceptions'
 require 'arrow/session/store'
+
+require 'active_record'
 require 'yaml'
+require 'diff/lcs'
 
 
 ### ActiveRecord session store class.
@@ -71,10 +74,13 @@ class Arrow::Session::ActiveRecordStore < Arrow::Session::Store
 
 	### Insert the specified +data+ hash into the database.
 	def insert
+		dbo = nil
+		
 		super {|data|
-			self.log.debug "Saving session to the database."
 			dbo = self.db_object
+			self.log.debug "Saving session to the database."
 			dbo.session_data = data
+			self.log.debug "Session db object is at version %d" % [dbo.lock_version]
 			
 			unless dbo.create_or_update
 				raise Arrow::SessionError, 
@@ -82,6 +88,17 @@ class Arrow::Session::ActiveRecordStore < Arrow::Session::Store
 			end
 			self.log.debug "Session data saved."
 		}
+	rescue ActiveRecord::StaleObjectError => err
+		otherdbo = @klass.find_by_session_id( @id.to_s )
+		self.log.notice "Conflicting session updates:  %p" %
+			[ otherdbo.attributes.diff(dbo.attributes) ]
+		# :TODO: Handle merging sessions
+		
+	rescue ActiveRecord::ActiveRecordError => err
+		# :TODO: Give up on the session after logging the error, but don't 
+		# propagate the exception.
+		self.log.error "Error inserting/saving session: %s at %s" %
+			[err.message, err.backtrace.first]
 	end
 	alias_method :update, :insert
 

@@ -26,7 +26,9 @@ end
 ###	C O N T E X T S
 #####################################################################
 
-context "" do
+describe #{vars[:specified_class]} do
+
+	
 	
 end
 

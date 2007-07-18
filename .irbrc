@@ -25,6 +25,7 @@ end
 # Try to require the 'arrow' library
 begin
 	puts "Requiring Arrow..."
+	require 'apache/fakerequest'
 	require "arrow"
 
 	if $DEBUG

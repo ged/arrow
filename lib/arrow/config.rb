@@ -192,6 +192,7 @@ class Arrow::Config < Arrow::Object
 	def self::load( source, loader_obj=nil )
 		loader_obj = self.get_loader( loader_obj ) unless
 			loader_obj.is_a?( Arrow::Config::Loader )
+		source.untaint
 		confighash = loader_obj.load( source )
 
 		obj = new( confighash )
