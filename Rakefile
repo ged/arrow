@@ -21,7 +21,7 @@ BEGIN {
 
 
 require 'rubygems'
-gem 'rspec', '>= 0.9.0'
+gem 'rspec', '>= 1.0.4'
 
 require 'rake'
 require 'rake/testtask'

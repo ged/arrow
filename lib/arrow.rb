@@ -43,7 +43,7 @@ module Arrow
 	SVNId = %q$Id$
 
 	# Release version
-	VERSION = '0.1.0'
+	VERSION = '0.9.1'
 
 	HOSTS_CONFIG_LINE = <<-EOF
 	Can't load Arrow: No host config specified. Try setting the 'hosts_map' 
