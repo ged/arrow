@@ -29,7 +29,6 @@ require 'arrow/session/store'
 
 require 'active_record'
 require 'yaml'
-require 'diff/lcs'
 
 
 ### ActiveRecord session store class.
