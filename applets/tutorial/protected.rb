@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the ProtectedDelegator class, a derivative of
 # Arrow::Applet. It is an applet you can chain through for authentication

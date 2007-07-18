@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 
 # This is an experiment to see if you can use module ivars from including
 # classes.

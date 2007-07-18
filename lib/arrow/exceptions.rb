@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains a collection of exception classes for the Arrow web
 # application framework.

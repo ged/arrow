@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Template class, instances of which are used to
 # generate X(HT)ML output for Arrow applications.

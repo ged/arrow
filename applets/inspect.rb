@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the InspectorApplet class, a derivative of
 # Arrow::Applet. It dumps data that might be useful to applet developers.

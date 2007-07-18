@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the FancyImageText class, a derivative of Arrow::Applet. It
 # is an applet which generates an image of a string of TrueType text.

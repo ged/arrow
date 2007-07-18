@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 #
 # Minimal testcase to track down a GD bug
 # 

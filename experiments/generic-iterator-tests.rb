@@ -1,4 +1,4 @@
-#!/usr/bin/ruby -w
+#!/usr/bin/env ruby -w
 #
 # Unit test for the Arrow::Template::Iterator class
 # $Id$

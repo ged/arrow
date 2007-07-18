@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the LogoGenerator class, a derivative of Arrow::Applet. It
 # generates a blank logo of a given size and format.

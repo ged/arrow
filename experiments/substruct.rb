@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 
 # Test to see if Struct can be inherited from usefully.
 

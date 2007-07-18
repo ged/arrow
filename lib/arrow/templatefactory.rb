@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the TemplateFactory class, which is responsible for
 # interpreting the 'templates' section of the configuration, and providing 

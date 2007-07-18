@@ -1,4 +1,4 @@
-#!/usr/bin/ruby -w
+#!/usr/bin/env ruby -w
 #
 # Unit test for the mixins contained in mixins.rb
 # $Id$

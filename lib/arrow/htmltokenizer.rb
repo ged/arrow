@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::HTMLTokenizer class and a collection of token
 # classes. HTMLTokenizer is a simple HTML parser that can be used to break HTML

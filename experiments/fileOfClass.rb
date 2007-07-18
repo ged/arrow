@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 #
 # Trying to find a graceful way to find the file a Class is defined in.
 # 

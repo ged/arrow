@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Template::#{vars[:class]} class, a derivative of
 # Arrow::Template::#{vars[:superclass]}. This is the class which defines the

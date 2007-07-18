@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::AppletRegistry class, a derivative of
 # Arrow::Object. Instances of this class are responsible for loading and

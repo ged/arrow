@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the TimeClock class, a derivative of Arrow::Applet; it
 # implements a web-based timeclock applet.

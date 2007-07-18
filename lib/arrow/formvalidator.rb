@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::FormValidator class, a derivative of
 # FormValidator. A FormValidator variant that adds some nicities and additional

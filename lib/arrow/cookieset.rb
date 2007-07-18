@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # An object which provides a convenient way of accessing a set of Arrow::Cookies.
 # 

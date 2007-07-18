@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the AccessCounter class, a derivative of
 # Arrow::Applet. It's a little applet for testing session persistance. It just

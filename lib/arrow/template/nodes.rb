@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the base node classes which are used to parse and define
 # behaviour for Arrow::Template objects.

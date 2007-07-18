@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the SubclassedHello class, a derivative of the Hello
 # applet to test applet inheritance.

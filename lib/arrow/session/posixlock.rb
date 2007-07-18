@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Session::PosixLock class, a derivative of
 # Arrow::Session::Lock. This lock type uses the 'posixlock' library

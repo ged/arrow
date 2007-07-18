@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Session::FileLock class, a derivative of
 # Arrow::Session::Lock. Instances of this class provide file-based locking for

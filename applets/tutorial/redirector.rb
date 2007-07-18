@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the RedirectorApplet class, a derivative of
 # Arrow::Applet. It's only a demonstration of the Transaction's #redirect

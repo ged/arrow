@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # Unit test for the Arrow::AppletRegistry class
 # $Id: broker.tests.rb 183 2004-08-23 06:10:32Z ged $

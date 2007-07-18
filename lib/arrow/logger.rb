@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 #
 # This file contains the Arrow::Logger class, a hierarchical logging class for
 # the Arrow framework. It provides a generalized means of logging from inside

@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Logger::Outputter class, which is the abstract
 # base class for objects that control where logging output is sent in an

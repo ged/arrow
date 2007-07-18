@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby/usr/bin/ruby
 # 
 # This file contains the ArgumentTester class, a derivative of
 # Arrow::Applet. This applet is for testing/debugging/demonstrating the argument

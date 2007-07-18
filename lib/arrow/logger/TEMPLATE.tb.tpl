@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Logger::(>>>class<<<) class, a derivative of
 # (>>>superclass<<<). (>>>description<<<)

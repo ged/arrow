@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the LoadedFiles class, a derivative of Arrow::Applet. It
 # displays the disposition of all the files that are being monitored by Arrow.

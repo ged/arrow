@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Session::NullLock class, a derivative of
 # Arrow::Session::Lock. This is a null lock, in that it does not lock.

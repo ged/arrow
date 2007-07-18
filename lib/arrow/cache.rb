@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Cache class, a derivative of the Cache class
 # from the ruby-cache module. It adds a few convenience and introspection

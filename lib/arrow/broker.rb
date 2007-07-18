@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Broker class. The broker is the applet
 # manager. It maintains a registry of applets, and delegates transactions

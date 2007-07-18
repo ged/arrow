@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Object and Arrow::Version classes. Arrow::Object is
 # the base class for all objects in Arrow. Arrow::Version is a Comparable version

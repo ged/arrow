@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 #
 # An attempt to make a miminal test case for the weird LocalJumpError that's
 # happening in Arrow::Iterator.

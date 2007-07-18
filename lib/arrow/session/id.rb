@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Session::Id class, a derivative of
 # Arrow::Object. Instances of concrete derivatives of this class are used as

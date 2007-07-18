@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Config::YamlLoader class, a derivative of
 # Arrow::Config::Loader. It is used to load configuration files written in YAML

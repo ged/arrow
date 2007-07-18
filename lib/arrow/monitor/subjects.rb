@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Subject class and a few default subject
 # derivatives. Arrow::Subject is a base class for objects which are a single

@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Logger::FileOutputter class, a derivative of
 # Apache::Logger::Outputter. This is a logger outputter that writes to a

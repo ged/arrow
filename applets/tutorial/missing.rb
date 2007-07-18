@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the MissingApplet class, a derivative of Arrow::Applet. It
 # is an example 'missingApplet' applet.

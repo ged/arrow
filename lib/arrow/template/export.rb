@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Template::ExportDirective class, a derivative of
 # Arrow::Template::BracketingDirective. This is the class which defines the

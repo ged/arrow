@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 #
 # A little experiment to see if dup'ing a Module used as a namespace duplicates
 # its local variables, too.

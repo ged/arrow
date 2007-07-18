@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::DataSource class, an experimental implementation
 # of an abstract data layer for Arrow. It's not ready for real use yet.

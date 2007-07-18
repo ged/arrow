@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the visitor patterned criteria extension to the
 # Arrow::DataSource class

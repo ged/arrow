@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Wiki class, a small collection of data classes
 # used by the demo Arrow wiki application.

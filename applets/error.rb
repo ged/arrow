@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the ErrorHandler class, a derivative of
 # Arrow::Applet. It's an example of an error-handler applet.

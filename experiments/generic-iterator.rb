@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Template::Iterator class, instances of which can
 # be used to provide an iteration context to nodes in an Arrow template.

@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 #
 # An experiment to see if you can pass a block to 'yield' to have a kind of
 # two-layer handoff in an iterator. This would be useful for making the

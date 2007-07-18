@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Template::Parser class, a derivative of
 # Arrow::Object. This is the default parser class for the default Arrow

@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Dispatcher class, which is the mod_ruby handler
 # frontend for a web application.

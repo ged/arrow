@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the UnitTester class, a derivative of
 # Arrow::Applet. The UnitTest applet can be used to define and run tests for

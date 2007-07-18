@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Template::EscapeDirective class, a derivative of
 # Arrow::Template::CallDirective. This is the class which defines the behaviour

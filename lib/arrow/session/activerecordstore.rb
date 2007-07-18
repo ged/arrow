@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Session::ActiveRecordStore class, a derivative of
 # Arrow::Session::Store. Instances of this class store a session object as a

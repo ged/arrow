@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the ShareNotes class, a derivative of Arrow::Applet. Render
 # a shared document after being transformed via Markdown

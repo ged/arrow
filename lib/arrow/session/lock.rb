@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Session::Lock class, which is the abstract
 # superclass for session lock object classes. Locks are objects which fulfill

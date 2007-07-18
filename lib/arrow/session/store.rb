@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Session::Store class, a derivative of
 # Arrow::Object. Instances of concrete deriviatives of this class provide

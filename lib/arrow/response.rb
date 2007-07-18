@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Response class, an experimental derivative of
 # Arrow::Object which is intended to make building a response for an

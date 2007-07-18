@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Template::IfDirective class, a derivative of
 # Arrow::Template::BracketingDirective. Instances of this class represent a

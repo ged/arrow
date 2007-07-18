@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # $Id$
 #
 # Benchmark DelimScanner creation to see whether using a single instance to

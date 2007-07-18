@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Template::SetDirective class, a derivative of
 # Arrow::Template::Directive. This is the class which defines the behaviour of

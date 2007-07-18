@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the ConfigApplet class, a derivative of Arrow::Applet. It
 # can be used to view/edit Arrow configurations.

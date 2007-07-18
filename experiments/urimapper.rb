@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 #
 # Find a good algorithm for mapping the URI path onto a registry of applets
 # 

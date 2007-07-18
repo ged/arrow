@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the ArrowWiki class, a derivative of Arrow::Applet. It's a
 # simple wiki to demonstrate the Arrow framework.

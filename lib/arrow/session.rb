@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Session class, a derivative of
 # Arrow::Object. This provides a container for maintaining state across multiple transactions.

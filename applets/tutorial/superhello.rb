@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the SuperHello class, a derivative of Arrow::Applet. A
 # "hello world" applet.

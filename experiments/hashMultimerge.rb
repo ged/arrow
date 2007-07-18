@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 #
 # Experiment to see if a block argument to Hash#merge would make it possible to
 # do multi-level merging.

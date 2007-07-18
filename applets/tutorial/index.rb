@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the ArrowTutorial class, a derivative of Arrow::Applet. It
 # is the applet which loads and displays the tutorial (or will eventually).

@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Config class, instances of which use used to
 # load and save configuration values for an Arrow application.

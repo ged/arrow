@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the MemCache class, a derivative of Arrow::Applet. This is a web interface to MemCached.
 # 

@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the BlueClothDingus class, a derivative of
 # Arrow::Applet. It presents a text box into which one can input Markdown text,

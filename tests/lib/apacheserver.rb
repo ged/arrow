@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # A convenience class for starting/stopping a non-forking apache server.
 # 

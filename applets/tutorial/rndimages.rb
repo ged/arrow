@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the RandomImages class, a derivative of Arrow::Applet. It
 # shows the 'latest images' feed from LiveJournal as a page full of clickable

@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 #
 # Easy entrypoint into the Arrow::Logger#hierloggers method
 # 

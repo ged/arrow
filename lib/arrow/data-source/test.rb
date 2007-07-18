@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::TestDataSource class, a derivative of
 # Arrow::DataSource. Instances of this class are mock objects which encapsulate

@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the AppletViewer class, a derivative of Arrow::Applet. It is
 # an introspection applet that can be used to view the code for Arrow applets in

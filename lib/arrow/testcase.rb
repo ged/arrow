@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This is an abstract test case class for building Test::Unit unit tests for the
 # Arrow web application framework. It consolidates most of the maintenance work

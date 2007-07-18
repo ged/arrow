@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # Adds a class method 'which' to the 'File' class that behaves like the
 # like-named *NIX command.

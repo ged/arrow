@@ -1,4 +1,4 @@
-#!/usr/bin/ruby -w
+#!/usr/bin/env ruby -w
 
 #
 # Not so much an experiment as documentation-generator: Shows the stages of a

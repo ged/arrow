@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Session::MD5Id class, a derivative of
 # Arrow::Session::Id. Instances of this class are session IDs created by

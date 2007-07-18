@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::FallbackHandler class, a request handler for
 # Arrow that is used to handle misconfigured handler requests.

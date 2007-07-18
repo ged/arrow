@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow.monitor class. Instance of this class
 # are used to monitor activity within an Arrow system.

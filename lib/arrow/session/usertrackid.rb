@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Session::UsertrackId class, a derivative of
 # Arrow::Session::Id. This class creates session id objects which uses Apache's

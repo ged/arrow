@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # 
 # This file contains various utility classes, modules, and functions that don't
 # really fit anywhere else. It also adds some stuff to several built-in classes.
