@@ -307,7 +307,7 @@ class Arrow::Dispatcher < Arrow::Object
 		# If the transaction succeeded, set up the Apache::Request object, add
 		# headers, add session state, etc. If it failed, log the failure and let
 		# the status be returned as-is.
-		outputString = nil
+		response_body = nil
 		self.log.debug "Transaction has status %d" % [txn.status]
 
 		# Render the output before anything else, as there might be
@@ -316,11 +316,11 @@ class Arrow::Dispatcher < Arrow::Object
 		# themselves.
 		if output && output != true
 			rendertime = Benchmark.measure do
-				outputString = output.to_s
+				response_body = output.to_s
 			end
 			self.log.debug "Output render time: %s" %
 				rendertime.format( '%8.4us usr %8.4ys sys %8.4ts wall %8.4r' )
-			req.headers_out['content-length'] = outputString.length.to_s unless
+			req.headers_out['content-length'] = response_body.length.to_s unless
 				req.headers_out['content-length']
 		end
 
@@ -333,13 +333,13 @@ class Arrow::Dispatcher < Arrow::Object
 		self.log.debug "HTTP response status is: %d" % [txn.status]
 		self.log.debug "Response headers were: %s" % [untable(req.headers_out)]
 		txn.send_http_header
-		txn.print( outputString ) if outputString
+		txn.print( response_body ) if response_body
 
 		self.log.info "--- Done with request %p (%s)---------------" % 
 			[ req, req.status_line ]
 
 		req.sync = true
-		return Apache::OK
+		return txn.handler_status
 	rescue ::Exception => err
 		self.log.error "Dispatcher caught an unhandled %s: %s:\n\t%s" %
 			[ err.class.name, err.message, err.backtrace.join("\n\t") ]
