@@ -1,4 +1,3 @@
-
 #!/usr/bin/env ruby
 # 
 # This file contains the Arrow::Applet class, which is an abstract base
