@@ -104,7 +104,6 @@ require 'uri'
 require 'pluginfactory'
 require 'forwardable'
 
-require 'arrow'
 require 'arrow/mixins'
 require 'arrow/exceptions'
 require 'arrow/utils'
