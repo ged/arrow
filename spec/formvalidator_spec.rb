@@ -38,14 +38,26 @@ TestProfile = {
 		:email_constraint	=> :email,
 		:host_constraint	=> :hostname,
 	},
-	:untaint_all_constraints => true
 }
 
 
 describe Arrow::FormValidator do
+	before( :all ) do
+		outputter = Arrow::Logger::Outputter.
+			create( 'color:stderr', "formvalidator-spec" )
+		Arrow::Logger::global.outputters << outputter
+		Arrow::Logger::global.level = :crit
+	end
+	
 	before(:each) do
 		@validator = Arrow::FormValidator.new( TestProfile )
 	end
+
+	after( :all ) do
+		Arrow::Logger.global.outputters.clear
+	end
+
+	
 
 	# Test index operator interface
 	it "should provide read and write access to valid args via the index operator" do
@@ -56,6 +68,21 @@ describe Arrow::FormValidator do
 
 		@validator[:required] = "bar"
 		@validator["required"].should == "bar"
+	end
+
+
+	it "should untaint valid args if told to do so" do
+		rval = nil
+		tainted_one = "1"
+		tainted_one.taint
+		
+		@validator.validate( {'required' => 1, 'number' => tainted_one},
+			:untaint_all_constraints => true )
+			
+		Arrow::Logger.global.notice "Validator: %p" % [@validator]
+			
+		@validator[:number].should == "1"
+		@validator[:number].tainted?.should be_false()
 	end
 
 

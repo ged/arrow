@@ -636,8 +636,14 @@ class Arrow::Applet < Arrow::Object
 	### Create a FormValidator object for the specified +action+ which has
 	### been given the arguments from the given +txn+.
 	def make_validator( action, txn )
+		unless action =~ /^(\w+)$/
+			raise "Invalid action '#{action.inspect}'"
+		end
+		action = $1
+		action.untaint
+		
 		# Look up the profile for the applet or the default one
-		profile = @signature.validator_profiles[ action.to_s.intern ] ||
+		profile = @signature.validator_profiles[ action.to_sym ] ||
 			@signature.validator_profiles[ :__default__ ]
 
 		if profile.nil?

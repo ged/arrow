@@ -150,6 +150,8 @@ module Arrow
 				Arrow::Logger[ self ].send( lvl, message )
 			end
 
+			Arrow::Logger[ self ].debug "Propagated config to %d modules: %p" %
+				[ @modules.length, @modules ]
 			return @modules
 		end
 		

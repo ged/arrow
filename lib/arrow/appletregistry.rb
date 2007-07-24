@@ -81,8 +81,8 @@ class Arrow::AppletRegistry < Arrow::Object
 		def loaded_okay?
 			@exception.nil?
 		end
-		
 
+		
 		### Returns +true+ if the corresponding file has changed since it was loaded
 		def has_changed?
 			@timestamp != File.mtime( path )
@@ -313,10 +313,10 @@ class Arrow::AppletRegistry < Arrow::Object
 
 		# Now search the applet path for applet files
 		filelist.each do |appletfile|
-			# self.log.debug "Found applet file %p" % appletfile
+			self.log.debug "Found applet file %p" % appletfile
 			self.load_applets_from_file( appletfile )
-			#self.log.debug "After %s, registry has %d entries" %
-			#	[ appletfile, @urispace.length ]
+			self.log.debug "After %s, registry has %d entries" %
+				[ appletfile, @urispace.length ]
 		end
 
 		@loadTime = Time.now
@@ -372,11 +372,19 @@ class Arrow::AppletRegistry < Arrow::Object
 
 		# Reload mode -- don't do anything unless the file's been updated
 		if @filemap.key?( path )
-			if @filemap[ path ].has_changed?
+			file = @filemap[ path ]
+			
+			if file.has_changed?
 				self.log.info "File %p has changed since loaded. Reloading." % [path]
 				self.purge_deleted_applets( path )
+			elsif !file.loaded_okay?
+				self.log.warning "File %s could not be loaded: %s" % 
+					[path, file.exception.message]
+				file.exception.backtrace.each do |frame|
+					self.log.debug "  " + frame
+				end
 			else
-				#self.log.debug "File %p has not changed." % [path]
+				self.log.debug "File %p has not changed." % [path]
 				return nil
 			end
 		end
@@ -385,7 +393,7 @@ class Arrow::AppletRegistry < Arrow::Object
 		@filemap[ path ] = AppletFile.new( path )
 	
 		@filemap[ path ].appletclasses.each do |appletclass|
-			#self.log.debug "Registering applet class %s from %p" % [appletclass.name, path]
+			self.log.debug "Registering applet class %s from %p" % [appletclass.name, path]
 			begin
 				uris = self.register_applet_class( appletclass )
 				@filemap[ path ].uris << uris

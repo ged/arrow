@@ -49,7 +49,7 @@ describe Arrow::Applet, " (subclass)" do
 		txn.should_receive( :form_request? ).at_least(1).and_return( false )
 		txn.stub!( :request ).and_return( request )
 
-		@applet.run( txn, :test )
+		@applet.run( txn, 'test' )
 	end
 
 	

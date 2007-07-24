@@ -386,10 +386,12 @@ class Arrow::Config < Arrow::Object
 		newhash = {}
 		
 		hash.each do |key,val|
+			keysym = key.to_s.dup.untaint.to_sym
+			
 			if val.is_a?( Hash )
-				newhash[ key.to_s.intern ] = internify_keys( val )
+				newhash[ keysym ] = internify_keys( val )
 			else
-				newhash[ key.to_s.intern ] = val
+				newhash[ keysym ] = val
 			end
 		end
 

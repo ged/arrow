@@ -453,7 +453,7 @@ class Arrow::Applet::TestCase < Arrow::TestCase
 		# Define the delegator and an action to subrun
 		@appletclass.class_eval do
 			def delegate( txn, chain, *args )
-				self.subrun( :test_vargs, txn, *args )
+				self.subrun( 'test_vargs', txn, *args )
 			end
 			def test_vargs_action( txn, *args )
 			end

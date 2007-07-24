@@ -431,15 +431,40 @@ class Arrow::Logger
 
 	### Auto-install logging methods (ie., methods whose names match one of
 	### Arrow::Logger::Levels.
-	def method_missing( id, *args )
-		super unless Arrow::Logger::Levels.member?( id )
+	def method_missing( sym, *args )
+		name = sym.to_s
+		level = name[/\w+/].to_sym
+		return super unless Arrow::Logger::Levels.member?( level )
+		code = nil
 
-		# debug_msg "Autoloading instance log method '#{id}'"
-		self.class.class_eval {
-			define_method( id ) {|*args| self.write(id, *args)}
-		}
+		case name
+		when /^\w+\?/
+			code = self.make_level_predicate_method( level )
 
-		self.send( id, *args )
+		when /^\w+$/
+			code = self.make_writer_method( level )
+			
+		else
+			return super
+		end
+			
+		self.class.send( :define_method, sym, &code )
+		return self.method( sym ).call( *args )
+	end
+
+
+	### Return a Proc suitable for installing as a predicate method for the given 
+	### logging level.
+	def make_level_predicate_method( level )
+		numeric_level = Levels[level]
+		Proc.new { self.level < numeric_level }
+	end
+
+
+	### Return a Proc suitable for installing as a log-writing method for the given
+	### logging level.
+	def make_writer_method( level )
+		Proc.new {|*args| self.write(level, *args)}
 	end
 
 end # class Arrow::Logger

@@ -90,112 +90,6 @@ require 'arrow/mixins'
 require 'arrow/exceptions'
 require 'arrow/object'
 
-# Override to eliminate use of deprecated Object#type
-module FormValidator::ConstraintHelpers # :nodoc:
-    def do_constraint(key, constraints)
-		constraints.each do |constraint|
-			# next unless(untaint?(key))
-			case constraint
-			when String
-				apply_string_constraint(key, constraint)
-			when Hash
-				apply_hash_constraint(key, constraint)
-			when Proc
-				apply_proc_constraint(key, constraint)
-			when Regexp
-				apply_regexp_constraint(key, constraint) 
-			end
-		end
-    end
-
-    # A hash allows you to send multiple arguments to a constraint.
-    # constraint can be a builtin constraint, regexp, or a proc object.
-    # params is a list of form fields to be fed into the constraint or proc.
-    # If an optional name field is specified then it will be listed as
-    # the failed constraint in the invalid_fields hash.
-	def apply_hash_constraint(key, constraint)
-		return unless(untaint?(key))
-		untainting_successful = false
-		action = constraint["constraint"]
-		case action
-		when String
-			untainting_successful = apply_string_constraint(key, constraint)
-		when Regexp
-			untainting_successful = apply_regexp_constraint(key, constraint) 
-		when Proc
-			args = constraint["params"].map {|p| @form[p] }
-			untainting_successful = apply_proc_constraint(key, constraint, args)
-		end
-		unless(untainting_successful)
-			if(constraint["name"])
-				@invalid_fields[key] = constraint["name"]
-			end
-		end
-		return untainting_successful
-	end
-
-    # applies a proc constraint to form[key]
-	def apply_proc_constraint(key, constraint, *args)
-		return unless(untaint?(key))
-		untainted_value = ''
-		if(args)
-			untainted_value = constraint.call(args)
-		else
-			untainted_value = constraint.call(@form[key])
-		end
-		set_untainted_form_value( key,
-		                          constraint,
-		                          untainted_value )
-	end
-
-    # Applies a builtin constraint to form[key]
-	def apply_string_constraint(key, constraint)
-		return unless(untaint?(key))
-		untainted_value = self.send("match_#{constraint}".to_sym, 
-		                            @form[key].to_s)
-		set_untainted_form_value( key,
-		                          constraint,
-		                          untainted_value )
-	end
-
-    # Applies regexp constraint to form[key]
-	def apply_regexp_constraint(key, constraint)
-		return unless(untaint?(key))
-		untainted_value = ''
-		user_value_array = Array(@form[key].to_s)
-		user_value_array.flatten!
-		user_value_array.each do |user_value|
-			if(matched = constraint.match(user_value))
-				untainted_value += matched[0]
-			end
-		end
-		set_untainted_form_value( key,
-		                          constraint,
-		                          untainted_value )
-	end
-
-	# A helper method which overwrites the form's field by the key
-	# if it has been successfully validated,
-	# or deletes it fromt he form hash, and adds it to an
-	# invalid fields has if it has not been validated.
-	def set_untainted_form_value(key, constraint, untainted_value)
-		if(untainted_value.length > 0)
-			@form[key] = untainted_value
-			@form[key].untaint
-			return true
-		else
-			@form.delete(key)
-			@invalid_fields = {} if @invalid_fields.nil?
-			@invalid_fields[key] = [] unless @invalid_fields.has_key?(key)
-
-			unless @invalid_fields[key].include?(constraint.inspect)
-				@invalid_fields[key].push(constraint.inspect)
-			end
-			return false
-		end
-	end
-end
-
 ### Add some Hash-ish methods for convenient access to FormValidator#valid.
 class Arrow::FormValidator < ::FormValidator
 	extend Forwardable
@@ -251,12 +145,14 @@ class Arrow::FormValidator < ::FormValidator
 	### Validate the input in +params+. If the optional +additional_profile+ is
 	### given, merge it with the validator's default profile before validating.
 	def validate( params, additional_profile=nil )
+		profile = @profile
+		
 		if additional_profile
 			self.log.debug "Merging additional profile %p" % [additional_profile]
-			@profile.merge!( additional_profile ) 
+			profile = @profile.merge( additional_profile ) 
 		end
 
-		super( params, @profile )
+		super( params, profile )
 	end
 
 
@@ -302,6 +198,21 @@ class Arrow::FormValidator < ::FormValidator
 	def okay?
 		self.missing.empty? && self.invalid.empty?
 	end
+	
+	
+	### Returns +true+ if the given +field+ is one that should be untainted.
+	def untaint?( field )
+		self.log.debug "Checking to see if %p should be untainted." % [field]
+		rval = ( @untaint_all || @untaint_fields.include?(field) )
+		if rval
+			self.log.debug "  ...yep it should."
+		else
+			self.log.debug "  ...nope."
+		end
+		
+		return rval
+	end
+	
 
 
 	### Return an array of field names which had some kind of error associated
@@ -448,17 +359,19 @@ class Arrow::FormValidator < ::FormValidator
 	### addresses.
 	def match_email( val )
 		match = RFC822EmailAddress.match( val )
+		self.log.debug "Validating an email address %p: %p" %
+			[ val, match ]
 		return match ? match[0] : nil
 	end
 	
 	
 	RFC1738Hostname = begin
 		alphadigit = /[a-z0-9]/i
-	    # toplabel       = alpha | alpha *[ alphadigit | "-" ] alphadigit
+		# toplabel		 = alpha | alpha *[ alphadigit | "-" ] alphadigit
 		toplabel = /[a-z]((#{alphadigit}|-)*#{alphadigit})?/i
-	    # domainlabel    = alphadigit | alphadigit *[ alphadigit | "-" ] alphadigit
+		# domainlabel	 = alphadigit | alphadigit *[ alphadigit | "-" ] alphadigit
 		domainlabel = /#{alphadigit}((#{alphadigit}|-)*#{alphadigit})?/i
-	    # hostname       = *[ domainlabel "." ] toplabel
+		# hostname		 = *[ domainlabel "." ] toplabel
 		hostname = /\A(#{domainlabel}\.)*#{toplabel}\z/
 	end
 
@@ -469,52 +382,158 @@ class Arrow::FormValidator < ::FormValidator
 	end
 
 
-	# Applies a builtin constraint to form[key]
-	def apply_string_constraint(key, constraint)
-		# FIXME: multiple elements
-		res = self.__send__( "match_#{constraint}", @form[key].to_s )
-		unless res.nil?
-			@form[key] = res 
-			if untaint?(key)
-				@form[key].untaint
+	### Apply one or more +constraints+ to the field value/s corresponding to
+	### +key+.
+	def do_constraint( key, constraints )
+		constraints.each do |constraint|
+			case constraint
+			when String
+				apply_string_constraint( key, constraint )
+			when Hash
+				apply_hash_constraint( key, constraint )
+			when Proc
+				apply_proc_constraint( key, constraint )
+			when Regexp
+				apply_regexp_constraint( key, constraint ) 
+			else
+				raise "unknown constraint type %p" % [constraint]
 			end
-		else
-			@form.delete(key)
-			@invalid_fields[key] ||= []
-			unless @invalid_fields[key].include?(constraint)
-				@invalid_fields[key].push(constraint) 
-			end
-			nil
 		end
 	end
 
+
+	### Applies a builtin constraint to form[key].
+	def apply_string_constraint( key, constraint )
+		# FIXME: multiple elements
+		rval = self.__send__( "match_#{constraint}", @form[key].to_s )
+		self.log.debug "Matched a string constraint: %p -> %p" %
+			[ @form[key].to_s, rval ]
+		self.set_form_value( key, rval, constraint )
+	end
+	
+	
+	### Apply a constraint given as a Hash to the value/s corresponding to the
+	### specified +key+:
+	### 
+	### constraint::
+	###   A builtin constraint (as a Symbol; e.g., :email), a Regexp, or a Proc.
+	### name::
+	###   A description of the constraint should it fail and be listed in #invalid.
+	### params::
+	###   If +constraint+ is a Proc, this field should contain a list of other
+	###   fields to send to the Proc.
+	def apply_hash_constraint( key, constraint )
+		action = constraint["constraint"]
+		
+		rval = case action
+			when String
+				self.apply_string_constraint( key, action )
+			when Regexp
+				self.apply_regexp_constraint( key, action )
+			when Proc
+				if args = constraint["params"]
+					args.collect! {|field| @form[field] }
+					self.apply_proc_constraint( key, action, *args )
+				else
+					self.apply_proc_constraint( key, action )
+				end
+			end
+	
+		# If the validation failed, and there's a name for this constraint, replace
+		# the name in @invalid_fields with the name
+		if !rval && constraint["name"]
+			@invalid_fields[key] = constraint["name"]
+		end
+	
+		return rval
+	end
+	
+	
+	### Apply a constraint that was specified as a Proc to the value for the given 
+	### +key+
+	def apply_proc_constraint( key, constraint, *params )
+		value = nil
+	
+		unless params.empty?
+			value = constraint.call( *params )
+		else
+			value = constraint.call( @form[key] )
+		end
+	
+		self.set_form_value( key, constraint, value )
+	end
+	
+	
+	### Applies regexp constraint to form[key]
+	def apply_regexp_constraint( key, constraint )
+		if match = constraint.match( @form[key].to_s )
+			if match.captures
+				if match.captures.length > 1
+					self.set_form_value( key, match.captures, constraint )
+				else
+					self.set_form_value( key, match.captures.first, constraint )
+				end
+			else
+				self.set_form_value( key, match[0], constraint )
+			end
+		else
+			self.set_form_value( key, nil, constraint )
+		end
+	end
+	
+	
+	### Set the form value for the given +key+. If +value+ is false, add it to
+	### the list of invalid fields with a description derived from the specified
+	### +constraint+.
+	def set_form_value( key, value, constraint )
+		key.untaint
+	
+		if !value.nil? 
+			@form[key] = value
+			@form[key].untaint if self.untaint?( key )
+			return true
+			
+		else
+			@form.delete( key )
+			@invalid_fields ||= {}
+			@invalid_fields[ key ] ||= []
+	
+			unless @invalid_fields[ key ].include?( constraint )
+				@invalid_fields[ key ].push( constraint )
+			end
+			return false
+		end
+	end
+
+
 	### Formvalidator hack:
 	### The formvalidator filters method has a bug where he assumes an array
-	###  when it is in fact a string for multiple values (ie anytime you have a 
-	###  text-area with newlines in it).
-    def filters
-	  @filters_array = Array(@profile[:filters]) unless(@filters_array)
-      @filters_array.each do |filter|
-        if respond_to?("filter_#{filter}".intern)
-          @form.keys.each do |field|
-            # If a key has multiple elements, apply filter to each element
-			@field_array = Array(@form[field])
-            if @field_array.length > 1
-              @field_array.each_index do |i|
-                elem = @field_array[i]
-                @field_array[i] = self.send("filter_#{filter}".intern, elem)
-              end
-            else
-              if not @form[field].to_s.empty?
-                @form[field] =
-                  self.send("filter_#{filter}".intern, @form[field].to_s)
-              end
-            end
-          end
-        end
-      end
-      @form
-    end
+	###	 when it is in fact a string for multiple values (ie anytime you have a 
+	###	 text-area with newlines in it).
+	def filters
+		@filters_array = Array(@profile[:filters]) unless(@filters_array)
+		@filters_array.each do |filter|
+
+			if respond_to?( "filter_#{filter}" )
+				@form.keys.each do |field|
+					# If a key has multiple elements, apply filter to each element
+					@field_array = Array( @form[field] )
+
+					if @field_array.length > 1
+						@field_array.each_index do |i|
+							elem = @field_array[i]
+							@field_array[i] = self.send("filter_#{filter}", elem)
+						end
+					else
+						if not @form[field].to_s.empty?
+							@form[field] = self.send("filter_#{filter}", @form[field].to_s)
+						end
+					end
+				end
+			end
+		end
+		@form
+	end
 
 
 	#######
@@ -561,5 +580,6 @@ class Arrow::FormValidator < ::FormValidator
 	end
 
 end # class Arrow::FormValidator
+
 
 
