@@ -636,7 +636,7 @@ class Arrow::Applet < Arrow::Object
 	### Create a FormValidator object for the specified +action+ which has
 	### been given the arguments from the given +txn+.
 	def make_validator( action, txn )
-		unless action =~ /^(\w+)$/
+		unless action.to_s =~ /^(\w+)$/
 			raise "Invalid action '#{action.inspect}'"
 		end
 		action = $1
