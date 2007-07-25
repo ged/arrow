@@ -56,6 +56,24 @@ LIB_FILES     = Dir.glob('lib/**/*.rb').delete_if { |item| item =~ /\.svn/ }
 
 RELEASE_FILES = TEXT_FILES + LIB_FILES + SPEC_FILES
 
+# Load task plugins
+RAKE_TASKDIR = BASEDIR + 'rake'
+Pathname.glob( RAKE_TASKDIR + '*.rb' ).each do |tasklib|
+	require tasklib
+end
+
+if Rake.application.options.trace
+	$trace = true
+	log "$trace is enabled"
+end
+
+if Rake.application.options.dryrun
+	$dryrun = true
+	log "$dryrun is enabled"
+end
+
+
+
 
 ### Default task
 task :default  => [:all_tests, :package]
