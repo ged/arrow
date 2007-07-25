@@ -269,12 +269,19 @@ class Arrow::Applet < Arrow::Object
 	### Inheritance callback: register any derivative classes so they can be
 	### looked up later.
 	def self::inherited( klass )
+		@inherited_from = true
 		if defined?( @newly_loaded )
 			@newly_loaded.push( klass )
 			super
 		else
 			Arrow::Applet.inherited( klass )
 		end
+	end
+	
+	
+	### Have any subclasses of this class been created?
+	def self::inherited_from?
+		@inherited_from
 	end
 
 
@@ -288,11 +295,15 @@ class Arrow::Applet < Arrow::Object
 	end
 
 
-	### Load any applet classes in the given file and return them.
-	def self::load( filename )
+	### Load any applet classes in the given file and return them.  Ignores
+	### any class which has a subclass in the file unless +ignore_base_classes+
+	### is set false
+	def self::load( filename, include_base_classes=false )
 		self.newly_loaded.clear
 
-		rval = Kernel.load( filename, true )
+		# Load the applet file in an anonymous module. Any applet classes get
+		# collected via the ::inherited hook into @newly_loaded
+		Kernel.load( filename, true )
 
 		newderivatives = @newly_loaded.dup
 		@derivatives -= @newly_loaded
@@ -302,6 +313,12 @@ class Arrow::Applet < Arrow::Object
 			applet.filename = filename
 		end
 
+		unless include_base_classes
+			newderivatives.delete_if do |applet|
+				applet.inherited_from?
+			end
+		end
+		
 		return newderivatives
 	end
 
