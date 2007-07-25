@@ -29,10 +29,12 @@ end
 TestProfile = {
 	:required		=> [ :required ],
 	:optional		=> %w{optional number alpha int_constraint 
-		bool_constraint email_constraint host_constraint},
+		bool_constraint email_constraint host_constraint
+		regexp_w_captures},
 	:constraints	=> {
-		:number				=> /^(\d+)$/,
-		:alpha				=> /^(\w+)$/,
+		:number				=> /^\d+$/,
+		:alpha				=> /^\w+$/,
+		:regexp_w_captures  => /(\w+)(\S+)/,
 		:int_constraint		=> :integer,
 		:bool_constraint	=> :boolean,
 		:email_constraint	=> :email,
@@ -85,6 +87,17 @@ describe Arrow::FormValidator do
 		@validator[:number].tainted?.should be_false()
 	end
 
+
+	it "should return the captures from a regexp constraint if it has them" do
+		rval = nil
+		params = { 'required' => 1, 'regexp_w_captures' => "   the1tree(!)   " }
+		
+		@validator.validate( params, :untaint_all_constraints => true )
+			
+		Arrow::Logger.global.notice "Validator: %p" % [@validator]
+			
+		@validator[:regexp_w_captures].should == ['the1tree', '(!)']
+	end
 
 	it "knows the names of fields that were required but missing from the parameters" do
 		@validator.validate( {} )

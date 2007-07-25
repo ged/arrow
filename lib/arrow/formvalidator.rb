@@ -118,6 +118,9 @@ class Arrow::FormValidator < ::FormValidator
 	public
 	######
 
+	attr_reader :raw_form
+	
+
 	### Delegate Hash methods to the valid form variables hash
 	def_delegators :@form,
 		*(Hash.public_instance_methods(false) - ['[]', '[]=', 'inspect'])
@@ -145,6 +148,7 @@ class Arrow::FormValidator < ::FormValidator
 	### Validate the input in +params+. If the optional +additional_profile+ is
 	### given, merge it with the validator's default profile before validating.
 	def validate( params, additional_profile=nil )
+		@raw_form = params.dup
 		profile = @profile
 		
 		if additional_profile
@@ -466,15 +470,17 @@ class Arrow::FormValidator < ::FormValidator
 	
 	### Applies regexp constraint to form[key]
 	def apply_regexp_constraint( key, constraint )
+		self.log.debug "Validating '%p' via regexp %p" % [@form[key], constraint]
+
 		if match = constraint.match( @form[key].to_s )
-			if match.captures
-				if match.captures.length > 1
-					self.set_form_value( key, match.captures, constraint )
-				else
-					self.set_form_value( key, match.captures.first, constraint )
-				end
-			else
+			self.log.debug "  matched %p" % [match[0]]
+
+			if match.captures.empty?
+				self.log.debug "  no captures, using whole match: %p" % [match[0]]
 				self.set_form_value( key, match[0], constraint )
+			else
+				self.log.debug "  extracting captures: %p" % [match.captures]
+				self.set_form_value( key, match.captures, constraint )
 			end
 		else
 			self.set_form_value( key, nil, constraint )
@@ -489,11 +495,15 @@ class Arrow::FormValidator < ::FormValidator
 		key.untaint
 	
 		if !value.nil? 
+			self.log.debug "Setting form value for %p to %p (constraint was %p)" %
+				[ key, value, constraint ]
 			@form[key] = value
 			@form[key].untaint if self.untaint?( key )
 			return true
 			
 		else
+			self.log.debug "Clearing form value for %p (constraint was %p)" %
+				[ key, constraint ]
 			@form.delete( key )
 			@invalid_fields ||= {}
 			@invalid_fields[ key ] ||= []
