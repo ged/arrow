@@ -296,7 +296,7 @@ class Arrow::Applet < Arrow::Object
 
 
 	### Load any applet classes in the given file and return them.  Ignores
-	### any class which has a subclass in the file unless +ignore_base_classes+
+	### any class which has a subclass in the file unless +include_base_classes+
 	### is set false
 	def self::load( filename, include_base_classes=false )
 		self.newly_loaded.clear
