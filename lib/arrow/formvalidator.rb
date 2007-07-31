@@ -329,6 +329,16 @@ class Arrow::FormValidator < ::FormValidator
 	end
 	
 	
+	### Constrain a value to any printable characters
+	def match_printable( val )
+		if val =~ /^[[:print:][:space:]]{0,255}$/
+			return val
+		else
+			return nil
+		end
+	end
+	
+	
 	
 	#
 	# RFC822 Email Address Regex

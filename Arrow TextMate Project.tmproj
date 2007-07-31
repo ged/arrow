@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>spec/formvalidator_spec.rb</string>
+	<string>lib/arrow/formvalidator.rb</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -184,14 +184,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>17</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>154</integer>
+				<integer>338</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>177</integer>
+			<integer>297</integer>
 		</dict>
 		<key>lib/arrow/logger.rb</key>
 		<dict>
@@ -612,6 +612,6 @@
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{80, 75}, {903, 1503}}</string>
+	<string>{{80, 0}, {903, 1028}}</string>
 </dict>
 </plist>

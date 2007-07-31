@@ -650,9 +650,10 @@ class Arrow::Applet < Arrow::Object
 	alias_method :template, :load_template
 
 
-	### Create a FormValidator object for the specified +action+ which has
-	### been given the arguments from the given +txn+.
-	def make_validator( action, txn )
+	### Return the validator profile that corresponds to the +action+ which
+	### will be executed by the specified +txn+. Returns the __default__
+	### profile if no more-specific one is available.
+	def get_validator_profile_for_action( action, txn )
 		unless action.to_s =~ /^(\w+)$/
 			raise "Invalid action '#{action.inspect}'"
 		end
@@ -668,6 +669,15 @@ class Arrow::Applet < Arrow::Object
 				"Returning nil validator."
 			return nil
 		end
+
+		return profile
+	end
+	
+
+	### Create a FormValidator object for the specified +action+ which has
+	### been given the arguments from the given +txn+.
+	def make_validator( action, txn )
+		profile = self.get_validator_profile_for_action( action, txn )
 
 		# Create a new validator object, map the request args into a regular
 		# hash, and then send them to the validaator with the applicable profile
