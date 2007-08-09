@@ -531,6 +531,7 @@ class Arrow::Applet < Arrow::Object
 	### Given an +action+ name (or +nil+ for the default action), return a
 	### Method for the action method which should be invoked on the specified +txn+.
 	def lookup_action_method( txn, action, *args )
+		self.log.debug "Mapping %s( %p ) to an action" % [ action, args ]
 
 		# Look up the Method object that needs to be called
 		if (( match = @actions_regexp.match(action.to_s) ))

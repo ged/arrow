@@ -316,7 +316,7 @@ class Arrow::FormValidator < ::FormValidator
 		return Integer( val ) rescue nil
 	end
 	
-	
+
 	### Contrain a value to a Float
 	def match_float( val )
 		return Float( val ) rescue nil
@@ -329,9 +329,29 @@ class Arrow::FormValidator < ::FormValidator
 	end
 	
 	
+	### Constrain a value to alpha characters (a-z, case-insensitive)
+	def match_alpha( val )
+		if val =~ /^([a-z]+)$/i
+			return $1
+		else
+			return nil
+		end
+	end
+	
+	
+	### Constrain a value to alpha characters (a-z, case-insensitive and 0-9)
+	def match_alphanumeric( val )
+		if val =~ /^([a-z0-9]+)$/i
+			return $1
+		else
+			return nil
+		end
+	end
+	
+	
 	### Constrain a value to any printable characters
 	def match_printable( val )
-		if val =~ /^[[:print:][:space:]]{0,255}$/
+		if val =~ /^([[:print:][:space:]]{0,255})$/
 			return val
 		else
 			return nil
@@ -420,7 +440,7 @@ class Arrow::FormValidator < ::FormValidator
 	def apply_string_constraint( key, constraint )
 		# FIXME: multiple elements
 		rval = self.__send__( "match_#{constraint}", @form[key].to_s )
-		self.log.debug "Matched a string constraint: %p -> %p" %
+		self.log.debug "Tried a string constraint: %p: %p" %
 			[ @form[key].to_s, rval ]
 		self.set_form_value( key, rval, constraint )
 	end

@@ -28,17 +28,20 @@ end
 #####################################################################
 TestProfile = {
 	:required		=> [ :required ],
-	:optional		=> %w{optional number alpha int_constraint 
+	:optional		=> %w{optional number int_constraint 
 		bool_constraint email_constraint host_constraint
-		regexp_w_captures},
+		regexp_w_captures alpha_constraint alphanumeric_constraint
+		printable_constraint},
 	:constraints	=> {
-		:number				=> /^\d+$/,
-		:alpha				=> /^\w+$/,
-		:regexp_w_captures  => /(\w+)(\S+)/,
-		:int_constraint		=> :integer,
-		:bool_constraint	=> :boolean,
-		:email_constraint	=> :email,
-		:host_constraint	=> :hostname,
+		:number                  => /^\d+$/,
+		:regexp_w_captures       => /(\w+)(\S+)/,
+		:int_constraint          => :integer,
+		:bool_constraint         => :boolean,
+		:email_constraint        => :email,
+		:host_constraint         => :hostname,
+		:alpha_constraint        => :alpha,
+		:alphanumeric_constraint => :alphanumeric,
+		:printable_constraint    => :printable,
 	},
 }
 
@@ -471,5 +474,82 @@ describe Arrow::FormValidator do
 		end
 	end
 
+	it "accepts alpha characters for fields with alpha constraints" do
+		params = {'required' => '1', 'alpha_constraint' => 'abelincoln'}
+	
+		@validator.validate( params )
+
+		@validator.should be_okay()
+		@validator.should_not have_errors()
+
+		@validator[:alpha_constraint].should == 'abelincoln'
+	end
+	
+	it "rejects non-alpha characters for fields with alpha constraints" do
+		params = {'required' => '1', 'alpha_constraint' => 'duck45'}
+	
+		@validator.validate( params )
+
+		@validator.should_not be_okay()
+		@validator.should have_errors()
+
+		@validator[:alpha_constraint].should be_nil()
+	end
+	
+	### 'alphanumeric'
+	it "accepts alphanumeric characters for fields with alphanumeric constraints" do
+		params = {'required' => '1', 'alphanumeric_constraint' => 'zombieabe11'}
+	
+		@validator.validate( params )
+
+		@validator.should be_okay()
+		@validator.should_not have_errors()
+
+		@validator[:alphanumeric_constraint].should == 'zombieabe11'
+	end
+	
+	it "rejects non-alphanumeric characters for fields with alphanumeric constraints" do
+		params = {'required' => '1', 'alphanumeric_constraint' => 'duck!ling'}
+	
+		@validator.validate( params )
+
+		@validator.should_not be_okay()
+		@validator.should have_errors()
+
+		@validator[:alphanumeric_constraint].should be_nil()
+	end
+	
+	### 'printable'
+	it "accepts printable characters for fields with 'printable' constraints" do
+		test_content = <<-EOF
+		I saw you with some kind of medical apparatus strapped to your
+        spine. It was all glass and metal, a great crystaline hypodermic
+        spider, carrying you into the aether with a humming, crackling sound.
+		EOF
+
+		params = {
+			'required' => '1',
+			'printable_constraint' => test_content
+		}
+	
+		@validator.validate( params )
+
+		@validator.should be_okay()
+		@validator.should_not have_errors()
+
+		@validator[:printable_constraint].should == test_content
+	end
+	
+	it "rejects non-printable characters for fields with 'printable' constraints" do
+		params = {'required' => '1', 'printable_constraint' => %{\0Something cold\0}}
+	
+		@validator.validate( params )
+
+		@validator.should_not be_okay()
+		@validator.should have_errors()
+
+		@validator[:printable_constraint].should be_nil()
+	end
+	
 end
 

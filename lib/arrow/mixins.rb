@@ -226,8 +226,7 @@ module Arrow
 				require modname or
 					raise "%s didn't register with Injectable for some reason" %
 					classname
-				Arrow::Logger[self].debug "Loaded %s: %p" %
-					[ classname, Arrow::Injectable.derivatives ]
+				Arrow::Logger[self].debug "Loaded %s" % [ classname ]
 			end
 
 			Arrow::Injectable.derivatives[ classname ]
