@@ -508,8 +508,11 @@ class Arrow::FormValidator < ::FormValidator
 			if match.captures.empty?
 				self.log.debug "  no captures, using whole match: %p" % [match[0]]
 				self.set_form_value( key, match[0], constraint )
+			elsif match.captures.length == 1
+				self.log.debug "  extracting one capture: %p" % [match.captures.first]
+				self.set_form_value( key, match.captures.first, constraint )
 			else
-				self.log.debug "  extracting captures: %p" % [match.captures]
+				self.log.debug "  extracting multiple captures: %p" % [match.captures]
 				self.set_form_value( key, match.captures, constraint )
 			end
 		else

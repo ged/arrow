@@ -28,13 +28,15 @@ end
 #####################################################################
 TestProfile = {
 	:required		=> [ :required ],
-	:optional		=> %w{optional number int_constraint 
-		bool_constraint email_constraint host_constraint
-		regexp_w_captures alpha_constraint alphanumeric_constraint
-		printable_constraint},
+	:optional		=> %w{
+		optional number int_constraint bool_constraint email_constraint
+        host_constraint regexp_w_captures regexp_w_one_capture
+        alpha_constraint alphanumeric_constraint printable_constraint
+	},
 	:constraints	=> {
 		:number                  => /^\d+$/,
-		:regexp_w_captures       => /(\w+)(\S+)/,
+		:regexp_w_captures       => /(\w+)(\S+)?/,
+		:regexp_w_one_capture    => /(\w+)/,
 		:int_constraint          => :integer,
 		:bool_constraint         => :boolean,
 		:email_constraint        => :email,
@@ -91,7 +93,18 @@ describe Arrow::FormValidator do
 	end
 
 
-	it "should return the captures from a regexp constraint if it has them" do
+	it "should return the capture from a regexp constraint if it has only one" do
+		rval = nil
+		params = { 'required' => 1, 'regexp_w_one_capture' => "   ygdrassil   " }
+		
+		@validator.validate( params, :untaint_all_constraints => true )
+			
+		Arrow::Logger.global.notice "Validator: %p" % [@validator]
+			
+		@validator[:regexp_w_one_capture].should == 'ygdrassil'
+	end
+
+	it "should return the captures from a regexp constraint as an array if it has more than one" do
 		rval = nil
 		params = { 'required' => 1, 'regexp_w_captures' => "   the1tree(!)   " }
 		
@@ -100,6 +113,18 @@ describe Arrow::FormValidator do
 		Arrow::Logger.global.notice "Validator: %p" % [@validator]
 			
 		@validator[:regexp_w_captures].should == ['the1tree', '(!)']
+	end
+
+	it "should return the captures from a regexp constraint as an array " +
+		"even if an optional capture doesn't match anything" do
+		rval = nil
+		params = { 'required' => 1, 'regexp_w_captures' => "   the1tree   " }
+		
+		@validator.validate( params, :untaint_all_constraints => true )
+			
+		Arrow::Logger.global.notice "Validator: %p" % [@validator]
+			
+		@validator[:regexp_w_captures].should == ['the1tree', nil]
 	end
 
 	it "knows the names of fields that were required but missing from the parameters" do
