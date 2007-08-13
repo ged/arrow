@@ -99,7 +99,7 @@ describe Arrow::Transaction, " (an instance)" do
 	end
 
 	
-	it "knows that a form was submitted if there's a urlencoded form content-type header" do
+	it "knows that a form was submitted if there's a urlencoded form content-type header with a POST" do
 		headers = Apache::Table.new({'content-type' => 'application/x-www-form-urlencoded'})
 		@mockrequest.should_receive( :headers_in ).
 			at_least(1).
@@ -107,7 +107,40 @@ describe Arrow::Transaction, " (an instance)" do
 		@mockrequest.should_receive( :request_method ).
 			at_least(1).
 			and_return('POST')
+		@txn.should be_a_form_request
+	end
 
+	it "knows that a form was submitted if there's a urlencoded form content-type header with a PUT" do
+		headers = Apache::Table.new({'content-type' => 'application/x-www-form-urlencoded'})
+		@mockrequest.should_receive( :unparsed_uri ).
+			at_least(1).
+			and_return( '' )# query is nil
+		@mockrequest.should_receive( :headers_in ).
+			at_least(1).
+			and_return( headers )
+		@mockrequest.should_receive( :request_method ).
+			at_least(1).
+			and_return('PUT')
+		@txn.should be_a_form_request
+	end
+
+	it "knows that a form was submitted if there's a urlencoded form content-type header with a GET" do
+		@mockrequest.should_receive( :unparsed_uri ).
+			at_least(1).
+			and_return( 'foo?bar=bas&biz=boz' )
+		@mockrequest.should_receive( :request_method ).
+			at_least(1).
+			and_return('GET')
+		@txn.should be_a_form_request
+	end
+
+	it "knows that a form was submitted if there's a urlencoded form content-type header with a DELETE" do
+		@mockrequest.should_receive( :unparsed_uri ).
+			at_least(1).
+			and_return( 'foo?bar=bas&biz=boz' )
+		@mockrequest.should_receive( :request_method ).
+			at_least(1).
+			and_return('DELETE')
 		@txn.should be_a_form_request
 	end
 

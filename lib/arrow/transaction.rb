@@ -436,7 +436,7 @@ class Arrow::Transaction < Arrow::Object
 	### either 'application/x-www-form-urlencoded' or 'multipart/form-data'.
 	def form_request?
 		case self.request_method
-		when 'GET', 'HEAD'
+		when 'GET', 'HEAD', 'DELETE', 'PUT'
 			return (!self.parsed_uri.query.nil? || 
 				self.request_content_type =~ FORM_CONTENT_TYPES) ? true : false
 			
