@@ -655,18 +655,20 @@ class Arrow::Applet < Arrow::Object
 	### will be executed by the specified +txn+. Returns the __default__
 	### profile if no more-specific one is available.
 	def get_validator_profile_for_action( action, txn )
-		unless action.to_s =~ /^(\w+)$/
-			raise "Invalid action '#{action.inspect}'"
+		if action.to_s =~ /^(\w+)$/
+			action = $1
+			action.untaint
+		else
+			self.log.warning "Invalid action '#{action.inspect}'"
+			action = :__default__
 		end
-		action = $1
-		action.untaint
 		
 		# Look up the profile for the applet or the default one
 		profile = @signature.validator_profiles[ action.to_sym ] ||
 			@signature.validator_profiles[ :__default__ ]
 
 		if profile.nil?
-			self.log.debug "No validator for #{action}, and no __default__. "\
+			self.log.warning "No validator for #{action}, and no __default__. "\
 				"Returning nil validator."
 			return nil
 		end
@@ -678,7 +680,8 @@ class Arrow::Applet < Arrow::Object
 	### Create a FormValidator object for the specified +action+ which has
 	### been given the arguments from the given +txn+.
 	def make_validator( action, txn )
-		profile = self.get_validator_profile_for_action( action, txn )
+		profile = self.get_validator_profile_for_action( action, txn ) or
+			return nil
 
 		# Create a new validator object, map the request args into a regular
 		# hash, and then send them to the validaator with the applicable profile

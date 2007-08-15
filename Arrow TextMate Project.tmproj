@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>lib/apache/fakerequest.rb</string>
+	<string>spec/formvalidator_spec.rb</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -15,8 +15,6 @@
 			<string>!(/\.(?!htaccess)[^/]*|\.(tmproj|o|pyc)|/Icon\r)$</string>
 			<key>regexFolderFilter</key>
 			<string>!.*/(\.[^/]*|CVS|pkg|coverage|redist|\{arch\}|blib|.*~\.nib|.*\.(framework|app|pbproj|pbxproj|xcode(proj)?|bundle))$</string>
-			<key>selected</key>
-			<true/>
 			<key>sourceDirectory</key>
 			<string></string>
 		</dict>
@@ -104,12 +102,12 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>159</integer>
+				<integer>18</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>129</integer>
+			<integer>102</integer>
 		</dict>
 		<key>lib/arrow/applettestcase.rb</key>
 		<dict>
@@ -166,6 +164,20 @@
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
+		</dict>
+		<key>lib/arrow/formvalidator.rb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>78</integer>
 		</dict>
 		<key>lib/arrow/logger.rb</key>
 		<dict>
@@ -428,12 +440,12 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>84</integer>
+				<integer>601</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>45</integer>
+			<integer>556</integer>
 		</dict>
 		<key>spec/transaction_spec.rb</key>
 		<dict>
@@ -581,6 +593,8 @@
 	<key>openDocuments</key>
 	<array>
 		<string>lib/apache/fakerequest.rb</string>
+		<string>lib/arrow/formvalidator.rb</string>
+		<string>spec/formvalidator_spec.rb</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
