@@ -15,6 +15,7 @@ begin
 	require 'arrow'
 	require 'arrow/spechelpers'
 	require 'arrow/transaction'
+	require 'date'
 rescue LoadError
 	unless Object.const_defined?( :Gem )
 		require 'rubygems'
@@ -32,6 +33,7 @@ TestProfile = {
 		optional number int_constraint bool_constraint email_constraint
         host_constraint regexp_w_captures regexp_w_one_capture
         alpha_constraint alphanumeric_constraint printable_constraint
+		proc_constraint
 	},
 	:constraints	=> {
 		:number                  => /^\d+$/,
@@ -44,6 +46,7 @@ TestProfile = {
 		:alpha_constraint        => :alpha,
 		:alphanumeric_constraint => :alphanumeric,
 		:printable_constraint    => :printable,
+		:proc_constraint         => Proc.new {|d| Date.parse(d) rescue nil },
 	},
 }
 
@@ -574,6 +577,33 @@ describe Arrow::FormValidator do
 		@validator.should have_errors()
 
 		@validator[:printable_constraint].should be_nil()
+	end
+	
+	
+	it "accepts parameters for fields with Proc constraints if the Proc " +
+		"returns a true value" do
+		test_date = '2007-07-17'
+		params = {'required' => '1', 'proc_constraint' => test_date}
+	
+		@validator.validate( params )
+
+		@validator.should be_okay()
+		@validator.should_not have_errors()
+
+		@validator[:proc_constraint].should == Date.parse( test_date )
+	end
+	
+	it "rejects parameters for fields with Proc constraints if the Proc " +
+		"returns a false value" do
+
+		params = {'required' => '1', 'proc_constraint' => %{::::}}
+	
+		@validator.validate( params )
+
+		@validator.should_not be_okay()
+		@validator.should have_errors()
+
+		@validator[:proc_constraint].should be_nil()
 	end
 	
 end

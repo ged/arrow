@@ -494,7 +494,7 @@ class Arrow::FormValidator < ::FormValidator
 			value = constraint.call( @form[key] )
 		end
 	
-		self.set_form_value( key, constraint, value )
+		self.set_form_value( key, value, constraint )
 	end
 	
 	
