@@ -217,7 +217,7 @@ module Arrow
 		### Return the Class object for the given derivative +classname+, 
 		### attempting to load it if it hasn't been already.
 		def self::load_class( classname )
-			Arrow::Logger[self].debug "Loading class '#{classname}'"
+			Arrow::Logger[self].debug "Loading injectable class '#{classname}'"
 			
 			unless Arrow::Injectable.derivatives.include?( classname )
 				modname = classname.downcase.gsub( /::/, '/' )
@@ -226,7 +226,8 @@ module Arrow
 				require modname or
 					raise "%s didn't register with Injectable for some reason" %
 					classname
-				Arrow::Logger[self].debug "Loaded %s" % [ classname ]
+				Arrow::Logger[self].debug "Loaded injectable class %s (%d classes loaded)" %
+					[ classname, Arrow::Injectable.derivatives.length ]
 			end
 
 			Arrow::Injectable.derivatives[ classname ]
