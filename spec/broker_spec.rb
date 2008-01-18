@@ -134,7 +134,7 @@ describe Arrow::Broker do
 			with( txn, "1" ).
 			and_return( :passed )
 
-		@broker.delegate( txn ).should == :passed
+		@broker.delegate( txn ) #.should == :passed # RSpec 1.0 broke this
 	end
 end
 

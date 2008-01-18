@@ -119,9 +119,9 @@ module Arrow
 			# Have to keep messages from being logged before logging is 
 			# configured.
 			logmessages = []
-			logmessages << [
-				:debug, "Propagating config to Configurable classes: %p" %
-				[@modules] ]
+			# logmessages << [
+			# 	:debug, "Propagating config to Configurable classes: %p" %
+			# 	[@modules] ]
 
 			@modules.each do |mod|
 				key = mod.config_key

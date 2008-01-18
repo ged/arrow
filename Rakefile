@@ -14,9 +14,12 @@
 BEGIN {
 	require 'pathname'
 	basedir = Pathname.new( __FILE__ ).dirname
-	libdir = basedir + "lib"
+
+	libdir = basedir + 'lib'
+	docsdir = basedir + 'docs'
 
 	$LOAD_PATH.unshift( libdir.to_s ) unless $LOAD_PATH.include?( libdir.to_s )
+	$LOAD_PATH.unshift( docsdir.to_s ) unless $LOAD_PATH.include?( docsdir.to_s )
 }
 
 
@@ -159,10 +162,18 @@ end
 ### Task: rdoc
 Rake::RDocTask.new do |rdoc|
 	rdoc.rdoc_dir = 'docs/html'
-	rdoc.title    = PKG_SUMMARY
-	rdoc.options += ['-w', '4', '-SHN', '-i', 'docs']
+	rdoc.title    = "The Arrow Web Application Framework"
 
-	rdoc.rdoc_files.include TEXT_FILES
+	rdoc.options += [
+		'-w', '4',
+		'-SHN',
+		'-i', 'docs',
+		'-f', 'darkfish',
+		'-m', 'README',
+		'-W', 'http://deveiate.org/projects/Arrow/browser/trunk/'
+	  ]
+	
+	rdoc.rdoc_files.include 'README'
 	rdoc.rdoc_files.include LIB_FILES
 end
 

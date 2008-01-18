@@ -330,10 +330,6 @@ class Arrow::Transaction < Arrow::Object
 	end
 	
 
-	### :TODO: Need to override Apache::Request#construct_url to use Apache2's 
-	### X-Forwarded-Host or X-Forwarded-Server when constructing 
-	### self-refererential URLs.
-
 	### Overridden from Apache::Request to take Apache mod_proxy headers into
 	### account. If the 'X-Forwarded-Host' or 'X-Forwarded-Server' headers
 	### exist in the request, the hostname specified is used instead of the

@@ -69,9 +69,18 @@ class Arrow::Logger::ColorOutputter < Arrow::Logger::FileOutputter
 		:emerg		=> %w{bold blink yellow on_red},
 	}
 
+	# Default decription used when creating instances
+	DEFAULT_DESCRIPTION = "Logging Outputter"
+
+	# The default logging output format
+	DEFAULT_FORMAT =
+		%q{#{time.strftime('%Y/%m/%d %H:%M:%S')} [#{level}]: #{name} } +
+			%q{#{frame ? '('+frame+')' : ''}: #{msg}}
+
+
 
 	### Override the default to add color scheme instance variable
-	def initialize( uri, description=DefaultDescription, format=DefaultFormat ) # :notnew:
+	def initialize( uri, description=DEFAULT_DESCRIPTION, format=DEFAULT_FORMAT ) # :notnew:
 		super
 		@color_scheme = DEFAULT_COLOR_SCHEME.dup
 	end

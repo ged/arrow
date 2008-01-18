@@ -12,11 +12,13 @@
 
 # Make sure we're in the correct directory, and if not, change there.
 BEGIN {
-	basedir = File.dirname(File.dirname( File.expand_path(__FILE__) ))
-	unless Dir.pwd == basedir
-		Dir.chdir( basedir ) 
-	end
-	$LOAD_PATH.unshift basedir
+	require 'pathname'
+	basedir = Pathname.new( __FILE__ ).expand_path.dirname.parent
+
+	Dir.chdir( basedir ) 
+
+	$LOAD_PATH.unshift( basedir )
+	$LOAD_PATH.unshift( basedir + 'docs' )
 }
 
 # Load modules
@@ -44,6 +46,7 @@ def makeDocs( docsdir, template='html', diagrams=false, upload=nil, ridocs=false
 		'--op', docsdir,
 		'--title', title,
 		'--tab-width', 4,
+		'--fmt', 'darkfish',
 	]
 
 	flags += [ '--quiet' ] unless $VERBOSE
@@ -180,6 +183,7 @@ if $0 == __FILE__
 
 		oparser.on( "--debug", "-d", TrueClass, "Output debugging information" ) do
 			$VERBOSE = true
+			$dryrun = true
 			debugMsg "Turned debugging on."
 		end
 
