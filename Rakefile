@@ -50,12 +50,15 @@ RELEASE_NAME  = "REL #{PKG_VERSION}"
 
 BASEDIR       = Pathname.new( __FILE__ ).dirname.expand_path
 LIBDIR        = BASEDIR + 'lib'
+DOCSDIR       = BASEDIR + 'docs' 
+MANUALDIR     = DOCSDIR + 'manual'
 
 TEXT_FILES    = %w( Rakefile README )
 SPEC_DIRS     = ['spec']
 TEST_FILES    = FileList[ 'tests/**/*.tests.rb' ]
 SPEC_FILES    = Dir.glob( 'spec/*_spec.rb' )
 LIB_FILES     = Dir.glob('lib/**/*.rb').delete_if { |item| item =~ /\.svn/ }
+
 
 RELEASE_FILES = TEXT_FILES + LIB_FILES + SPEC_FILES
 
@@ -90,39 +93,6 @@ Rake::TestTask.new do |task|
     task.libs << "test/lib"
     task.test_files = TEST_FILES
     task.verbose = true
-end
-
-### Task: spec
-Spec::Rake::SpecTask.new( :spec ) do |task|
-	task.spec_files = SPEC_FILES
-	task.spec_opts = ['-c', '-f','s']
-end
-
-
-### Task: spec:autotest
-namespace :spec do
-	desc "Run rspec every time there's a change to one of the files"
-	task :autotest do |t|
-		basedir = Pathname.new( __FILE__ )
-		$LOAD_PATH.unshift( LIBDIR ) unless $LOAD_PATH.include?( LIBDIR )
-
-		require 'rspec_autotest'
-		$v = true
-		$vcs = 'svn'
-		RspecAutotest.run
-	end
-	
-	desc "Run rspec with default (quieter) output"
-	Spec::Rake::SpecTask.new( :quiet ) do |task|
-		task.spec_files = SPEC_FILES
-		task.spec_opts = []
-	end
-	
-	desc "Generate HTML output for a spec run"
-	Spec::Rake::SpecTask.new( :html ) do |task|
-		task.spec_files = SPEC_FILES
-		task.spec_opts = ['-f','h']
-	end
 end
 
 
@@ -216,12 +186,15 @@ gemspec = Gem::Specification.new do |gem|
 
 	gem.summary     = PKG_SUMMARY
 	gem.description = <<-EOD
-	#{PKG_SUMMARY}. And it needs more description.
+	Arrow is a web application framework for mod_ruby. It was designed to make
+	development of web applications under Apache easier and more fun without
+	sacrificing the power of being able to access the native Apache API.
 	EOD
 
 	gem.authors  	= "Michael Granger, Martin Chase, Dave McCorkhill, Jeremiah Jordan"
+	gem.email       = "ged@FaerieMUD.org"
 	gem.homepage 	= "http://deveiate.org/projects/Arrow"
-	gem.rubyforge_project = 'arrow'
+	gem.rubyforge_project = 'deveiate'
 
 	gem.has_rdoc 	= true
 
@@ -233,8 +206,6 @@ gemspec = Gem::Specification.new do |gem|
   	gem.add_dependency( 'ruby-cache', '>= 0.3.0' )
   	gem.add_dependency( 'formvalidator', '>= 0.1.3' )
   	gem.add_dependency( 'pluginfactory', '>= 1.0.2' )
-
-	gem.autorequire	= 'arrow'
 end
 
 Rake::GemPackageTask.new( gemspec ) do |task|
@@ -251,6 +222,126 @@ end
 task :uninstall => [:clean] do
 	uninstaller = Gem::Uninstaller.new( PKG_FILE_NAME )
 	uninstaller.uninstall
+end
+
+
+begin
+	gem 'rspec', '>= 1.1.1'
+	require 'spec/rake/spectask'
+
+	COMMON_SPEC_OPTS = ['-c', '-f', 's']
+
+	### Task: spec
+	Spec::Rake::SpecTask.new( :spec ) do |task|
+		task.spec_files = SPEC_FILES
+		task.libs += [LIBDIR]
+		task.spec_opts = COMMON_SPEC_OPTS
+	end
+
+
+	namespace :spec do
+		desc "Run rspec every time there's a change to one of the files"
+        task :autotest do
+            require 'autotest/rspec'
+
+            autotester = Autotest::Rspec.new
+			autotester.exceptions = %r{\.svn|\.skel}
+            autotester.run
+        end
+
+	
+		desc "Generate quiet output"
+		Spec::Rake::SpecTask.new( :quiet ) do |task|
+			task.spec_files = SPEC_FILES
+			task.spec_opts = ['-f', 'p', '-D']
+		end
+	
+		desc "Generate HTML output for a spec run"
+		Spec::Rake::SpecTask.new( :html ) do |task|
+			task.spec_files = SPEC_FILES
+			task.spec_opts = ['-f','h', '-D']
+		end
+
+		desc "Generate plain-text output for a CruiseControl.rb build"
+		Spec::Rake::SpecTask.new( :text ) do |task|
+			task.spec_files = SPEC_FILES
+			task.spec_opts = ['-f','p']
+		end
+	end
+rescue LoadError => err
+	task :no_rspec do
+		$stderr.puts "Testing tasks not defined: RSpec rake tasklib not available: %s" %
+			[ err.message ]
+	end
+	
+	task :spec => :no_rspec
+	namespace :spec do
+		task :autotest => :no_rspec
+		task :html => :no_rspec
+		task :text => :no_rspec
+	end
+end
+
+
+
+### Publication tasks
+begin
+	RUBYFORGE_DOC_DIR = "/var/www/gforge-projects/#{PKG_NAME}"
+
+	gem 'meta_project'
+	require 'meta_project'
+	require 'rake/contrib/xforge'
+	require 'rake/contrib/sshpublisher'
+
+	task :release => [:changelog, :release_files, :publish_doc, :publish_news, :tag]
+
+	task :verify_env_vars do
+		raise "RUBYFORGE_USER environment variable not set!" unless ENV['RUBYFORGE_USER']
+		raise "RUBYFORGE_PASSWORD environment variable not set!" unless ENV['RUBYFORGE_PASSWORD']
+	end
+
+	# Publish everything in the 'html' directory to arrow.RubyForge.org
+	task :publish_doc => :verify_env_vars do
+		user = "%s@rubyforge.org" % [ENV['RUBYFORGE_USER']]
+
+		publisher = Rake::SshDirPublisher.new( user, RUBYFORGE_DOC_DIR )
+		publisher.upload
+	end
+
+	desc "Release files on RubyForge"
+	task :release_files => [:gem] do
+		release_files = FileList[ "pkg/#{PKG_FILE_NAME}.*" ]
+
+		Rake::XForge::Release.new(MetaProject::Project::XForge::RubyForge.new('deveiate')) do |release|
+			release.user_name    = ENV['RUBYFORGE_USER']
+			release.password     = ENV['RUBYFORGE_PASSWORD']
+			release.files        = release_files.to_a
+			release.release_name = "#{PKG_NAME} #{PKG_VERSION}"
+			release.changes_file = 'ChangeLog'
+			# The rest of the options are defaults (among others, release_notes and
+			# release_changes, parsed from CHANGES)
+		end
+	end
+
+	desc "Publish news on RubyForge"
+	task :publish_news => [:gem] do
+		release_files = FileList[
+			"pkg/#{PKG_FILE_NAME}.gem"
+		]
+
+		Rake::XForge::NewsPublisher.new(MetaProject::Project::XForge::RubyForge.new('xforge')) do |news|
+			news.user_name = ENV['RUBYFORGE_USER']
+			news.password = ENV['RUBYFORGE_PASSWORD']
+		end
+	end
+
+rescue LoadError => err
+	task :no_meta_project do
+		$stderr.puts "Release tasks not defined: MetaProject/XForge tasklib not available: %s" %
+			[ err.message ]
+	end
+
+	task :release => :no_meta_project
 end
 
 

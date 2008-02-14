@@ -82,6 +82,7 @@
 # Please see the file COPYRIGHT in the 'docs' directory for licensing details.
 #
 
+require 'uri'
 require 'forwardable'
 require 'formvalidator'
 require 'date'
@@ -415,6 +416,18 @@ class Arrow::FormValidator < ::FormValidator
 		return match ? match[0] : nil
 	end
 
+
+	### Match valid URIs
+	def match_uri( val )
+		return URI.parse( val )
+	rescue URI::InvalidURIError => err
+		self.log.error "Error trying to parse URI %p: %s" % [ val, err.message ]
+		return nil
+	rescue NoMethodError
+		self.log.debug "Ignoring bug in URI#parse"
+		return nil
+	end
+	
 
 	### Apply one or more +constraints+ to the field value/s corresponding to
 	### +key+.

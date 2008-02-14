@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>lib/arrow/logger/htmloutputter.rb</string>
+	<string>docs/manual/source/config.textile</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -23,6 +23,50 @@
 	<integer>291</integer>
 	<key>metaData</key>
 	<dict>
+		<key>ChangeLog</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>README</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>18</integer>
+			</dict>
+			<key>columnSelection</key>
+			<false/>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>15</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>18</integer>
+			</dict>
+		</dict>
 		<key>Rakefile</key>
 		<dict>
 			<key>caret</key>
@@ -30,7 +74,7 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>21</integer>
+				<integer>54</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -81,28 +125,14 @@
 				<integer>49</integer>
 			</dict>
 		</dict>
-		<key>docs/makedocs.rb</key>
+		<key>docs/manual/source/config.textile</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>20</integer>
+				<integer>28</integer>
 				<key>line</key>
-				<integer>48</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>24</integer>
-		</dict>
-		<key>docs/rdoc/generators/template/index.rhtml</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>26</integer>
-				<key>line</key>
-				<integer>21</integer>
+				<integer>5</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -151,7 +181,7 @@
 			<key>firstVisibleLine</key>
 			<integer>102</integer>
 		</dict>
-		<key>lib/arrow/applet.rb</key>
+		<key>lib/arrow.rb</key>
 		<dict>
 			<key>caret</key>
 			<dict>
@@ -163,7 +193,7 @@
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>652</integer>
+			<integer>6</integer>
 		</dict>
 		<key>lib/arrow/applettestcase.rb</key>
 		<dict>
@@ -228,12 +258,12 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>27</integer>
+				<integer>0</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>220</integer>
+			<integer>78</integer>
 		</dict>
 		<key>lib/arrow/logger.rb</key>
 		<dict>
@@ -247,79 +277,51 @@
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>374</integer>
-		</dict>
-		<key>lib/arrow/logger/coloroutputter.rb</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>84</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>80</integer>
+			<integer>392</integer>
 		</dict>
 		<key>lib/arrow/logger/fileoutputter.rb</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
+				<integer>8</integer>
+				<key>line</key>
+				<integer>81</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>31</integer>
+		</dict>
+		<key>lib/arrow/logger/outputter.rb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>21</integer>
+				<integer>114</integer>
 			</dict>
 			<key>columnSelection</key>
 			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>66</integer>
 			<key>selectFrom</key>
 			<dict>
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>0</integer>
+				<integer>111</integer>
 			</dict>
 			<key>selectTo</key>
 			<dict>
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>21</integer>
+				<integer>114</integer>
 			</dict>
-		</dict>
-		<key>lib/arrow/logger/htmloutputter.rb</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>1</integer>
-				<key>line</key>
-				<integer>16</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>4</integer>
-		</dict>
-		<key>lib/arrow/mixins.rb</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>121</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>97</integer>
 		</dict>
 		<key>lib/arrow/session/filelock.rb</key>
 		<dict>
@@ -334,6 +336,20 @@
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>52</integer>
+		</dict>
+		<key>lib/arrow/session/lock.rb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
 		</dict>
 		<key>lib/arrow/session/sha1id.rb</key>
 		<dict>
@@ -382,7 +398,7 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>30</integer>
 				<key>line</key>
 				<integer>206</integer>
 			</dict>
@@ -489,48 +505,6 @@
 			<key>firstVisibleLine</key>
 			<integer>87</integer>
 		</dict>
-		<key>lib/arrow/transaction.rb</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>74</integer>
-				<key>line</key>
-				<integer>351</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>345</integer>
-		</dict>
-		<key>spec/applet_spec.rb</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>1</integer>
-				<key>line</key>
-				<integer>90</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>41</integer>
-		</dict>
-		<key>spec/cookieset_spec.rb</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>31</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>0</integer>
-		</dict>
 		<key>spec/formvalidator_spec.rb</key>
 		<dict>
 			<key>caret</key>
@@ -543,7 +517,7 @@
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>556</integer>
+			<integer>527</integer>
 		</dict>
 		<key>spec/transaction_spec.rb</key>
 		<dict>
@@ -690,12 +664,11 @@
 	</dict>
 	<key>openDocuments</key>
 	<array>
-		<string>lib/arrow/transaction.rb</string>
-		<string>lib/arrow/mixins.rb</string>
-		<string>lib/arrow/logger.rb</string>
-		<string>lib/arrow/logger/coloroutputter.rb</string>
-		<string>lib/arrow/logger/htmloutputter.rb</string>
-		<string>lib/arrow/logger/fileoutputter.rb</string>
+		<string>Rakefile</string>
+		<string>ChangeLog</string>
+		<string>docs/manual/source/config.textile</string>
+		<string>README</string>
+		<string>lib/arrow.rb</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
@@ -707,19 +680,26 @@
 			<true/>
 			<key>subItems</key>
 			<dict>
-				<key>lib</key>
+				<key>docs</key>
 				<dict>
 					<key>isExpanded</key>
 					<true/>
 					<key>subItems</key>
 					<dict>
-						<key>arrow</key>
+						<key>manual</key>
 						<dict>
 							<key>isExpanded</key>
 							<true/>
 							<key>subItems</key>
 							<dict>
-								<key>logger</key>
+								<key>layouts</key>
+								<dict>
+									<key>isExpanded</key>
+									<true/>
+									<key>subItems</key>
+									<dict/>
+								</dict>
+								<key>source</key>
 								<dict>
 									<key>isExpanded</key>
 									<true/>
@@ -730,10 +710,24 @@
 						</dict>
 					</dict>
 				</dict>
+				<key>lib</key>
+				<dict>
+					<key>isExpanded</key>
+					<true/>
+					<key>subItems</key>
+					<dict/>
+				</dict>
+				<key>rake</key>
+				<dict>
+					<key>isExpanded</key>
+					<true/>
+					<key>subItems</key>
+					<dict/>
+				</dict>
 			</dict>
 		</dict>
 	</dict>
 	<key>windowFrame</key>
-	<string>{{42, 63}, {846, 965}}</string>
+	<string>{{557, 76}, {1029, 1502}}</string>
 </dict>
 </plist>

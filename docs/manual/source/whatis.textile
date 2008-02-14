@@ -1,0 +1,100 @@
+h1. What is Arrow?
+
+h2. Overview
+
+Arrow is a web application framework for mod_ruby. It was designed to make development of web
+applications under Apache easier and more fun without sacrificing the power of being able to access
+the native Apache API.
+
+h3. Why another web framework?
+
+A few friends and I started writing this framework in early 2003 because there were only a handful
+of web frameworks at the time, none of which we felt provided enough high-level functionality for
+web programming. Tasks like untainting and validating form data, abstracting out HTML from code, and
+function dispatch based on URI had to be written over and over, each time introducing the potential
+for new bugs and reducing the time developers had to write the code unique to the application.
+
+A few months before our first release, Rails came out, and we considered dropping development of
+Arrow. I tried out Rails, and even wrote a few commercial applications using it, but there were
+several things that I kept tripping on, so I resumed Arrow development for myself in 2005.
+
+There were several reasons I decided to continue using Arrow despite the overwhelming enthusiasm for
+locomotive-themed web frameworks. I've heard all the FUD about Apache and mod_ruby, but frankly I've
+never seen any evidence to back it up. I've been a programmer for almost 12 years as of this
+writing, deployed code for several very high-traffic sites (Livejournal, Active.com), and my
+experience with Apache and an embedded interpreter environment has shown it to be stable, fast, and
+extremely flexible. I've heard people claim lots of bad things about Apache, but I've seen Apache
+and mod_perl handle 40-50 million dynamic page views per day firsthand, and I'll take that
+first-hand experience over uncorroborated conjecture and the new-shiny-toy appeal of the web server
+_du jour_ any day. I've heard bad things about @mod_ruby@, too, and it may be that I'm biased
+because I contributed a bit of code to it, but I've been using it in production for a year and a
+half on a relatively low-traffic site (around 3M dynamic hits/year) and I'm pretty happy with it so
+far.
+
+There's a Rails adapter for @mod_ruby@ of course, but I've never gotten it to run stably, and I've
+been burned numerous times by FastCGI, so I won't touch that again.
+
+Rails (when I was trying to write web applications in it, anyway) also doesn't run under @$SAFE = 1@,
+and relies purely on validation in the Model layer for ensuring that untrusted user input is in
+the form you expect it in. I have strong objections to letting untrusted data get anywhere near my
+domain objects, but maybe I've just read the "The World Wide Web Security
+FAQ":http://www.w3.org/Security/Faq/ too many times. With ActiveRecord's use of SQL placeholders and
+validations maybe no one's ever had a SQL injection attack or a mailer hijacking exploit in a Rails
+app, but I'd rather have the assurance of running in an environment that reduced the chances of the
+inevitable oversight or lazy developer from causing catastrophic harm.
+
+
+h3. Design Goals
+
+Our primary intent when creating Arrow was to make development of applications using @mod_ruby@ as
+easy as writing CGIs, but with the repetitive and boring stuff factored out for you.
+
+Some of the good things we wanted to preserve from the CGI environment:
+
+* Immediate gratification — we wanted to preserve the "tweak the code and reload" of CGI development
+  to encourage small incremental development and experimentation.
+* Simplicity — we didn't want to have to worry about things like headers, query parameter parsing,
+  response buffering, and the other stuff that CGI libraries typically provide, but we still wanted
+  to be able to access or override those things with minimum effort when necessary.
+
+CGI also has some bad parts that we wanted to eliminate:
+
+* Startup time/fork overhead — CGI has to fork an interpreter each time, load all required 
+  libraries, establish new connections, etc. There are accelerators for @mod_ruby@ that eliminate
+  some of this, but usually at the cost of additional complexity or fragility. We wanted to be able 
+  to have persistent connections, with little or no startup cost beyond the initial server startup.
+* Monolithic code — CGIs of any complexity are usually large chunks of code, with some kind of
+  internal dispatch to manage different actions or parts of the URI space. We wanted to be able to 
+  attach smaller pieces of code to paths in the URI space in a way that let control pass through
+  multiple components without them having to know too much about each other.
+
+We also wanted to add some features which are useful in most all web application programming:
+
+* *Templating* — To separate presentation HTML from application logic, we decided to provide an
+  integrated templating system that uses valid XHTML documents (or document fragments) for
+  templates. We also realized that there are already many excellent templating systems available for
+  Ruby, and so we tried to make it as easy as possible to use your own preferred templating library
+  instead of ours if you should so choose.
+* *Sessions* — Many web application developers find it necessary to maintain state between
+  connections in their applications, so Arrow includes sessions that are very easy to use, but can
+  be configured to use one of a number of different configurable strategies on the back end for
+  storage, locking, and key generation.
+* *Argument validation/untainting* — Web applications need to handle input from end users which
+  needs to be untainted and validated against a definition of what constitutes legal data.
+  Fortunately, Travis Whitton already wrote an excellent Ruby data-validation library called
+  @FormValidator@, support for which is built into Arrow.
+* *Modular applications* — Very often, web applications need to share several subsystems (e.g.,
+  authentication/authorization, state checkpointing and validation, etc.) which are orthogonal to
+  the main application logic but still necessary. Arrow allows some apps to act as delegators,
+  providing some functionality for all apps which are chained through it.
+* *Graceful error-handling* — Sometimes applications fall on their face, and there is little more
+  frustrating than having to track down an error trace from within the bowels of your app. Arrow
+  provides a customizable error-handling mechanism that can be used to speed development and act on
+  errors intelligently.
+* *Strong introspection* — One of Ruby's strengths is its strong introspection features, and we wanted
+  to build on those strengths. Arrow has some powerful introspection facilities that let the
+  developer examine the state of applications, templates, sessions, etc.
+
+
+mod_perl_two_servers:http://perl.apache.org/docs/1.0/guide/strategy.html#Alternative_architectures_for_running_one_and_two_servers_
+

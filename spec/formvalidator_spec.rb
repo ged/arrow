@@ -33,7 +33,7 @@ TestProfile = {
 		optional number int_constraint bool_constraint email_constraint
         host_constraint regexp_w_captures regexp_w_one_capture
         alpha_constraint alphanumeric_constraint printable_constraint
-		proc_constraint
+		proc_constraint uri_constraint
 	},
 	:constraints	=> {
 		:number                  => /^\d+$/,
@@ -42,6 +42,7 @@ TestProfile = {
 		:int_constraint          => :integer,
 		:bool_constraint         => :boolean,
 		:email_constraint        => :email,
+		:uri_constraint          => :uri,
 		:host_constraint         => :hostname,
 		:alpha_constraint        => :alpha,
 		:alphanumeric_constraint => :alphanumeric,
@@ -397,6 +398,98 @@ describe Arrow::FormValidator do
 		@validator[:int_constraint].should be_nil()
 	end
 	
+	ValidURIs = %w{
+		http://127.0.0.1
+		http://127.0.0.1/
+		http://[127.0.0.1]/
+		http://ruby-lang.org/
+		http://www.rocketboom.com/vlog/rb_08_feb_01
+		http://del.icio.us/search/?fr=del_icio_us&p=ruby+arrow&type=all
+		http://[FEDC:BA98:7654:3210:FEDC:BA98:7654:3210]:8080/index.html
+		http://[1080:0:0:0:8:800:200C:417A]/index.html
+		http://[3ffe:2a00:100:7031::1]
+		http://[1080::8:800:200C:417A]/foo
+		http://[::192.9.5.5]/ipng
+		http://[::FFFF:129.144.52.38]:3474/index.html
+		http://[2010:836B:4179::836B:4179]
+
+		https://mail.google.com/
+		https://127.0.0.1/
+		https://r4.com:8080/
+
+		ftp://ftp.ruby-lang.org/pub/ruby/1.0/ruby-0.49.tar.gz
+		ftp://crashoverride:god@gibson.ellingsonmineral.com/root/.workspace/.garbage.
+		
+		ldap:/o=University%20of%20Michigan,c=US
+		ldap://ldap.itd.umich.edu/o=University%20of%20Michigan,c=US
+		ldap://ldap.itd.umich.edu/o=University%20of%20Michigan,c=US?postalAddress
+		ldap://host.com:6666/o=University%20of%20Michigan,c=US??sub?(cn=Babs%20Jensen)
+		ldap://ldap.itd.umich.edu/c=GB?objectClass?one
+		ldap://ldap.question.com/o=Question%3f,c=US?mail
+		ldap://ldap.netscape.com/o=Babsco,c=US??(int=%5c00%5c00%5c00%5c04)
+		ldap:/??sub??bindname=cn=Manager%2co=Foo
+		ldap:/??sub??!bindname=cn=Manager%2co=Foo
+	  }
+
+	ValidURIs.each do |uri_string|
+		it "accepts #{uri_string} for fields with URI constraints" do
+			params = {'required' => '1', 'uri_constraint' => uri_string}
+	
+			@validator.validate( params )
+
+			@validator.should be_okay()
+			@validator.should_not have_errors()
+
+			@validator[:uri_constraint].should be_a_kind_of( URI::Generic )
+			@validator[:uri_constraint].to_s.should == uri_string
+		end
+	end
+
+	# :FIXME: I don't know LDAP uris very well, so I'm not sure how they're likely to
+	# be invalidly-occurring in the wild
+	InvalidURIs = %W{
+		glark:
+		
+		http:
+		http://
+		http://_com/vlog/rb_08_feb_01
+		http://del.icio.us/search/\x20\x14\x18
+		http://FEDC:BA98:7654:3210:FEDC:BA98:7654:3210/index.html
+		http://1080:0:0:0:8:800:200C:417A/index.html
+		http://3ffe:2a00:100:7031::1
+		http://1080::8:800:200C:417A/foo
+		http://::192.9.5.5/ipng
+		http://::FFFF:129.144.52.38:80/index.html
+		http://2010:836B:4179::836B:4179
+
+		https:
+		https://user:pass@/
+		https://r4.com:nonnumericport/
+
+		ftp:
+		ftp:ruby-0.49.tar.gz
+		ftp://crashoverride:god@/root/.workspace/.garbage.
+		
+		ldap:
+		ldap:/o=University\x20of\x20Michigan,c=US
+		ldap://ldap.itd.umich.edu/o=University+\x00of+Michigan
+	  }
+
+	InvalidURIs.each do |uri_string|
+		it "rejects #{uri_string} for fields with URI constraints" do
+			params = {'required' => '1', 'uri_constraint' => uri_string}
+	
+			# lambda {
+				@validator.validate( params )
+			# }.should_not raise_error()
+
+			@validator.should_not be_okay()
+			@validator.should have_errors()
+
+			@validator[:uri_constraint].should be_nil()
+		end
+	end
+
 	it "accepts simple RFC822 addresses for fields with email constraints" do
 		params = {'required' => '1', 'email_constraint' => 'jrandom@hacker.ie'}
 	
@@ -425,8 +518,8 @@ describe Arrow::FormValidator do
 		'jrandom@[ruby hacquer].com',
 		'abcdefghijklmnopqrstuvwxyz@abcdefghijklmnopqrstuvwxyz',
 	]
-	it "accepts complex RFC822 addresses for fields with email constraints" do
-		ComplexAddresses.each do |addy|
+	ComplexAddresses.each do |addy|
+		it "accepts #{addy} for fields with email constraints" do
 			params = {'required' => '1', 'email_constraint' => addy}
 	
 			@validator.validate( params )
@@ -446,8 +539,8 @@ describe Arrow::FormValidator do
 		'j random@ruby|hacquer.com',
 		'j:random@rubyhacquer.com',
 	]
-	it "rejects bogus RFC822 addresses for fields with email constraints" do
-		BogusAddresses.each do |addy|
+	BogusAddresses.each do |addy|
+		it "rejects #{addy} for fields with email constraints" do
 			params = {'required' => '1', 'email_constraint' => addy}
 	
 			@validator.validate( params )
@@ -489,8 +582,8 @@ describe Arrow::FormValidator do
 		'indus«tree».com',
 	]
 
-	it "rejects hostnames for fields with host constraints" do
-		BogusHosts.each do |hostname|
+	BogusHosts.each do |hostname|
+		it "rejects #{hostname} for fields with host constraints" do
 			params = {'required' => '1', 'host_constraint' => hostname}
 	
 			@validator.validate( params )
