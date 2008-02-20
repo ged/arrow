@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>docs/manual/source/config.textile</string>
+	<string>lib/arrow/session/activerecordstore.rb</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -124,20 +124,6 @@
 				<key>line</key>
 				<integer>49</integer>
 			</dict>
-		</dict>
-		<key>docs/manual/source/config.textile</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>28</integer>
-				<key>line</key>
-				<integer>5</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>0</integer>
 		</dict>
 		<key>experiments/cookiedemo.rb</key>
 		<dict>
@@ -322,6 +308,20 @@
 				<key>line</key>
 				<integer>114</integer>
 			</dict>
+		</dict>
+		<key>lib/arrow/session/activerecordstore.rb</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>77</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>61</integer>
 		</dict>
 		<key>lib/arrow/session/filelock.rb</key>
 		<dict>
@@ -664,11 +664,7 @@
 	</dict>
 	<key>openDocuments</key>
 	<array>
-		<string>Rakefile</string>
-		<string>ChangeLog</string>
-		<string>docs/manual/source/config.textile</string>
-		<string>README</string>
-		<string>lib/arrow.rb</string>
+		<string>lib/arrow/session/activerecordstore.rb</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
@@ -704,7 +700,15 @@
 									<key>isExpanded</key>
 									<true/>
 									<key>subItems</key>
-									<dict/>
+									<dict>
+										<key>tutorial</key>
+										<dict>
+											<key>isExpanded</key>
+											<true/>
+											<key>subItems</key>
+											<dict/>
+										</dict>
+									</dict>
 								</dict>
 							</dict>
 						</dict>
@@ -728,6 +732,6 @@
 		</dict>
 	</dict>
 	<key>windowFrame</key>
-	<string>{{557, 76}, {1029, 1502}}</string>
+	<string>{{557, 63}, {1029, 965}}</string>
 </dict>
 </plist>

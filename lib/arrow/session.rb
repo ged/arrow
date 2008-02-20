@@ -25,10 +25,14 @@ require 'arrow/object'
 require 'arrow/exceptions'
 require 'arrow/mixins'
 require 'arrow/logger'
+require 'arrow/config'
 
-### This provides a container for maintaining state across multiple transactions..
+
+### This provides a container for maintaining state across multiple transactions.
 class Arrow::Session < Arrow::Object
-	include PluginFactory, Enumerable, Arrow::Configurable
+	include PluginFactory,
+		Enumerable,
+		Arrow::Configurable
 
 	config_key :session
 
@@ -48,7 +52,7 @@ class Arrow::Session < Arrow::Object
 	###	C L A S S   M E T H O D S
 	#############################################################
 
-	@config = {}
+	@config = Arrow::Config.new
 	class << self
 		attr_reader :config
 	end

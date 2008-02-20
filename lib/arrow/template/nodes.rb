@@ -53,6 +53,7 @@ class Arrow::Template
 
 	### The abstract base node class.
 	class Node < Arrow::Object
+		include Arrow::HTMLUtilities
 
 		# SVN Revision
 		SVNRev = %q$Rev$
@@ -161,21 +162,6 @@ class Arrow::Template
 			return nodeclass
 		end
 
-
-		### Escape special characters in the given +string+ for display in an
-		### HTML inspection interface. This escapes common invisible characters
-		### like tabs and carriage-returns in additional to the regular HTML
-		### escapes.
-		def escape_html( string )
-			return "nil" if string.nil?
-			string = string.inspect unless string.is_a?( String )
-			string.
-				gsub(/&/, '&amp;').
-				gsub(/</, '&lt;').
-				gsub(/>/, '&gt;').
-				gsub(/\n/, '&#8629;').
-				gsub(/\t/, '&#8594;')
-		end
 
 	end # class Node
 

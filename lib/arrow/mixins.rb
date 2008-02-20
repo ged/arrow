@@ -78,6 +78,26 @@
 # The module that serves as a namespace for all Arrow classes/mixins.
 module Arrow
 
+	### A collection of HTML utility functions
+	module HTMLUtilities
+
+		### Escape special characters in the given +string+ for display in an
+		### HTML inspection interface. This escapes common invisible characters
+		### like tabs and carriage-returns in additional to the regular HTML
+		### escapes.
+		def escape_html( string )
+			return "nil" if string.nil?
+			string = string.inspect unless string.is_a?( String )
+			string.
+				gsub(/&/, '&amp;').
+				gsub(/</, '&lt;').
+				gsub(/>/, '&gt;').
+				gsub(/\n/, '&#8629;').
+				gsub(/\t/, '&#8594;')
+		end
+		
+	end # module HTMLUtiities
+
 	### A mixin that adds configurability via an Arrow::Config object. 
 	module Configurable
 
@@ -265,7 +285,6 @@ module Arrow
 
 	end # module Loggable
 
-	
 
 end # module Arrow
 

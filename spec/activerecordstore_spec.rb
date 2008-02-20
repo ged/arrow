@@ -134,7 +134,7 @@ describe Arrow::Session::ActiveRecordStore do
 		dataobj = mock( "ar_dataobject" )
 		dataobj.should_receive( :new_record? ).and_return( false )
 		dataobj.should_receive( :session_data= ).once
-		dataobj.should_receive( :create_or_update ).once.and_return( true )
+		dataobj.should_receive( :save ).once.and_return( true )
 		dataobj.should_receive( :lock_version ).and_return( 18 )
 
 		@arclassmock.should_receive( :find_or_create_by_session_id ).with( @id.to_s ).
@@ -151,7 +151,7 @@ describe Arrow::Session::ActiveRecordStore do
 		dataobj = mock( "ar_dataobject" )
 		dataobj.should_receive( :new_record? ).and_return( false )
 		dataobj.should_receive( :session_data= ).once.with( {} )
-		dataobj.should_receive( :create_or_update ).once.and_return( false )
+		dataobj.should_receive( :save ).once.and_return( false )
 		dataobj.should_receive( :errors ).once.and_return( errors_mock )
 		dataobj.should_receive( :lock_version ).and_return( 18 )
 

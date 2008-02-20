@@ -191,11 +191,11 @@ class Arrow::Logger
 		return super unless Levels.key?( sym )
 
 		self.global.debug( "Autoloading class log method '#{sym}'." )
-		(class << self; self; end).class_eval {
-			define_method( sym ) {|*args|
+		(class << self; self; end).class_eval do
+			define_method( sym ) do |*args|
 				self.global.send( sym, *args )
-			}
-		}
+			end
+		end
 
 		self.global.send( sym, *args )
 	end

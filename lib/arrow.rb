@@ -62,6 +62,11 @@ module Arrow
 	require 'arrow/exceptions'
 	require 'arrow/mixins'
 
+	# Hook up PluginFactory logging to Arrow logging
+	PluginFactory.logger_callback = lambda do |lvl, msg|
+		Arrow::Logger[PluginFactory].send( lvl, msg )
+	end
+	PluginFactory.log( :debug, "Hooked up PluginFactory logging through Arrow's logger." )
 
 	### A +RubyChildInitHandler+ class which loads one or more dispatchers
 	### when a child server starts. This can eliminate the startup lag for 

@@ -81,7 +81,7 @@ class Arrow::Session::ActiveRecordStore < Arrow::Session::Store
 			dbo.session_data = data
 			self.log.debug "Session db object is at version %d" % [dbo.lock_version]
 			
-			unless dbo.create_or_update
+			unless dbo.save
 				raise Arrow::SessionError, 
 					"Could not save session: %s" % [ dbo.errors.full_messages.join(', ') ]
 			end
