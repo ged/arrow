@@ -51,19 +51,19 @@ easy as writing CGIs, but with the repetitive and boring stuff factored out for 
 
 Some of the good things we wanted to preserve from the CGI environment:
 
-* Immediate gratification — we wanted to preserve the "tweak the code and reload" of CGI development
+* *Immediate gratification* — we wanted to preserve the "tweak the code and reload" of CGI development
   to encourage small incremental development and experimentation.
-* Simplicity — we didn't want to have to worry about things like headers, query parameter parsing,
+* *Simplicity* — we didn't want to have to worry about things like headers, query parameter parsing,
   response buffering, and the other stuff that CGI libraries typically provide, but we still wanted
   to be able to access or override those things with minimum effort when necessary.
 
 CGI also has some bad parts that we wanted to eliminate:
 
-* Startup time/fork overhead — CGI has to fork an interpreter each time, load all required 
+* *Startup time/fork overhead* — CGI has to fork an interpreter each time, load all required 
   libraries, establish new connections, etc. There are accelerators for @mod_ruby@ that eliminate
   some of this, but usually at the cost of additional complexity or fragility. We wanted to be able 
   to have persistent connections, with little or no startup cost beyond the initial server startup.
-* Monolithic code — CGIs of any complexity are usually large chunks of code, with some kind of
+* *Monolithic code* — CGIs of any complexity are usually large chunks of code, with some kind of
   internal dispatch to manage different actions or parts of the URI space. We wanted to be able to 
   attach smaller pieces of code to paths in the URI space in a way that let control pass through
   multiple components without them having to know too much about each other.
@@ -95,6 +95,4 @@ We also wanted to add some features which are useful in most all web application
   to build on those strengths. Arrow has some powerful introspection facilities that let the
   developer examine the state of applications, templates, sessions, etc.
 
-
-mod_perl_two_servers:http://perl.apache.org/docs/1.0/guide/strategy.html#Alternative_architectures_for_running_one_and_two_servers_
 

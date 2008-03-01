@@ -1,3 +1,11 @@
+--- 
+title: Configuration
+filters:
+  - erb
+  - examples
+  - textile
+---
+
 h1. Arrow: Configuration
 
 h2. Apache
@@ -6,21 +14,21 @@ You'll need to add mod_ruby to the configuration file for Apache, typically name
 httpd.conf, if you hadn't done so when you installed mod_ruby. For example, assuming your
 mod_ruby.so is installed in $WEBROOT/libexec/mod_ruby.so:
 
-#:example#{ language: apache, caption: Adding mod_ruby to your Apache config.}#
+<?example { language: html, caption: Adding mod_ruby to your Apache config. } ?>
   LoadModule ruby_module libexec/mod_ruby.so
   AddModule mod_ruby.c
-#:example#
+<?end?>
 		
 To associate an Arrow instance with a location in your web space:
 
-#:example#{ language: apache, caption: Tell Arrow to answer a location in your server.}#
+<?example { language: html, caption: Tell Arrow to answer a location in your server.} ?>
   RubyAddPath /path/to/your/Arrow/lib
   RubyRequire arrow
   <Location /your/desired/arrow/url>
       SetHandler ruby-object
       RubyHandler "Arrow::Dispatcher.create('/your/arrow.conf')"
   </Location>
-#:example#
+<?end?>
 		
 Be sure to have put your Arrow configuration file into place wherever you tell Apache you put it.
 
@@ -31,58 +39,58 @@ Apache, and it's something we're very interested in fixing. Ideas welcomed.
 This is the Arrow-specific configuration you'll need to put in, but the rest of this config file
 will still need to be set up for a working server. For more information on Apache configuration
 files, see the Apache documentation, as well as the mod_ruby documentation.
-	  
+
 
 h2. Arrow
 
 Arrow's config file is written in YAML, and looks something like this:
 
 		
-#:example#{ language: yaml, caption: An example arrow.yaml config file.}#
-  ---
-  logLevel: debug
-  templateLogLevel: info
-  applets: 
-    missingApplet: "/missing"
-    errorApplet: "/error"
-    pattern: "*.rb"
-    path:
-      - "/usr/local/apache/applets"
-      - "/www/applets"
-    pollInterval: 5
-    config: {}
-    layout: 
-      "/args": ArgumentTester
-      "/hello": HelloWorld
-      "/missing": NoSuchAppletHandler
-      "/status": ServerStatus
-      "/error": ErrorHandler
-      "/raiseError": ErrorDemo
-      "/view-template": TemplateViewer
-      "/count": AccessCounter
-      "/count/hello": HelloWorld
-      "/protected": ProtectedDelegator
-      "/protected/hello": HelloWorld
-      "/files": LoadedFiles
-  templates: 
-    loader: Arrow::Template
-    path:
-      - "/usr/local/apache/templates"
-      - "/www/templates"
-    cache: true
-    cacheConfig: 
-      maxObjSize: 131072
-      maxNum: 20
-      expiration: 36
-      maxSize: 2621440
-  session: 
-    idName: arrow-session
-    expires: "+48h"
-    idType: md5:.
-    storeType: file:/usr/local/apache/sessions
-    lockType: file:/usr/local/apache/sessions
+<?example { language: yaml, caption: An example arrow.yaml config file.} ?>
+---
+logLevel: debug
+templateLogLevel: info
+applets: 
+  missingApplet: "/missing"
+  errorApplet: "/error"
+  pattern: "*.rb"
+  path:
+    - "/usr/local/apache/applets"
+    - "/www/applets"
+  pollInterval: 5
+  config: {}
+  layout: 
+    "/args": ArgumentTester
+    "/hello": HelloWorld
+    "/missing": NoSuchAppletHandler
+    "/status": ServerStatus
+    "/error": ErrorHandler
+    "/raiseError": ErrorDemo
+    "/view-template": TemplateViewer
+    "/count": AccessCounter
+    "/count/hello": HelloWorld
+    "/protected": ProtectedDelegator
+    "/protected/hello": HelloWorld
+    "/files": LoadedFiles
+templates: 
+  loader: Arrow::Template
+  path:
+    - "/usr/local/apache/templates"
+    - "/www/templates"
+  cache: true
+  cacheConfig: 
+    maxObjSize: 131072
+    maxNum: 20
+    expiration: 36
+    maxSize: 2621440
+session: 
+  idName: arrow-session
+  expires: "+48h"
+  idType: md5:.
+  storeType: file:/usr/local/apache/sessions
+  lockType: file:/usr/local/apache/sessions
 
-#:example#
+<?end?>
 		
 All items in the configuration are optional; reasonable default values are provided by
 Arrow::Config::Defaults. The more important to customize for most users are going to be the applet

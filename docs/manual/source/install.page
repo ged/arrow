@@ -1,3 +1,11 @@
+---
+template: default
+filters:
+  - erb
+  - textile
+  - examples
+---
+
 h1. Arrow: Installation
 
 h2. Step One: Install "Apache":http://httpd.apache.org/
@@ -71,7 +79,12 @@ Again, if you installed via Rubygems, you won't need to do anything else.
 
 If you're installing from source, now that all of the dependencies are installed, just do:
 
+<notextile>
+<?example language: shell, linenumbers: none, test: false, 
+	caption: "Installing arrow as a conventional library" ?>
   $ rake install
+<?end?>
+</notextile>
 
 to install the Arrow libraries.
 

@@ -30,10 +30,11 @@ require 'rake'
 require 'rake/testtask'
 require 'rcov/rcovtask'
 require 'spec/rake/spectask'
-require 'spec/rake/verifytask'
+require 'spec/rake/verify_rcov'
 require 'rake/rdoctask'
 require 'rake/packagetask'
 require 'rake/gempackagetask'
+require 'rake/contrib/sshpublisher'
 require 'pathname'
 
 require 'apache/fakerequest'
@@ -48,10 +49,11 @@ PKG_SUMMARY   = "Arrow - A Ruby web application framework"
 
 RELEASE_NAME  = "REL #{PKG_VERSION}"
 
-BASEDIR       = Pathname.new( __FILE__ ).dirname.expand_path
+BASEDIR       = Pathname.new( __FILE__ ).dirname
 LIBDIR        = BASEDIR + 'lib'
 DOCSDIR       = BASEDIR + 'docs' 
 MANUALDIR     = DOCSDIR + 'manual'
+APIDOCSDIR    = DOCSDIR + 'api'
 
 TEXT_FILES    = %w( Rakefile README )
 SPEC_DIRS     = ['spec']
@@ -61,6 +63,35 @@ LIB_FILES     = Dir.glob('lib/**/*.rb').delete_if { |item| item =~ /\.svn/ }
 
 
 RELEASE_FILES = TEXT_FILES + LIB_FILES + SPEC_FILES
+
+GEMSPEC = Gem::Specification.new do |gem|
+	gem.name    	= PKG_NAME
+	gem.version 	= PKG_VERSION
+
+	gem.summary     = PKG_SUMMARY
+	gem.description = <<-EOD
+	Arrow is a web application framework for mod_ruby. It was designed to make
+	development of web applications under Apache easier and more fun without
+	sacrificing the power of being able to access the native Apache API.
+	EOD
+
+	gem.authors  	= "Michael Granger, Martin Chase, Dave McCorkhill, Jeremiah Jordan"
+	gem.email       = "ged@FaerieMUD.org"
+	gem.homepage 	= "http://deveiate.org/projects/Arrow"
+	gem.rubyforge_project = 'deveiate'
+
+	gem.has_rdoc 	= true
+
+	gem.files      	= RELEASE_FILES
+	gem.test_files 	= SPEC_FILES + TEST_FILES
+
+	gem.requirements << "mod_ruby >= 1.2.6"
+
+  	gem.add_dependency( 'ruby-cache', '>= 0.3.0' )
+  	gem.add_dependency( 'formvalidator', '>= 0.1.3' )
+  	gem.add_dependency( 'pluginfactory', '>= 1.0.2' )
+end
+
 
 # Load task plugins
 RAKE_TASKDIR = BASEDIR + 'rake'
@@ -98,7 +129,7 @@ end
 
 ### Task: clean
 desc "Clean pkg, coverage, and rdoc; remove .bak files"
-task :clean => [ :clobber_rdoc, :clobber_package, :clobber_coverage ] do
+task :clean => [ :clobber_rdoc, :clobber_manual, :clobber_package, :clobber_coverage ] do
 	files = FileList['**/*.bak']
 	files.clear_exclude
 	File.rm( files ) unless files.empty?
@@ -109,29 +140,31 @@ end
 desc "Build RSpec test coverage reports"
 Spec::Rake::SpecTask.new( :spec_coverage ) do |task|
 	task.spec_files = SPEC_FILES
-	task.rcov_opts = ['--exclude', 'spec']
+	task.rcov_opts = ['--exclude', 'spec', '--aggregate', 'coverage.data']
 	task.rcov = true
-	task.rcov_dir = 'spec_coverage'
+	task.rcov_dir = 'coverage'
 end
 
 desc "Build Test::Unit test coverage reports"
 Rcov::RcovTask.new( :test_coverage ) do |task|
 	task.test_files = TEST_FILES
-	task.output_dir = 'test_coverage'
+	task.rcov_opts = ['--exclude', 'spec', '--aggregate', 'coverage.data']
+	task.output_dir = 'coverage'
 end
 
 task :coverage => [:spec_coverage, :test_coverage]
 task :clobber_coverage => [:clobber_spec_coverage, :clobber_test_coverage]
 
 desc "Build coverage statistics"
-VerifyTask.new( :verify => :coverage ) do |task|
+RCov::VerifyTask.new( :verify => :coverage ) do |task|
 	task.threshold = 85.0
+	task.require_exact_threshold = false
 end
 
 
 ### Task: rdoc
 Rake::RDocTask.new do |rdoc|
-	rdoc.rdoc_dir = 'docs/html'
+	rdoc.rdoc_dir = APIDOCSDIR.to_s
 	rdoc.title    = "The Arrow Web Application Framework"
 
 	rdoc.options += [
@@ -145,6 +178,14 @@ Rake::RDocTask.new do |rdoc|
 	
 	rdoc.rdoc_files.include 'README'
 	rdoc.rdoc_files.include LIB_FILES
+end
+
+
+### Task: manual
+Manual::GenTask.new do |manual|
+	manual.metadata.version = PKG_VERSION
+	manual.metadata.gemspec = GEMSPEC
+	manual.base_dir = MANUALDIR
 end
 
 
@@ -180,36 +221,8 @@ end
 
 
 ### Task: gem
-gemspec = Gem::Specification.new do |gem|
-	gem.name    	= PKG_NAME
-	gem.version 	= PKG_VERSION
-
-	gem.summary     = PKG_SUMMARY
-	gem.description = <<-EOD
-	Arrow is a web application framework for mod_ruby. It was designed to make
-	development of web applications under Apache easier and more fun without
-	sacrificing the power of being able to access the native Apache API.
-	EOD
-
-	gem.authors  	= "Michael Granger, Martin Chase, Dave McCorkhill, Jeremiah Jordan"
-	gem.email       = "ged@FaerieMUD.org"
-	gem.homepage 	= "http://deveiate.org/projects/Arrow"
-	gem.rubyforge_project = 'deveiate'
-
-	gem.has_rdoc 	= true
-
-	gem.files      	= RELEASE_FILES
-	gem.test_files 	= SPEC_FILES + TEST_FILES
-
-	gem.requirements << "mod_ruby >= 1.2.6"
-
-  	gem.add_dependency( 'ruby-cache', '>= 0.3.0' )
-  	gem.add_dependency( 'formvalidator', '>= 0.1.3' )
-  	gem.add_dependency( 'pluginfactory', '>= 1.0.2' )
-end
-
-Rake::GemPackageTask.new( gemspec ) do |task|
-	task.gem_spec = gemspec
+Rake::GemPackageTask.new( GEMSPEC ) do |task|
+	task.gem_spec = GEMSPEC
 	task.need_tar = true
 	task.need_zip = true
 end
@@ -286,7 +299,8 @@ end
 
 ### Publication tasks
 begin
-	RUBYFORGE_DOC_DIR = "/var/www/gforge-projects/#{PKG_NAME}"
+	PROJECT_HOST = 'deveiate.org'
+	PROJECT_HTMLDIR = "/usr/local/trac/Arrow/htdocs/api"
 
 	gem 'meta_project'
 	require 'meta_project'
@@ -300,13 +314,13 @@ begin
 		raise "RUBYFORGE_PASSWORD environment variable not set!" unless ENV['RUBYFORGE_PASSWORD']
 	end
 
-	# Publish everything in the 'html' directory to arrow.RubyForge.org
-	task :publish_doc => :verify_env_vars do
-		user = "%s@rubyforge.org" % [ENV['RUBYFORGE_USER']]
-
-		publisher = Rake::SshDirPublisher.new( user, RUBYFORGE_DOC_DIR )
+	# Publish everything in the api docs directory to the project page
+	desc "Publish manual and API docs to the project site"
+	task :publish_docs => [ :rdoc, :manual ] do
+		publisher = Rake::SshDirPublisher.new( "deveiate.org", PROJECT_HTMLDIR, APIDOCSDIR )
 		publisher.upload
 	end
+
 
 	desc "Release files on RubyForge"
 	task :release_files => [:gem] do
@@ -322,6 +336,7 @@ begin
 			# release_changes, parsed from CHANGES)
 		end
 	end
+
 
 	desc "Publish news on RubyForge"
 	task :publish_news => [:gem] do

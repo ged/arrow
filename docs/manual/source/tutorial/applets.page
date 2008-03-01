@@ -1,0 +1,381 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+  <!--
+
+	Arrow Manual: Tutorial: Applets
+	$Id: apps.textile 431 2008-02-14 08:10:49Z deveiant $
+
+	Author:		Michael Granger
+
+  -->
+
+  <head>
+	<title>Arrow Manual: Tutorial: Applets</title>
+
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+
+	<meta name="authors" content="Michael Granger (ged@FaerieMUD.org)>" />
+	<link rel="stylesheet" href="manual.css" type="text/css" />
+  </head>
+  <body>
+
+
+	<!-- Experimental linkbox thingie -->
+	<div id="linkbox">
+	  <span id="linkbox-head">Arrow Manual</span>
+	  <span id="linkbox-body">
+		<ul>
+		  <li>[<a href="index.html">Index</a>]</li>
+		  <li>[<a href="whatis.html">What Is Arrow?</a>]</li>
+		  <li>[<a href="download.html">Downloading</a>]</li>
+		  <li>[<a href="install.html">Installation</a>]</li>
+		  <li>[<a href="config.html">Configuration</a>]</li>
+		  <li>[<a href="tutorial.html">Tutorial</a>]</li>
+		  <li>[<a href="html/">API Reference</a>]</li>
+		</ul>
+	  </span>
+	</div>
+
+
+	<!-- Tutorial linkbox thingie -->
+	<div id="sub-linkbox">
+	  <span id="sub-linkbox-head">&rarr; Tutorial</span>
+	  <span id="sub-linkbox-body">
+		<ul>
+		  <li>[<a href="tutorial-intro.html">Intro</a>]</li>
+		  <li>[<a href="tutorial-apps.html">Applets</a>]</li>
+		  <li>[<a href="tutorial-templates.html">Templates</a>]</li>
+		  <li>[<a href="tutorial-sessions.html">Sessions</a>]</li>
+		  <li>[<a href="tutorial-validation.html">Input Validation</a>]</li>
+<!-- 		  <li>[<a href="tutorial-sources.html">Data Sources</a>]</li> -->
+<!-- 		  <li>[<a href="tutorial-monitors.html">Monitors</a>]</li> -->
+		</ul>
+	  </span>
+	</div>
+
+	<!-- Main content -->
+	<div id="content">
+	  <h1>Arrow: Tutorial: Applets</h1>
+
+	  <p>The <tt>Arrow::Applet</tt> class is the main workhorse of the
+	  Arrow framework; it, in concert with <tt>Arrow::Transaction</tt>,
+	  provides most of the functionality that application developers will be
+	  concerned with.</p>
+
+	  <p>Applets make up the functionality of an application; each distinct task
+	  that a user can do is consicely expressed as a separate class which
+	  inherits from Arrow::Applet. The base Applet class defines much of what is
+	  covered in the rest of this tutorial, so if you don't like the templating
+	  system or the argument validation system built into the base applet class,
+	  you can easily define your own that uses something else instead without
+	  having to give up any of the other functionality.</p>
+
+	  <p>For now, though, this tutorial will focus on the default functionality,
+	  with mention made of how to override or replace it where
+	  appropriate.</p>
+
+	  <div class="section">
+		<h2><a href="#overview" id="overview">The Parts of an Applet</a></h2>
+
+		<p>An Arrow applet is made up of <strong>a signature</strong>, one or more
+		<strong>actions</strong>, and an optional <strong>delegator
+		method</strong>.</p>
+	  </div>
+
+	  <!-- The Signature -->
+	  <div class="section">
+		<h2><a href="#signature" id="signature">The Signature</a></h2>
+
+		<p>The <strong>signature</strong> is a Hash of metadata which describes
+		the applet to the app framework, and includes information like name and
+		author, and configures some of the logic and functionality provided by
+		the <tt>Arrow::Applet</tt> class itself.</p>
+
+		<p>Here's an example of a basic applet signature:</p>
+		
+		<pre>
+# Applet signature
+Signature = {
+    :name => "Hello World",
+    :description => "This is yet another implementation of Hello World",
+    :maintainer => "ged@FaerieMUD.org",
+    :default_action => 'greet',
+}
+</pre>
+
+		<h3>Signature Values</h3>
+		<p>No element of the signature is mandatory: the base applet class will
+		try to guess appropriate values for any missing elements. The values the
+		base applet class understands are listed below along with what they
+		do.</p>
+
+		<dl class="linelist signature-items">
+		  <dt>name</dt>
+		  <dd>The name of the applet, used for display purposes in introspection
+		  and for automated bug- or error-reporting. Defaults to the name of the
+		  Applet class.</dd>
+
+		  <dt>description</dt>
+		  <dd>A brief explanation of what the applet does or is for; used
+		  in introspection utilities. Defaults to <tt>"(none)"</tt>.</dd>
+
+		  <dt>maintainer</dt>
+		  <dd>The RFC822-formatted email address of the person to praise and/or
+		  blame for the functioning of the applet. This is intended to be used
+		  in introspection utilities and also for automated bug- or error-
+		  reporting. Defaults to whatever the <tt>ServerAdmin</tt> of Apache is
+		  set to, or the empty string if the <tt>ServerAdmin</tt> setting is not
+		  available.</dd>
+
+		  <dt>default_action</dt>
+		  <dd>When no action is specified by the incoming request, this
+		  determines which one will be used. Defaults to
+		  <tt>'_default'</tt>.</dd>
+
+		  <dt>templates</dt>
+		  <dd>This should be set to a hash filled with file names of the
+		  templates that will be used by this applet.  Templates listed in this
+		  hash can later be loaded via the <tt
+		  class="method-name">#load_template</tt> method of the applet
+		  object. Defaults to an empty hash.  See the <a
+		  href="tutorial-template.html">templating tutorial</a> for more
+		  coverage of this</dd>
+
+		  <dt>version</dt>
+		  <dd>The version of the applet. If the applet defines any of the 
+		    <tt class="constant-name">Version</tt>, <tt
+		    class="constant-name">Revision</tt>, <tt
+		    class="constant-name">SVNId</tt>, or <tt
+		    class="constant-name">Rcsid</tt> constants, the value it contains is
+		    used as a default. Otherwise the mtime of the file which contains
+		    the applet is used.</dd>
+
+		  <dt>vargs</dt>
+		  <dd>A hash containing profiles for the built in form validator, one
+		  per action. See the <a href="tutorial-validation.html">input
+		  validation section</a> of the tutorial for more.</dd>
+		</dl>
+	  </div>
+
+	  <!-- Actions -->
+	  <div class="section">
+		<h2><a href="#actions" id="actions">Actions</a></h2>
+
+		<p>Actions provide the actual functionality of the applet. An action is
+		just a specially-named method which corresponds to a part of the URI the
+		client requests, and represents a step or phase of the applet's
+		execution.</p>
+
+		<h3>Action Method Form</h3>
+		<p>Each action method's name must end with <tt>_action</tt>. For
+		example, if you're defining the 'display' action, you'd define a method
+		called <tt>display_action</tt>:</p>
+
+<pre>
+def display_action( txn, *args )
+  # Do something with the txn
+
+  return "Some content"
+end
+</pre>
+
+		<p>Action methods are called with an <tt
+		  class="class-name">Arrow::Transaction</tt> object and zero or more
+		  arguments that can be passed REST-style in the URI. Only the
+		  transaction argument is mandatory; defining an action method without
+		  parameters will result in an error.</p>
+
+		<p>You can also use the <tt class="method-name">def_action</tt> shortcut to
+		  define an action to make them easily distinguishable from other
+		  methods you may define in your applet class:</p>
+
+<pre>
+def_action :display do |txn, *args|
+  # Do something with the txn
+
+  return "Some content"
+end
+</pre>
+
+		<p>The two declarations are equivalent.</p>
+
+		<h3>Action Execution</h3>
+
+		<p>When an action method is called, it should do the necessary
+		processing to build the response data and return it to its caller. This
+		return value will then be converted to a <tt
+		class="class-name">String</tt> (via <tt class="method-name">#to_s</tt>)
+		and sent to the client after doing the necessary header setting and
+		Apache housekeeping. Returning a non-true value causes a
+		<tt>DECLINED</tt> status to be sent back to Apache. This can be used to
+		pass control to a further handler if the action determines it cannot
+		handle the request.</p>
+
+		<p>For return behaviors outside of these (for example, altered headers
+		or a different status), it is necessary to access the Apache::Request
+		object directly (through <tt>txn.request</tt> in the examples
+		above). See the <a href="http://modruby.net">mod ruby</a> site for more
+		information on what to do with this.</p>
+
+		<h3>Action Signature Proxy</h3>
+
+		<p>For convenience, the <tt>action</tt> shortcut also returns an
+		  object that can be used to add templates and/or validation profiles to
+		  the Signature, but keep them together with the action they are used
+		  by:</p>
+
+<pre>
+formaction = def_action :form do |txn|
+    templ = self.load_template( :form )
+    templ.txn = txn
+    return templ
+end
+
+formaction.template = "form.tmpl"
+</pre>
+
+	  </div>
+
+	  <!-- Example -->
+	  <div class="section example-section">
+		<h2><a href="#hello-example" id="hello-example">A simple
+			applet - Hello</a></h2>
+
+		<p>We'll start with a dead-simple applet that doesn't really do
+		  much of anything useful. In keeping with tradition, of course, this
+		  applet will be yet another implementation of 'Hello World':</p>
+
+<pre>
+#
+# A "hello world" Arrow applet
+#
+
+require 'arrow/applet'
+
+# Define the applet class; inherit from the base applet class.
+class Hello &lt; Arrow::Applet
+
+  # Applet signature
+  Signature = {
+	  :name =&gt; "Hello World",
+	  :description =&gt; "This is yet another implementation of Hello World",
+	  :maintainer =&gt; "ged@FaerieMUD.org",
+	  :default_action =&gt; 'greet',
+  }
+
+  # Define the 'greet' (default) action
+  def_action :greet do |txn|
+    return &lt;&lt;-EOF
+	&lt;html&gt;
+	  &lt;head&gt;&lt;title&gt;Hello&lt;/title&gt;&lt;/head&gt;
+	  &lt;body&gt;&lt;p&gt;Hello, world.&lt;/p&gt;&lt;/body&gt;
+	&lt;/html&gt;
+    EOF
+  end
+
+end
+</pre>
+
+		<p>The applet's class is <tt class="class-name">Hello</tt>, which means
+		to install it into the server's URI-space you'd add a line like the
+		following to the <tt>layout</tt> hash of the <tt>applets</tt> section of
+		the arrow config file:</p>
+
+<pre>
+applets:
+  layout:
+    "/hello": Hello
+</pre>
+
+        <p>After the config has been loaded, requests for
+        <code>/&lt;arrow-root&gt;/hello/greet</code> (and simply
+        <code>/&lt;arrow-root&gt;/hello</code>, because <tt>greet</tt> is the
+        default action) will return something that looks like:</p>
+
+		<div class="screenshot">
+		  <img src="hello-world-sshot.png" alt="screenshot" height="324" width="460" />
+		</div>
+
+	  </div>
+
+	  <div class="section">
+		<h2><a href="#arguments" id="arguments">Passing REST-style Arguments</a></h2>
+
+		<p>Now let's add a bit of personalization to the applet. Perhaps it
+		should be able to generate customizable messages in addition to greeting
+		the entire world. To do this, we can make the <tt>greet</tt> action take
+		an additional argument specified in the URL:</p>
+
+<pre>
+  # Define the 'greet' (default) action
+  action( :greet ) {|txn<strong>, name</strong>|
+    <strong>name ||= "world"</strong>
+
+    return &lt;&lt;-EOF
+	&lt;html&gt;
+	  &lt;head&gt;&lt;title&gt;Hello&lt;/title&gt;&lt;/head&gt;
+	  &lt;body&gt;&lt;p&gt;Hello, <strong>#{name}</strong>.&lt;/p&gt;&lt;/body&gt;
+	&lt;/html&gt;
+    EOF
+  }
+
+end
+</pre>
+
+		<p>Calling the applet with a URL like <code>/hello/greet/Dave</code>
+		will now cause it to greet only Dave instead:</p>
+
+		<div class="screenshot">
+		  <img src="hello-dave-sshot.png" alt="screenshot" height="324" width="464" />
+		</div>
+
+		<p>Note that we're required to call the action '<tt>greet</tt>'
+		explicitly to be able to pass in URL-style arguments.</p>
+
+	  </div>
+
+	  <div class="section">
+		<h2><a href="#chaining" id="chaining">Applet Chaining</a></h2>
+
+		<p>As mentioned before, applets can also be chained together to build
+		  more complex functionality. Apps which are intended to be chained
+		  through should define a <tt>#delegate</tt> method. This delegation
+		  method is called by the broker when the applet is being chained
+		  through, and is responsible for calling <tt>yield</tt> when (if) it
+		  wishes to pass control to the next applet in the chain, passing any
+		  desired additional arguments. Delegation methods are invoked with the
+		  same arguments as action methods, including any added by previous
+		  applets in the chain.</p>
+	  </div>
+	  
+
+		<p></p>
+		<h3>?(delegation example)?</h3>
+		<p></p>
+
+
+	  </div>
+
+	  <div class="section">
+		<h2><a href="#special" id="special">Special Applets</a></h2>
+		<p></p>
+		<h3>Internal-only Applets</h3>
+		<p></p>
+		<h3>Error Handlers</h3>
+		<p></p>
+		<h3>Status/Introspection Applets</h3>
+		<p></p>
+	  </div>
+
+	</div>
+
+  </body>
+</html>
+
+
+<!--
+  Local Variables:
+  mode: nxml
+ -->

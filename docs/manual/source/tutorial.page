@@ -1,0 +1,13 @@
+h1. Arrow: Tutorial
+
+Arrow, as mentioned in the "What is Arrow?":whatis.html
+part of this manual, is a web application framework for mod_ruby. This
+tutorial will introduce the parts of the framework, and walk through
+the process of creating some basic applets.
+
+# "Introduction":tutorial/intro.html
+# "Applications and Applets":tutorial/applets.html
+# "Templates":tutorial/templates.html
+# "Sessions":tutorial/sessions.html
+# "Parameter Validation":tutorial/validation.html
+
