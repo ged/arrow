@@ -26,13 +26,6 @@ require 'tmpdir'
 
 require 'pathname'
 
-begin
-	require 'rubygems'
-rescue LoadError
-	# No RubyGems is okay
-end
-
-
 ### The module that serves as a namespace for all Arrow classes.
 module Arrow
 
@@ -42,25 +35,21 @@ module Arrow
 	# SVN Id
 	SVNId = %q$Id$
 
-	# Release version
-	VERSION = '0.9.3'
-
-	HOSTS_CONFIG_LINE = <<-EOF
-	Can't load Arrow: No host config specified. Try setting the 'hosts_map' 
-	option via a line like:
-	
-	  RubyOption hosts_map "/path/to/yaml/hosts/file.yml"
-	EOF
-	HOSTS_CONFIG_LINE.strip!
-
-	# Yaml stuff
-	YamlDomain = "rubycrafters.com,2003-10-22"
-
-	require 'arrow/applet'
-	require 'arrow/dispatcher'
-	require 'arrow/broker'
-	require 'arrow/exceptions'
-	require 'arrow/mixins'
+	begin
+		require 'arrow/constants'
+		require 'arrow/monkeypatches'
+		require 'arrow/applet'
+		require 'arrow/dispatcher'
+		require 'arrow/broker'
+		require 'arrow/exceptions'
+		require 'arrow/mixins'
+	rescue LoadError
+		if ! Object.constant_defined?( :Gem )
+			require 'rubygems'
+			retry
+		end
+		raise
+	end
 
 	# Hook up PluginFactory logging to Arrow logging
 	PluginFactory.logger_callback = lambda do |lvl, msg|

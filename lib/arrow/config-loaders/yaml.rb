@@ -37,7 +37,7 @@ class Arrow::Config::YamlLoader < Arrow::Config::Loader
 
 	# Add YAML domain types for Arrow classes
 
-	YAML.add_domain_type( Arrow::YamlDomain, "arrowPath" ) do |type, val|
+	YAML.add_domain_type( Arrow::YAML_DOMAIN, "arrowPath" ) do |type, val|
 		obj = nil
 		case val
 		when Array

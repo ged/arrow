@@ -2,9 +2,9 @@ h1. What is Arrow?
 
 h2. Overview
 
-Arrow is a web application framework for mod_ruby. It was designed to make development of web
-applications under Apache easier and more fun without sacrificing the power of being able to access
-the native Apache API.
+Arrow is a web application framework for mod_ruby. It was designed to make development of
+high-performance web applications under Apache easier and more fun without sacrificing the power of
+being able to access the native Apache module API.
 
 h3. Why another web framework?
 

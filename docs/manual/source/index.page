@@ -1,39 +1,105 @@
+---
+template: default
+filters:
+  - erb
+  - textile
+  - examples
+---
+
 h1. Arrow
 
-Arrow is a web application 
+Arrow is a web application framework for "mod_ruby":http://www.modruby.net/, a module for "the Apache webserver":http://httpd.apache.org/ that exposes most of the server's module API to Ruby via an embedded interpreter.
 
-	  <h1>Arrow: Downloading</h1>
+It features:
 
-	  <div class="section">
-		<h2><a href="#releases" id="releases">Releases</a></h2>
+* reloadable applets that can be chained together
+* request and response utilities
+* object-oriented templating system
+* cookie-based sessions
+* form-data validation and untainting
+* hierarchical configuration and logging classes
 
-		<p>You can download the latest release from <a
-		href="http://www.rubycrafters.com/projects/Arrow/">the main project
-		page</a>.</p>
-	  </div>
+For more information about Arrow's history and design, see "Arrow's History and Design":history.html.
 
-	  <div class="section">
-		<h2><a href="#development" id="development">Development Versions</a></h2>
+h2. Installation
 
-		<p>We use Subversion for version control. You can see a web view of the
-		repository at: </p>
+h3. Step One: Install "Apache":http://httpd.apache.org/
 
-		<div style="margin: 0 2em;">
-		  <p>&lt;<a
-		  href="http://svn.rubycrafters.com/index.cgi/Arrow">http://svn.rubycrafters.com/index.cgi/Arrow</a>&gt;</p>
-		</div>
+All development and testing is done using the Apache 2.2.x series webserver on Linux, FreeBSD, and
+MacOS X, though you should be able to run it under earlir versions or other platforms. We'd love to
+hear about you experiences under other configurations, and patches for portability are of course
+always welcomed.
 
-		<p>You can also check out the latest source read-only like this:</p>
 
-		<p><tt>$ </tt><kbd>svn co svn://svn.RubyCrafters.com/Arrow/trunk Arrow</kbd></p>
-<pre>
-A  Arrow/.irbrc
-A  Arrow/test.rb
-A  Arrow/arrow.css
-A  Arrow/demo.cfg
-<em>[...]</em>
- U Arrow
-Checked out revision 192.
-</pre>
+h3. Step Two: Install "Ruby":http://www.ruby-lang.org/
 
-		<p>This will check out the source into a directory called 'Arrow'.</p>
+You probably already have Ruby installed, but in case you don't, you'll need the latest version in
+the 1.8.x series. We're interested in running it under 1.9.x, but that hasn't been tested at all 
+yet.
+
+
+h3. Step Three: Install "mod_ruby":http://www.modruby.net/
+
+The @mod_ruby@ Apache module embeds a Ruby interpreter into Apache, much like @mod_perl@ and
+@mod_python@ do for their respective interpreters.
+
+Arrow is tested with the latest version, which was 1.2.6 when this was written.
+
+
+h3. Step Four: Install Ruby Library Dependencies
+
+These are the various ruby libraries you will need to install in addition to the standard
+distributed ones. If you install Arrow as a gem, these will be installed for you, but you can
+install them by hand, too.
+
+* "ruby-cache":http://www.nongnu.org/pupa/ruby-cache.html (>= 0.3.0)
+* "formvalidator":http://grub.ath.cx/formvalidator/ (>= 0.1.3)
+* "pluginfactory":http://www.deveiate.org/projects/PluginFactory (>= 1.0.2)
+
+
+h3. Standard Library		
+
+Arrow also uses some standard libraries that are part of the standard library, but which some
+package maintainers may elect not to install with the main Ruby interpreter package. If you have
+problems, you may wish to ensure that these are installed.
+
+* strscan (0.6.7)
+
+
+h3. Optional Libraries
+
+Some of the developer tasks in the Rakefile and some plugins for the server require additional
+libraries:
+
+h4. Developer Tasks
+
+* "rspec":http://rspec.info/ (>= 1.0.3) — This is required to run the test suite
+* "rcov":http://eigenclass.org/hiki/rcov (>= 0.8.1.2.0) — Used to check test coverage
+
+h4. Documentation Tasks
+
+* "RedCloth":http://whytheluckystiff.net/ruby/redcloth/
+* "CodeRay":http://coderay.rubychan.de/
+* "Darkfish RDoc":http://www.deveiate.org/projects/Darkfish-Rdoc — An alternate template for RDoc
+
+
+h4. Plugin Dependencies
+
+* posixlock (>= 0.0.1) — Required if you wish to use the 'posix' type of session locking.
+
+
+h2. Installing the Arrow Libraries
+
+Again, if you installed via RubyGems, you won't need to do anything else.
+
+If you're installing from source, now that all of the dependencies are installed, just do:
+
+<notextile>
+<?example language: shell, linenumbers: none, test: false, 
+	caption: "Installing arrow as a conventional library" ?>
+  $ rake install
+<?end?>
+</notextile>
+
+to install the Arrow libraries.
+

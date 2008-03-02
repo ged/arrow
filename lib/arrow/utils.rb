@@ -27,58 +27,8 @@ require 'rbconfig'
 require 'forwardable'
 require 'pathname'
 
-
-### Add some operator methods to regular expression objects for catenation,
-### union, etc.
-class Regexp #:nodoc:
-
-	### Append the given +other+ Regexp (or String) onto a copy of the receiving
-	### one and return it.
-	def +( other ) 
-		return self.class.new( self.to_s + other.to_s )
-	end
-
-	### Create and return a new Regexp that is an alternation between the
-	### receiver and the +other+ Regexp.
-	def |( other )
-		return Regexp.new( "(?:%s|%s)" % [self.to_s, other.to_s] )
-	end
-end
-
-
-### Add some stuff to the String class to allow easy transformation to Regexp
-### and in-place interpolation.
-class String
-	def to_re( casefold=false, extended=false )
-		return Regexp.new( self.dup )
-	end
-
-	### Ideas for String-interpolation stuff courtesy of Hal E. Fulton
-	### <hal9000@hypermetrics.com> via ruby-talk
-
-	### Interpolate any '#{...}' placeholders in the string within the given
-	### +scope+ (a Binding object).
-    def interpolate( scope )
-        unless scope.is_a?( Binding )
-            raise TypeError, "Argument to interpolate must be a Binding, not "\
-                "a #{scope.class.name}"
-        end
-
-		# $stderr.puts ">>> Interpolating '#{self}'..."
-
-        copy = self.gsub( /"/, %q:\": )
-        eval( '"' + copy + '"', scope )
-	rescue Exception => err
-		nicetrace = err.backtrace.find_all {|frame|
-			/in `(interpolate|eval)'/i !~ frame
-		}
-		Kernel.raise( err, err.message, nicetrace )
-    end
-
-end
-
-
-
+require 'arrow/monkeypatches'
+require 'arrow/constants'
 require 'arrow/mixins'
 require 'arrow/exceptions'
 
@@ -145,7 +95,7 @@ module Arrow
 
 		### Return the YAML type for this class
 		def self::to_yaml_type
-			"!%s/arrowPath" % Arrow::YamlDomain
+			"!%s/arrowPath" % Arrow::YAML_DOMAIN
 		end
 
 

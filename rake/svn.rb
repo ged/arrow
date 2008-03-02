@@ -2,7 +2,7 @@
 ###	S U B V E R S I O N   T A S K S   A N D   H E L P E R S
 #####################################################################
 
-require 'arrow'
+require 'arrow/constants'
 require 'yaml'
 require 'English'
 
