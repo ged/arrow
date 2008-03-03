@@ -138,4 +138,3 @@ rescue LoadError => err
 		task :clobber => :no_coverage
 	end
 end
-

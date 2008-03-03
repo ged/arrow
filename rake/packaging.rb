@@ -7,9 +7,19 @@
 # 
 
 begin
-	require 'rake/packagetask'
-	require 'rake/gempackagetask'
-	require 'rubygems/specification'
+
+	begin
+		oldverbose = $VERBOSE
+		$VERBOSE = false
+		require 'rake/packagetask'
+		require 'rake/gempackagetask'
+		require 'rubygems/specification'
+		require 'rubygems/remote_installer'
+		require 'rubygems/doc_manager'
+	ensure
+		$VERBOSE = oldverbose
+	end
+
 
 	GEMSPEC = Gem::Specification.new do |gem|
 		gem.name    	= PKG_NAME
@@ -47,10 +57,6 @@ begin
 		task.need_zip = true
 	end
 
-
-	require 'rubygems/installer'
-	require 'rubygems/remote_installer'
-	require 'rubygems/doc_manager'
 
 	class Gem::RemoteInstaller
 
@@ -115,17 +121,6 @@ begin
 		meta_project diff-lcs]
 	task :install_dependencies do
 		install_gems( DEPENDENCIES )
-	end
-
-
-	task :install_gem => [:spec, :gem] do
-		installer = Gem::Installer.new( %{pkg/#{PKG_FILE_NAME}.gem} )
-		installer.install
-	end
-
-	task :uninstall_gem => [:clean] do
-		uninstaller = Gem::Uninstaller.new( PKG_FILE_NAME )
-		uninstaller.uninstall
 	end
 
 

@@ -73,11 +73,15 @@ end
 if Rake.application.options.trace
 	$trace = true
 	log "$trace is enabled"
+else
+	$trace = false
 end
 
 if Rake.application.options.dryrun
 	$dryrun = true
 	log "$dryrun is enabled"
+else
+	$dryrun = false
 end
 
 
@@ -92,7 +96,7 @@ task :docs => [ :rdoc, :manual ]
 
 ### Task: clean
 desc "Clean pkg, coverage, and rdoc; remove .bak files"
-task :clean => [ :clobber_rdoc, :clobber_manual, :clobber_package, :clobber_coverage ] do
+task :clean => [ :clobber_rdoc, :clobber_manual, :clobber_package, 'coverage:clobber' ] do
 	files = FileList['**/*.bak']
 	files.clear_exclude
 	File.rm( files ) unless files.empty?
@@ -101,13 +105,12 @@ end
 
 ### Task: rdoc
 begin
-	gem 'darkfish'
-	require 'darkfish'
+	gem 'darkfish-rdoc'
 	require 'rake/rdoctask'
 	
 	Rake::RDocTask.new do |rdoc|
 		rdoc.rdoc_dir = APIDOCSDIR.to_s
-		rdoc.title    = "The Arrow Web Application Framework"
+		rdoc.title    = "Arrow #{PKG_VERSION}"
 
 		rdoc.options += [
 			'-w', '4',
@@ -136,6 +139,21 @@ Manual::GenTask.new do |manual|
 	manual.metadata.version = PKG_VERSION
 	manual.metadata.gemspec = GEMSPEC
 	manual.base_dir = MANUALDIR
+end
+
+
+### Installation tasks
+
+desc "Install the library as a gem"
+task :install_gem => [:spec, :gem] do
+	installer = Gem::Installer.new( %{pkg/#{PKG_FILE_NAME}.gem} )
+	installer.install
+end
+
+desc "Uninstall the gem"
+task :uninstall_gem => [:clean] do
+	uninstaller = Gem::Uninstaller.new( PKG_FILE_NAME )
+	uninstaller.uninstall
 end
 
 

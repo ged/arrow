@@ -292,11 +292,8 @@ class Arrow::Session < Arrow::Object
 	### re-delegates them to its data.
 	def_delegated_readers :[], :default, :default=, :each, :each_key,
 		:each_pair, :each_value, :empty?, :fetch, :has_key?, :has_value?,
-		:include?, :index, :invert, :keys, :length, :member?, :merge,
+		:include?, :index, :invert, :key?, :keys, :length, :member?, :merge,
 		:rehash, :reject, :select, :size, :sort, :to_a, :value?, :values
-
-	alias_method :key?, :has_key?
-	alias_method :value?, :has_value?
 
 	def_delegated_writers :[]=, :delete, :clear, :merge!, :replace,
 		:delete_if, :reject!

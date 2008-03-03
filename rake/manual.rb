@@ -267,10 +267,81 @@ module Manual
 			:metadata
 
 		attr_reader :name
+
+		### Load the filter libraries provided in the given +libdir+
+		def load_filter_libraries( libdir )
+			Pathname.glob( libdir + '*.rb' ) do |filterlib|
+				trace "  loading filter library #{filterlib}"
+				require( filterlib )
+			end
+		end
+
+
+		### Set up the main HTML-generation task that will convert files in the given +sourcedir+ to
+		### HTML in the +outputdir+
+		def setup_page_conversion_tasks( sourcedir, outputdir, layoutsdir )
+			source_glob = sourcedir + '**/*.page'
+			trace "Looking for sources that match: %s" % [ source_glob ]
+
+			# Find the list of source .page files
+			manual_sources = FileList[ source_glob ]
+			trace "   found %d source files" % [ manual_sources.length ]
+			
+			# Map .page files to their equivalent .html output
+			html_pathmap = "%%{%s,%s}X.html" % [ sourcedir, outputdir ]
+			manual_pages = manual_sources.pathmap( html_pathmap )
+			trace "Mapping sources like so: \n  %p -> %p" %
+				[ manual_sources.first, manual_pages.first ]
+
+			# Output directory task
+			directory( outputdir.to_s )
+			file outputdir.to_s do
+				touch outputdir + '.buildtime'
+			end
+
+			# Rule to generate .html files from .page files
+			rule( 
+				%r{#{outputdir}/.*\.html$} => [
+					proc {|name| name.sub(/\.[^.]+$/, '.page').sub( outputdir, sourcedir) },
+					outputdir.to_s
+			 	]) do |task|
+				trace "  #{task.source} -> #{task.name}"
+			
+				source = Pathname.new( task.source )
+				target = Pathname.new( task.name )
+					
+				page = Manual::Page.new( source, layoutsdir )
+					
+				target.dirname.mkpath
+				target.open( File::WRONLY|File::CREAT|File::TRUNC ) do |io|
+					io.write( page.generate(metadata) )
+				end
+			end
+			
+			return manual_pages
+		end
+		
+		
+		### Set up a rule for copying files from the resources directory to the output dir.
+		def setup_resource_copy_tasks( resourcedir, outputdir )
+			
+			task :copy_resources => [ outputdir.to_s ] do
+				when_writing( "Copying resources" ) do
+					verbose do
+						cp_r FileList[ resourcedir + '*' ], outputdir, :verbose => true
+					end
+				end
+			end
+		end
 		
 
 		### Set up the tasks for building the manual
 		def define
+
+			# Set up a description if the caller hasn't already defined one
+			unless Rake.application.last_comment
+				desc "Generate the manual"
+			end
 
 			# Make Pathnames of the directories relative to the base_dir
 			basedir     = Pathname.new( @base_dir )
@@ -280,67 +351,18 @@ module Manual
 			resourcedir = basedir + @resource_dir
 			libdir      = basedir + @lib_dir
 
-			trace "Basedir:     #{basedir}\n",
-			      "Sourcedir:   #{sourcedir}\n",
-			      "Layoutsdir:  #{layoutsdir}\n",
-			      "Outputdir:   #{outputdir}\n",
-			      "resourcedir: #{resourcedir}\n",
-			      "libdir:      #{libdir}\n"
+			load_filter_libraries( libdir )
 
-
-			# Load all the filter libraries
-			Pathname.glob( libdir + '*.rb' ) do |filterlib|
-				trace "  loading filter library #{filterlib}"
-				require( filterlib )
-			end
-
-			# Set up a description if the caller hasn't already defined one
-			unless Rake.application.last_comment
-				desc "Generate the manual"
-			end
+			# Declare the tasks outside the namespace that point in
 			task @name => "#@name:build"
 			task "clobber_#@name" => "#@name:clobber"
 
 			namespace( self.name ) do
-				source_glob = sourcedir + '**/*.page'
-				trace "Looking for sources that match: %s" % [ source_glob ]
-
-				manual_sources = FileList[ source_glob ]
-				trace "   found %d source files" % [ manual_sources.length ]
+				setup_resource_copy_tasks( resourcedir, outputdir )
+				manual_pages = setup_page_conversion_tasks( sourcedir, outputdir, layoutsdir )
 				
-				html_pathmap = "%%{%s,%s}X.html" % [ sourcedir, outputdir ]
-				manual_pages = manual_sources.pathmap( html_pathmap )
-				trace "Mapping sources like so: \n  %p -> %p" %
-					[ manual_sources.first, manual_pages.first ]
-
-				# Output directory task
-				directory( outputdir.to_s )
-				file outputdir.to_s do
-					touch outputdir + '.buildtime'
-				end
-
+				task :build => [ :copy_resources, *manual_pages ]
 				
-				# Rule to generate .html files from .page files
-				rule( 
-					%r{#{outputdir}/.*\.html$} => [
-						proc {|name| name.sub(/\.[^.]+$/, '.page').sub( outputdir, sourcedir) },
-						outputdir.to_s
-				 	]) do |task|
-					trace "  #{task.source} -> #{task.name}"
-				
-					source = Pathname.new( task.source )
-					target = Pathname.new( task.name )
-						
-					page = Manual::Page.new( source, layoutsdir )
-						
-					target.dirname.mkpath
-					target.open( File::WRONLY|File::CREAT|File::TRUNC ) do |io|
-						io.write( page.generate(metadata) )
-					end
-				end
-				
-							
-				task :build => manual_pages
 				task :clobber do
 					RakeFileUtils.verbose( $verbose ) do
 						rm_f manual_pages.to_a
