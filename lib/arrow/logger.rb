@@ -77,11 +77,10 @@ class Arrow::Logger
 	].inject({}) {|hsh, sym| hsh[ sym ] = hsh.length; hsh}
 	LevelNames = Levels.invert
 
-	# Constant for debugging the logger - set to true to output internals to
-	# $stderr.
-	module DebugLogger
+	### Module for adding debugging to the logger
+	module DebugLogger # :nodoc:
 		def debug_msg( *parts ) # :nodoc:
-			#$deferr.puts parts.join('') if $DEBUG
+			# $deferr.puts parts.join('') if $DEBUG
 		end
 	end
 
@@ -261,6 +260,37 @@ class Arrow::Logger
 		]
 	end
 	
+	
+	### Return a (more-detailed) human-readable string representation of the object.
+	def inspect_details( level=0 )
+		indent = '  ' * (level + 1)
+
+		prelude = "<< %s [level: %s, trace: %s] >>" % [
+			self.readable_name,
+			self.readable_level,
+			self.trace ? "on" : "off",
+		  ]
+
+		details = []
+		
+		unless self.outputters.empty?
+			details << "Outputters:" << self.outputters.map {|op| op.inspect }
+		end
+		
+		unless self.subloggers.empty?
+			details << "Subloggers:" << 
+				self.subloggers.values.map {|sl| sl.inspect_details(level + 1) }
+		end
+		
+		details = details.flatten.compact.map {|line| indent + line }
+		
+		if level.zero?
+			return [ prelude, *details ].join( "\n" )
+		else
+			return [ prelude, *details ]
+		end
+	end
+	
 
 	### Return the name of the logger formatted to be suitable for reading.
 	def readable_name
@@ -366,11 +396,7 @@ class Arrow::Logger
 
 
 	### Write the given +args+ to any connected outputters if +level+ is
-	### less than or equal to this logger's level. If the first item in
-	### +args+ is a String and contains %<char> codes, the message will
-	### formed by using the first argument as a format string in +sprintf+
-	### with the remaining items. Otherwise, the message will be formed by
-	### catenating the results of calling #formatObject on each of them.
+	### less than or equal to this logger's level.
 	def write( level, *args )
 		debug_msg "Writing message at %p: %p" % [ level, args ]
 

@@ -216,7 +216,7 @@ class Arrow::Config < Arrow::Object
 		@struct      = ConfigStruct.new( mergedhash )
 		@create_time = Time.now
 		@name        = nil
-		@loader      = self.class.get_loader
+		@loader      = nil
 
 		super()
 	end
@@ -236,9 +236,6 @@ class Arrow::Config < Arrow::Object
 	# The time the configuration was loaded
 	attr_accessor :create_time
 
-	# The loader that will be used to save this config
-	attr_reader :loader
-
 	# The name of the associated record stored on permanent storage for this
 	# configuration.
 	attr_accessor :name
@@ -255,6 +252,13 @@ class Arrow::Config < Arrow::Object
 		end
 	end
 
+
+	### Fetch the loader from this config object, or create an instance 
+	### of the default one if none is yet associated with it.
+	def loader
+		@loader ||= self.class.get_loader
+	end
+	
 
 	### Write the configuration object using the specified name and any
 	### additional +args+.

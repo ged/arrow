@@ -24,7 +24,6 @@ unless defined? Arrow::TestCase
 	require 'arrow/testcase'
 end
 
-require 'breakpoint'
 require 'arrow/cookie'
 
 ### Collection of tests for the Arrow::Cookie class.

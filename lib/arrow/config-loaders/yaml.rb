@@ -21,7 +21,6 @@
 
 require 'yaml'
 
-require 'arrow'
 require 'arrow/config'
 require 'arrow/utils'
 

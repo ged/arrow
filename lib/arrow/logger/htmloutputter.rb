@@ -40,7 +40,7 @@ class Arrow::Logger::HtmlOutputter < Arrow::Logger::FileOutputter
 		<span class="log-time">#{time.strftime('%Y/%m/%d %H:%M:%S')}</span>
 		<span class="log-level">#{level}</span>
 		:
-		<span class="log-name">#{name}</span>
+		<span class="log-name">#{escaped_name}</span>
 		<span class="log-frame">#{frame ? '('+frame+'): ' : ''}</span>
 		<span class="log-message-text">#{escaped_msg}</span>
 	</div>
@@ -48,7 +48,7 @@ class Arrow::Logger::HtmlOutputter < Arrow::Logger::FileOutputter
 
 
 	### Override the default to add color scheme instance variable
-	def initialize( uri, description=DEFAULT_DESCRIPTION, format='' ) # :notnew:
+	def initialize( uri, description=DEFAULT_DESCRIPTION, format=HTML_FORMAT ) # :notnew:
 		super
 	end
 
@@ -60,13 +60,12 @@ class Arrow::Logger::HtmlOutputter < Arrow::Logger::FileOutputter
 	### write the log message to $deferr.
 	def write( time, level, name, frame, msg )
 		escaped_msg = escape_html( msg )
+		escaped_name = escape_html( name )
 		html = @format.interpolate( binding )
 
-		if block_given?
-			yield( html )
-		else
-			$deferr.puts( html ) if $DEBUG
-		end
+		raise "Fuckery: " + self.inspect if html =~ /<div/
+
+		@io.puts( html )
 	end
 
 

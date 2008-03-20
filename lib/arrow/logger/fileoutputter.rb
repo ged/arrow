@@ -85,4 +85,28 @@ class Arrow::Logger::FileOutputter < Arrow::Logger::Outputter
 		end
 	end
 
+
+	#########
+	protected
+	#########
+
+	### Returns a String which should be included in the implementation-specific part 
+	### of the object's inspection String.
+	def inspection_details
+		io_desc = 
+			case @io
+			when $stderr
+				'STDERR'
+			when $stdout
+				'STDOUT'
+			when StringIO
+				'(StringIO 0x%0x)' % [ @io.object_id * 2 ]
+			else
+				'(IO: fd %d)' % [ @io.fileno ]
+			end
+		
+		return [ super, io_desc ].join(', ')
+	end
+	
+	
 end # class Arrow::Logger::FileOutputter

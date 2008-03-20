@@ -117,6 +117,27 @@ class Arrow::Logger::Outputter
 	end
 
 
+	### Returns a human-readable description of the object as a String
+	def inspect
+		"#<%s:0x%0x %s>" % [
+			self.class.name,
+			self.object_id * 2,
+			self.inspection_details,
+		]
+	end
+
+
+	#########
+	protected
+	#########
+
+	### Returns a String which should be included in the implementation-specific part 
+	### of the object's inspection String.
+	def inspection_details
+		return "%s (%s)" % [ self.description, self.format ]
+	end
+	
+
 end # class Arrow::Logger::Outputter
 
 
