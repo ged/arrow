@@ -11,7 +11,7 @@
 #
 # == Subversion Id
 #
-#  $Id: prettyprint.rb 183 2004-08-23 06:10:32Z ged $
+#  $Id$
 # 
 # == Authors
 # 
@@ -38,7 +38,7 @@ class Arrow::Template::PrettyPrintDirective < Arrow::Template::CallDirective # :
 	SVNRev = %q$Rev$
 	
 	# SVN Id
-	SVNId = %q$Id: prettyprint.rb 183 2004-08-23 06:10:32Z ged $
+	SVNId = %q$Id$
 	
 	
 	### Render the content and return it as prettyprinted text.

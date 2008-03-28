@@ -19,10 +19,10 @@ require 'arrow/applet'
 class MissingApplet < Arrow::Applet
 
 	# SVN Revision
-	SVNRev = %q$Rev: 54 $
+	SVNRev = %q$Rev$
 
 	# SVN Id
-	SVNId = %q$Id: noSuchApp.rb 54 2004-05-22 06:42:56Z deveiant $
+	SVNId = %q$Id$
 
 
 	# Applet signature

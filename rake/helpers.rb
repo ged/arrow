@@ -29,6 +29,10 @@ ANSI_ATTRIBUTES = {
 }
 
 
+CLEAR_TO_EOL       = "\e[K"
+CLEAR_CURRENT_LINE = "\e[2K"
+
+
 ### Output a logging message
 def log( *msg )
 	output = colorize( msg.flatten.join(' '), 'cyan' )
@@ -36,7 +40,7 @@ def log( *msg )
 end
 
 
-### Output a logging message
+### Output a logging message if tracing is on
 def trace( *msg )
 	return unless $trace
 	output = colorize( msg.flatten.join(' '), 'yellow' )
@@ -47,6 +51,8 @@ end
 ### Run the specified command +cmd+ with system(), failing if the execution
 ### fails.
 def run( *cmd )
+	cmd.flatten!
+
 	log( cmd.collect {|part| part =~ /\s/ ? part.inspect : part} ) 
 	if $dryrun
 		$deferr.puts "(dry run mode)"
@@ -54,6 +60,31 @@ def run( *cmd )
 		system( *cmd )
 		unless $?.success?
 			fail "Command failed: [%s]" % [cmd.join(' ')]
+		end
+	end
+end
+
+
+### Open a pipe to a process running the given +cmd+ and call the given block with it.
+def pipeto( *cmd )
+	$DEBUG = true
+
+	cmd.flatten!
+	log( "Opening a pipe to: ", cmd.collect {|part| part =~ /\s/ ? part.inspect : part} ) 
+	if $dryrun
+		$deferr.puts "(dry run mode)"
+	else
+		open( '|-', 'w+' ) do |io|
+		
+			# Parent
+			if io
+				yield( io )
+
+			# Child
+			else
+				exec( *cmd )
+				fail "Command failed: [%s]" % [cmd.join(' ')]
+			end
 		end
 	end
 end
@@ -72,19 +103,32 @@ def download( sourceuri, targetfile )
 	targetpath.open( File::WRONLY|File::TRUNC|File::CREAT, 0644 ) do |ofh|
 	
 		url = URI.parse( sourceuri )
-		Net::HTTP.start( url.host, url.port ) do |http|
-			req = Net::HTTP::Get.new( url.path )
+		downloaded = false
+		limit = 5
+		
+		until downloaded or limit.zero?
+			Net::HTTP.start( url.host, url.port ) do |http|
+				req = Net::HTTP::Get.new( url.path )
 
-			http.request( req ) do |res|
-				if res.is_a?( Net::HTTPSuccess )
-					print "Downloading..."
-					res.read_body do |buf|
-						ofh.print( buf )
-					end
-					puts "done."
+				http.request( req ) do |res|
+					if res.is_a?( Net::HTTPSuccess )
+						log "Downloading..."
+						res.read_body do |buf|
+							ofh.print( buf )
+						end
+						downloaded = true
+						puts "done."
+		
+					elsif res.is_a?( Net::HTTPRedirection )
+						url = URI.parse( res['location'] )
+						log "...following redirection to: %s" % [ url ]
+						limit -= 1
+						sleep 0.2
+						next
 				
-				else
-					res.error!
+					else
+						res.error!
+					end
 				end
 			end
 		end
@@ -122,21 +166,36 @@ def ansi_code( *attributes )
 end
 
 
-### Colorize the given +string+ with the specified +attributes+ and return it, handling line-endings, etc.
-def colorize( string, *attributes )
+### Colorize the given +string+ with the specified +attributes+ and return it, handling 
+### line-endings, color reset, etc.
+def colorize( *args )
+	string = ''
+	
+	if block_given?
+		string = yield
+	else
+		string = args.shift
+	end
+	
 	ending = string[/(\s)$/] || ''
 	string = string.rstrip
-	return ansi_code( attributes.flatten ) + string + ansi_code( 'reset' ) + ending
+
+	return ansi_code( args.flatten ) + string + ansi_code( 'reset' ) + ending
 end
 
 
 ### Output the specified <tt>msg</tt> as an ANSI-colored error message
 ### (white on red).
-def error_message( msg )
-	$deferr.puts ansi_code( 'bold', 'white', 'on_red' ) +
-		msg.strip + ansi_code( 'reset' ) + "\n\n"
+def error_message( msg, details='' )
+	$deferr.puts colorize( 'bold', 'white', 'on_red' ) { msg } + details
 end
 alias :error :error_message
+
+
+### Highlight and embed a prompt control character in the given +string+ and return it.
+def make_prompt_string( string )
+	return CLEAR_CURRENT_LINE + colorize( 'bold', 'green' ) { string + ' ' }
+end
 
 
 ### Output the specified <tt>prompt_string</tt> as a prompt (in green) and
@@ -149,14 +208,14 @@ def prompt( prompt_string, failure_msg="Try again." ) # :yields: response
 	response = nil
 
 	begin
-		response = Readline.readline( ansi_code('bold', 'green') +
-			"#{prompt_string} " + ansi_code('reset') ) || ''
+		prompt = make_prompt_string( prompt_string )
+		response = Readline.readline( prompt ) || ''
 		response.strip!
 		if block_given? && ! yield( response ) 
 			error_message( failure_msg + "\n\n" )
 			response = nil
 		end
-	end until response
+	end while response.nil?
 
 	return response
 end
@@ -177,7 +236,7 @@ def prompt_with_default( prompt_string, default, failure_msg="Try again." )
 			error_message( failure_msg + "\n\n" )
 			response = nil
 		end
-	end until response
+	end while response.nil?
 
 	return response
 end
@@ -202,6 +261,23 @@ def ask_for_confirmation( description )
 end
 
 
+### Search line-by-line in the specified +file+ for the given +regexp+, returning the
+### first match, or nil if no match was found. If the +regexp+ has any capture groups,
+### those will be returned in an Array, else the whole matching line is returned.
+def find_pattern_in_file( regexp, file )
+	rval = nil
+	
+	File.open( file, 'r' ).each do |line|
+		if (( match = regexp.match(line) ))
+			rval = match.captures.empty? ? match[0] : match.captures
+			break
+		end
+	end
+
+	return rval
+end
+
+
 ### Get a list of the file or files to run rspec on.
 def rspec_files
 	if ENV['class']
@@ -213,5 +289,13 @@ def rspec_files
 		return SPEC_FILES
 	end
 end
+
+
+### Extract all the non Rake-target arguments from ARGV and return them.
+def get_target_args
+	args = ARGV.reject {|arg| Rake::Task.task_defined?(arg) }
+	return args
+end
+
 
 

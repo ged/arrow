@@ -123,7 +123,7 @@ begin
 		end
 	end
 	
-	task :coverage => [ 'coverage:spec', 'coverage:test' ]
+	task :coverage => [ 'coverage:clobber', 'coverage:spec', 'coverage:test' ]
 
 rescue LoadError => err
 	task :no_coverage do
