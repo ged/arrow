@@ -85,13 +85,16 @@ module Manual
 
 
 		### Create a new page-generator for the given +sourcefile+, which will use
-		### ones of the templates in +layouts_dir+ as a wrapper.
-		def initialize( sourcefile, layouts_dir )
-			@sourcefile = Pathname.new( sourcefile )
+		### ones of the templates in +layouts_dir+ as a wrapper. The +basepath+ 
+		### is the path to the base output directory.
+		def initialize( sourcefile, layouts_dir, basepath='.' )
+			@sourcefile  = Pathname.new( sourcefile )
 			@layouts_dir = Pathname.new( layouts_dir )
+			@basepath    = basepath
 
 			rawsource = @sourcefile.read
 			@config, @source = self.read_page_config( rawsource )
+
 			# $stderr.puts "Config is: %p" % [@config],
 			# 	"Source is: %p" % [ @source[0,100] ]
 			@filters = self.load_filters( @config['filters'] )
@@ -103,6 +106,9 @@ module Manual
 		######
 		public
 		######
+		
+		# The relative path to the base directory, for prepending to page paths
+		attr_reader :basepath
 		
 		# The Pathname object that specifys the page source file
 		attr_reader :sourcefile
@@ -304,13 +310,15 @@ module Manual
 				%r{#{outputdir}/.*\.html$} => [
 					proc {|name| name.sub(/\.[^.]+$/, '.page').sub( outputdir, sourcedir) },
 					outputdir.to_s
-			 	]) do |task|
-			
-				source = Pathname.new( task.source ).relative_path_from( Pathname.getwd )
-				target = Pathname.new( task.name ).relative_path_from( Pathname.getwd )
+				]) do |task|
+				
+				source = Pathname.new( task.source )
+				target = Pathname.new( task.name )
+				trace "    sourcedir = #{sourcedir}"
 				log "  #{ source } -> #{ target }"
-					
-				page = Manual::Page.new( source, layoutsdir )
+				
+				path_to_root = sourcedir.relative_path_from( source.dirname )
+				page = Manual::Page.new( source, layoutsdir, path_to_root )
 					
 				target.dirname.mkpath
 				target.open( File::WRONLY|File::CREAT|File::TRUNC ) do |io|
@@ -367,7 +375,7 @@ module Manual
 			end
 
 			# Make Pathnames of the directories relative to the base_dir
-			basedir     = Pathname.new( @base_dir )
+			basedir     = Pathname.new( @base_dir ).relative_path_from( Pathname.getwd )
 			sourcedir   = basedir + @source_dir
 			layoutsdir  = basedir + @layouts_dir
 			outputdir   = basedir + @output_dir
