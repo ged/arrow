@@ -1,145 +1,69 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+---
+title: Input Validation
+template: tutorial
+filters:
+  - erb
+  - examples
+  - textile
+---
 
-<!--
+h1. Input Validation
 
-		Arrow Manual: Input Validation Tutorial
-		$Id$
+Most web applications process input from forms at some point in their execution. While under some
+circumstances it may be okay to accept incoming data as is, the chance of malevolent data, even from
+trusted networks, as well as the extent to which such data can compromise a system (through the use
+of escape, shell and other sequences), makes doing so in today's Internet an extremely bad practice.
 
-		Author:		Michael Granger
-		Time-stamp: <23-Apr-2001 19:58:12 deveiant>
+A first line of defense taken by Ruby is to flag all incoming data as tainted, and restrict the use
+of such flagged data in potentially dangerous operations if the $SAFE global variable is non-zero.
+This "safe" level is set to 1 by default in mod_ruby, and it is recommended that it be kept at that
+setting for Arrow applications as well. In order to use data which comes from outside of the
+application, then, it is necessary to untaint it, which means to analyze it for acceptability.
 
-  -->
+The analysis step is typically implemented in Ruby with a regular expression, which is applied to
+the input, and the part of the input which matches the expected pattern is retained.
 
-  <head>
-	<title>Arrow Manual: Input Validation Tutorial</title>
+In addition to untainting, input data must also sometimes be tested against more-stringent
+validation routines, such as in the case of credit card numbers, phone numbers, email addresses,
+etc.
 
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+These data-validation tasks are common enough to web application development that Arrow integrates
+Travis Whitton's excellent FormValidator library, which provides both validation and (optionally)
+untainting. It has built in support for validating many different kinds of structured data, giving
+an application plenty of control over what values are acceptable for any given field with a
+convenient and consistent interface.
 
-    <meta name="authors" content="Michael Granger (ged@FaerieMUD.org)>" />
-	<link rel="stylesheet" href="manual.css" type="text/css" />
-  </head>
-  <body>
+h2. Writing a Validation Specification
 
+The documentation for FormValidator gives a thorough coverage of the different options that are
+available to control how data gets through. This will be a brief coverage of some of these, with
+notes on the specifics of how this package is integrated with Arrow and how it can be used by
+applications you write.
 
+To begin with, recognize that any action which expects to receive input must declare a specification
+for it to get through. Further, a specification must validate every field of the expected input, or
+individual fields will not be passed in. To simplify this, you may end up writing a few base
+validation schemes that then get extended by each of the actions.
 
-	<!-- Experimental linkbox thingie -->
-	<div id="linkbox">
-	  <span id="linkbox-head">Arrow Manual</span>
-	  <span id="linkbox-body">
-		<ul>
-		  <li>[<a href="index.html">Index</a>]</li>
-		  <li>[<a href="whatis.html">What Is Arrow?</a>]</li>
-		  <li>[<a href="download.html">Downloading</a>]</li>
-		  <li>[<a href="install.html">Installation</a>]</li>
-		  <li>[<a href="config.html">Configuration</a>]</li>
-		  <li>[<a href="tutorial.html">Tutorial</a>]</li>
-		  <li>[<a href="html/">API Reference</a>]</li>
-		</ul>
-	  </span>
-	</div>
+The specifications are kept in the signature of an application, stored as a Hash keyed by action
+name, with values of that action's specification. While it is acceptable to include all of your
+actions' specifications when the signature is first declared, you may find it more readable to
+include an action's specification immediately before or after the action itself, thus keeping
+related information together. (This is equally applicable to templates, config(?) and monitors(?).)
 
 
-	<!-- Tutorial linkbox thingie -->
-	<div id="sub-linkbox">
-	  <span id="sub-linkbox-head">&rarr; Tutorial</span>
-	  <span id="sub-linkbox-body">
-		<ul>
-		  <li>[<a href="tutorial-intro.html">Intro</a>]</li>
-		  <li>[<a href="tutorial-apps.html">Applets</a>]</li>
-		  <li>[<a href="tutorial-templates.html">Templates</a>]</li>
-		  <li>[<a href="tutorial-sessions.html">Sessions</a>]</li>
-		  <li>[<a href="tutorial-validation.html">Input Validation</a>]</li>
-<!-- 		  <li>[<a href="tutorial-sources.html">Data Sources</a>]</li> -->
-<!-- 		  <li>[<a href="tutorial-monitors.html">Monitors</a>]</li> -->
-		</ul>
-	  </span>
-	</div>
+h2. Application With Input Args
 
-	<div id="content">
-	  <h1>Arrow: Tutorial: Input Validation</h1>
-
-	  <div class="section">
-	    <p>Most web applications process input from forms at some point in their
-		  execution.  While under some circumstances it may be okay to accept
-		  incoming data as is, the chance of malevolent data, even from trusted
-		  networks, as well as the extent to which such data can compromise a
-		  system (through the use of escape, shell and other sequences), makes
-		  doing so in today's Internet an extremely bad practice.</p>
-
-		<p>A first line of defense taken by Ruby is to flag all incoming data as
-		  tainted, and restrict the use of such flagged data in potentially
-		  dangerous operations if the <tt>$SAFE</tt> global variable is
-		  non-zero. This "safe" level is set to <tt>1</tt> by default in
-		  mod_ruby, and it is recommended that it be kept at that setting for
-		  Arrow applications as well. In order to use data which comes from
-		  outside of the application, then, it is necessary to <em>untaint</em>
-		  it, which means to analyze it for acceptability.</p>
-
-		<p>The analysis step is typically implemented in Ruby with a regular
-		  expression, which is applied to the input, and the part of the input
-		  which matches the expected pattern is retained.</p>
-
-		<p>In addition to untainting, input data must also sometimes be tested
-		  against more-stringent validation routines, such as in the case of
-		  credit card numbers, phone numbers, email addresses, etc. </p>
-
-		<p>These data-validation tasks are common enough to web application
-		  development that Arrow integrates Travis Whitton's excellent
-		  FormValidator library, which provides both validation and (optionally)
-		  untainting. It has built in support for validating many different
-		  kinds of structured data, giving an application plenty of control over
-		  what values are acceptable for any given field with a convenient and
-		  consistent interface.</p>
-	  </div>
-
-	  <div class="section">
-		<h2><a href="#writing" id="writing">Writing a Validation
-			Specification</a></h2>
-
-		<p>The documentation for <a href="http://grub.ath.cx/formvalidator/doc">
-		  FormValidator</a> gives a thorough coverage of the different options
-		  that are available to control how data gets through.  We give here a
-		  brief coverage of some of these, with notes on the specifics of how
-		  this package is integrated with Arrow and how it can be used by
-		  applications you write.</p>
-
-		<p>To begin with, recognize that any action which expects to receive
-		  input must declare a specification for it to get through.  Further, a
-		  specification must validate every field of the expected input, or
-		  individual fields will not be passed in.  To simplify this, you may
-		  end up writing a few base validation schemes that then get extended by
-		  each of the actions.</p>
-
-		<p>The specifications are kept in the signature of an application,
-		  stored as a Hash keyed by action name, with values of that action's
-		  specification.  While it is acceptable to include all of your actions'
-		  specifications when the signature is first declared, you may find it
-		  more readable to include an action's specification immediately before
-		  or after the action itself, thus keeping related information
-		  together.  (This is equally applicable to templates, config(?) and
-		  monitors(?).)</p>
-	  </div>
-	  <div class="section">
-		<h2><a href="#example" id="example">Application With Input -
-		Args</a></h2>
-
-		<p>See this one <a
-		href="http://dev.rubycrafters.com/arrow/args/">live</a> at our test
-		server, if it happens to be up today =:)</p>
-
-		<!-- TODO: this example is way too much.  Strip it down to something
-		people can understand. -->
-<pre>
+<?example { language: ruby, caption: Argument testing application. } ?>
 class Args < Arrow::Application
 
-    Signature = {
-        :name => "Argument Tester",
-        :description => "This app is for testing/debugging the argument validator.",
-        :maintainer => "god@host.com",
-        :default_action => 'display',
-        :templates => {
+    applet_name "Argument Tester"
+    applet_description "This app is for testing/debugging the argument validator."
+    applet_maintainer "god@host.com"
+    
+    default_action :display
+
+    templates => {
             :display    => 'args-display.tmpl',
         },
         :vargs => {
@@ -161,59 +85,48 @@ class Args < Arrow::Application
     ### template and renders it.  Cute, huh?
 
 end # class Args
-</pre>
 
-		<p>Then in the template:</p>
-<pre>
-    &lt;html&gt;
-        &lt;body&gt;
-        &lt;h1&gt;Argument Validation/Untainting/Testing applet&lt;/h1&gt;
-        &lt;p&gt;This is an applet to test argument validation.&lt;/p&gt;
+Then in the template:
 
-        &lt;form action="[?call txn.action?]" method="get"&gt;
-            &lt;p&gt;Name: &lt;input id="name-field" type="text" name="name" 
-              value="[?call txn.request.param('name') ?]" size="20"/&gt;&lt;/p&gt;
-            &lt;p&gt;Email: &lt;input id="email-field" type="text" name="email"
-                value="[?call txn.request.param('email') ?]" size="35"/&gt;&lt;/p&gt;
-            &lt;p&gt;Description: &lt;input id="description-field" type="text"
-                name="description" value="[?call
-              txn.request.param('description') ?]" size="55"/&gt;&lt;/p&gt;
-            &lt;p&gt;Other: &lt;input id="other-field" type="text" name="other"
-                  value="[?call txn.request.param('other') ?]" size="55" /&gt;&lt;/p&gt;
-        &lt;/form&gt;
+<?example { language: html, caption: Argument testing template. } ?>
+<html>
+    <body>
+    <h1>Argument Validation/Untainting/Testing applet</h1>
+    <p>This is an applet to test argument validation.</p>
 
-        &lt;h2&gt;Valid Args&lt;/h2&gt;
+    <form action="[?call txn.action?]" method="get">
+        <p>Name: <input id="name-field" type="text" name="name" 
+          value="[?call txn.request.param('name') ?]" size="20"/></p>
+        <p>Email: <input id="email-field" type="text" name="email"
+            value="[?call txn.request.param('email') ?]" size="35"/></p>
+        <p>Description: <input id="description-field" type="text"
+            name="description" value="[?call
+          txn.request.param('description') ?]" size="55"/></p>
+        <p>Other: <input id="other-field" type="text" name="other"
+              value="[?call txn.request.param('other') ?]" size="55" /></p>
+    </form>
 
-        &lt;p&gt;Fetched via: &lt;tt&gt;txn.vargs.valid&lt;/tt&gt;:&lt;/p&gt;
-        &lt;tt&gt;&lt;?escape txn.vargs.valid.inspect ?&gt;&lt;/tt&gt;
+    <h2>Valid Args</h2>
 
-        &lt;h2&gt;Missing Args&lt;/h2&gt;
+    <p>Fetched via: <tt>txn.vargs.valid</tt>:</p>
+    <tt><?escape txn.vargs.valid.inspect ?></tt>
 
-        &lt;p&gt;Fetched via: &lt;tt&gt;txn.vargs.missing&lt;/tt&gt;:&lt;/p&gt;
-        &lt;tt&gt;&lt;?escape txn.vargs.missing.inspect ?&gt;&lt;/tt&gt;
+    <h2>Missing Args</h2>
 
-        &lt;h2&gt;Invalid Args&lt;/h2&gt;
+    <p>Fetched via: <tt>txn.vargs.missing</tt>:</p>
+    <tt><?escape txn.vargs.missing.inspect ?></tt>
 
-        &lt;p&gt;Fetched via: &lt;tt&gt;txn.vargs.invalid&lt;/tt&gt;:&lt;/p&gt;
-        &lt;tt&gt;&lt;?escape txn.vargs.invalid.inspect ?&gt;&lt;/tt&gt;
+    <h2>Invalid Args</h2>
 
-        &lt;h2&gt;Unknown Args&lt;/h2&gt;
+    <p>Fetched via: <tt>txn.vargs.invalid</tt>:</p>
+    <tt><?escape txn.vargs.invalid.inspect ?></tt>
 
-        &lt;p&gt;Fetched via: &lt;tt&gt;txn.vargs.unknown&lt;/tt&gt;:&lt;/p&gt;
-        &lt;tt&gt;&lt;?escape txn.vargs.unknown.inspect ?&gt;&lt;/tt&gt;
-        &lt;/body&gt;
-    &lt;/html&gt;
-</pre>
-		<p></p>
-	  </div>
+    <h2>Unknown Args</h2>
 
-	</div>
-
-  </body>
+    <p>Fetched via: <tt>txn.vargs.unknown</tt>:</p>
+    <tt><?escape txn.vargs.unknown.inspect ?></tt>
+    </body>
 </html>
+<?end?>
 
 
-<!--
-  Local Variables:
-  mode: xml
- -->

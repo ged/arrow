@@ -42,7 +42,7 @@ class Arrow::Logger::ApacheOutputter < Arrow::Logger::Outputter
 		%q{#{name}#{frame ? '('+frame+')' : ''}: #{msg[0,2048]}}
 
 	# The Logger log levels (copied for easy access)
-	Levels = Arrow::Logger::Levels
+	LEVELS = Arrow::Logger::LEVELS
 
 
 	#############################################################
@@ -65,7 +65,7 @@ class Arrow::Logger::ApacheOutputter < Arrow::Logger::Outputter
 	def write( time, level, name, frame, msg )
 		return unless defined?( ::Apache )
 		srvr = ::Apache.request.server
-		return unless srvr.loglevel >= Levels[ level ]
+		return unless srvr.loglevel >= LEVELS[ level ]
 
 		# Translate calls to log.warning into Apache::Server#log_warn
 		level = :warn if level == :warning

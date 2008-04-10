@@ -1,269 +1,485 @@
+/* @override 
+	http://gont.ljc.laika.com/Arrow/css/manual.css
+	http://tenar.home.faeriemud.org/Arrow/css/manual.css
+*/
+
 /* 
  *	Arrow Manual Stylesheet
  *	$Id$
  *	Time-stamp: <06-Sep-2004 15:09:35 ged>
  */
 
+/* Start with Blueprint screen */
+/*@import url(screen.css);*/
+@import url(deveiate.css);
+
+/* Uses the "Brazilian Red Cap" Palette from COLOURlovers:
+ *   http://www.colourlovers.com/palette/91529/Brazilian_Red_Cap
+ * 
+ * RGB: 240, 24, 24
+ * Hex: #F01818
+ * 
+ * RGB: 144, 0, 0
+ * Hex: #900000
+ * 
+ * RGB: 243, 243, 243
+ * Hex: #F3F3F3
+ * 
+ * RGB: 72, 72, 96
+ * Hex: #484860
+ * 
+ * RGB: 120, 120, 144
+ * Hex: #787890
+ * 
+ */
+
 body {
-    margin: 3em;
-    background: #efefef url("draft-wm.png") fixed repeat-both;
-    color: #333;
-    font: 12px "Lucida Grande", Skia, Tahoma, sans-serif;
+	margin: 0;
+	padding: 2em 4em;
+	font: 14px/1.2em "Helvetica Neue", Helvetica, Tahoma, sans-serif;
+	background: #f3f3f3;
+	color: #333;
+	border-left: 5px solid #ca2f1b;
 }
 
 h1,h2,h3,h4,h5,h6 {
-    text-align: left;
-    color: #663333;
-    background: transparent;
-    font-family:  "Lucida Grande", Tahoma, sans-serif;
-    margin-bottom: 0;
-    padding-bottom: 0;
+	font-weight: normal;
+	color: #484860;
+}
+h1 {
+	font-size: 3em;
+	margin: 0.5em 0 0;
+	color: #ca2f1b;
+}
+h2 {
+	font-size: 2em;
+	margin: 1em 0 0;
+}
+h3 {
+	font-size: 1.5em;
+	margin: 1em 0 0;
+}
+h4 {
+	font-size: 1.25em;
+	margin: 1em 0 0;
 }
 
-h1 + p,
-h2 + p,
-h3 + p,
-h4 + p,
-h5 + p,
-h6 + p { margin-top: 0.2em; }
+p, ul {
+	line-height: 1.5;
+}
 
-h1 { font: bold 170%; text-shadow: #666 2px 2px 2px; }
-h2 { font: bold 150%; text-shadow: #666 1px 1px 2px; }
-h3 { font: bold 125%; text-shadow: #666 1px 1px 2px; }
-h4 { font: bold 110%; }
-h5 { font: bold small-caps; }
-h6 { font-weight: bold; font-style: italic; }
+li {
+	margin: 0.5em 0;
+}
 
-p,td,th {
-	font-family:	"Lucida Grande", Verdana, sans-serif;
-	font-weight:	normal;
-	font-style:		normal;
-	color:			#333;
+acronym, abbr {
+	border-bottom: 1px dotted #666;
 }
 
 a {
-	background: #fec;
-	color: #933;
+	color: #791707;
 	text-decoration: none;
+	border-bottom: 1px dotted;
 }
 
-a:hover {
-	border-bottom: 1px dotted #900;
+dl {
+	margin: 0 2em;
 }
-a[id] { background: inherit; color: inherit; text-decoration: inherit; border: none; }
-
-table {
-    background: #fefefe;
-    color: black;
-    border-left: 1px solid #333;
-    border-top: 1px solid #333;
-    border-right: 2px solid black;
-    border-bottom: 2px solid black;
+dl dt {
+	font-weight: bold;
+	border: 1px solid #ccc;
+	background-color: #e7e7e7;
+	color: #484860;
+	padding: 4px;
 }
-
-th {
-    background: white;
-    color: black;
-    font-weight: bold;
-    text-align: center;
-    vertical-align: bottom;
+dd {
+	padding: 4px;
+	margin: 0 0 0.5em;
 }
 
-th.row-title {
-    background: white;
-    color: black;
-    font-weight: bold;
-    text-align: right;
-    vertical-align: top;
+dd + dt {
+	margin-top: 1em;
 }
 
-td { padding: 1px 3px; }
-
-pre {
-    margin: 5px;
-    background: #ccc;
-    color: black;
-    border: 1px dotted black;
-    padding: 10px;
-    overflow: auto;
+div.screenshot {
+	margin: 1em 3em;
+}
+div.screenshot img {
+	-webkit-box-shadow: #333 1px 1px 5px;
 }
 
-ul > li,
-ol > li {
-    margin-bottom: 5px;
+/* @group Generic Classes */
+.todo {
+}
+/* @end Generic Classes */
+
+/* @group Examples */
+div.caption {
+	font-size: 12px;
+	text-align: center;
+	padding: 0.5em 0;
+	border-top: 1px solid #787890;
+}
+div.example {
+	border: 3px solid #787890;
+	margin: 0.5em 1em;
+	padding: 0;
+	font: 14px Monaco, Profont, "Andale Mono", mono;
+}
+div.example pre {
+	line-height: 1.2em;
+	margin: 0;
+	padding: 0;
 }
 
-fieldset { border: 0; padding: 0; margin: 5px 0; }
-
-button {
-    background: #fe9;
-    color: #900;
-    border: 1px solid black;
-    display: inline;
+pre.deveiate .line-numbers {
+	background-color: #474860;
+	color: #f3f3f3;
 }
 
-kbd, samp {
-    font-family: "Andale Mono", "Monotype.com", "Vera Sans Mono", fixed;
-    color: #633;
-    background: inherit;
+/* @group CodeRay highlighting */
+.CodeRay {}
+
+.CodeRay pre {}
+
+span.CodeRay {
+	white-space: pre;
+	border: 0px;
+	padding: 2px
 }
 
-acronym, cite {
-    border-bottom: 1px dotted #666;
-    font-style: normal;
-}
-acronym[title], cite[title] { cursor: help; }
-
-var {
-    font-family: "Andale Mono", "Monotype.com", "Vera Sans Mono", fixed;
-    font-weight: bold;
-    font-style: normal;
+table.CodeRay {
+	border-collapse: collapse;
+	width: 100%;
+	padding: 2px
 }
 
-/* IDed entities */
-
-#content {
-    margin: 0.2em 0.3em 1em;
-    padding: 3px 15px 25px;
-    border: 1px dotted #999;
-    background: #white url("draft-wm.png") fixed repeat-both;
-    background: rgba(255, 255, 255, 0.75);
-    color: inherit;
+table.CodeRay td {
+	padding: 2px 4px;
+	vertical-align: top
 }
 
-#badges { text-align: center; }
-
-#version { font-size: 10px; margin-top: 3em; margin-bottom: 0; }
-
-#footer { font-size: 10px; margin: 3em; }
-
-#copyright {
-	font-size: 80%;
+.CodeRay .line_numbers, .CodeRay .no {
+	background-color: #ededed;
+	color: gray;
 	text-align: right;
 }
 
-#navbar {
-	text-align: center;
+.CodeRay .line_numbers tt {
+	font-weight: bold
 }
 
-#linkbox {
-    margin: 4px 0 0;
-    padding: 2px 4px;
-    background: #edd;
-    border-top: 1px solid #333;
+.CodeRay .no {
+	padding: 0px 4px
+}
+.CodeRay .no strong {
+	font-weight: bold;
+	color: #555;
 }
 
-#sub-linkbox {
-    margin: 0 0;
-    padding: 2px 10px;
-    background: #dcc;
-    border-top: 1px dotted #666;
+.CodeRay .code {
+	width: 100%
 }
 
-#linkbox-head {
-    font-weight: bold;
-    font-size: 110%;
-    display: inline;
+ol.CodeRay {
+	font-size: 10pt
 }
 
-#sub-linkbox-head {
-    font-weight: bold;
-    font-size: 105%;
-    display: inline;
+ol.CodeRay li {
+	white-space: pre
 }
 
-#linkbox-body { list-style-type: none; }
-#linkbox-body ul { display: inline; }
-#linkbox-body li { display: inline; }
-
-#sub-linkbox-body { list-style-type: none; }
-#sub-linkbox-body ul { display: inline; }
-#sub-linkbox-body li { display: inline; }
-
-/* Style classes */
-
-div.section {
-    margin-bottom: 2em;
+.CodeRay .af {
+	color: #00C
 }
 
-ol.toc {}
-ol.toc > li {
-    font-size: 120%;
-    line-height: 125%;
-    letter-spacing: 0.1em;
-    margin-bottom: 1em;
-    font-weight: bold;
-}
-ol.toc > li > ol {
-    font-size: 80%;
-    letter-spacing: normal;
-    line-height: 100%;
-    font-weight: normal;
+.CodeRay .an {
+	color: #007
 }
 
-
-.whiteblock {
-    margin: 2em;
-    border: 1px solid #ddd;
-    background: #fefefe;
-    padding: 2em;
+.CodeRay .av {
+	color: #700
 }
 
-.dashbox {
-    margin: 10px 0;
-    border-top: 1px dotted #666;
-    border-left: 1px dotted #666;
-    border-right: 1px dotted black;
-    border-bottom: 1px dotted black;
-    padding: 1px 5px;
+.CodeRay .aw {
+	color: #C00
 }
 
-.caution { color: #900; background: inherit; }
-
-tr.odd-row { background: #bbb; color: inherit; }
-tr.even-row { background: #ddd; color: black; }
-
-table.kvlist {
-    margin: 5px;
-    background: #ccc;
-    border: 1px dotted black;
-    color: black;
-    caption-side: bottom;
+.CodeRay .bi {
+	color: #509;
+	font-weight: bold
 }
 
-table.kvlist th { text-align: right; vertical-align: top; }
-table.kvlist td { text-align: left; }
-
-table.clear {
-    border: 0;
-    background: inherit;
+.CodeRay .c {
+	background: #cdd;
+	color: #669;
 }
 
-.no-display { display: none; }
-.reddish { color: #900; background: inherit; }
-ul.flattened li { display: inline; }
-
-dl.linelist { }
-dl.linelist > dt {
-    color: #633;
-    background: transparent;
-    font: bold 110% fixed;
-    border-bottom: 1px dotted #633;
-}
-dl.linelist > dd {
-    margin: 0 15px 7px 20px;
+.CodeRay .ch {
+	color: #04D
 }
 
-dd.format {
-    margin: 2px 20px 10px;
-    padding: 3px;
-    background: #dedede;
-    border-bottom: 1px solid #999;
+.CodeRay .ch .k {
+	color: #04D
 }
 
-.highlighted { color: #633; }
+.CodeRay .ch .dl {
+	color: #039
+}
 
-/* Template node-display classes */
+.CodeRay .cl {
+	color: #c63c36;
+	font-weight: bold
+}
+
+.CodeRay .co {
+	color: #036;
+	font-weight: bold
+}
+
+.CodeRay .cr {
+	color: #0A0
+}
+
+.CodeRay .cv {
+	color: #369
+}
+
+.CodeRay .df {
+	color: #099;
+	font-weight: bold
+}
+
+.CodeRay .di {
+	color: #088;
+	font-weight: bold
+}
+
+.CodeRay .dl {
+	color: black
+}
+
+.CodeRay .do {
+	color: #970
+}
+
+.CodeRay .ds {
+	color: #D42;
+	font-weight: bold
+}
+
+.CodeRay .e {
+	color: #666;
+	font-weight: bold
+}
+
+.CodeRay .en {
+	color: #800;
+	font-weight: bold
+}
+
+.CodeRay .er {
+	color: #F00;
+	background-color: #FAA
+}
+
+.CodeRay .ex {
+	color: #F00;
+	font-weight: bold
+}
+
+.CodeRay .fl {
+	color: #60E;
+	font-weight: bold
+}
+
+.CodeRay .fu {
+	color: #06B;
+	font-weight: bold
+}
+
+.CodeRay .gv {
+	color: #d70;
+	font-weight: bold
+}
+
+.CodeRay .hx {
+	color: #058;
+	font-weight: bold
+}
+
+.CodeRay .i {
+	color: #00D;
+	font-weight: bold
+}
+
+.CodeRay .ic {
+	color: #B44;
+	font-weight: bold
+}
+
+.CodeRay .il {
+	background: #eee
+}
+
+.CodeRay .il .il {
+	background: #ddd
+}
+
+.CodeRay .il .il .il {
+	background: #ccc
+}
+
+.CodeRay .il .idl {
+	font-weight: bold;
+	color: #888
+}
+
+.CodeRay .in {
+	color: #B2B;
+	font-weight: bold
+}
+
+.CodeRay .iv {
+	color: #33B
+}
+
+.CodeRay .la {
+	color: #970;
+	font-weight: bold
+}
+
+.CodeRay .lv {
+	color: #963
+}
+
+.CodeRay .oc {
+	color: #40E;
+	font-weight: bold
+}
+
+.CodeRay .on {
+	color: #000;
+	font-weight: bold
+}
+
+.CodeRay .op {
+	
+}
+
+.CodeRay .pc {
+	color: #038;
+	font-weight: bold
+}
+
+.CodeRay .pd {
+	color: #369;
+	font-weight: bold
+}
+
+.CodeRay .pp {
+	color: #579
+}
+
+.CodeRay .pt {
+	color: #339;
+	font-weight: bold
+}
+
+.CodeRay .r {
+	color: #080;
+	font-weight: bold
+}
+
+.CodeRay .rx {
+	background-color: #fff0ff
+}
+
+.CodeRay .rx .k {
+	color: #808
+}
+
+.CodeRay .rx .dl {
+	color: #404
+}
+
+.CodeRay .rx .mod {
+	color: #C2C
+}
+
+.CodeRay .rx .fu {
+	color: #404;
+	font-weight: bold
+}
+
+.CodeRay .s {
+	background: rgba(240,240,240,0.5);
+}
+
+.CodeRay .s  .k {
+	color: #666;
+}
+
+.CodeRay .s  .dl {
+	color: #710;
+}
+
+.CodeRay .sh {
+	background-color: #f0fff0
+}
+
+.CodeRay .sh .k {
+	color: #2B2
+}
+
+.CodeRay .sh .dl {
+	color: #161
+}
+
+.CodeRay .sy {
+	color: #A60
+}
+
+.CodeRay .sy .k {
+	color: #A60
+}
+
+.CodeRay .sy .dl {
+	color: #630
+}
+
+.CodeRay .ta {
+	color: #070
+}
+
+.CodeRay .tf {
+	color: #070;
+	font-weight: bold
+}
+
+.CodeRay .ts {
+	color: #D70;
+	font-weight: bold
+}
+
+.CodeRay .ty {
+	color: #339;
+	font-weight: bold
+}
+
+.CodeRay .v {
+	color: #036
+}
+
+.CodeRay .xt {
+	color: #444
+}
+/* @end CodeRay */
+/* @end Examples */
+
+
+
+/* @group Template node-display classes */
 .node-tree {
     border: 1px dotted #333;
     margin: 2px;
@@ -319,9 +535,9 @@ dd.format {
 .if-directive-node-body,
 .else-directive-node-body,
 .elsif-directive-node-body { background: #BCD; }
+/* @end */
 
-
-/* Template syntax-highlighted html classes */
+/* @group Template syntax-highlighted html classes */
 .highlighted-source {
     border: 1px dotted #333;
     margin: 2px;
@@ -349,4 +565,5 @@ dd.format {
     background: #dcc;
     font-weight: bold;
 }
+/* @end */
 

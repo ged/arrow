@@ -92,14 +92,19 @@ task :default  => [:all_tests, :docs, :package]
 task :all_tests => ["spec:quiet", :test]
 
 ### Documentation task
-task :docs => [ :rdoc, :manual ]
+task :docs do
+	log "Building API docs"
+	Rake::Task[:rdoc].invoke
+	log "Building the manual"
+	Rake::Task[:manual].invoke
+end
 
 ### Task: clean
 desc "Clean pkg, coverage, and rdoc; remove .bak files"
 task :clean => [ :clobber_rdoc, :clobber_manual, :clobber_package, 'coverage:clobber' ] do
-	files = FileList['**/*.bak']
+	files = FileList['**/*{.bak,~}']
 	files.clear_exclude
-	File.rm( files ) unless files.empty?
+	rm( files, :verbose => true ) unless files.empty?
 end
 
 
@@ -114,7 +119,7 @@ begin
 
 		rdoc.options += [
 			'-w', '4',
-			'-SHN',
+			'-qSHN',
 			'-i', 'docs',
 			'-f', 'darkfish',
 			'-m', 'README',
@@ -135,10 +140,17 @@ end
 
 
 ### Task: manual
-Manual::GenTask.new do |manual|
+Manual::GenTask.new( :manual ) do |manual|
 	manual.metadata.version = PKG_VERSION
 	manual.metadata.gemspec = GEMSPEC
 	manual.base_dir = MANUALDIR
+	manual.output_dir = 'output'
+end
+task :manual => [ :rdoc ] do
+	log "Copying API docs into the manual output"
+	
+	apidocs = FileList[ APIDOCSDIR + '**/*' ]
+	copydocs = apidocs.pathmap( '%{^docs/}p' )
 end
 
 

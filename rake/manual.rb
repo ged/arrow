@@ -1,4 +1,4 @@
-# 
+	# 
 # Manual-generation Rake tasks and classes
 # $Id$
 # 
@@ -48,6 +48,12 @@ module Manual
 				super
 			end
 
+
+			### Export any static resources required by this filter to the given +output_dir+.
+			def export_resources( output_dir )
+				# No-op by default
+			end
+			
 
 			### Process the +page+'s source with the filter and return the altered content.
 			def process( source, page, metadata )
@@ -339,9 +345,10 @@ module Manual
 			source = task.prerequisites[ 1 ]
 			target = task.name
 			
-			when_writing( "  copying #{target}" ) do
+			when_writing do
+				log "  #{source} -> #{target}"
 				mkpath File.dirname( target )
-				cp source, target, :verbose => true
+				cp source, target, :verbose => $trace
 			end
 		end
 			

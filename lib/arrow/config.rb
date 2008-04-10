@@ -6,16 +6,6 @@
 # == Description
 # The configuration values are as follows:
 #
-# [<b>startMonitor</b>]
-#	Start the monitoring subsystem. Defaults to +false+.
-# [<b>noSuchAppletHandler</b>]
-#   The URI of the applet which should handle requests for applets that don't
-#   exist. A value of '(builtin)' (the default) will cause a builtin handler to
-#   be invoked.
-# [<b>errorHandler</b>]
-#	The URI of the applet which should handle untrapped exceptions raised
-#	from other applets. A value of '(builtin)' (the default) will cause a
-#	builtin handler to be invoked.
 # [<b>logging</b>]
 #	Arrow::Logger configuration. See arrow/logger.rb for specifics about this
 #   section.
@@ -30,6 +20,14 @@
 #   [<b>pollInterval</b>]
 #	  The number of seconds between checks of the applet path for
 #	  new/updated/deleted applet files. Defaults to 5.
+#   [<b>noSuchAppletHandler</b>]
+#     The URI of the applet which should handle requests for applets that don't
+#     exist. A value of '(builtin)' (the default) will cause a builtin handler to
+#     be invoked.
+#   [<b>errorHandler</b>]
+#     The URI of the applet which should handle untrapped exceptions raised
+#     from other applets. A value of '(builtin)' (the default) will cause a
+#     builtin handler to be invoked.
 # [<b>templates</b>]
 #	Template configuration values:
 #   [<b>loader</b>]
@@ -127,8 +125,6 @@ class Arrow::Config < Arrow::Object
 
 	# Define the layout and defaults for the underlying structs
 	DEFAULTS = {
-		:startMonitor		=> false,
-
 		:logging			=> { :global => 'notice' },
 
 		:applets => {

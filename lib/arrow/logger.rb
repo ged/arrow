@@ -1,55 +1,52 @@
 #!/usr/bin/env ruby
-#
-# This file contains the Arrow::Logger class, a hierarchical logging class for
-# the Arrow framework. It provides a generalized means of logging from inside
-# Arrow classes, and then selectively outputting/formatting log messages from
-# points within the hierarchy.
+
+require 'arrow/utils'
+require 'arrow/mixins'
+
+# A hierarchical logging class for the Arrow framework. It provides a
+# generalized means of logging from inside Arrow classes, and then selectively
+# outputting/formatting log messages from points within the hierarchy.
 #
 # A lot of concepts in this class were stolen from Log4r, though it's all
 # original code, and works a bit differently.
-# 
+#
 # == Synopsis
-# 
+#   
 #   require 'arrow/object'
 #   require 'arrow/logger'
-# 
+#   
 #   logger = Arrow::Logger.global
-#	logfile = File.open( "global.log", "a" )
-#	logger.outputters << Arrow::Logger::Outputter.new(logfile)
-#	logger.level = :debug
+#   logfile = File.open( "global.log", "a" )
+#   logger.outputters << Arrow::Logger::Outputter.new(logfile)
+#   logger.level = :debug
 #
-#	class MyClass < Arrow::Object
+#   class MyClass < Arrow::Object
 #
-#		def self::fooMethod
-#			Arrow::Logger.debug( "In server start routine" )
-#			Arrow::Logger.info( "Server is not yet configured." )
-#			Arrow::Logger.notice( "Server is starting up." )
-#		end
+#       def self::fooMethod
+#           Arrow::Logger.debug( "In server start routine" )
+#           Arrow::Logger.info( "Server is not yet configured." )
+#           Arrow::Logger.notice( "Server is starting up." )
+#       end
 #
-#		def initialize
-#			self.log.info( "Initializing another MyClass object." )
-#		end
-#	end
+#       def initialize
+#           self.log.info( "Initializing another MyClass object." )
+#       end
+#   end
 #
 # == Subversion Id
 #
-#  $Id$
-# 
+#   $Id$
+#   
 # == Authors
-# 
+#   
 # * Michael Granger <ged@FaerieMUD.org>
-# 
-#:include: COPYRIGHT
+#   
+# :include: COPYRIGHT
 #
 #---
 #
 # Please see the file COPYRIGHT for licensing details.
 #
-
-require 'arrow/utils'
-require 'arrow/mixins'
-
-### A log class for Arrow systems.
 class Arrow::Logger
 	require 'arrow/logger/outputter'
 
@@ -65,7 +62,7 @@ class Arrow::Logger
 
 
 	# Construct a log levels Hash on the fly
-	Levels = [
+	LEVELS = [
 		:debug,
 		:info,
 		:notice,
@@ -75,9 +72,9 @@ class Arrow::Logger
 		:alert,
 		:emerg,
 	].inject({}) {|hsh, sym| hsh[ sym ] = hsh.length; hsh}
-	LevelNames = Levels.invert
+	LEVEL_NAMES = LEVELS.invert
 
-	### Module for adding debugging to the logger
+	### Module for adding internals debugging to the Logger class
 	module DebugLogger # :nodoc:
 		def debug_msg( *parts ) # :nodoc:
 			# $deferr.puts parts.join('') if $DEBUG
@@ -137,7 +134,7 @@ class Arrow::Logger
 	### is in the form:
 	###   <level> [<outputter_uri>]
 	### where +level+ is one of the logging levels defined by this class (see
-	### the Levels constant), and the optional +outputter_uri+ indicates which
+	### the LEVELS constant), and the optional +outputter_uri+ indicates which
 	### outputter to use, and how it should be configured. See 
 	### Arrow::Logger::Outputter for more info.
 	###
@@ -187,7 +184,7 @@ class Arrow::Logger
 
 	### Autoload global logging methods for the log levels
 	def self::method_missing( sym, *args )
-		return super unless Levels.key?( sym )
+		return super unless LEVELS.key?( sym )
 
 		self.global.debug( "Autoloading class log method '#{sym}'." )
 		(class << self; self; end).class_eval do
@@ -303,7 +300,7 @@ class Arrow::Logger
 
 	### Return the logger's level as a Symbol.
 	def readable_level
-		return LevelNames[ @level ]
+		return LEVEL_NAMES[ @level ]
 	end
 	
 
@@ -315,9 +312,9 @@ class Arrow::Logger
 
 		case level
 		when String
-			@level = Levels[ level.intern ]
+			@level = LEVELS[ level.intern ]
 		when Symbol
-			@level = Levels[ level ]
+			@level = LEVELS[ level ]
 		when Integer
 			@level = level
 		else
@@ -327,7 +324,7 @@ class Arrow::Logger
 		# If the level wasn't set correctly, raise an error after setting
 		# the level to something reasonable.
 		if @level.nil?
-			@level = Levels[ :notice ]
+			@level = LEVELS[ :notice ]
 			raise ArgumentError, "Illegal log level specification: %p for %s" %
 				[ level, self.name ]
 		end
@@ -340,11 +337,11 @@ class Arrow::Logger
 	### block, it will be called once for each Logger object. If +level+ is
 	### specified, only those loggers whose level is +level+ or lower will be
 	### selected.
-	def hierloggers( level=Levels[:emerg] )
+	def hierloggers( level=LEVELS[:emerg] )
 		loggers = []
 		logger = self
 		lastlogger = nil
-		level = Levels[ level ] if level.is_a?( Symbol )
+		level = LEVELS[ level ] if level.is_a?( Symbol )
 
 		# debug_msg "Searching for loggers in the hierarchy above %s" % 
 			# [ logger.name.empty? ? "[Global]" : logger.name ]
@@ -371,7 +368,7 @@ class Arrow::Logger
 	### the loggers above it in the logging hierarchy. If called with a block,
 	### it will be called once for each outputter and the first logger to which
 	### it is attached.
-	def hieroutputters( level=Levels[:emerg] )
+	def hieroutputters( level=LEVELS[:emerg] )
 		outputters = []
 
 		# Look for loggers which are higher in the hierarchy
@@ -456,11 +453,11 @@ class Arrow::Logger
 
 
 	### Auto-install logging methods (ie., methods whose names match one of
-	### Arrow::Logger::Levels.
+	### Arrow::Logger::LEVELS.
 	def method_missing( sym, *args )
 		name = sym.to_s
 		level = name[/\w+/].to_sym
-		return super unless Arrow::Logger::Levels.member?( level )
+		return super unless Arrow::Logger::LEVELS.member?( level )
 		code = nil
 
 		case name
@@ -482,7 +479,7 @@ class Arrow::Logger
 	### Return a Proc suitable for installing as a predicate method for the given 
 	### logging level.
 	def make_level_predicate_method( level )
-		numeric_level = Levels[level]
+		numeric_level = LEVELS[level]
 		Proc.new { self.level < numeric_level }
 	end
 

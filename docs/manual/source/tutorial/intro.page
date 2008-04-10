@@ -1,72 +1,106 @@
 ---
-title: "Tutorial: Introduction"
-template: default
+title: Introduction
+template: tutorial
 filters:
   - erb
   - textile
   - examples
 ---
 
-h1. Arrow: Tutorial: Introduction
+h1. Arrow Tutorial: Introduction
 
-First a brief overview of the big parts of Arrow you are likely to hear about later on in the tutorial.
+First a brief overview of the big parts of Arrow you are likely to hear about later on in the
+tutorial.
 
 h2. Overview
 
-The term _application_, used in the Arrow documentation,
-refers to a overarching group of functionality like a CMS, an online customer
-service interface, online event-management, or something similar. Arrow
-was created to allow developers to create large generic applications for
-the web which are easily tailored to a specific installation's
-requirements. Each application is assembled out of small, mostly
-orthogonal applets, which can be combined, re-arranged, swapped out, or
-subclassed to provide branding, custom features, or other customization
-with a minimum of time and effort.
+The term _application_, used in the Arrow documentation, refers to a overarching group of
+functionality like a CMS, an online customer service interface, online event-management, or
+something similar. Arrow was created to allow developers to create large generic applications for
+the web which are easily tailored to a specific installation's requirements. Each application is
+assembled out of small, loosely-coupled Applet objects, which can be combined, re-arranged, swapped
+out, or subclassed to provide branding, custom features, or other customization with a minimum of
+time and effort.
 
-To achieve this componentization, Arrow is made up of four basic
-parts: a Dispatcher, a Broker, one or more Applets, and the Transaction
-objects which are wrapped around incoming requests.
- 
+To facilitate this loose coupling, the design of Arrow is somewhat different than many other popular
+web frameworks, which all more-or-less follow the "Recursive Model-View-Controller":RMVCpattern
+aggregate pattern. Arrow is designed around the "Supervising Controller":SPpattern pattern with a
+"Passive View":PVpattern, which in simple terms means that the Controller plays a bigger role in the
+presentation of results to the user, reducing or eliminating the coupling between any
+"DomainModel":DMpattern classes and the View. This is accomplished through some deliberate design
+decisions:
+
+<dl>
+	<dt>Passive View</dt>
+	<dd>Arrow includes a templating system that is designed to be more object-oriented than some 
+		others, which makes keeping the View decoupled from the model easier than when 
+		it's implemented as a purely procedural system with a shared-state mechanism. Arrow 
+		templates have an interface (in the API sense) just like any other Ruby object, and
+		are interacted with in much the same manner, which makes it possible to test the interaction 
+		between Controller and View without resorting to parsing the resulting HTML.</dd>
+
+	<dt>Composed Application Control</dt>
+	<dd>A typical arrow application is composed of several cooperating Applet objects which are 
+		chained together, and communicate via delegation, in much the same way as command-line
+		utilities can be chained together to cooperate in the assembly of some final result. </dd>
+
+	<dt>No Included Domain Model</dt>
+	<dd>Arrow intentionally does not have any notion of what DomainModel you might want to use, or 	
+		even that you necessarily want to use one. It provides some (optional) lightweight 
+		facilities for doing "dependency injection":IOCandDI, but doesn't otherwise assume anything 
+		about where you might want to store your data. There are of course plenty of implementations 
+		of the "Active Record":ARpattern you can use, as well as some other "exciting 
+		alternatives":Sequel that reduce the impedence mismatch inherent in a ORM layer backed by an 
+		RDBMS.</dd>
+		
+	<dt class="todo">(more...)</dt>
+	<dd class="todo"></dd>
+</dl>
+
 
 h2. The Basic Parts
 
-An Arrow application looks conceptually something like this:
+An Arrow blogging application might look conceptually something like this:
 
-!../images/structural-overview.png!
+!.<%= page.basepath %>/images/basic-structure.png!
 
 h3. Dispatcher
 
-The Dispatcher is the mod_ruby request handler that is invoked by
-Apache; it loads the configuration (or reloads it if it has changed
-since the last time it was read), sets up the Broker, creates
-Transaction objects for each incoming request, sends the response
-headers, and renders the resulting output.
+The Dispatcher is the mod_ruby request handler that is invoked by Apache; it loads the configuration
+(or reloads it if it has changed since the last time it was read), sets up the Broker, creates
+Transaction objects for each incoming request, sends the response headers, and renders the resulting
+output.
 
 h3. Transaction
 
-A new Transaction object is created by the Dispatcher for each
-request, and then passed to the Broker for handling. It encapsulates
-the incoming @Apache::Request@ object, providing easy access to
-request values, configuration values, session data, and validated
-query arguments.
+A new Transaction object is created by the Dispatcher for each request, and then passed to the
+Broker for handling. It encapsulates the incoming @Apache::Request@ object, providing easy access to
+request values, configuration values, session data, and validated query arguments.
 
 h3. Broker
 
-The Broker decides how Transaction objects get handled by loading
-and building a registry of Applet objects. When the transaction calls
-its @#delegate@ method with a Transaction object, it searches
-its Registry for applets which have been mapped to all or part of the
-incoming request's URI.
+The Broker decides how Transaction objects get handled by loading and building a registry of Applet
+objects. When the transaction calls its @#delegate@ method with a Transaction object, it searches
+its Registry for applets which have been mapped to all or part of the incoming request's URI.
 
 h3. Applets
 
-Applets are objects which handle user requests, and define the
-basic logic of different parts of the application. They can also be
-combined to run in sequence via delegation (aka chaining).  The
-writing of custom Applets is where nearly all of the development work
-will happen while creating an application under Arrow.
+Applets are objects which handle user requests, and define the basic logic of different parts of the
+application. They can also be combined to run in sequence via delegation (aka chaining). The writing
+of custom Applets is where nearly all of the development work will happen while creating an
+application under Arrow.
 
-The default classes provide enough functionality to create a fairly
-large number of different kinds of applications, but they are all
-designed with subclassing in mind, so if you don't like the way
+The default classes provide enough functionality to create a fairly large number of different kinds
+of applications, but they are all designed with subclassing in mind, so if you don't like the way
 something behaves, it should be fairly easy to customize.
+
+
+[SPpattern]http://www.martinfowler.com/eaaDev/SupervisingPresenter.html
+[MVPpattern]http://www.martinfowler.com/eaaDev/ModelViewPresenter.html
+[RMVCpattern]http://c2.com/cgi/wiki?RecursiveModelViewController
+[PVpattern]http://www.martinfowler.com/eaaDev/PassiveScreen.html
+[ARpattern]http://www.martinfowler.com/eaaCatalog/activeRecord.html
+[IOCandDI]http://www.martinfowler.com/articles/injection.html
+[DMpattern]http://martinfowler.com/eaaCatalog/domainModel.html
+[Sequel]http://sequel.rubyforge.org/
+

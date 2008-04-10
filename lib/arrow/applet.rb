@@ -109,7 +109,7 @@ class Arrow::Applet < Arrow::Object
 		:name				=> proc {|rawsig, klass| klass.name},
 		:description		=> "(none)",
 		:maintainer			=> "", # Workaround for RDoc
-		:version			=> nil, # Wordaround for RDoc
+		:version			=> nil, # Workaround for RDoc
 		:default_action		=> '_default',
 		:config				=> {},
 		:templates			=> {},
@@ -220,6 +220,10 @@ class Arrow::Applet < Arrow::Object
 		else
 			raise ArgumentError, "cannot convert %s to Symbol" % [ sym ]
 		end
+	end
+	class << self
+		# Allow either 'template' or 'templates'
+		alias_method :templates, :template
 	end
 
 

@@ -64,10 +64,10 @@ h3. Developer Tasks
 
 h3. Documentation Tasks
 
-* "RedCloth":http://whytheluckystiff.net/ruby/redcloth/
-* "CodeRay":http://coderay.rubychan.de/
+* "RedCloth":http://whytheluckystiff.net/ruby/redcloth/ - Textile text-to-html filter
+* "Ultraviolet":http://ultraviolet.rubyforge.org/ - Syntax highlighting
 * "Darkfish RDoc":http://www.deveiate.org/projects/Darkfish-Rdoc — An alternate template for RDoc
-
+* "rcodetools":http://eigenclass.org/hiki.rb?rcodetools
 
 h3. Plugin Dependencies
 
@@ -86,5 +86,5 @@ If you're installing from source, now that all of the dependencies are installed
 
 to install the Arrow libraries.
 
-Next, you will want to "configure the webserver":config.html.
+Next, you will probably want to "configure the webserver":config.html.
 

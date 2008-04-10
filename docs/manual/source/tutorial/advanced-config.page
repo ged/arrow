@@ -1,0 +1,162 @@
+--- 
+title: Configuration
+template: default
+filters:
+  - erb
+  - examples
+  - textile
+---
+
+h1. Arrow Tutorial: Advanced Configuration
+
+The more important to customize for most users are going to be the applet
+layout section as well as all the various paths. Briefly, here's what each item of the config means:
+
+<notextile>
+<dl>
+  <dt>logLevel</dt>
+  <dd>This is related to the Apache log level; only messages at or
+  above the specified level will be output to the log. However, this
+  setting not only affects the output to Apache's ErrorLog, but also
+  any other logging outputters you might have attached to the global
+  logger. See the documentation on @Arrow::Logger@ for valid values 
+  for this setting.</dd>
+
+  <dt>templateLogLevel</dt>
+  <dd>Again similar to Apache's log level, but only applicable to the
+  templating system, and likely only useful with the templating that
+  comes with Arrow.</dd>
+
+  <dt>applets</dt>
+  <dd>This has options controlling how applet files are loaded
+  into Arrow and how they are accessed after loading.</dd>
+  <dd>
+	<dl class="linelist config-subitems">
+	  <dt>missingApplet</dt>
+	  <dd>Specifies the URI of an applet which should be executed when
+	  the one specified by the request's URI does not exist. If this
+	  value is not specified or set to <tt>(builtin)</tt>, Arrow will
+	  decline the request and pass it on to the next Apache
+	  handler.</dd>
+
+	  <dt>errorApplet</dt>
+	  <dd>This is the URI of the applet to which uncaught exceptions are
+	  sent. If this value is not specified, a generic handler is used
+	  instead (Arrow::Broker#defaultErrorHandler).</dd>
+
+	  <dt>pattern</dt>
+	  <dd>Glob pattern used to find applet files. This value is appended
+	  to each directory listed in the <tt>path</tt> config item, and the
+	  files which match are loaded.</dd>
+
+	  <dt>path</dt>
+	  <dd>An Array of directories which Arrow searches for
+	  applets. Arrow maintains a list of the files in these directories
+	  or any subdirectories for files which match the <tt>pattern</tt>,
+	  reloading, removing, and updating them as they change.</dd>
+
+	  <dt>pollInterval</dt>
+	  <dd>The number of seconds between checks for new and altered
+	  applets. If this is set to <tt>0</tt>, applets are only loaded
+	  once, and never checked for updates.</dd>
+	  
+	  <dt>config</dt>
+	  <dd>This is a freeform Hash value that can be used to provide
+	  key/value-pair type configuration for any of the applets. For more
+	  complex configurations, you can add members to the arrow config
+	  file itself should you so desire.</dd>
+
+	  <dt>layout</dt>
+	  <dd>A Hash of URIs to applet classes. Each entry maps a sub-URI
+	  (relative to the Arrow URI) to an instance of the given applet
+	  class. URIs can be stacked on one another (e.g., <tt>/count</tt>
+	  and <tt>/count/hello</tt> in the above example) to chain applets
+	  together. See the <a href="tutorial-apps.html">Applications and
+	  Applets</a> for more information about this section.</dd>
+	</dl>
+  </dd>
+
+  <dt>templates</dt>
+  <dd>The configuration of the templating system used by Arrow (if
+  any).</dd>
+
+  <dd>
+	<dl class="linelist config-subitems">
+	  <dt>loader</dt>
+	  <dd>This is the name of the loader class for the templating system
+	  you are using.  For more information on how to use this, see the
+	  <a href="tutorial-templates.html">Templating Tutorial
+	  section</a>.</dd>
+
+	  <dt>path</dt>
+	  <dd>An Array of the paths that will be searched for
+	  templates. This path, in contrast to the <tt>applets/path</tt>
+	  setting, will not be searched, but you can still keep templates in
+	  other than the topmost directory by referring to them with
+	  relative paths.</dd>
+
+	  <dt>cache</dt>
+	  <dd>Whether or not to cache templates. This setting is only
+	  guaranteed to have an effect on the built-in templating system;
+	  other systems may wish to provide their own caching via their
+	  loader class (i.e., the one in <tt>templates/loader</tt>). </dd>
+
+	  <dt>cacheConfig</dt>
+	  <dd>Settings which control template caching.</dd>
+
+	  <dd>
+		<dl class="linelist config-subitems">
+		  <dt>maxNum</dt>
+		  <dd>This sets the number of templates that will be
+		  cached. Templates beyond this number will expire in <acronym
+		  title="least-recently used">LRU</acronym> order.</dd>
+
+		  <dt>maxSize</dt>
+		  <dd>The maximum number of bytes allowed in the cache before it
+		  begins expiring items.</dd>
+
+		  <dt>maxObjSize</dt>
+		  <dd>The size (in bytes) of the largest single cacheable
+		  template. Templates larger than this will not be cached.</dd>
+
+		  <dt>expiration</dt>
+		  <dd>The maximum number of seconds an object can stay in the
+		  cache after its last access.</dd>
+		</dl>
+	  </dd>
+
+	</dl>
+  </dd>
+
+  <dt>session</dt>
+  <dd>This defines how sessions are implemented, stored, etc.</dd>
+  <dd>
+	<dl class="linelist config-subitems">
+	  <dt>idName</dt>
+	  <dd>The name of the cookie/parameter that contains the
+	  session key.</dd>
+
+	  <dt>expires</dt>
+	  <dd>The expiration time to set on session cookies, in the format
+	  given to Apache::Cookie.</dd>
+
+	  <dt>idType</dt>
+	  <dd>The URI containing the type and configuration of the
+	  id-generation part of the session. The URI's scheme specifies the
+	  type, and the path and/or query string can be used for further
+	  configuration. See the documentation for the session id class for
+	  more.</dd>
+
+	  <dt>storeType</dt>
+	  <dd>The URI of the type of session store to use; the URI for this
+	  is used similarly to the one for idType.</dd>
+
+	  <dt>lockType</dt>
+	  <dd>The URI of the type of lock to use, or <tt>'recommended'</tt>,
+	  which will consult the the session store for its recommended
+	  locking strategy.</dd>
+
+	</dl>
+  </dd>
+</dl>
+</notextile>

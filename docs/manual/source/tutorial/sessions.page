@@ -1,160 +1,83 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+---
+title: Sessions
+template: tutorial
+filters:
+  - erb
+  - examples
+  - textile
+---
 
-<!--
+h1. Sessions
 
-		Arrow Manual: Sessions Tutorial
-		$Id$
-
-		Author:		Michael Granger
-		Time-stamp: <23-Apr-2001 19:58:12 deveiant>
-
-  -->
-
-  <head>
-	<title>Arrow Manual: Sessions Tutorial</title>
-
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta http-equiv="Content-Script-Type" content="text/javascript" />
-
-    <meta name="authors" content="Michael Granger (ged@FaerieMUD.org)>" />
-	<link rel="stylesheet" href="manual.css" type="text/css" />
-  </head>
-  <body>
+A functional web interface needs to be able to treat each person accessing the site as an
+individual. The way this works out in practice is by associating a "session" with each user, through
+the use of a single cookie on the client machine referencing that particular user's data stored on
+the web server. There are other less secure and less practical ways of acomplishing this, but
+experience has led the world to accept this as standard.
 
 
+h2. Session Types and Plugins
 
-	<!-- Experimental linkbox thingie -->
-	<div id="linkbox">
-	  <span id="linkbox-head">Arrow Manual</span>
-	  <span id="linkbox-body">
-		<ul>
-		  <li>[<a href="index.html">Index</a>]</li>
-		  <li>[<a href="whatis.html">What Is Arrow?</a>]</li>
-		  <li>[<a href="download.html">Downloading</a>]</li>
-		  <li>[<a href="install.html">Installation</a>]</li>
-		  <li>[<a href="config.html">Configuration</a>]</li>
-		  <li>[<a href="tutorial.html">Tutorial</a>]</li>
-		  <li>[<a href="html/">API Reference</a>]</li>
-		</ul>
-	  </span>
-	</div>
+Within that standard, however, a number of variations have developed on the actual implementation.
+Arrow comes standard with a couple of these, as well as offering an easily configured plugin
+architecture for implementing any of the others.
+
+The Arrow configuration file has a section on sessions, wherein you can decide how sessions should
+behave.
 
 
-	<!-- Tutorial linkbox thingie -->
-	<div id="sub-linkbox">
-	  <span id="sub-linkbox-head">&rarr; Tutorial</span>
-	  <span id="sub-linkbox-body">
-		<ul>
-		  <li>[<a href="tutorial-intro.html">Intro</a>]</li>
-		  <li>[<a href="tutorial-apps.html">Applets</a>]</li>
-		  <li>[<a href="tutorial-templates.html">Templates</a>]</li>
-		  <li>[<a href="tutorial-sessions.html">Sessions</a>]</li>
-		  <li>[<a href="tutorial-validation.html">Input Validation</a>]</li>
-<!-- 		  <li>[<a href="tutorial-sources.html">Data Sources</a>]</li> -->
-<!-- 		  <li>[<a href="tutorial-monitors.html">Monitors</a>]</li> -->
-		</ul>
-	  </span>
-	</div>
-
-	<div id="content">
-	  <h1>Arrow: Sessions Tutorial</h1>
-
-	  <div class="section">
-		<p>A functional web interface needs to be able to treat each person
-		accessing the site as an individual.  The way this works out in practice
-		is by associating a "session" with each user, through the use of a
-		single cookie on the client machine referencing that particular user's
-		data stored on the web server.  There are other less secure and less
-		practical ways of acomplishing this, but experience has led the world to
-		accept this as standard.
-
-	  </div>
-
-
-	  <div class="section">
-		<h2><a href="#types" id="types">Session Types and Plugins</a></h2>
-
-		<p>Within that standard, however, a number of variations have developed
-		on the actual implementation.  Arrow comes standard with a couple of
-		these, as well as offering an easily configured plugin architecture for
-		implementing any of the others.</p>
-
-		<p>The Arrow configuration file has a section on sessions, wherein you
-		can decide how sessions should behave.</p>
-
-<pre>
+<?example { language: yaml, test: true, caption: 'Session configuration' } ?>
 session: 
   lockType: recommended
   storeType: file:/tmp/sessions
   idType: md5:.
   idName: session
   rewriteUrls: false
-</pre>
+<?end?>
 
-		<!-- <p>TODO: make this more in depth, with lists of options and
-		possible values.</p> -->
+<dl class="linelist">
+	<dt>expires</dt>
+	<dd>This sets the default length of time that a session will
+		remain active without use.</dd>
 
-		<dl class="linelist">
-			<dt>expires</dt>
-			<dd>This sets the default length of time that a session will
-				remain active without use.</dd>
+	<dt>idType</dt>
+	<dd>The URI of the type of session id to use.</dd>
 
-			<dt>idType</dt>
-			<dd>The URI of the type of session id to use.</dd>
+	<dt>storeType</dt>
+	<dd>The URI of the type of session store to use.</dd>
 
-			<dt>storeType</dt>
-			<dd>The URI of the type of session store to use.</dd>
+	<dt>lockType</dt>
+	<dd>The URI of the type of lock to use. If it is set to
+		@'recommended'@, the session store's recommended lock is
+		used.</dd>
 
-			<dt>lockType</dt>
-			<dd>The URI of the type of lock to use. If it is set to
-				<tt>'recommended'</tt>, the session store's recommended lock is
-				used.</dd>
+	<dt>rewriteUrls</dt>
+	<dd>Rewrite URLs in links in outgoing content to include the
+		session key.</dd>
 
-			<dt>rewriteUrls</dt>
-			<dd>Rewrite URLs in links in outgoing content to include the
-				session key.</dd>
+	<dt>idName</dt>
+	<dd>The name of the cookie/parameter that contains the
+		session key.</dd>
+</dl>
 
-			<dt>idName</dt>
-			<dd>The name of the cookie/parameter that contains the
-				session key.</dd>
-		</dl>
+h2. Session Application - Counter
 
-	  </div>
+Beyond the initial configuration, Arrow makes using sessions transparent and natural. The session
+interface is set up automatically inside your applets - you need only treat it as a user-specific
+hash, accessing and altering data like normal.
 
-
-	  <div class="section">
-		<h2><a href="#example" id="example">Session Application - Counter</a></h2>
-
-		<p>Beyond the initial configuration, Arrow makes using sessions
-		transparent and natural.  The session interface is set up automatically
-		inside your applets - you need only treat it as a user-specific
-		hash, accessing and altering data like normal.</p>
-<pre>
+<?example { language: ruby, test: true, caption: '' } ?>
   def_action :counter do |txn|
     txn.session["accesses"] ||= 0
     txn.session["accesses"] += 1
-    return &lt;&lt;-EOF
-    &lt;html&gt;
-      &lt;head&gt;&lt;title&gt;Counter&lt;/title&gt;&lt;/head&gt;
-      &lt;body&gt;
-        &lt;p&gt;I've seen you #{txn.session["accesses"]} times!&lt;/p&gt;
-      &lt;/body&gt;
-    &lt;/html&gt;
+    return <<-EOF
+    <html>
+      <head><title>Counter</title></head>
+      <body>
+        <p>I've seen you #{txn.session["accesses"]} times!</p>
+      </body>
+    </html>
     EOF
   end
-</pre>
+<?end?>
 
-	  </div>
-
-
-	</div>
-
-  </body>
-</html>
-
-
-<!--
-  Local Variables:
-  mode: xml
- -->

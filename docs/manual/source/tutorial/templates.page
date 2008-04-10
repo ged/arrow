@@ -1,249 +1,188 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+---
+title: Templating
+template: tutorial
+filters:
+  - erb
+  - examples
+  - textile
+---
 
-<!--
+h1. Templating
 
-		Arrow Manual: Templating Tutorial
-		$Id$
+Putting code and html together (either html in the code or vice versa) becomes unwieldy and ugly
+after a certain level of complexity (a little after "hello world"), and for this reason, web
+developers have traditionally used templates to separate off all the display work. There is debate
+over exactly how much power a templating system should have (should it be able to execute arbitrary
+code, or only adhere to a small set of tools), and the construction of a templating system is
+relatively easy, so templating systems are many and diverse. We have included with Arrow our own
+templating system - complete, extensible and (we think) intuitive - but have also made it easy for
+you to use any other templating system. If you already have a favorite, and have no interest in
+seeing another, (even if you might like it,) you can skip past the tutorial on ours and learn 
+"how to use your own":#others
 
-		Author:		Michael Granger
-		Time-stamp: <23-Apr-2001 19:58:12 deveiant>
+Template handling is, to some degree, integrated with the Arrow server. The arrow config file has a
+templates section.
 
-  -->
+h2. Arrow::Template
 
-  <head>
-	<title>Arrow Manual: Templating Tutorial</title>
+h3. Syntax
 
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+The Arrow Templating System uses preprocessing tags to distinguish template directives. These are
+both <code>&lt;?...?&gt;</code> and <code>[?...?]</code>. The square bracket version is meant to be
+used inside of other html tags (e.g., <code>&lt;a href="[?attr link?]"&gt;</code>...)</p>
 
-    <meta name="authors" content="Michael Granger (ged@FaerieMUD.org)>" />
-	<link rel="stylesheet" href="manual.css" type="text/css" />
-  </head>
-  <body>
+h3. The Directives
 
-	<!-- Experimental linkbox thingie -->
-	<div id="linkbox">
-	  <span id="linkbox-head">Arrow Manual</span>
-	  <span id="linkbox-body">
-		<ul>
-		  <li>[<a href="index.html">Index</a>]</li>
-		  <li>[<a href="whatis.html">What Is Arrow?</a>]</li>
-		  <li>[<a href="download.html">Downloading</a>]</li>
-		  <li>[<a href="install.html">Installation</a>]</li>
-		  <li>[<a href="config.html">Configuration</a>]</li>
-		  <li>[<a href="tutorial.html">Tutorial</a>]</li>
-		  <li>[<a href="html/">API Reference</a>]</li>
-		</ul>
-	  </span>
-	</div>
+<notextile>
+<dl>
+  <dt>attr</dt>
+  <dd class="format">
+	<samp>&lt;?attr <var>attribute</var> ?&gt;</samp><br />
+	<samp>&lt;?attr "<var>fmtstring</var>" % <var>attribute</var> ?&gt;</samp>
+  </dd>
+  <dd>A simple directive similar to <code>attr_accessor</code> in Ruby,
+  this defines a method <var>attribute</var> on the template object which can
+  be used to insert one or more objects into the template. Each object
+  will be stringified and then joined together with the empty string,
+  and the resultant String will replace each instance of the
+  <code>&lt;attr&gt;</code> tag. If the tag specified a
+  <var>fmtstring</var>, it will be used in the stringification instead
+  of <code>#to_s</code>.</dd>
 
+  <dt>call</dt>
+  <dd class="format">
+    <samp>&lt;?call <var>attribute</var>.<var>method</var> ?&gt;</samp><br />
+	<samp>&lt;?call "<var>fmtstring</var>" % <var>attribute</var>.<var>method</var> ?&gt;</samp><br />
+    <samp>&lt;?call <var>attribute</var>.<var>method</var>(<var>args</var>) ?&gt;</samp>
+  </dd>
+  <dd>This directive also defines a method of the template object, but
+  also specifies one or more methods that should be called on the
+  inserted objects before replacing the tag.</dd>
 
-	<!-- Tutorial linkbox thingie -->
-	<div id="sub-linkbox">
-	  <span id="sub-linkbox-head">&rarr; Tutorial</span>
-	  <span id="sub-linkbox-body">
-		<ul>
-		  <li>[<a href="tutorial-intro.html">Intro</a>]</li>
-		  <li>[<a href="tutorial-apps.html">Applets</a>]</li>
-		  <li>[<a href="tutorial-templates.html">Templates</a>]</li>
-		  <li>[<a href="tutorial-sessions.html">Sessions</a>]</li>
-		  <li>[<a href="tutorial-validation.html">Input Validation</a>]</li>
-<!-- 		  <li>[<a href="tutorial-sources.html">Data Sources</a>]</li> -->
-<!-- 		  <li>[<a href="tutorial-monitors.html">Monitors</a>]</li> -->
-		</ul>
-	  </span>
-	</div>
+  <dt>set</dt>
+  <dd class="format">
+	<samp>&lt;?set <var>attribute</var> <var>value</var> ?&gt;</samp><br />
+	<samp>&lt;?set <var>attribute</var> <var>value</var>.<var>method</var> ?&gt;</samp><br />
+	<samp>&lt;?set <var>attribute</var> <var>value</var>.<var>method</var>(<var>args</var>) ?&gt;</samp>
+  </dd>
 
-	<div id="content">
-	  <h1>Arrow: Templating Tutorial</h1>
+  <dd>Sets template variable <var>attribute</var> to the specified
+  <var>value</var>, which will then be accessible through the rest of
+  the template.</dd>
 
-	  <div class="section">
-		<h2>Templates</h2>
-		<p>
-		  Putting code and html together (either html in the code or vice versa)
-		  becomes unwieldy and ugly after a certain level of complexity (a
-		  little after "hello world"), and for this reason, web developers have
-		  traditionally used templates to separate off all the display work.
-		  There is debate over exactly how much power a templating system should
-		  have (should it be able to execute arbitrary code, or only adhere to a
-		  small set of tools), and the construction of a templating system is
-		  relatively easy, so templating systems are many and diverse.  We have
-		  included with Arrow our own templating system - complete, extensible
-		  and (we think) intuitive - but have also made it easy for you to use
-		  any other templating system.  If you already have a favorite, and have
-		  no interest in seeing another, (even if you might like it,) you can
-		  skip past the tutorial on ours and learn <a href="#others">how to use
-		  your own</a>.
-		</p>
-		<p>
-		  Template handling is, to some degree, integrated with the Arrow
-		  server.  The arrow config file has a templates section.
-		</p>
-	  </div>
-	  <div class="section">
+  <dt>escape</dt>
+  <dd class="format"><samp>&lt;?escape
+	<var>attribute</var>.<var>method</var> ?&gt;</samp></dd>
+  <dd>Acts like the <code>&lt;call&gt;</code> directive, but
+  HTML-escapes the String just before it is inserted into the output
+  (e.g., turns all <code>&lt;</code> and <code>&gt;</code> characters
+  into into the corresponding <code>&amp;lt;</code> and
+  <code>&amp;gt;</code> entities).</dd>
 
-		<h2><a href="#ats" id="ats">Arrow Templating System</a></h2>
+  <dt>urlencode</dt>
+  <dd class="format"><samp>&lt;?urlencode
+	<var>attribute</var>.<var>method</var> ?&gt;</samp></dd>
+  <dd>Acts like the <code>&lt;call&gt;</code> directive, but URL-encodes
+  the String just before it is inserted into the output.</dd>
 
-		<h3>Syntax</h3>
+  <dt>if/elsif/else</dt>
+  <dd class="format">
+	<samp>
+	  &lt;?if <var>statement</var> ?&gt;<br />
+	  ...<br />
+	  &lt;?elsif <var>statement</var> ?&gt;<br />
+	  ...<br />
+	  &lt;?else?&gt;<br />
+	  ...<br />
+	  &lt;?end if ?&gt;
+	</samp>
+  </dd>
 
-		<p>The Arrow Templating System uses preprocessing tags to distinguish
-		template directives.  These are both <code>&lt;?...?&gt;</code> and
-		<code>[?...?]</code>. The square bracket version is meant to be used
-		inside of other html tags (e.g., <code>&lt;a href="[?attr
-		link?]"&gt;</code>...)</p>
+  <dd>Your run-of-the-mill conditional flow control.  The
+  <code>else</code> and <code>elsif</code>s are optional, the
+  <code>elsif</code>s can be repeated any number of times (including
+  zero), and the <var>statement</var> can be any template variable,
+  method chain off a template variable, or regular expression match of a
+  template variable (like <code>&lt;?if var.method =~ /regex/
+  ?&gt;</code>).</dd>
 
-		<h3>The Directives</h3>
+  <dt>for</dt>
+  <dd class="format">
+	<samp>
+	  &lt;?for <var>arglist</var> in <var>iterable</var> ?&gt;<br/>
+	  ...<br/>
+	  &lt;?end for ?&gt;
+	</samp>
+  </dd>
 
-		<dl class="linelist">
-		  <dt>attr</dt>
-		  <dd class="format">
-			<samp>&lt;?attr <var>attribute</var> ?&gt;</samp><br />
-			<samp>&lt;?attr "<var>fmtstring</var>" % <var>attribute</var> ?&gt;</samp>
-		  </dd>
-		  <dd>A simple directive similar to <code>attr_accessor</code> in Ruby,
-		  this defines a method <var>attribute</var> on the template object which can
-		  be used to insert one or more objects into the template. Each object
-		  will be stringified and then joined together with the empty string,
-		  and the resultant String will replace each instance of the
-		  <code>&lt;attr&gt;</code> tag. If the tag specified a
-		  <var>fmtstring</var>, it will be used in the stringification instead
-		  of <code>#to_s</code>.</dd>
+  <dd>For each element of the <var>iterable</var> object (i.e., an
+  object that implements the <tt>Enumerable</tt> interface), the element
+  is assigned to a template variable (or multiple, if appropriate), and
+  the enclosed content is rendered.  The <var>arglist</var> can have
+  default values (as in: <code>&lt;?for a,b=1 in a_hash ?&gt;</code>),
+  array-slurping arguments (<code>*args</code>) and hashified
+  arguments.</dd>
 
-		  <dt>call</dt>
-		  <dd class="format">
-		    <samp>&lt;?call <var>attribute</var>.<var>method</var> ?&gt;</samp><br />
-			<samp>&lt;?call "<var>fmtstring</var>" % <var>attribute</var>.<var>method</var> ?&gt;</samp><br />
-		    <samp>&lt;?call <var>attribute</var>.<var>method</var>(<var>args</var>) ?&gt;</samp>
-		  </dd>
-		  <dd>This directive also defines a method of the template object, but
-		  also specifies one or more methods that should be called on the
-		  inserted objects before replacing the tag.</dd>
+  <dd>Also defined during iteration is a template variable
+  <var>iterator</var>, which is an <tt>Arrow::Template::Iterator</tt>
+  object that can be used to interact with the iteration. See the API
+  documentation for the <tt>Arrow::Template::Iterator</tt> class for
+  more on what it can do.</dd>
 
-		  <dt>set</dt>
-		  <dd class="format">
-			<samp>&lt;?set <var>attribute</var> <var>value</var> ?&gt;</samp><br />
-			<samp>&lt;?set <var>attribute</var> <var>value</var>.<var>method</var> ?&gt;</samp><br />
-			<samp>&lt;?set <var>attribute</var> <var>value</var>.<var>method</var>(<var>args</var>) ?&gt;</samp>
-		  </dd>
+  <dt>yield</dt>
+  <dd class="format">
+	<samp>
+	  &lt;?yield <var>arglist</var> from <var>attribute</var>.<var>block_method</var> ?&gt;<br/>
+	  ...<br/>
+	  &lt;?end yield ?&gt;
+	</samp>
+  </dd>
 
-		  <dd>Sets template variable <var>attribute</var> to the specified
-		  <var>value</var>, which will then be accessible through the rest of
-		  the template.</dd>
+  <dd>Calls the specified <var>block_method</var> on the given template
+  <var>attribute</var>, passing a rendering function for the contained
+  content as the block. Each call to the block will assign arguments to
+  the <var>arglist</var> and render the content. This is a more-generic
+  version of the functionality represented by the <code>for</code>
+  directive, useful for calling block-accepting methods besides
+  <code>#each</code>.</dd>
 
-		  <dt>escape</dt>
-		  <dd class="format"><samp>&lt;?escape
-			<var>attribute</var>.<var>method</var> ?&gt;</samp></dd>
-		  <dd>Acts like the <code>&lt;call&gt;</code> directive, but
-		  HTML-escapes the String just before it is inserted into the output
-		  (e.g., turns all <code>&lt;</code> and <code>&gt;</code> characters
-		  into into the corresponding <code>&amp;lt;</code> and
-		  <code>&amp;gt;</code> entities).</dd>
+  <dt>import</dt>
+  <dd class="format">
+	<samp>
+	  &lt;?import <var>attribute</var> ?&gt;<br/>
+	  &lt;?import <var>attribute</var> as <var>altname</var> ?&gt;<br/>
+	  &lt;?import <var>attribute</var>, <var>attr2</var> ?&gt;<br/>
+	  &lt;?import <var>attribute</var> as <var>altname</var>,
+	  <var>attr2</var> as <var>altname2</var> ?&gt;
+	</samp>
+  </dd>
 
-		  <dt>urlencode</dt>
-		  <dd class="format"><samp>&lt;?urlencode
-			<var>attribute</var>.<var>method</var> ?&gt;</samp></dd>
-		  <dd>Acts like the <code>&lt;call&gt;</code> directive, but URL-encodes
-		  the String just before it is inserted into the output.</dd>
+  <dd>This tag causes one or more template values from a containing
+  template to be imported into a subordinate one. For example, if there
+  is a template that contains the attribute <var>foo</var>, rendering a
+  sub-template which has <code>&lt;?import foo ?></code> in it would
+  cause the sub-template's <var>foo</var> to be set to the container
+  template's <var>foo</var> at the point at which it is rendered.</dd>
 
-		  <dt>if/elsif/else</dt>
-		  <dd class="format">
-			<samp>
-			  &lt;?if <var>statement</var> ?&gt;<br />
-			  ...<br />
-			  &lt;?elsif <var>statement</var> ?&gt;<br />
-			  ...<br />
-			  &lt;?else?&gt;<br />
-			  ...<br />
-			  &lt;?end if ?&gt;
-			</samp>
-		  </dd>
+  <dt>include</dt>
+  <dd class="format">
+	<samp>
+	  &lt;?include <var>filename</var> ?&gt;<br/>
+	  &lt;?include <var>filename</var> as <var>name</var> ?&gt;
+	</samp>
+  </dd>
 
-		  <dd>Your run-of-the-mill conditional flow control.  The
-		  <code>else</code> and <code>elsif</code>s are optional, the
-		  <code>elsif</code>s can be repeated any number of times (including
-		  zero), and the <var>statement</var> can be any template variable,
-		  method chain off a template variable, or regular expression match of a
-		  template variable (like <code>&lt;?if var.method =~ /regex/
-		  ?&gt;</code>).</dd>
+  <dd>This directive is replaced either with the contents of the
+  template specified (first form), or a placeholder attribute with the
+  specified <var>name</var> (second form). </dd>
 
-		  <dt>for</dt>
-		  <dd class="format">
-			<samp>
-			  &lt;?for <var>arglist</var> in <var>iterable</var> ?&gt;<br/>
-			  ...<br/>
-			  &lt;?end for ?&gt;
-			</samp>
-		  </dd>
+  <dd>The first form merges the two templates together, while the second
+  keeps them separate for the purposes of interaction. For example, you
+  may wish to define a generic table template called "table.tmpl", but
+  include it in another template in such a way that it can be interacted
+  with separately:</dd>
 
-		  <dd>For each element of the <var>iterable</var> object (i.e., an
-		  object that implements the <tt>Enumerable</tt> interface), the element
-		  is assigned to a template variable (or multiple, if appropriate), and
-		  the enclosed content is rendered.  The <var>arglist</var> can have
-		  default values (as in: <code>&lt;?for a,b=1 in a_hash ?&gt;</code>),
-		  array-slurping arguments (<code>*args</code>) and hashified
-		  arguments.</dd>
-
-		  <dd>Also defined during iteration is a template variable
-		  <var>iterator</var>, which is an <tt>Arrow::Template::Iterator</tt>
-		  object that can be used to interact with the iteration. See the API
-		  documentation for the <tt>Arrow::Template::Iterator</tt> class for
-		  more on what it can do.</dd>
-
-		  <dt>yield</dt>
-		  <dd class="format">
-			<samp>
-			  &lt;?yield <var>arglist</var> from <var>attribute</var>.<var>block_method</var> ?&gt;<br/>
-			  ...<br/>
-			  &lt;?end yield ?&gt;
-			</samp>
-		  </dd>
-
-		  <dd>Calls the specified <var>block_method</var> on the given template
-		  <var>attribute</var>, passing a rendering function for the contained
-		  content as the block. Each call to the block will assign arguments to
-		  the <var>arglist</var> and render the content. This is a more-generic
-		  version of the functionality represented by the <code>for</code>
-		  directive, useful for calling block-accepting methods besides
-		  <code>#each</code>.</dd>
-
-		  <dt>import</dt>
-		  <dd class="format">
-			<samp>
-			  &lt;?import <var>attribute</var> ?&gt;<br/>
-			  &lt;?import <var>attribute</var> as <var>altname</var> ?&gt;<br/>
-			  &lt;?import <var>attribute</var>, <var>attr2</var> ?&gt;<br/>
-			  &lt;?import <var>attribute</var> as <var>altname</var>,
-			  <var>attr2</var> as <var>altname2</var> ?&gt;
-			</samp>
-		  </dd>
-
-		  <dd>This tag causes one or more template values from a containing
-		  template to be imported into a subordinate one. For example, if there
-		  is a template that contains the attribute <var>foo</var>, rendering a
-		  sub-template which has <code>&lt;?import foo ?></code> in it would
-		  cause the sub-template's <var>foo</var> to be set to the container
-		  template's <var>foo</var> at the point at which it is rendered.</dd>
-
-		  <dt>include</dt>
-		  <dd class="format">
-			<samp>
-			  &lt;?include <var>filename</var> ?&gt;<br/>
-			  &lt;?include <var>filename</var> as <var>name</var> ?&gt;
-			</samp>
-		  </dd>
-
-		  <dd>This directive is replaced either with the contents of the
-		  template specified (first form), or a placeholder attribute with the
-		  specified <var>name</var> (second form). </dd>
-
-		  <dd>The first form merges the two templates together, while the second
-		  keeps them separate for the purposes of interaction. For example, you
-		  may wish to define a generic table template called "table.tmpl", but
-		  include it in another template in such a way that it can be interacted
-		  with separately:</dd>
-
-		  <dd>
+  <dd>
 			<strong>In the template:</strong>
 
 <pre><code>
@@ -264,160 +203,90 @@ tmpl.totals.rows << ["fred" => 5.77], ["wilma" => 4.95]
 
 		</dl>
 	  </div>
+</notextile>
 
 
-	  <div class="section">
-		<h2><a href="#example" id="example">Templated Applets - Hello World
-		(templated)</a></h2>
-		<p>
-		  First, we need to tell Arrow what kind of templates to use, where to
-		  look for templates, and various other configuration options.  These
-		  settings are kept in the Arrow config file, under the templates
-		  section:</p>
+h2. Templated Applets - Hello World (templated)
 
-<pre>templates: 
-  loader: Arrow::Template
+First, we need to tell Arrow where to look for templates:
+
+<?example { language: yaml, test: true, caption: Template config section } ?>
+templates: 
   path:
     - "/www/templates"
-  cache: true
-  cacheConfig: 
-    maxObjSize: 131072
-    maxNum: 20
-    expiration: 36
-    maxSize: 2621440
-</pre>
+<?end?>
 
-		<p>Here, "loader" is the templating system to use, "path" is a list of
-		  directories to search for the templates, and the "cache" and
-		  "cacheConfig" determine how to cache templates, balancing between
-		  increased response time and decreased resource usage.
-		</p>
+The @path@ config item takes one or more directories to use when searching for a template. An applet
+registers which templates it will use when it's loaded via one or more @template@ directives. If
+they're not absolute paths (i.e., begin with @/@), then they're searched for relative to the paths
+in the @templates.path@:
 
-		<p>
-		  Now we can access and use our templates in an Applet.  As a
-		  convenience, the Signature of an applet has room for mention of the
-		  templates it uses.</p>
+<?example { language: ruby, test: true, caption: Loading a few templates } ?>
+class HelloApplet < Arrow::Applet
+    # Applet signature
+    template :hello => 'hello-world.tmpl'
+end
+<?end?>
 
-<pre># Applet signature
-Signature = {
-    :name => "Hello World",
-    :description => %{A 'hello world' applet.},
-    :maintainer => "ged@FaerieMUD.org",
-    :default_action => 'templated',
-    <span class="highlighted">:templates => {
-        :templated     => 'hello-world.tmpl',
-    },</span>
-}
-</pre>
+When the applet is running, it can now load the appropriate template by using its @#load_template@
+method and passing the key assigned to the template it wishes to load. You can then fill it with
+data and make it the return value of an action:
 
-		<p>Which then further allows the use of the Arrow::Applet#load_template
-		  method to get an Arrow::Template object.  This is mostly just for you
-		  to fill with data, and then make the return value of an action:</p>
-
-<pre>def_action :templated do |txn, *args|
+<?example { language: ruby, test: true, caption: "To render a template, just return it from an action" } ?>
+def_action :templated do |txn, *args|
     self.log.debug "In the 'templated' action of the %s applet." %
         self.signature.name
 
-    <span class="highlighted">templ = self.load_template( :templated )
+	# Get a copy of the ':hello' template
+    templ = self.load_template( :hello )
+
+	# Fill in some values
     templ.txn = txn
     templ.time = Time.now.to_s
     templ.applet = self
 
-    return templ</span>
+    return templ
 end
-</pre>
+<?end?>
 
-		<p>
-		  So now we need to actually have a /www/templates/hello-world.tmpl file
-		  made to display our page how we want it.</p>
+So now we need to create a @/www/templates/hello-world.tmpl@ file made to display our excitingly
+original page.
 
-<pre>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"&gt;
-&lt;html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"&gt;
+<?example { language: xml, caption: A page template } ?>
+<html>
+  <head>
+	<title><?attr message ?></title>
+  </head>
+  <body>
 
-&lt;!--
-
-  Arrow "Hello World" Applet Template
-
-  --&gt;
-
-  &lt;head&gt;
-	&lt;title&gt;Arrow: Hello World&lt;/title&gt;
-	&lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8" /&gt;
-	&lt;meta http-equiv="Content-Script-Type" content="text/javascript" /&gt;
-	&lt;link rel="stylesheet" type="text/css" href="/css/arrow.css" /&gt;
-  &lt;/head&gt;
-  &lt;body&gt;
-
-	&lt;h1&gt;Hello World&lt;/h1&gt;
-
-	&lt;p&gt;It is &lt;?attr time?&gt;.  This is a minimal demo applet that just
-	loads and prints a template.  There's also &lt;a href="<span class="highlighted">[?call txn.action?]</span>/display"&gt;a simpler
-	version&lt;/a&gt; of this applet that outputs plain text (i.e., no
-	templates).&lt;p&gt;
-
-		&lt;!-- Runcount: <span class="highlighted">[?call applet.run_count ?]</span> --&gt;
-
-<span class="highlighted">&lt;?if txn.session? ?&gt;</span>
-	  &lt;!-- Session found --&gt;
-  <span class="highlighted">&lt;?if txn.session[:user] ?&gt;</span>
-	&lt;p&gt;Since you're logged in as '<span class="highlighted">&lt;?call
-	txn.session[:user]?&gt;</span>', you can also &lt;a
-		href="<span class="highlighted">[?call txn.app_root?]</span>/<span class="highlighted">[?call txn.applet_path.split(%r{/})[0]
-		?]</span>/logout"&gt;log out&lt;/a&gt; to test the protectedness
-	  of the applet chain.&lt;/p&gt;
-  <span class="highlighted">&lt;?end?&gt;</span>
-
-<span class="highlighted">&lt;?end if ?&gt;</span>
-
-	<span class="highlighted">&lt;?include navbar.incl?&gt;</span>
-
-  &lt;/body&gt;
-&lt;/html&gt;
-
-
-&lt;!--
-  Local Variables:
-  mode: xml
- --&gt;
-</pre>
-
-		<p>Which is, for the most part, just static XHTML that will be displayed
-		  verbatim.  The template directives designate places where the display
-		  will be determined by the data that had been saved into the
-		  Arrow::Template object in the action itself.  This template makes use
-		  of the attr, call, if, and include directives, as described above.
-		</p>
-	  </div>
-
-
-	  <div class="section">
-		<h2><a href="#adding" id="adding">Renderers</a></h2>
-		<p></p>
-	  </div>
-
-
-	  <div class="section">
-		<h2><a href="#adding" id="adding">Adding Directives</a></h2>
-		<p></p>
-		<h2>Sample Directive</h2>
-		<p></p>
-	  </div>
-
-
-	  <div class="section">
-		<h2><a href="#others" id="others">Using Other Templating Systems</a></h2>
-		<p></p>
-		<h2>Writing a Loader</h2>
-		<p></p>
-	  </div>
-
-	</div>
+	<h1><?attr message ?></h1>
 
   </body>
 </html>
+<?end?>
 
+Which is, for the most part, just static XHTML that will be displayed verbatim. The template
+directives designate places where the display will be determined by the data that had been saved
+into the Arrow::Template object in the action itself. This template makes use of the attr, call, if,
+and include directives, as described above.
 
-<!--
-  Local Variables:
-  mode: nxml
- -->
+h2. Renderers
+
+(Describe the details of rendering, and how to influence how things are rendered.)
+
+h2. Adding Directives
+
+(Describe in general terms how to add directives by putting files in an @arrow/template/@ directory)
+
+h3. Sample Directive
+
+(How to build a template directive, step-by-step)
+
+h2. Using Other Templating Systems
+
+(Describe how to change templating systems by using a different @template.loader@)
+
+h3. Writing a Loader
+
+(How to write a loader for your templating system of choice)
+

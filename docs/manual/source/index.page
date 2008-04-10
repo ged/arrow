@@ -3,8 +3,8 @@ title: A web application framework for Apache+mod_ruby
 template: default
 filters:
   - erb
-  - textile
   - examples
+  - textile
 ---
 
 h1. Arrow
@@ -13,30 +13,80 @@ Arrow is a web application framework for "mod_ruby":http://www.modruby.net/, a m
 
 It features:
 
-* reloadable applets that can be chained together
-* request and response utilities
+* all the usual web goodies:
+** advanced query-argument handling
+** cookie manipulation
+** URL utilities
+** Multipart (upload) form handling
+* reloadable modular application code that can be chained together to form larger 
+  applications
 * object-oriented templating system
-* cookie-based sessions
+* pluggable cookie-based session management
 * form-data validation and untainting
-* hierarchical configuration and logging classes
+* single-file YAML-based configuration for both the appserver and applications
+* Hierarchical pluggable logging facilities
 
-For more information about Arrow's history and design, see "Arrow's History and Design":history.html.
+For more information about Arrow's history and design, see "Arrow's History and Design Philosophy":history.html.
+
+h2. A Quick Example
+
+Here's the obligatory "Hello World" example:
+
+<?example { language: ruby, caption: "A Hello World applet", test: true } ?>
+#!/usr/bin/ruby
+
+require 'arrow/applet'
+
+class HelloWorldApplet < Arrow::Applet
+
+	default_action :hello
+
+	def hello_action( txn, *args )
+		return %Q{<html><head><title>Hello, World</title></head>} +
+		       %Q{<body><h1>Hello, World</h1></body></html>}
+	end
+
+end
+
+<?end?>
+
+The output from this will be something like:
+
+<div class="screenshot">
+!images/helloworld.png(Gratuitous screenshot)!
+</div>
+
 
 h2. Getting Started
 
 Before you can get started, you have to install and configure some stuff. Nothing too tricky.
 
-* There's some "installation instructions":installation.html in case you don't yet have it.
+* If you don't yet have Arrow installed, there are some "installation instructions":installation.html.
 * Next, you'll probably want to "configure the server":config.html.
 
 h2. Tutorial
 
-Once you have things up and running, you can start writing stuff.
+Once you have things up and running, you can start writing Ruby.
 
 # "Introduction":tutorial/intro.html
 # "Applications and Applets":tutorial/applets.html
 # "Templates":tutorial/templates.html
-# "Sessions":tutorial/sessions.html
 # "Parameter Validation":tutorial/validation.html
+# "Sessions":tutorial/sessions.html
+# "Configuration":tutorial/advanced-config.html
+# "Logging":tutorial/logging.html
+# "Handling Errors":tutorial/error-handling.html
+
+
+h2. API Documentation
+
+Arrow has "full API documentation":api/.
+
+h2. Cookbook
+
+Once the tutorial is a bit more complete, we'll start putting together some recipes for common
+tasks. For now, though, we suggest you take a look at the example applets in the @applets/@
+directory of the distribution, and their corresponding templates in the @templates/@ directory.
+
 
 

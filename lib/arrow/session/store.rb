@@ -324,7 +324,7 @@ class Arrow::Session::Store < Arrow::Object
 		uri = adviceClass.const_get( :RecommendedLocker ) or
 			raise SessionError, "Could not fetch RecommendedLocker constant"
 
-		self.log.debug "Creating recommeded lock %s" % uri
+		self.log.debug "Creating recommended lock %s" % uri
 		uri = Arrow::Session.parse_uri( uri ) if
 			uri.is_a?( String )
 
