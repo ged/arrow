@@ -238,9 +238,18 @@ class Arrow::Template < Arrow::Object
 		raise TemplateError, "Filename #{file} is tainted." if
 			file.tainted?
 
-		filename = path.
-			collect {|dir| File.expand_path(file, dir).untaint }.
-			find {|fn| File.file?(fn) }
+		filename = nil
+		path.collect {|dir| File.expand_path(file, dir).untaint }.each do |fn|
+			Arrow::Logger[self].debug "Checking path %p" % [ fn ]
+			if File.file?( fn )
+				Arrow::Logger[self].debug "  found the template file at %p" % [ fn ]
+				filename = fn
+				break
+			end
+			
+			Arrow::Logger[self].debug "  %p does not exist or is not a plain file." % [ fn ]
+		end
+		
 		raise Arrow::TemplateError,
 			"Template '%s' not found. Search path was %p" %
 			[ file, path ] unless filename

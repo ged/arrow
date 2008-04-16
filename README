@@ -41,12 +41,13 @@ We'd be happy to hear your suggestions, bug reports, or complaints.
 
 === (Non-Standard) Ruby Library Dependencies
 
-Appropriate versions are included under redist/ for your convenience.
+If you use RubyGems, appropriate versions can be installed using the
+'install_dependencies' Rakefile task. Otherwise, you'll need to build and
+install these by hand:
 
 ruby-cache-0.3::      http://raa.ruby-lang.org/project/ruby-cache
 formvalidator-0.1.4:: http://raa.ruby-lang.org/project/formvalidator
-PluginFactory-1.0.1:: http://raa.ruby-lang.org/project/pluginfactory
-flexmock-0.3.2::      http://raa.ruby-lang.org/project/hashslice
+PluginFactory-1.0.3:: http://deveiate.org/projects/PluginFactory
 
 
 ==== Quickstart

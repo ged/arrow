@@ -23,6 +23,7 @@ BEGIN {
 }
 
 
+require 'rbconfig'
 require 'rubygems'
 require 'rake'
 require 'pathname'
@@ -34,6 +35,8 @@ rescue LoadError => err
 	$stderr.puts "Arrow didn't load cleanly: #{err.message}"
 end
 
+include Config
+
 
 PKG_NAME      = 'arrow'
 PKG_VERSION   = Arrow::VERSION
@@ -44,18 +47,23 @@ PKG_SUMMARY   = "Arrow - A Ruby web application framework"
 RELEASE_NAME  = "REL #{PKG_VERSION}"
 
 BASEDIR       = Pathname.new( __FILE__ ).dirname
-LIBDIR        = BASEDIR + 'lib'
 DOCSDIR       = BASEDIR + 'docs' 
 MANUALDIR     = DOCSDIR + 'manual'
 APIDOCSDIR    = DOCSDIR + 'api'
 
+TESTDIR       = BASEDIR + 'tests'
+TEST_FILES    = Pathname.glob( TESTDIR + '**/*.tests.rb' ).
+	delete_if {|item| item =~ /\.svn/ }
+
+SPECDIR       = BASEDIR + 'spec'
+SPEC_FILES    = Pathname.glob( SPECDIR + '**/*_spec.rb' ).
+	delete_if {|item| item =~ /\.svn/ }
+
+LIBDIR        = BASEDIR + 'lib'
+LIB_FILES     = Pathname.glob( LIBDIR + '**/*.rb' )	.
+	delete_if {|item| item =~ /\.svn/ }
+
 TEXT_FILES    = %w( Rakefile README )
-TEST_FILES    = FileList[ 'tests/**/*.tests.rb' ]
-TEST_FILES.exclude( /\.svn/ )
-SPEC_FILES    = FileList[ 'spec/**/*_spec.rb' ]
-SPEC_FILES.exclude( /\.svn/ )
-LIB_FILES     = FileList[ 'lib/**/*.rb' ]
-LIB_FILES.exclude( /\.svn/ )
 
 RELEASE_FILES = TEXT_FILES + LIB_FILES + SPEC_FILES
 
@@ -119,7 +127,7 @@ begin
 
 		rdoc.options += [
 			'-w', '4',
-			'-qSHN',
+			'-SHN',
 			'-i', 'docs',
 			'-f', 'darkfish',
 			'-m', 'README',
@@ -127,7 +135,7 @@ begin
 		  ]
 	
 		rdoc.rdoc_files.include 'README'
-		rdoc.rdoc_files.include LIB_FILES
+		rdoc.rdoc_files.include LIB_FILES.collect {|file| file.to_s }
 	end
 	
 rescue LoadError => err
@@ -154,15 +162,42 @@ task :manual => [ :rdoc ] do
 end
 
 
-### Installation tasks
+### Task: install
+desc "Install Arrow as a conventional library"
+task :install do
+	log "Installing Arrow as a convention library"
+	sitelib = Pathname.new( CONFIG['sitelibdir'] )
+	Dir.chdir( LIBDIR ) do
+		LIB_FILES.each do |libfile|
+			relpath = libfile.relative_path_from( LIBDIR )
+			target = sitelib + relpath
+			FileUtils.mkpath target.dirname,
+				:mode => 0755, :verbose => true, :noop => $dryrun unless target.dirname.directory?
+			FileUtils.install relpath, target,
+				:mode => 0644, :verbose => true, :noop => $dryrun
+		end
+	end
+end
 
-desc "Install the library as a gem"
-task :install_gem => [:spec, :gem] do
+### Task: install_gem
+desc "Install Arrow as a gem"
+task :install_gem => [:package] do
 	installer = Gem::Installer.new( %{pkg/#{PKG_FILE_NAME}.gem} )
 	installer.install
 end
 
-desc "Uninstall the gem"
+### Task: uninstall
+desc "Uninstall Arrow if it's been installed as a conventional library"
+task :uninstall do
+	log "Uninstalling conventionally-installed Arrow library files"
+	sitelib = Pathname.new( CONFIG['sitelibdir'] )
+	dir = sitelib + 'arrow'
+	FileUtils.rm_rf( dir, :verbose => true, :noop => $dryrun )
+	lib = sitelib + 'arrow.rb'
+	FileUtils.rm( lib, :verbose => true, :noop => $dryrun )
+end
+
+### Task: uninstall_gem
 task :uninstall_gem => [:clean] do
 	uninstaller = Gem::Uninstaller.new( PKG_FILE_NAME )
 	uninstaller.uninstall
