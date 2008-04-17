@@ -1,0 +1,13 @@
+---
+title: Logging
+template: tutorial
+filters:
+  - erb
+  - examples
+  - textile
+---
+
+h1. Logging
+
+You can log stuff. Yeah! Kudos!
+
