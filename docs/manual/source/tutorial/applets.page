@@ -13,12 +13,11 @@ The @Arrow::Applet@ class is the main workhorse of the Arrow framework; it, in c
 @Arrow::Transaction@, provides most of the functionality that application developers will be
 concerned with.
 
-Applets make up the functionality of an application; each distinct task that a user can do is
-concisely expressed as a separate class which inherits from @Arrow::Applet@. The base @Applet@ class
+Applets make up the functionality of an application; each distinct group of tasks that a user can do
+is expressed as a separate class which inherits from @Arrow::Applet@. The base @Applet@ class
 defines much of what is covered in the rest of this tutorial, so if you don't like the templating
 system or the argument validation system built into the base applet class, you can easily define
 your own that uses something else instead without having to give up any of the other functionality.
-
 
 For now, though, this tutorial will focus on the default functionality, with mention made of how
 to override or replace it where appropriate.
@@ -36,17 +35,23 @@ information like name and author, and configures some of the logic and functiona
 @Arrow::Applet@ class itself. An Applet's signature is set by calling class methods in the
 definition to configure it.
 
-Here's an example of a basic applet defining several values of its signature:
+Here's an example of an applet signature for a Hello World applet:
 
 <?example { language: ruby, caption: "Setting applet signature values" } ?>
-# Applet signature
-applet_name "Hello World"
-applet_description "This is yet another implementation of Hello World"
-applet_maintainer "ged@FaerieMUD.org"
-applet_version '1.2.2'
+require 'arrow/applet'
 
-default_action :greet
-template :greeting => 'templates/greeting.tmpl'
+class HelloWorldApplet < Arrow::Applet
+	# Applet signature
+	applet_name        "Hello World"
+	applet_description "This is yet another implementation of Hello World"
+	applet_maintainer  "ged@FaerieMUD.org"
+	applet_version     "1.2.2"
+
+	default_action :greet
+	template :greeting => 'templates/greeting.tmpl'
+
+	# Define some actions...
+end
 <?end?>
 
 h4. Signature Values
@@ -56,47 +61,52 @@ for any missing elements. The values the base applet class understands are liste
 what they do.
 
 <dl class="linelist signature-items">
-  <dt>name</dt>
+  <dt><code>applet_name</code> <var>String</var></dt>
 
   <dd>The name of the applet, used for display purposes in introspection and for automated bug- or
   error-reporting. Defaults to the name of the Applet class.</dd>
 
-  <dt>description</dt>
+  <dt><code>applet_description</code> <var>String</var></dt>
 
   <dd>A brief explanation of what the applet does or is for; used in introspection utilities.
   Defaults to @"(none)"@.</dd>
 
-  <dt>maintainer</dt>
+  <dt><code>applet_maintainer</code> <var>String</var></dt>
 
   <dd>The RFC822-formatted email address of the person to praise and/or blame for the functioning of
   the applet. This is intended to be used in introspection utilities and also for automated bug- or
   error- reporting. Defaults to whatever the <code>ServerAdmin</code> of Apache is set to, or the
   empty string if the <code>ServerAdmin</code> setting is not available.</dd>
 
-  <dt>default_action</dt>
+  <dt><code>applet_version</code> <var>String</var></dt>
+
+  <dd>The version of the applet. If the applet defines any of the <code
+  class="constant-name">Version</code>, <code class="constant-name">Revision</code>, <code
+  class="constant-name">SVNId</code>, or <code class="constant-name">Rcsid</code> constants, the 
+  value it contains is used as a default. Otherwise the <code>mtime</code> of the file which
+  contains the applet is used.</dd>
+
+  <dt><code>default_action</code> <var>Symbol</var></dt>
 
   <dd>When no action is specified by the incoming request, this determines which one will be used.
   Defaults to <code>'_default'</code>.</dd>
 
-  <dt>templates</dt>
+  <dt><code>templates</code> <var>Hash</var></dt>
 
   <dd>This should be set to a hash filled with file names of the templates that will be used by this
   applet. Templates listed in this hash can later be loaded via the <code
   class="method-name">#load_template</code> method of the applet object. Defaults to an empty hash.
   See the <a href="tutorial/templates.html">templating tutorial</a> for more coverage of this</dd>
 
-  <dt>version</dt>
-
-  <dd>The version of the applet. If the applet defines any of the <code
-  class="constant-name">Version</code>, <code class="constant-name">Revision</code>, <code
-  class="constant-name">SVNId</code>, or <code class="constant-name">Rcsid</code> constants, the value it
-  contains is used as a default. Otherwise the mtime of the file which contains the applet is
-  used.</dd>
-
-  <dt>vargs</dt>
+  <dt><code>validator</code> <var>Hash</var></dt>
   <dd>A hash containing profiles for the built in form validator, one
   per action. See the <a href="tutorial-validation.html">input
   validation section</a> of the tutorial for more.</dd>
+
+  <dt><code>appicon</code> <var>String</var></dt>
+  <dd>The URL for the icon that will be used to represent this applet in
+	introspection output. Optional, defaults to <code>'application-x-executable.png'</code>,
+	which is an icon in the </dd>
 </dl>
 
 h3. Actions
@@ -112,24 +122,40 @@ Each action method's name must end with @_action@. For example, if you're defini
 action, you'd define a method called @display_action@:
 
 <?example { language: ruby, caption: "Defining an action" } ?>
-def display_action( txn, *args )
-  # Do something with the txn
-  return "Some content"
+require 'arrow/applet'
+
+class HelloWorldApplet < Arrow::Applet
+
+	### Action: Display some content
+	def display_action( txn, *args )
+	    # ...do something with the transaction 'txn'...
+	    return "Some content"
+	end
+
 end
+
 <?end?>
 
-Action methods are called with an @Arrow::Transaction(class-name)@ object and zero or more arguments
+Action methods are called with an @Arrow::Transaction@ object and zero or more arguments
 that can be passed REST-style in the URI. Only the transaction argument is mandatory; defining an
 action method without parameters will result in an error.
 
-You can also use the @def_action(method-name)@ shortcut to define an action to make them easily
-distinguishable from other methods you may define in your applet class:
+If you like, you can also distinguish actions from other methods in the applet by using the
+@def_action@ declaration to define an action:
 
 <?example { language: ruby, caption: "Defining the same action with `def_action'" } ?>
-def_action :display do |txn, *args|
-  # Do something with the txn
-  return "Some content"
+require 'arrow/applet'
+
+class HelloWorldApplet < Arrow::Applet
+
+	### Action: Display some content
+	def_action :display do |txn, *args|
+    	# ...do something with the transaction 'txn'...
+    	return "Some content"
+	end
+
 end
+
 <?end?>
 
 The two declarations are equivalent.
@@ -137,22 +163,31 @@ The two declarations are equivalent.
 h4. Action Execution
 
 When an action method is called, it should do the necessary processing to build the response data
-and return it to its caller. This return value will then be converted to a @String(class-name)@ (via
-@#to_s(method-name)@) and sent to the client after doing the necessary header senting and Apache
+and return it to its caller. This return value will then be converted to a @String@ (via
+@#to_s@) and sent to the client after doing the necessary header senting and Apache
 housekeeping. Returning a non-true value causes a @DECLINED@ status to be sent back to Apache. This
 can be used to pass control to a further handler if the action determines it cannot handle the
 request.
 
 For return behaviors outside of these (for example, altered headers or a different status), it is
-necessary to access the @Apache::Request(class-name)@ object directly (through @txn.request@ in the
+necessary to access the @Apache::Request@ object directly (through @txn.request@ in the
 examples above). See the "mod ruby":http://modruby.net/ site for more information on what to do with
 this.
 
+h3. Delegator Method
+
+As mentioned before, applets can also be chained together to build more complex functionality. Apps
+which are intended to be chained through should define a @#delegate@ method. This
+delegation method is called by the broker when the applet is being chained through, and is
+responsible for calling @yield@ if and when it wishes to pass control to the next applet in the
+chain, passing any desired additional arguments. Delegation methods are invoked with the same
+arguments as action methods, including any added by previous applets in the chain.
 
 h2. A simple applet - Hello
 
-We'll start with a dead-simple applet that doesn't really do much of anything useful. In keeping
-with tradition, of course, this applet will be yet another implementation of 'Hello World':
+We'll start with a dead-simple applet that doesn't really do much of anything useful, snippets of
+which you've already seen above. In keeping with tradition, of course, this applet will be yet
+another implementation of 'Hello World':
 
 <?example { language: ruby, caption: "A Hello World applet" } ?>
 #
@@ -162,7 +197,7 @@ with tradition, of course, this applet will be yet another implementation of 'He
 require 'arrow/applet'
 
 # Define the applet class; inherit from the base applet class.
-class Hello < Arrow::Applet
+class HelloWorldApplet < Arrow::Applet
 
   # Applet signature
   applet_name "Hello World"
@@ -184,9 +219,9 @@ class Hello < Arrow::Applet
 end
 <?end?>
 
-The applet's class is @Hello(class-name)@, which means to install it into the server's URI-space
-you'd add a line like the following to the @layout@ hash of the @applets@ section of the arrow
-config file:
+The applet's class is @HelloWorldApplet@, which means to install it into the server's
+URI-space you'd add a line like the following to the @layout@ hash of the @applets@ section of the
+arrow config file:
 
 <?example { language: yaml, caption: "Installing the Hello World applet." } ?>
 applets:
@@ -208,35 +243,23 @@ action take an additional argument specified in the URL:
   def greet_action( txn, name=nil )
     name ||= "world"
 
-    return <<-EOF
-	<html>
-	  <head><title>Hello</title></head>
-	  <body><p>Hello, #{name.capitalize}.</p></body>
-	</html>
-    EOF
+    return \
+		%{<html>} +
+		%{  <head><title>Hello</title></head>} +
+		%{  <body><p>Hello, #{name.capitalize}.</p></body>} +
+		%{</html>}
   end
 <?end?>
 
 Calling the applet with a URL like @/hello/greet/Dave@ will now cause it to greet only Dave instead:
 
 <div class="screenshot">
-  <img src="hello-dave-sshot.png" alt="screenshot" height="324" width="464" />
+!.../images/hello-dave-sshot.png(I don't think I can do that, Dave.)!
 </div>
 
 Note that we're required to call the action '@greet@' explicitly to be able to pass in URL-style
 arguments.
 
-
-h2. Applet Chaining
-
-As mentioned before, applets can also be chained together to build more complex functionality. Apps
-which are intended to be chained through should define a @#delegate@ method. This delegation method
-is called by the broker when the applet is being chained through, and is responsible for calling
-@yield@ when (if) it wishes to pass control to the next applet in the chain, passing any desired
-additional arguments. Delegation methods are invoked with the same arguments as action methods,
-including any added by previous applets in the chain.
-
-h3. ?(delegation example)?
 
 h2. Special Applets
 

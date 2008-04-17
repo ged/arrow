@@ -85,6 +85,7 @@ class Args < Arrow::Application
     ### template and renders it.  Cute, huh?
 
 end # class Args
+<?end?>
 
 Then in the template:
 

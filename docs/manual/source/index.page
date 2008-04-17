@@ -42,8 +42,8 @@ class HelloWorldApplet < Arrow::Applet
 	default_action :hello
 
 	def hello_action( txn, *args )
-		return %Q{<html><head><title>Hello, World</title></head>} +
-		       %Q{<body><h1>Hello, World</h1></body></html>}
+		return "<html><head><title>Hello, World</title></head>" +
+		       "<body><h1>Hello, World</h1></body></html>"
 	end
 
 end

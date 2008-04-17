@@ -46,10 +46,14 @@ h1,h2,h3,h4,h5,h6 {
 	font-weight: normal;
 	color: #484860;
 }
+h1,h2,h3 {
+	text-shadow: #a7a7a7 1px 1px 2px;
+}
 h1 {
 	font-size: 3em;
 	margin: 0.5em 0 0;
 	color: #ca2f1b;
+	text-shadow: #999 2px 2px 3px;
 }
 h2 {
 	font-size: 2em;
@@ -101,11 +105,14 @@ dd + dt {
 	margin-top: 1em;
 }
 
+code {
+	background: #ddd;
+}
+
 div.screenshot {
 	margin: 1em 3em;
 }
 div.screenshot img {
-	-webkit-box-shadow: #333 1px 1px 5px;
 }
 
 /* @group Generic Classes */
@@ -117,7 +124,7 @@ div.screenshot img {
 div.caption {
 	font-size: 12px;
 	text-align: center;
-	padding: 0.5em 0;
+	padding: 0.25em 0;
 	border-top: 1px solid #787890;
 }
 div.example {
