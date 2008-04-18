@@ -135,7 +135,8 @@ begin
 		  ]
 	
 		rdoc.rdoc_files.include 'README'
-		rdoc.rdoc_files.include LIB_FILES.collect {|file| file.to_s }
+		rdoc.rdoc_files.include LIB_FILES.
+			collect {|file| file.relative_path_from(BASEDIR).to_s }
 	end
 	
 rescue LoadError => err
