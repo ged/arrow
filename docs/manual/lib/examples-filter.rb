@@ -239,10 +239,14 @@ class ExamplesFilter < Manual::Page::Filter
 			begin
 				require 'amatch'
 				pat = Amatch::PairDistance.new( lang )
-				matches = Uv.syntaxes {|syntax| [pat.match(syntax), syntax] }.sort[ 0, 5 ]
+				matches = Uv.syntaxes.
+					collect {|syntax| [pat.match(syntax), syntax] }.
+					sort_by {|tuple| tuple[0] }.
+					reverse
+				puts matches[ 0..5 ].inspect
 				puts "No syntax called '#{lang}'.",
 					"Perhaps you meant one of: ",
-					*(matches.collect {|m| "  #{m[1]} (#{m[0]})"})
+					*(matches[ 0..5 ].collect {|m| "  #{m[1]}" })
 			rescue => err
 				$stderr.puts err.message, err.backtrace.join("\n  ")
 				raise "No UV syntax called '#{lang}'."

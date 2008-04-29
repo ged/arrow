@@ -12,24 +12,109 @@ h1. Templating
 Putting code and html together (either html in the code or vice versa) becomes unwieldy and ugly
 after a certain level of complexity (a little after "hello world"), and for this reason, web
 developers have traditionally used templates to separate off all the display work. There is debate
-over exactly how much power a templating system should have (should it be able to execute arbitrary
-code, or only adhere to a small set of tools), and the construction of a templating system is
-relatively easy, so templating systems are many and diverse. We have included with Arrow our own
+over exactly how much power a templating system should have (e.g., should it be able to execute
+arbitrary code, or only adhere to a small set of tools), and the construction of a templating system
+is relatively easy, so templating systems are many and diverse. We have included with Arrow our own
 templating system - complete, extensible and (we think) intuitive - but have also made it easy for
 you to use any other templating system. If you already have a favorite, and have no interest in
-seeing another, (even if you might like it,) you can skip past the tutorial on ours and learn 
-"how to use your own":#others
-
-Template handling is, to some degree, integrated with the Arrow server. The arrow config file has a
-templates section.
+seeing another (even if you might like it), you can skip past the tutorial on ours and learn "how
+to use your own":#others
 
 h2. Arrow::Template
 
 h3. Syntax
 
 The Arrow Templating System uses preprocessing tags to distinguish template directives. These are
-both <code>&lt;?...?&gt;</code> and <code>[?...?]</code>. The square bracket version is meant to be
-used inside of other html tags (e.g., <code>&lt;a href="[?attr link?]"&gt;</code>...)</p>
+both @<?...?>@ and @[?...?]@. The square bracket version is meant to be
+used inside of other html tags (e.g., @<a href="[?attr link?]">@...)
+
+The basic format for a preprocessing tag is: @<?command arguments ?>@
+
+
+h2. Templated Applets - Hello World (templated)
+
+First, we need to tell Arrow what templating system to use, where to look for templates, and how to
+cache them:
+
+<?example { language: yaml, test: true, caption: Template config section } ?>
+templates: 
+  loader: Arrow::Template
+  path:
+    - templates
+    - "/www/templates"
+  cache: true
+  cacheConfig: 
+    maxObjSize: 131072
+    maxNum: 20
+    expiration: 36
+    maxSize: 2621440
+<?end?>
+
+Some highlights (see "the configuration part of the tutorial":advanced-config.html for the full
+details):
+
+table(line-comments).
+|_. line |_. description |
+|=. 2 | use Arrow templating |
+|=. 3 | The @path@ config item takes one or more directories to search when loading a template. Any
+templates which aren't loaded via an absolute path are searched for relative to the paths in the
+@templates.path@. |
+|=.6 & 7| Turn on caching and set up the LRU cache |
+
+Now declare the templates your applet will use:
+
+<?example { language: ruby, test: true, caption: Loading a few templates } ?>
+class HelloWorldApplet < Arrow::Applet
+    template :hello => 'hello/world.tmpl',
+	         :main => 'main.tmpl'
+end
+<?end?>
+
+When the applet is running, it can now load the appropriate template by using its @#load_template@
+method and passing the key assigned to the template it wishes to load. You can then fill it with
+data and make it the return value of an action:
+
+<?example { language: ruby, test: true, caption: "To render a template, just return it from an action" } ?>
+class TimedGreetingWorldApplet < Arrow::Applet
+
+	def templated_action( txn, *args )
+
+		# Get a copy of the ':hello' template
+	    templ = self.load_template( :hello )
+
+		# Fill in some values
+	    templ.txn = txn
+	    templ.applet = self
+		templ.time = Time.now
+		templ.greeting_recipient = "World"
+
+	    return templ
+	end
+
+end
+<?end?>
+
+So now we need to create a @/www/templates/hello-world.tmpl@ file made to display our excitingly
+original page.
+
+<?example { language: xml, caption: A page template } ?>
+<html>
+  <head>
+	<title>Timed Greeting</title>
+  </head>
+  <body>
+
+	<?if time.hour > 4 && time.hour < 12 ?>
+	<h1><?attr message ?></h1>
+
+  </body>
+</html>
+<?end?>
+
+Which is, for the most part, just static XHTML that will be displayed verbatim. The template
+directives designate places where the display will be determined by the data that had been saved
+into the Arrow::Template object in the action itself. This template makes use of the @attr@, @call@,
+@if@, and @include@ directives. Here's the list of all the directives that come with Arrow.
 
 h3. The Directives
 
@@ -206,69 +291,6 @@ tmpl.totals.rows << ["fred" => 5.77], ["wilma" => 4.95]
 </notextile>
 
 
-h2. Templated Applets - Hello World (templated)
-
-First, we need to tell Arrow where to look for templates:
-
-<?example { language: yaml, test: true, caption: Template config section } ?>
-templates: 
-  path:
-    - "/www/templates"
-<?end?>
-
-The @path@ config item takes one or more directories to use when searching for a template. An applet
-registers which templates it will use when it's loaded via one or more @template@ directives. If
-they're not absolute paths (i.e., begin with @/@), then they're searched for relative to the paths
-in the @templates.path@:
-
-<?example { language: ruby, test: true, caption: Loading a few templates } ?>
-class HelloApplet < Arrow::Applet
-    # Applet signature
-    template :hello => 'hello-world.tmpl'
-end
-<?end?>
-
-When the applet is running, it can now load the appropriate template by using its @#load_template@
-method and passing the key assigned to the template it wishes to load. You can then fill it with
-data and make it the return value of an action:
-
-<?example { language: ruby, test: true, caption: "To render a template, just return it from an action" } ?>
-def_action :templated do |txn, *args|
-    self.log.debug "In the 'templated' action of the %s applet." %
-        self.signature.name
-
-	# Get a copy of the ':hello' template
-    templ = self.load_template( :hello )
-
-	# Fill in some values
-    templ.txn = txn
-    templ.time = Time.now.to_s
-    templ.applet = self
-
-    return templ
-end
-<?end?>
-
-So now we need to create a @/www/templates/hello-world.tmpl@ file made to display our excitingly
-original page.
-
-<?example { language: xml, caption: A page template } ?>
-<html>
-  <head>
-	<title><?attr message ?></title>
-  </head>
-  <body>
-
-	<h1><?attr message ?></h1>
-
-  </body>
-</html>
-<?end?>
-
-Which is, for the most part, just static XHTML that will be displayed verbatim. The template
-directives designate places where the display will be determined by the data that had been saved
-into the Arrow::Template object in the action itself. This template makes use of the attr, call, if,
-and include directives, as described above.
 
 h2. Renderers
 

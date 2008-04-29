@@ -55,41 +55,43 @@ related information together. (This is equally applicable to templates, config(?
 h2. Application With Input Args
 
 <?example { language: ruby, caption: Argument testing application. } ?>
-class Args < Arrow::Application
+require 'arrow/applet'
 
-    applet_name "Argument Tester"
-    applet_description "This app is for testing/debugging the argument validator."
-    applet_maintainer "god@host.com"
-    
-    default_action :display
+### An applet for testing/debugging the argument validator.
+class ArgumentTester < Arrow::Applet
 
-    templates => {
-            :display    => 'args-display.tmpl',
-        },
-        :vargs => {
-            :display    => {
-                :required       => :name,
-                :optional       => [:email, :description],
-                :filters        => [:strip, :squeeze],
-                :constraints    => {
-                    :email          => :email,
-                    :name           => /^[\x20-\x7f]+$/,
-                    :description    => /^[\x20-\x7f]+$/,
-                },
-            },
-        },
-    }
+	# Applet signature
+	applet_name "Argument Tester"
+	applet_description "This app is for testing/debugging the argument validator."
+	applet_maintainer "ged@FaerieMUD.org"
 
-    ### All of the applet's functionality is handled by the fallback action
-    ### (Arrow::Applet#action_missing_action), which loads the 'display'
-    ### template and renders it.  Cute, huh?
+	default_action :display
+	template :display => 'args-display.tmpl'
 
-end # class Args
+    validator :display => {
+		:required		=> :name,
+		:optional		=> [:email, :description],
+		:filters		=> [:strip, :squeeze],
+		:untaint_all_constraints => true,
+		:descriptions	=> {
+			:email			=> "Customer Email",
+			:description	=> "Issue Description",
+			:name			=> "Customer Name",
+		},
+		:constraints	=> {
+			:email	=> :email,
+			:name	=> /^[\x20-\x7f]+$/,
+			:description => /^[\x20-\x7f]+$/,
+		},
+	}
+
+end # class ArgumentTester
+
 <?end?>
 
 Then in the template:
 
-<?example { language: html, caption: Argument testing template. } ?>
+<?example { language: xml, caption: Argument testing template. } ?>
 <html>
     <body>
     <h1>Argument Validation/Untainting/Testing applet</h1>

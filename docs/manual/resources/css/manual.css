@@ -87,7 +87,7 @@ a {
 }
 
 dl {
-	margin: 0 2em;
+	margin: 1em 2em;
 }
 dl dt {
 	font-weight: bold;
@@ -100,13 +100,36 @@ dd {
 	padding: 4px;
 	margin: 0 0 0.5em;
 }
+dd.format {
+	color: #791707;
+	background: #ddd;
+	padding: 2px 10px;
+}
 
+dt + dd {
+	margin-top: 0.25em;
+}
 dd + dt {
 	margin-top: 1em;
 }
 
 code {
 	background: #ddd;
+}
+
+table {
+	margin: 1em;
+	background-color: #fff;
+	border-collapse: collapse;
+}
+th {
+	color: white;
+	background: #484860;
+}
+tr {}
+td, th {
+	padding: 4px;
+	border: 1px solid #484860;
 }
 
 div.screenshot {
