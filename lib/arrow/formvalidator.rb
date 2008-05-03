@@ -373,7 +373,7 @@ class Arrow::FormValidator < ::FormValidator
 	# Licensed under a Creative Commons Attribution-ShareAlike 2.5 License
 	# http://creativecommons.org/licenses/by-sa/2.5/
 	# 
-	RFC822EmailAddress = begin
+	RFC822_EMAIL_ADDRESS = begin
 		qtext = '[^\\x0d\\x22\\x5c\\x80-\\xff]'
 		dtext = '[^\\x0d\\x5b-\\x5d\\x80-\\xff]'
 		atom = '[^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-' +
@@ -387,13 +387,13 @@ class Arrow::FormValidator < ::FormValidator
 		domain = "#{sub_domain}(?:\\x2e#{sub_domain})*"
 		local_part = "#{word}(?:\\x2e#{word})*"
 		addr_spec = "#{local_part}\\x40#{domain}"
-		pattern = /\A#{addr_spec}\z/
+		/\A#{addr_spec}\z/
 	end
 	
 	### Override the parent class's definition to (not-sloppily) match email 
 	### addresses.
 	def match_email( val )
-		match = RFC822EmailAddress.match( val )
+		match = RFC822_EMAIL_ADDRESS.match( val )
 		self.log.debug "Validating an email address %p: %p" %
 			[ val, match ]
 		return match ? match[0] : nil
