@@ -1,6 +1,6 @@
 --- 
 title: Configuration
-template: default
+layout: default
 filters:
   - erb
   - examples
@@ -9,8 +9,14 @@ filters:
 
 h1. Arrow Tutorial: Advanced Configuration
 
-The more important to customize for most users are going to be the applet
-layout section as well as all the various paths. Briefly, here's what each item of the config means:
+Arrow's configuration system provides quite a few ways to control the appserver, which it loads,
+where it loads it from, and how it is cached, as well as facilities for adding configuration for 
+your own applets.
+
+h2. Appserver Configuration Items
+
+Arrow's configuration is loaded via the @Arrow::Config@ class, which provides a @Struct@-like interface
+to configuration values.
 
 <notextile>
 <dl class="linelist">

@@ -98,6 +98,21 @@ describe Arrow::FormValidator do
 	end
 
 
+	it "should untaint field names" do
+		rval = nil
+		tainted_one = "1"
+		tainted_one.taint
+		
+		@validator.validate( {'required' => 1, 'number' => tainted_one},
+			:untaint_all_constraints => true )
+			
+		Arrow::Logger.global.notice "Validator: %p" % [@validator]
+			
+		@validator[:number].should == "1"
+		@validator[:number].tainted?.should be_false()
+	end
+
+
 	it "should return the capture from a regexp constraint if it has only one" do
 		rval = nil
 		params = { 'required' => 1, 'regexp_w_one_capture' => "   ygdrassil   " }
@@ -243,6 +258,39 @@ describe Arrow::FormValidator do
 				'yield' => '2 loaves'
 			}
 		}
+	end
+
+	it "should untaint both keys and values in complex hash fields if untainting is turned on" do
+		profile = {
+			:optional => [
+				'recipe[ingredient][name]',
+				'recipe[ingredient][cost]',
+				'recipe[yield]'
+			],
+			:untaint_all_constraints => true,
+		}
+		args = {
+			'recipe[ingredient][name]'.taint => 'nutmeg'.taint,
+			'recipe[ingredient][cost]'.taint => '$0.18'.taint,
+			'recipe[yield]'.taint => '2 loaves'.taint,
+		}
+	
+		@validator.validate( args, profile )
+
+		@validator.valid.should == {
+			'recipe' => {
+				'ingredient' => { 'name' => 'nutmeg', 'cost' => '$0.18' },
+				'yield' => '2 loaves'
+			}
+		}
+
+		@validator.valid.keys.all? {|key| key.should_not be_tainted() }
+		@validator.valid.keys.all? {|key| key.should_not be_tainted() }
+		@validator.valid['recipe'].keys.all? {|key| key.should_not be_tainted() }
+		@validator.valid['recipe']['ingredient'].keys.all? {|key| key.should_not be_tainted() }
+		@validator.valid['recipe']['yield'].should_not be_tainted()
+		@validator.valid['recipe']['ingredient']['name'].should_not be_tainted()
+		@validator.valid['recipe']['ingredient']['cost'].should_not be_tainted()
 	end
 
 	it "accepts the value 'true' for fields with boolean constraints" do

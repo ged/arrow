@@ -287,7 +287,6 @@ tmpl.totals.rows << ["fred" => 5.77], ["wilma" => 4.95]
 		  </dd>
 
 		</dl>
-	  </div>
 </notextile>
 
 

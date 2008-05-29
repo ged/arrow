@@ -38,34 +38,35 @@ end
 include Config
 
 
-PKG_NAME      = 'arrow'
-PKG_VERSION   = Arrow::VERSION
-PKG_FILE_NAME = "#{PKG_NAME}-#{PKG_VERSION}"
+PKG_NAME        = 'arrow'
+PKG_VERSION     = Arrow::VERSION
+PKG_FILE_NAME   = "#{PKG_NAME}-#{PKG_VERSION}"
 
-PKG_SUMMARY   = "Arrow - A Ruby web application framework"
+PKG_SUMMARY     = "Arrow - A Ruby web application framework"
 
-RELEASE_NAME  = "REL #{PKG_VERSION}"
+RELEASE_NAME    = "REL #{PKG_VERSION}"
 
-BASEDIR       = Pathname.new( __FILE__ ).dirname
-DOCSDIR       = BASEDIR + 'docs' 
-MANUALDIR     = DOCSDIR + 'manual'
-APIDOCSDIR    = DOCSDIR + 'api'
+BASEDIR         = Pathname.new( __FILE__ ).dirname
+DOCSDIR         = BASEDIR + 'docs' 
+MANUALDIR       = DOCSDIR + 'manual'
+MANUALOUTPUTDIR = MANUALDIR + 'output'
+APIDOCSDIR      = DOCSDIR + 'api'
 
-TESTDIR       = BASEDIR + 'tests'
-TEST_FILES    = Pathname.glob( TESTDIR + '**/*.tests.rb' ).
+TESTDIR         = BASEDIR + 'tests'
+TEST_FILES      = Pathname.glob( TESTDIR + '**/*.tests.rb' ).
 	delete_if {|item| item =~ /\.svn/ }
 
-SPECDIR       = BASEDIR + 'spec'
-SPEC_FILES    = Pathname.glob( SPECDIR + '**/*_spec.rb' ).
+SPECDIR         = BASEDIR + 'spec'
+SPEC_FILES      = Pathname.glob( SPECDIR + '**/*_spec.rb' ).
 	delete_if {|item| item =~ /\.svn/ }
 
-LIBDIR        = BASEDIR + 'lib'
-LIB_FILES     = Pathname.glob( LIBDIR + '**/*.rb' )	.
+LIBDIR          = BASEDIR + 'lib'
+LIB_FILES       = Pathname.glob( LIBDIR + '**/*.rb' )	.
 	delete_if {|item| item =~ /\.svn/ }
 
-TEXT_FILES    = %w( Rakefile README )
+TEXT_FILES      = %w( Rakefile README )
 
-RELEASE_FILES = TEXT_FILES + LIB_FILES + SPEC_FILES
+RELEASE_FILES   = TEXT_FILES + LIB_FILES + SPEC_FILES
 
 
 # Load task plugins
@@ -148,19 +149,43 @@ rescue LoadError => err
 end
 
 
+### Copy method for resources -- passed as a block to the various file tasks that copy
+### resources to the output directory.
+def copy_resource( task )
+	source = task.prerequisites[ 1 ]
+	target = task.name
+	
+	when_writing do
+		log "  #{source} -> #{target}"
+		mkpath File.dirname( target )
+		cp source, target, :verbose => $trace
+	end
+end
+	
+
 ### Task: manual
 Manual::GenTask.new( :manual ) do |manual|
 	manual.metadata.version = PKG_VERSION
 	manual.metadata.gemspec = GEMSPEC
 	manual.base_dir = MANUALDIR
-	manual.output_dir = 'output'
+	manual.output_dir = MANUALOUTPUTDIR
 end
-task :manual => [ :rdoc ] do
-	log "Copying API docs into the manual output"
-	
+begin
 	apidocs = FileList[ APIDOCSDIR + '**/*' ]
-	copydocs = apidocs.pathmap( '%{^docs/}p' )
+	targets = apidocs.pathmap( "%%{api,%s}p" % [ MANUALOUTPUTDIR + 'api' ] )
+	copier = self.method( :copy_resource ).to_proc
+	
+	# Create a file task to copy each file to the output directory
+	apidocs.each_with_index do |docsfile, i|
+		file( targets[i] => [ MANUALOUTPUTDIR.to_s, docsfile ], &copier )
+	end
+
+	# Now group all the API doc copy tasks into a containing task
+	desc "Copy API documentation to the output directory"
+	task :copy_apidocs => targets
 end
+
+task :manual => :copy_apidocs
 
 
 ### Task: install

@@ -610,7 +610,7 @@ class Arrow::FormValidator < ::FormValidator
 	### Build a deep hash out of the given parameter +value+
 	def build_deep_hash( value, hash, levels )
 		if levels.length == 0
-			value
+			value.untaint
 		elsif hash.nil?
 			{ levels.first => build_deep_hash(value, nil, levels[1..-1]) }
 		else
@@ -627,11 +627,11 @@ class Arrow::FormValidator < ::FormValidator
 		if main.nil?
 			return []
 		elsif trailing
-			return [key]
+			return [key.untaint]
 		elsif bracketed
-			return [main] + bracketed.slice(1...-1).split('][')
+			return [main.untaint] + bracketed.slice(1...-1).split('][').collect {|k| k.untaint }
 		else
-			return [main]
+			return [main.untaint]
 		end
 	end
 
