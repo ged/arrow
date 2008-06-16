@@ -117,8 +117,9 @@ begin
 
 
 	### Task: install gems for development tasks
-	DEPENDENCIES = %w[rspec rcov RedCloth coderay tidy formvalidator ruby-cache flexmock 
+	DEPENDENCIES = %w[rspec rcov RedCloth ultraviolet tidy formvalidator ruby-cache flexmock 
 		meta_project diff-lcs]
+	desc "Install all dependencies"
 	task :install_dependencies do
 		install_gems( DEPENDENCIES )
 	end

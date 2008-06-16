@@ -72,10 +72,17 @@ RELEASE_FILES   = TEXT_FILES + LIB_FILES + SPEC_FILES
 # Load task plugins
 RAKE_TASKDIR = BASEDIR + 'rake'
 Pathname.glob( RAKE_TASKDIR + '*.rb' ).each do |tasklib|
+	next if tasklib =~ %r{/helpers.rb$}
 	begin
 		require tasklib
+	rescue ScriptError => err
+		fail "Task library '%s' failed to load: %s: %s" %
+			[ tasklib, err.class.name, err.message ]
+		trace "Backtrace: \n  " + err.backtrace.join( "\n  " )
 	rescue => err
-		fail "Tasklib #{tasklib}: #{err.message}"
+		log "Task library '%s' failed to load: %s: %s. Some tasks may not be available." %
+			[ tasklib, err.class.name, err.message ]
+		trace "Backtrace: \n  " + err.backtrace.join( "\n  " )
 	end
 end
 
