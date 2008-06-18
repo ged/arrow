@@ -68,6 +68,35 @@ TEXT_FILES      = %w( Rakefile README )
 
 RELEASE_FILES   = TEXT_FILES + LIB_FILES + SPEC_FILES
 
+GEMSPEC = Gem::Specification.new do |gem|
+	gem.name    	= PKG_NAME
+	gem.version 	= PKG_VERSION
+
+	gem.summary     = PKG_SUMMARY
+	gem.description = <<-EOD
+	Arrow is a web application framework for mod_ruby. It was designed to make
+	development of web applications under Apache easier and more fun without
+	sacrificing the power of being able to access the native Apache API.
+	EOD
+
+	gem.authors  	= "Michael Granger, Martin Chase, Dave McCorkhill, Jeremiah Jordan"
+	gem.email       = "ged@FaerieMUD.org"
+	gem.homepage 	= "http://deveiate.org/projects/Arrow"
+	gem.rubyforge_project = 'deveiate'
+
+	gem.has_rdoc 	= true
+
+	gem.files      	= RELEASE_FILES
+	gem.test_files 	= SPEC_FILES + TEST_FILES
+
+	gem.requirements << "mod_ruby >= 1.2.6"
+
+  	gem.add_dependency( 'ruby-cache', '>= 0.3.0' )
+  	gem.add_dependency( 'formvalidator', '>= 0.1.3' )
+  	gem.add_dependency( 'pluginfactory', '>= 1.0.2' )
+end
+
+
 
 # Load task plugins
 RAKE_TASKDIR = BASEDIR + 'rake'

@@ -21,35 +21,6 @@ begin
 	end
 
 
-	GEMSPEC = Gem::Specification.new do |gem|
-		gem.name    	= PKG_NAME
-		gem.version 	= PKG_VERSION
-
-		gem.summary     = PKG_SUMMARY
-		gem.description = <<-EOD
-		Arrow is a web application framework for mod_ruby. It was designed to make
-		development of web applications under Apache easier and more fun without
-		sacrificing the power of being able to access the native Apache API.
-		EOD
-
-		gem.authors  	= "Michael Granger, Martin Chase, Dave McCorkhill, Jeremiah Jordan"
-		gem.email       = "ged@FaerieMUD.org"
-		gem.homepage 	= "http://deveiate.org/projects/Arrow"
-		gem.rubyforge_project = 'deveiate'
-
-		gem.has_rdoc 	= true
-
-		gem.files      	= RELEASE_FILES
-		gem.test_files 	= SPEC_FILES + TEST_FILES
-
-		gem.requirements << "mod_ruby >= 1.2.6"
-
-	  	gem.add_dependency( 'ruby-cache', '>= 0.3.0' )
-	  	gem.add_dependency( 'formvalidator', '>= 0.1.3' )
-	  	gem.add_dependency( 'pluginfactory', '>= 1.0.2' )
-	end
-
-
 	### Task: gem
 	Rake::GemPackageTask.new( GEMSPEC ) do |task|
 		task.gem_spec = GEMSPEC
@@ -58,60 +29,54 @@ begin
 	end
 
 
-	class Gem::RemoteInstaller
+	require 'rubygems/dependency_installer'
+	require 'rubygems/source_index'
+	require 'rubygems/requirement'
+	require 'rubygems/doc_manager'
 
-		def install( gem_name, version_requirement=Gem::Requirement.default, force=false, install_dir=Gem.dir )
-			unless version_requirement.respond_to?(:satisfied_by?)
-				version_requirement = Gem::Requirement.new [version_requirement]
-			end
-			installed_gems = []
-			begin
-				spec, source = find_gem_to_install(gem_name, version_requirement)
-				dependencies = find_dependencies_not_installed(spec.dependencies)
+	### Install the specified +gems+ if they aren't already installed.
+	def install_gems( *gems )
+		gems.flatten!
 
-				installed_gems << install_dependencies(dependencies, force, install_dir)
+		defaults = Gem::DependencyInstaller::DEFAULT_OPTIONS.merge({
+			:generate_rdoc     => true,
+			:generate_ri       => true,
+			:install_dir       => Gem.dir,
+			:format_executable => false,
+			:test              => false,
+			:version           => Gem::Requirement.default,
+		  })
 
-				cache_dir = @options[:cache_dir] || File.join(install_dir, "cache")
-				destination_file = File.join( cache_dir, spec.full_name + ".gem" )
-
-				download_gem( destination_file, source, spec )
-
-				installer = new_installer( destination_file )
-				installed_gems.unshift( installer.install )
-			rescue Gem::RemoteInstallationSkipped => e
-				alert_error e.message
-			end
-			return installed_gems.flatten
-		end
-
-	end
-
-	### Attempt to install the given +gemlist+.
-	def install_gems( gemlist )
 		# Check for root
-		unless Process.euid.zero?
+		if Process.euid != 0
 			$stderr.puts "This probably won't work, as you aren't root, but I'll try anyway"
 		end
 
-		installer = Gem::RemoteInstaller.new( :include_dependencies => true )
 		gemindex = Gem::SourceIndex.from_installed_gems
 
-		gemlist.each do |gemname|
+		gems.each do |gemname|
 			if (( specs = gemindex.search(gemname) )) && ! specs.empty?
-				$stderr.puts "Version %s of %s is already installed; skipping..." % 
+				log "Version %s of %s is already installed; skipping..." % 
 					[ specs.first.version, specs.first.name ]
 				next
 			end
 
-			$stderr.puts "Trying to install #{gemname}..."
-			gems = installer.install( gemname )
-			gems.compact!
-			$stderr.puts "Installed: %s" % [gems.collect {|spec| spec.full_name}.join(', ')]
+			rgv = Gem::Version.new( Gem::RubyGemsVersion )
+			installer = nil
 
-			gems.each do |gem|
-				Gem::DocManager.new( gem, '-w4 -SNH' ).generate_ri
-				Gem::DocManager.new( gem, '-w4 -SNH' ).generate_rdoc
+			log "Trying to install #{gemname.inspect}..."
+			if rgv >= Gem::Version.new( '1.1.1' )
+				installer = Gem::DependencyInstaller.new
+				installer.install( gemname )
+			else
+				installer = Gem::DependencyInstaller.new( gemname )
+				installer.install
 			end
+
+			installer.installed_gems.each do |spec|
+				log "Installed: %s" % [ spec.full_name ]
+			end
+
 		end
 	end
 
