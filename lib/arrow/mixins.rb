@@ -280,7 +280,7 @@ module Arrow
 
 		### Return the Arrow::Logger object for the receiving class.
 		def log 
-			Arrow::Logger[ self.class.name ]
+			Arrow::Logger[ self.class ]
 		end
 
 	end # module Loggable

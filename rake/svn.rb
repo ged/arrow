@@ -2,9 +2,7 @@
 ###	S U B V E R S I O N   T A S K S   A N D   H E L P E R S
 #####################################################################
 
-require 'pp'
 require 'yaml'
-require 'English'
 
 # Strftime format for tags/releases
 TAG_TIMESTAMP_FORMAT = '%Y%m%d-%H%M%S'
@@ -32,6 +30,7 @@ end
 ### Get the subversion information for the current working directory as
 ### a hash.
 def get_svn_info( dir='.' )
+	trace "Doing: svn info #{dir}"
 	info = IO.read( '|-' ) or exec 'svn', 'info', dir
 	return YAML.load( info ) # 'svn info' outputs valid YAML! Yay!
 end
@@ -101,6 +100,13 @@ def get_svn_rev( dir='.' )
 end
 
 
+### Return the latest revision number of the specified +dir+ as an Integer.
+def get_last_changed_rev( dir='.' )
+	info = get_svn_info( dir )
+	return info['Last Changed Rev']
+end
+
+
 ### Return a list of the entries at the specified Subversion url. If
 ### no +url+ is specified, it will default to the list in the URL
 ### corresponding to the current working directory.
@@ -108,7 +114,7 @@ def svn_ls( url=nil )
 	url ||= get_svn_url()
 	list = IO.read( '|-' ) or exec 'svn', 'ls', url
 
-	trace 'svn ls of %s: %p' % [url, list] if $trace
+	trace 'svn ls of %s: %p' % [url, list]
 	
 	return [] if list.nil? || list.empty?
 	return list.split( $INPUT_RECORD_SEPARATOR )
@@ -142,24 +148,36 @@ def get_latest_release_tag
 	rooturl    = get_svn_repo_root()
 	releaseurl = rooturl + '/releases'
 	
-	tags = svn_ls( releaseurl ).grep( RELEASE_VERSION_PATTERN ).sort_by do |tag|
-		tag.split('.').collect {|i| Integer(i) }
-	end
+	tags = svn_ls( releaseurl ).
+		grep( RELEASE_VERSION_PATTERN ).
+		sort_by do |tag|
+			$stderr.puts "Sorting %p" % [ tag ]
+			tag.sub(%r{/$}, '' ).split('_')[1..-1].collect {|i| Integer(i) }
+		end
+	trace "Release tags are: %p" % [ tags ]
 	return nil if tags.empty?
 
 	return releaseurl + '/' + tags.last
 end
 
 
-### Extract a diff from the specified subversion working +dir+, rewrite its
-### file lines as Trac links, and return it.
+### Extract a diff from the specified subversion working +dir+ and return it.
 def make_svn_commit_log( dir='.' )
-	editor_prog = ENV['EDITOR'] || ENV['VISUAL'] || DEFAULT_EDITOR
-	
 	diff = IO.read( '|-' ) or exec 'svn', 'diff'
 	fail "No differences." if diff.empty?
 
 	return diff
+end
+
+
+### Extract the svn log from the specified subversion working +dir+, 
+### starting from rev +start+ and ending with rev +finish+, and return it.
+def make_svn_log( dir='.', start='PREV', finish='HEAD' )
+	trace "svn -r#{start}:#{finish} log #{dir}"
+	log = IO.read( '|-' ) or exec 'svn', "-r#{start}:#{finish}", 'log', dir
+	fail "No log between #{start} and #{finish}." if log.empty?
+
+	return log
 end
 
 
@@ -182,7 +200,7 @@ namespace :svn do
 
 		desc = "Tagging trunk as #{svntag}"
 		ask_for_confirmation( desc ) do
-			msg = prompt_with_default( "Commit log: ", "Tagging for code push" )
+			msg = prompt_with_default( "Commit log: ", "Tagging for release" )
 			run 'svn', 'cp', '-m', msg, svntrunk, svntag
 		end
 	end
@@ -192,29 +210,25 @@ namespace :svn do
 	task :release do
 		last_tag    = get_latest_svn_timestamp_tag()
 		svninfo     = get_svn_info()
-		release     = PKG_VERSION
-		svnrel      = svninfo['Repository Root'] + '/thingfish/releases'
+		svntrunk    = svninfo['Repository Root'] + '/trunk'
+		svnrel      = svninfo['Repository Root'] + '/releases'
+		release     = RELEASE_NAME
 		svnrelease  = svnrel + '/' + release
 
-		if last_tag.nil?
-			error "There are no tags in the repository"
-			fail
-		end
-
-		releases = svn_ls( svnrel )
+		releases = svn_ls( svnrel ).collect {|name| name.sub(%r{/$}, '') }
 		trace "Releases: %p" % [releases]
 		if releases.include?( release )
 			error "Version #{release} already has a branch (#{svnrelease}). Did you mean" +
-				"to increment the version in thingfish.rb?"
+				"to increment the version in arrow.rb?"
 			fail
 		else
-			trace "No #{svnrel} version currently exists"
+			trace "No #{release} version currently exists"
 		end
 		
-		desc = "Release tag\n  #{last_tag}\nto\n  #{svnrelease}"
+		desc = "Tagging trunk as #{svnrelease}..."
 		ask_for_confirmation( desc ) do
 			msg = prompt_with_default( "Commit log: ", "Branching for release" )
-			run 'svn', 'cp', '-m', msg, last_tag, svnrelease
+			run 'svn', 'cp', '-m', msg, svntrunk, svnrelease
 		end
 	end
 
@@ -228,17 +242,13 @@ namespace :svn do
 	task :commitlog => [COMMIT_MSG_FILE]
 	
 	desc "Show the (pre-edited) commit log for the current directory"
-	task :show_commitlog => [COMMIT_MSG_FILE] do
-		ask_for_confirmation( "Confirm? " ) do
-			args = get_target_args()
-			puts get_svn_diff( *args )
-		end
+	task :show_commitlog do
+		puts make_svn_commit_log()
 	end
 	
 
 	file COMMIT_MSG_FILE do
-		args = get_target_args()
-		diff = get_svn_diff( *args )
+		diff = make_svn_commit_log()
 		
 		File.open( COMMIT_MSG_FILE, File::WRONLY|File::EXCL|File::CREAT ) do |fh|
 			fh.print( diff )

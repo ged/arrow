@@ -35,6 +35,11 @@ module Arrow
 	# SVN Id
 	SVNId = %q$Id$
 
+	# Library version
+	VERSION = '0.9.3'
+
+
+	# Try loading stuff through Rubygems if the require fails and Rubygems isn't loaded yet
 	begin
 		require 'arrow/constants'
 		require 'arrow/monkeypatches'
@@ -51,11 +56,13 @@ module Arrow
 		raise
 	end
 
+
 	# Hook up PluginFactory logging to Arrow logging
 	PluginFactory.logger_callback = lambda do |lvl, msg|
 		Arrow::Logger[PluginFactory].send( lvl, msg )
 	end
 	PluginFactory.log( :debug, "Hooked up PluginFactory logging through Arrow's logger." )
+
 
 	### A +RubyChildInitHandler+ class which loads one or more dispatchers
 	### when a child server starts. This can eliminate the startup lag for 

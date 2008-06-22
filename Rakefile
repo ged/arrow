@@ -40,13 +40,13 @@ include Config
 
 PKG_NAME        = 'arrow'
 PKG_VERSION     = Arrow::VERSION
-PKG_FILE_NAME   = "#{PKG_NAME}-#{PKG_VERSION}"
+PKG_FILE_NAME   = "#{PKG_NAME.capitalize}-#{PKG_VERSION}"
 
 PKG_SUMMARY     = "Arrow - A Ruby web application framework"
 
-RELEASE_NAME    = "REL #{PKG_VERSION}"
+RELEASE_NAME    = PKG_FILE_NAME
 
-BASEDIR         = Pathname.new( __FILE__ ).dirname
+BASEDIR         = Pathname.new( __FILE__ ).dirname.expand_path.relative_path_from( Pathname.getwd )
 DOCSDIR         = BASEDIR + 'docs' 
 MANUALDIR       = DOCSDIR + 'manual'
 MANUALOUTPUTDIR = MANUALDIR + 'output'
@@ -61,13 +61,35 @@ SPEC_FILES      = Pathname.glob( SPECDIR + '**/*_spec.rb' ).
 	delete_if {|item| item =~ /\.svn/ }
 
 LIBDIR          = BASEDIR + 'lib'
-LIB_FILES       = Pathname.glob( LIBDIR + '**/*.rb' )	.
+LIB_FILES       = Pathname.glob( LIBDIR + '**/*.rb' ).
 	delete_if {|item| item =~ /\.svn/ }
 
 TEXT_FILES      = %w( Rakefile README )
 
 RELEASE_FILES   = TEXT_FILES + LIB_FILES + SPEC_FILES
 
+
+# Documentation constants
+RDOC_OPTIONS = [
+	'-w', '4',
+	'-SHN',
+	'-i', '.',
+	'-m', 'README',
+	'-W', %Q{http://deveiate.org/projects/#{PKG_NAME.capitalize}/browser/trunk/}
+  ]
+
+# Release constants
+SMTP_HOST = 'mail.faeriemud.org'
+SMTP_PORT = 465 # SMTP + SSL
+
+# Project constants
+PROJECT_HOST = 'deveiate.org'
+PROJECT_PUBDIR = "/usr/local/www/public/code"
+PROJECT_PUBURL = "#{PROJECT_HOST}:#{PROJECT_PUBDIR}"
+PROJECT_DOCDIR = "#{PROJECT_PUBDIR}/#{PKG_NAME}"
+PROJECT_DOCURL = "#{PROJECT_HOST}:#{PROJECT_DOCDIR}"
+
+# RubyGem specification
 GEMSPEC = Gem::Specification.new do |gem|
 	gem.name    	= PKG_NAME
 	gem.version 	= PKG_VERSION
@@ -86,8 +108,8 @@ GEMSPEC = Gem::Specification.new do |gem|
 
 	gem.has_rdoc 	= true
 
-	gem.files      	= RELEASE_FILES
-	gem.test_files 	= SPEC_FILES + TEST_FILES
+	gem.files      	= RELEASE_FILES.collect {|pn| pn.to_s }
+	gem.test_files 	= [ SPEC_FILES + TEST_FILES ].flatten.collect {|pn| pn.to_s }
 
 	gem.requirements << "mod_ruby >= 1.2.6"
 
@@ -95,8 +117,6 @@ GEMSPEC = Gem::Specification.new do |gem|
   	gem.add_dependency( 'formvalidator', '>= 0.1.3' )
   	gem.add_dependency( 'pluginfactory', '>= 1.0.2' )
 end
-
-
 
 # Load task plugins
 RAKE_TASKDIR = BASEDIR + 'rake'
@@ -115,6 +135,12 @@ Pathname.glob( RAKE_TASKDIR + '*.rb' ).each do |tasklib|
 	end
 end
 
+# Define some constants that depend on the 'svn' tasklib
+PKG_BUILD = get_svn_rev( BASEDIR ) || 0
+SNAPSHOT_PKG_NAME = "#{PKG_FILE_NAME}.#{PKG_BUILD}"
+SNAPSHOT_GEM_NAME = "#{SNAPSHOT_PKG_NAME}.gem"
+
+# Support old-style trace and dryrun
 if Rake.application.options.trace
 	$trace = true
 	log "$trace is enabled"
@@ -208,7 +234,9 @@ Manual::GenTask.new( :manual ) do |manual|
 end
 begin
 	apidocs = FileList[ APIDOCSDIR + '**/*' ]
-	targets = apidocs.pathmap( "%%{api,%s}p" % [ MANUALOUTPUTDIR + 'api' ] )
+	# trace "  apidocs: %p" % [ apidocs ]
+	targets = apidocs.pathmap( "%%{#{APIDOCSDIR},%s}p" % [ MANUALOUTPUTDIR + 'api' ] )
+	# trace "  mapped apidocs to targets: %p" % [ targets ]
 	copier = self.method( :copy_resource ).to_proc
 	
 	# Create a file task to copy each file to the output directory
@@ -222,7 +250,7 @@ begin
 end
 
 task :manual => :copy_apidocs
-
+directory MANUALOUTPUTDIR.to_s
 
 ### Task: install
 desc "Install Arrow as a conventional library"

@@ -24,9 +24,6 @@
 ### The module that serves as a namespace for all Arrow classes.
 module Arrow
 
-	# Release version
-	VERSION = '0.9.3'
-
 	# The domain to put Arrow objects into
 	YAML_DOMAIN = "rubycrafters.com,2003-10-22"
 
