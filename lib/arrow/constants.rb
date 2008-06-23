@@ -13,11 +13,11 @@
 # * Michael Granger <mgranger@rubycrafters.com>
 # * David McCorkhill <dmccorkhill@rubycrafters.com>
 # 
-#:include: COPYRIGHT
+#:include: LICENSE
 #
 #---
 #
-# Please see the file COPYRIGHT for licensing details.
+# Please see the file LICENSE in the BASE directory for licensing details.
 #
 
 

@@ -64,7 +64,7 @@ LIBDIR          = BASEDIR + 'lib'
 LIB_FILES       = Pathname.glob( LIBDIR + '**/*.rb' ).
 	delete_if {|item| item =~ /\.svn/ }
 
-TEXT_FILES      = %w( Rakefile README )
+TEXT_FILES      = %w( Rakefile LICENSE README )
 
 RELEASE_FILES   = TEXT_FILES + LIB_FILES + SPEC_FILES
 

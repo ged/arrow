@@ -66,11 +66,11 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: COPYRIGHT
+#:include: LICENSE
 #
 #---
 #
-# Please see the file docs/COPYRIGHT for licensing details.
+# Please see the file LICENSE in the BASE directory for licensing details.
 #
 
 # Dependencies follow the module because of dependency loops.

@@ -50,7 +50,12 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: COPYRIGHT
+#:include: LICENSE
+#
+#---
+#
+# Please see the file LICENSE in the BASE directory for licensing details.
+#
 #
 # Portions of this file are from Ruby on Rails' CGIMethods class from the
 # action_controller:

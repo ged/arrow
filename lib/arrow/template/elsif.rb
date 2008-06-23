@@ -12,11 +12,11 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: COPYRIGHT
+#:include: LICENSE
 #
 #---
 #
-# Please see the file COPYRIGHT in the 'docs' directory for licensing details.
+# Please see the file LICENSE in the BASE directory for licensing details.
 #
 
 require 'arrow/exceptions'

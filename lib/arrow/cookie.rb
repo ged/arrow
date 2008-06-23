@@ -20,12 +20,12 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: COPYRIGHT
-# 
-# ---
-# 
-# Please see the file docs/COPYRIGHT for licensing details.
-# 
+#:include: LICENSE
+#
+#---
+#
+# Please see the file LICENSE in the BASE directory for licensing details.
+#
 
 require 'date'
 require 'time'
