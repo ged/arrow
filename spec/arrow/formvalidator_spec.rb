@@ -262,14 +262,21 @@ describe Arrow::FormValidator do
 
 	it "should untaint both keys and values in complex hash fields if untainting is turned on" do
 		profile = {
+			:required => [
+				'recipe[ingredient][rarity]',
+			],
 			:optional => [
 				'recipe[ingredient][name]',
 				'recipe[ingredient][cost]',
 				'recipe[yield]'
 			],
+			:constraints	=> {
+				'recipe[ingredient][rarity]' => /^([\w\-]+)$/,
+			},
 			:untaint_all_constraints => true,
 		}
 		args = {
+			'recipe[ingredient][rarity]'.taint => 'super-rare'.taint,
 			'recipe[ingredient][name]'.taint => 'nutmeg'.taint,
 			'recipe[ingredient][cost]'.taint => '$0.18'.taint,
 			'recipe[yield]'.taint => '2 loaves'.taint,
@@ -279,16 +286,17 @@ describe Arrow::FormValidator do
 
 		@validator.valid.should == {
 			'recipe' => {
-				'ingredient' => { 'name' => 'nutmeg', 'cost' => '$0.18' },
+				'ingredient' => { 'name' => 'nutmeg', 'cost' => '$0.18', 'rarity' => 'super-rare' },
 				'yield' => '2 loaves'
 			}
 		}
 
 		@validator.valid.keys.all? {|key| key.should_not be_tainted() }
-		@validator.valid.keys.all? {|key| key.should_not be_tainted() }
+		@validator.valid.values.all? {|key| key.should_not be_tainted() }
 		@validator.valid['recipe'].keys.all? {|key| key.should_not be_tainted() }
 		@validator.valid['recipe']['ingredient'].keys.all? {|key| key.should_not be_tainted() }
 		@validator.valid['recipe']['yield'].should_not be_tainted()
+		@validator.valid['recipe']['ingredient']['rarity'].should_not be_tainted()
 		@validator.valid['recipe']['ingredient']['name'].should_not be_tainted()
 		@validator.valid['recipe']['ingredient']['cost'].should_not be_tainted()
 	end

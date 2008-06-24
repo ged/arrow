@@ -132,8 +132,6 @@ class Arrow::FormValidator < ::FormValidator
 		*(Hash.public_instance_methods(false) - ['[]', '[]=', 'inspect'])
 
 
-		
-
 	### Stringified description of the validator
 	def to_s
 		""
