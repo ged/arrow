@@ -36,7 +36,7 @@ module Arrow
 	SVNId = %q$Id$
 
 	# Library version
-	VERSION = '0.9.3'
+	VERSION = '0.9.4'
 
 
 	# Try loading stuff through Rubygems if the require fails and Rubygems isn't loaded yet
