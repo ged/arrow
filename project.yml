@@ -4,3 +4,11 @@ author_name: Michael Granger
 project_homepage: http://deveiate.org/projects/Arrow
 project_name: Arrow
 author_email: ged@FaerieMUD.org
+project_dependencies:
+  ruby-cache: '>= 0.3.0'
+  formvalidator: '>= 0.1.4'
+  PluginFactory: '>= 1.0.3'
+project_requirements:
+  Apache: >= 2.2.6
+  mod_ruby: >= 1.2.6
+

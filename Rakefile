@@ -57,21 +57,27 @@ EXT_FILES     = Pathname.glob( EXTDIR + '**/*.{c,h,rb}' ).delete_if {|item| item
 
 SPECDIR       = BASEDIR + 'spec'
 SPEC_FILES    = Pathname.glob( SPECDIR + '**/*_spec.rb' ).delete_if {|item| item =~ /\.svn/ }
-SPEC_EXCLUDES = 'spec,/Library/Ruby,/var/lib,/usr/local/lib'
 
 TESTDIR       = BASEDIR + 'tests'
-TEST_FILES    = Pathname.glob( TESTDIR + '**/*.tests.rb' )
+TEST_FILES    = Pathname.glob( TESTDIR + '**/*.tests.rb' ).delete_if {|item| item =~ /\.svn/ }
 
 RELEASE_FILES = FileList[ TEXT_FILES + SPEC_FILES + TEST_FILES + LIB_FILES + EXT_FILES ]
 
-
+RCOV_EXCLUDES = 'spec,tests,/Library/Ruby,/var/lib,/usr/local/lib'
 RCOV_OPTS = [
-	'--exclude', SPEC_EXCLUDES,
+	'--exclude', RCOV_EXCLUDES,
 	'--xrefs',
 	'--save',
-	'--callsites'
+	'--callsites',
+	#'--aggregate', 'coverage.data' # <- doesn't work as of 0.8.1.2.0
   ]
 
+
+# Subversion constants -- directory names for releases and tags
+SVN_TRUNK_DIR    = 'trunk'
+SVN_RELEASES_DIR = 'releases'
+SVN_BRANCHES_DIR = 'branches'
+SVN_TAGS_DIR     = 'tags'
 
 ### Load some task libraries that need to be loaded early
 require RAKE_TASKDIR + 'helpers.rb'
@@ -104,12 +110,15 @@ PROJECT_SCPURL = "#{PROJECT_HOST}:#{PROJECT_DOCDIR}"
 
 # Gem dependencies: gemname => version
 DEPENDENCIES = {
-#	'mongrel'       => '',
+	'formvalidator' => '>= 0.1.4',
+	'ruby-cache' => '>= 0.3.0',
+	'PluginFactory' => '>= 1.0.3',
 }
 
 # Non-gem requirements: packagename => version
 REQUIREMENTS = {
-#	'Apache'  => '>= 2.2.6',
+	'mod_ruby' => '>= 1.2.6',
+	'Apache' => '>= 2.2.6',
 }
 
 # RubyGem specification
@@ -119,9 +128,7 @@ GEMSPEC   = Gem::Specification.new do |gem|
 
 	gem.summary           = PKG_SUMMARY
 	gem.description       = <<-EOD
-
 	A mod_ruby web application framework
-
 	EOD
 
 	gem.authors           = 'Michael Granger'
