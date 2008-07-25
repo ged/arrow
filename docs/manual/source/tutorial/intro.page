@@ -35,14 +35,17 @@ decisions:
 	<dd>Arrow includes a templating system that is designed to be more object-oriented than some 
 		others, which makes keeping the View decoupled from the model easier than when 
 		it's implemented as a purely procedural system with a shared-state mechanism. Arrow 
-		templates have an interface (in the API sense) just like any other Ruby object, and
-		are interacted with in much the same manner, which makes it possible to test the interaction 
-		between Controller and View without resorting to parsing the resulting HTML.</dd>
+		templates are first-order Ruby objects which have an interface (in the API sense) defined 
+		by its source just like any other Ruby object. You can interact with a template in much 
+		the same manner as you would any other Ruby object, which makes it possible to test the 
+		interaction between Controller and View without resorting to parsing the resulting 
+		HTML.</dd>
 
-	<dt>Composed Application Control</dt>
+	<dt>Composed Application Controllers</dt>
 	<dd>A typical arrow application is composed of several cooperating Applet objects which are 
-		chained together, and communicate via delegation, in much the same way as command-line
-		utilities can be chained together to cooperate in the assembly of some final result. </dd>
+		"chained together":CoRpattern, and communicate via delegation, in much the same way as 
+		command-line utilities can be chained together to cooperate in the assembly of some final 
+		result. </dd>
 
 	<dt>No Included Domain Model</dt>
 	<dd>Arrow intentionally does not have any notion of what DomainModel you might want to use, or 	
@@ -103,4 +106,4 @@ something behaves, it should be fairly easy to customize.
 [IOCandDI]http://www.martinfowler.com/articles/injection.html
 [DMpattern]http://martinfowler.com/eaaCatalog/domainModel.html
 [Sequel]http://sequel.rubyforge.org/
-
+[CoRpattern]http://c2.com/cgi/wiki?ChainOfResponsibilityPattern

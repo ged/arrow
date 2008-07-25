@@ -1,4 +1,10 @@
 #!/usr/bin/env ruby
+# 
+# Specification for the Arrow::Applet class
+# $Id$
+#
+# Copyright (c) 2004-2008 The FaerieMUD Consortium. Most rights reserved.
+# 
 
 BEGIN {
 	require 'pathname'
