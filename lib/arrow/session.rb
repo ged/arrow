@@ -52,7 +52,7 @@ class Arrow::Session < Arrow::Object
 	###	C L A S S   M E T H O D S
 	#############################################################
 
-	@config = Arrow::Config.new
+	@config = Arrow::Config.new.session
 	class << self
 		attr_reader :config
 	end

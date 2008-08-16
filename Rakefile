@@ -38,16 +38,13 @@ LIBDIR        = BASEDIR + 'lib'
 EXTDIR        = BASEDIR + 'ext'
 DOCSDIR       = BASEDIR + 'docs'
 PKGDIR        = BASEDIR + 'pkg'
-RAKE_TASKDIR  = BASEDIR + 'rake'
 
 PKG_NAME      = 'arrow'
-PKG_SUMMARY   = ''
+PKG_SUMMARY   = 'A mod_ruby web application framework'
 VERSION_FILE  = LIBDIR + 'arrow.rb'
 PKG_VERSION   = VERSION_FILE.read[ /VERSION = '(\d+\.\d+\.\d+)'/, 1 ]
 PKG_FILE_NAME = "#{PKG_NAME.downcase}-#{PKG_VERSION}"
 GEM_FILE_NAME = "#{PKG_FILE_NAME}.gem"
-
-RELEASE_NAME  = "RELEASE_#{PKG_VERSION.gsub(/\./, '_')}"
 
 ARTIFACTS_DIR = Pathname.new( ENV['CC_BUILD_ARTIFACTS'] || 'artifacts' )
 
@@ -61,8 +58,26 @@ SPEC_FILES    = Pathname.glob( SPECDIR + '**/*_spec.rb' ).delete_if {|item| item
 TESTDIR       = BASEDIR + 'tests'
 TEST_FILES    = Pathname.glob( TESTDIR + '**/*.tests.rb' ).delete_if {|item| item =~ /\.svn/ }
 
-RELEASE_FILES = FileList[ TEXT_FILES + SPEC_FILES + TEST_FILES + LIB_FILES + EXT_FILES ]
+RAKE_TASKDIR  = BASEDIR + 'rake'
+RAKE_TASKLIBS = Pathname.glob( RAKE_TASKDIR + '*.rb' )
 
+LOCAL_RAKEFILE = BASEDIR + 'Rakefile.local'
+
+EXTRA_PKGFILES = []
+EXTRA_PKGFILES.concat Pathname.glob( BASEDIR + 'applets/**/*.rb' ).delete_if {|item| item =~ /\.svn/ } 
+EXTRA_PKGFILES.concat Pathname.glob( BASEDIR + 'docs/manual/**' ).delete_if {|item| item =~ /\.svn/ } 
+
+RELEASE_FILES = TEXT_FILES + 
+	SPEC_FILES + 
+	TEST_FILES + 
+	LIB_FILES + 
+	EXT_FILES + 
+	RAKE_TASKLIBS +
+	EXTRA_PKGFILES
+
+RELEASE_FILES << LOCAL_RAKEFILE if LOCAL_RAKEFILE.exist?
+
+COVERAGE_MINIMUM = ENV['COVERAGE_MINIMUM'] ? Float( ENV['COVERAGE_MINIMUM'] ) : 85.0
 RCOV_EXCLUDES = 'spec,tests,/Library/Ruby,/var/lib,/usr/local/lib'
 RCOV_OPTS = [
 	'--exclude', RCOV_EXCLUDES,
@@ -78,6 +93,10 @@ SVN_TRUNK_DIR    = 'trunk'
 SVN_RELEASES_DIR = 'releases'
 SVN_BRANCHES_DIR = 'branches'
 SVN_TAGS_DIR     = 'tags'
+
+SVN_DOTDIR       = BASEDIR + '.svn'
+SVN_ENTRIES      = SVN_DOTDIR + 'entries'
+
 
 ### Load some task libraries that need to be loaded early
 require RAKE_TASKDIR + 'helpers.rb'
@@ -95,7 +114,7 @@ RDOC_OPTIONS = [
 	'-SHN',
 	'-i', '.',
 	'-m', 'README',
-	'-W', 'http://deveiate.org/projects/Arrow/browser/trunk/'
+	'-W', 'http://deveiate.org/projects/Arrow//browser/trunk/'
   ]
 
 # Release constants
@@ -106,7 +125,12 @@ SMTP_PORT = 465 # SMTP + SSL
 PROJECT_HOST = 'deveiate.org'
 PROJECT_PUBDIR = "/usr/local/www/public/code"
 PROJECT_DOCDIR = "#{PROJECT_PUBDIR}/#{PKG_NAME}"
-PROJECT_SCPURL = "#{PROJECT_HOST}:#{PROJECT_DOCDIR}"
+PROJECT_SCPPUBURL = "#{PROJECT_HOST}:#{PROJECT_PUBDIR}"
+PROJECT_SCPDOCURL = "#{PROJECT_HOST}:#{PROJECT_DOCDIR}"
+
+# Rubyforge stuff
+RUBYFORGE_GROUP = 'deveiate'
+RUBYFORGE_PROJECT = 'arrow'
 
 # Gem dependencies: gemname => version
 DEPENDENCIES = {
@@ -128,13 +152,15 @@ GEMSPEC   = Gem::Specification.new do |gem|
 
 	gem.summary           = PKG_SUMMARY
 	gem.description       = <<-EOD
-	A mod_ruby web application framework
+	Arrow is a web application framework for mod_ruby. It was designed to make
+	development of web applications under Apache easier and more fun without
+	sacrificing the power of being able to access the native Apache API.
 	EOD
 
 	gem.authors           = 'Michael Granger'
 	gem.email             = 'ged@FaerieMUD.org'
-	gem.homepage          = 'http://deveiate.org/projects/Arrow'
-	gem.rubyforge_project = 'deveiate'
+	gem.homepage          = 'http://deveiate.org/projects/Arrow/'
+	gem.rubyforge_project = RUBYFORGE_PROJECT
 
 	gem.has_rdoc          = true
 	gem.rdoc_options      = RDOC_OPTIONS
@@ -154,11 +180,12 @@ GEMSPEC   = Gem::Specification.new do |gem|
 	end
 end
 
+$trace = Rake.application.options.trace ? true : false
+$dryrun = Rake.application.options.dryrun ? true : false
+
 
 # Load any remaining task libraries
-Pathname.glob( RAKE_TASKDIR + '*.rb' ).each do |tasklib|
-	RELEASE_FILES.include( tasklib )
-
+RAKE_TASKLIBS.each do |tasklib|
 	next if tasklib =~ %r{/(helpers|svn|verifytask)\.rb$}
 	begin
 		require tasklib
@@ -173,15 +200,8 @@ Pathname.glob( RAKE_TASKDIR + '*.rb' ).each do |tasklib|
 	end
 end
 
-$trace = Rake.application.options.trace ? true : false
-$dryrun = Rake.application.options.dryrun ? true : false
-
 # Load any project-specific rules defined in 'Rakefile.local' if it exists
-LOCAL_RAKEFILE = BASEDIR + 'Rakefile.local'
-if LOCAL_RAKEFILE.exist?
-	import LOCAL_RAKEFILE 
-	RELEASE_FILES.include( LOCAL_RAKEFILE.to_s )
-end
+import LOCAL_RAKEFILE if LOCAL_RAKEFILE.exist?
 
 
 #####################################################################
@@ -189,26 +209,53 @@ end
 #####################################################################
 
 ### Default task
-task :default  => [:clean, :spec, :rdoc, :package]
+task :default  => [:clean, :local, :spec, :rdoc, :package]
+
+### Task the local Rakefile can append to -- no-op by default
+task :local
 
 
 ### Task: clean
 CLEAN.include 'coverage'
 CLOBBER.include 'artifacts', 'coverage.info', PKGDIR
 
+# Target to hinge on ChangeLog updates
+file SVN_ENTRIES
 
-### Cruisecontrol task
+### Task: changelog
+file 'ChangeLog' => SVN_ENTRIES.to_s do |task|
+	log "Updating #{task.name}"
+
+	changelog = make_svn_changelog()
+	File.open( task.name, 'w' ) do |fh|
+		fh.print( changelog )
+	end
+end
+
+
+### Task: cruise (Cruisecontrol task)
 desc "Cruisecontrol build"
 task :cruise => [:clean, :spec, :package] do |task|
 	raise "Artifacts dir not set." if ARTIFACTS_DIR.to_s.empty?
 	artifact_dir = ARTIFACTS_DIR.cleanpath
 	artifact_dir.mkpath
 	
-	$stderr.puts "Copying coverage stats..."
-	FileUtils.cp_r( 'coverage', artifact_dir )
+	coverage = BASEDIR + 'coverage'
+	if coverage.exist? && coverage.directory?
+		$stderr.puts "Copying coverage stats..."
+		FileUtils.cp_r( 'coverage', artifact_dir )
+	end
 	
 	$stderr.puts "Copying packages..."
 	FileUtils.cp_r( FileList['pkg/*'].to_a, artifact_dir )
 end
 
+
+desc "Update the build system to the latest version"
+task :update_build do
+	log "Updating the build system"
+	sh 'svn', 'up', RAKE_TASKDIR
+	log "Updating the Rakefile"
+	sh 'rake', '-f', RAKE_TASKDIR + 'Metarakefile'
+end
 

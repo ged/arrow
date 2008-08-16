@@ -1,14 +1,22 @@
 --- 
-project_description: A mod_ruby web application framework
+rubyforge_project: arrow
+project_requirements: 
+  mod_ruby: ">= 1.2.6"
+  Apache: ">= 2.2.6"
+project_description: |-
+  Arrow is a web application framework for mod_ruby. It was designed to make
+  development of web applications under Apache easier and more fun without
+  sacrificing the power of being able to access the native Apache API.
+rubyforge_group: deveiate
 author_name: Michael Granger
-project_homepage: http://deveiate.org/projects/Arrow
+project_homepage: http://deveiate.org/projects/Arrow/
+project_dependencies: 
+  formvalidator: ">= 0.1.4"
+  ruby-cache: ">= 0.3.0"
+  PluginFactory: ">= 1.0.3"
+project_summary: A mod_ruby web application framework
 project_name: Arrow
+additional_pkgfiles: 
+- applets/**/*.rb
+- docs/manual/**
 author_email: ged@FaerieMUD.org
-project_dependencies:
-  ruby-cache: '>= 0.3.0'
-  formvalidator: '>= 0.1.4'
-  PluginFactory: '>= 1.0.3'
-project_requirements:
-  Apache: >= 2.2.6
-  mod_ruby: >= 1.2.6
-

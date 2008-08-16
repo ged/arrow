@@ -83,20 +83,20 @@ class Arrow::Transaction < Arrow::Object
 	### +broker+ object (an Arrow::Broker), and +session+ (Arrow::Session)
 	### objects.
 	def initialize( request, config, broker )
-		@request			= request
-		@config				= config
-		@broker				= broker
-		@handler_status     = Apache::OK
+		@request         = request
+		@config          = config
+		@broker          = broker
+		@handler_status  = Apache::OK
 
-		@serial				= make_transaction_serial( request )
+		@serial          = make_transaction_serial( request )
 
 		# Stuff that may be filled in later
-		@session			= nil # Lazily-instantiated
-		@applet_path		= nil # Added by the broker
-		@vargs				= nil # Filled in by the applet
-		@data				= {}
-		@request_cookies	= parse_cookies( request )
-		@cookies			= Arrow::CookieSet.new()
+		@session         = nil # Lazily-instantiated
+		@applet_path     = nil # Added by the broker
+		@vargs           = nil # Filled in by the applet
+		@data            = {}
+		@request_cookies = parse_cookies( request )
+		@cookies         = Arrow::CookieSet.new()
 
 		# Check for a "RubyOption root_dispatcher true"
 		if @request.options.key?('root_dispatcher') &&
@@ -524,7 +524,7 @@ class Arrow::Transaction < Arrow::Object
 
 	### Parse cookies from the specified request and return them in a Hash.
 	def parse_cookies( request )
-		hash = Arrow::Cookie.parse(request.headers_in['cookie'])
+		hash = Arrow::Cookie.parse( request.headers_in['cookie'] )
 		return Arrow::CookieSet.new( hash.values )
 	end
 	
