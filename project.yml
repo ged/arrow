@@ -16,6 +16,7 @@ project_dependencies:
   PluginFactory: ">= 1.0.3"
 project_summary: A mod_ruby web application framework
 project_name: Arrow
+version_file: arrow.rb
 additional_pkgfiles: 
 - applets/**/*.rb
 - docs/manual/**
