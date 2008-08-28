@@ -345,6 +345,17 @@ describe Arrow::FormValidator do
 		@validator[:bool_constraint].should be_true()
 	end
 	
+	it "accepts the value '1' for fields with boolean constraints" do
+		params = {'required' => '1', 'bool_constraint' => '1'}
+	
+		@validator.validate( params )
+
+		@validator.should be_okay()
+		@validator.should_not have_errors()
+
+		@validator[:bool_constraint].should be_true()
+	end
+	
 	it "accepts the value 'false' for fields with boolean constraints" do
 		params = {'required' => '1', 'bool_constraint' => 'false'}
 	
@@ -380,6 +391,17 @@ describe Arrow::FormValidator do
 	
 	it "accepts the value 'n' for fields with boolean constraints" do
 		params = {'required' => '1', 'bool_constraint' => 'n'}
+	
+		@validator.validate( params )
+
+		@validator.should be_okay()
+		@validator.should_not have_errors()
+
+		@validator[:bool_constraint].should be_false()
+	end
+
+	it "accepts the value '0' for fields with boolean constraints" do
+		params = {'required' => '1', 'bool_constraint' => '0'}
 	
 		@validator.validate( params )
 

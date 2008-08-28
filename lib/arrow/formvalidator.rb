@@ -305,9 +305,9 @@ class Arrow::FormValidator < ::FormValidator
 	### Constrain a value to +true+ (or +yes+) and +false+ (or +no+).
 	def match_boolean( val )
 		rval = nil
-		if ( val =~ /^(t(?:rue)?|y(?:es)?)$/i )
+		if ( val =~ /^(t(?:rue)?|y(?:es)?)|1$/i )
 			rval = true
-		elsif ( val =~ /^(no?|f(?:alse)?)$/i )
+		elsif ( val =~ /^(no?|f(?:alse)?)|0$/i )
 			rval = false
 		end
 		
