@@ -689,7 +689,7 @@ class Arrow::Applet < Arrow::Object
 
 		# Create a new validator object, map the request args into a regular
 		# hash, and then send them to the validaator with the applicable profile
-		self.log.debug "Creating form validator for profile: %p" % profile
+		self.log.debug "Creating form validator for profile: %p" % [ profile ]
 
 		params = {}
 

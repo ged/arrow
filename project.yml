@@ -20,4 +20,6 @@ version_file: arrow.rb
 additional_pkgfiles: 
 - applets/**/*.rb
 - docs/manual/**
+dev_dependencies: {}
+
 author_email: ged@FaerieMUD.org
