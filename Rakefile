@@ -21,9 +21,10 @@ BEGIN {
 	$LOAD_PATH.unshift( extdir.to_s ) unless $LOAD_PATH.include?( extdir.to_s )
 }
 
+require 'rubygems'
+gem 'rake', '>= 0.8.3'
 
 require 'rbconfig'
-require 'rubygems'
 require 'rake'
 require 'rake/rdoctask'
 require 'rake/testtask'
