@@ -1,0 +1,58 @@
+# 
+# Local project Rakefile tasks
+# $Id$
+# 
+# 
+
+APPLETSDIR              = DATADIR + 'applets'
+TEMPLATESDIR            = DATADIR + 'templates'
+
+DEMO_APPLETS            = Pathname.glob( APPLETSDIR + '**/*.rb' )
+DEMO_TEMPLATES          = Pathname.glob( TEMPLATESDIR + '**/*.tmpl' )
+
+DEMO_APPLETS_NAME       = 'arrow-demo-applets'
+DEMO_APPLETS_GEM_NAME   = "#{DEMO_APPLETS_NAME}-#{PKG_VERSION}"
+DEMO_APPLETS_GEM        = PKGDIR + "#{DEMO_APPLETS_GEM_NAME}.gem"
+
+DEMO_APPLETS_PKGDIR     = PKGDIR + "#{DEMO_APPLETS_NAME}-#{PKG_VERSION}"
+DEMO_APPLETS_DATADIR    = DEMO_APPLETS_PKGDIR + 'data'
+DEMO_APPLETS_GEM_FILES  = (DEMO_APPLETS + DEMO_TEMPLATES).collect {|pn|
+	DEMO_APPLETS_DATADIR + pn.relative_path_from(BASEDIR)
+}
+
+
+DEMO_APPLETS_GEMSPEC = Gem::Specification.new do |gem|
+	gem.name              = DEMO_APPLETS_NAME
+	gem.version           = PKG_VERSION
+
+	gem.summary           = "A collection of demo applets for Arrow"
+	gem.description       = <<-EOD
+	This is a collection of demo applets for exploring various features of
+	Arrow.
+	EOD
+
+	gem.authors           = 'Michael Granger'
+	gem.email             = 'ged@FaerieMUD.org'
+	gem.homepage          = 'http://deveiate.org/projects/Arrow/'
+	gem.rubyforge_project = RUBYFORGE_PROJECT
+
+	gem.has_rdoc          = false
+
+	gem.files             = DEMO_APPLETS + DEMO_TEMPLATES
+		
+	gem.add_runtime_dependency( 'arrow', PKG_VERSION )
+end
+
+
+desc "Build a gem for the demo applets (#{DEMO_APPLETS_GEM})"
+task :demo_applets_gem => DEMO_APPLETS_GEM.to_s
+
+file DEMO_APPLETS_GEM.to_s => [PKGDIR.to_s] + DEMO_APPLETS_GEM_FILES do
+	when_writing( "Creating GEM" ) do
+		Gem::Builder.new( DEMO_APPLETS_GEMSPEC ).build
+		verbose( true ) do
+			mv GEM_FILE_NAME, gempath
+		end
+	end
+end
+	

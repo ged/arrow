@@ -10,10 +10,10 @@ BEGIN {
 }
 
 begin
-	require 'spec/runner'
+	require 'spec'
 	require 'apache/fakerequest'
 	require 'arrow'
-	require 'arrow/spechelpers'
+	require 'spec/lib/helpers'
 	require 'arrow/transaction'
 	require 'date'
 rescue LoadError

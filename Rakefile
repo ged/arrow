@@ -40,14 +40,25 @@ LIBDIR        = BASEDIR + 'lib'
 EXTDIR        = BASEDIR + 'ext'
 DOCSDIR       = BASEDIR + 'docs'
 PKGDIR        = BASEDIR + 'pkg'
+DATADIR       = BASEDIR + 'data'
 
 PROJECT_NAME  = 'Arrow'
 PKG_NAME      = PROJECT_NAME.downcase
 PKG_SUMMARY   = 'A mod_ruby web application framework'
+
 VERSION_FILE  = LIBDIR + 'arrow.rb'
-PKG_VERSION   = VERSION_FILE.read[ /VERSION = '(\d+\.\d+\.\d+)'/, 1 ]
+if VERSION_FILE.exist? && buildrev = ENV['CC_BUILD_LABEL']
+	PKG_VERSION = VERSION_FILE.read[ /VERSION\s*=\s*['"](\d+\.\d+\.\d+)['"]/, 1 ] + '.' + buildrev
+elsif VERSION_FILE.exist?
+	PKG_VERSION = VERSION_FILE.read[ /VERSION\s*=\s*['"](\d+\.\d+\.\d+)['"]/, 1 ]
+else
+	PKG_VERSION = '0.0.0'
+end
+
 PKG_FILE_NAME = "#{PKG_NAME.downcase}-#{PKG_VERSION}"
 GEM_FILE_NAME = "#{PKG_FILE_NAME}.gem"
+
+EXTCONF       = EXTDIR + 'extconf.rb'
 
 ARTIFACTS_DIR = Pathname.new( ENV['CC_BUILD_ARTIFACTS'] || 'artifacts' )
 
@@ -55,6 +66,7 @@ TEXT_FILES    = %w( Rakefile ChangeLog README LICENSE ).collect {|filename| BASE
 BIN_FILES     = Pathname.glob( BINDIR + '*' ).delete_if {|item| item =~ /\.svn/ }
 LIB_FILES     = Pathname.glob( LIBDIR + '**/*.rb' ).delete_if {|item| item =~ /\.svn/ }
 EXT_FILES     = Pathname.glob( EXTDIR + '**/*.{c,h,rb}' ).delete_if {|item| item =~ /\.svn/ }
+DATA_FILES    = Pathname.glob( DATADIR + '**/*' ).delete_if {|item| item =~ /\.svn/ }
 
 SPECDIR       = BASEDIR + 'spec'
 SPECLIBDIR    = SPECDIR + 'lib'
@@ -70,8 +82,7 @@ RAKE_TASKLIBS = Pathname.glob( RAKE_TASKDIR + '*.rb' )
 LOCAL_RAKEFILE = BASEDIR + 'Rakefile.local'
 
 EXTRA_PKGFILES = []
-EXTRA_PKGFILES.concat Pathname.glob( BASEDIR + 'applets/**/*.rb' ).delete_if {|item| item =~ /\.svn/ } 
-EXTRA_PKGFILES.concat Pathname.glob( BASEDIR + 'docs/manual/**' ).delete_if {|item| item =~ /\.svn/ } 
+EXTRA_PKGFILES.concat Pathname.glob( BASEDIR + 'docs/manual/{layouts,lib,resources,source}/**' ).delete_if {|item| item =~ /\.svn/ } 
 
 RELEASE_FILES = TEXT_FILES + 
 	SPEC_FILES + 
@@ -79,6 +90,7 @@ RELEASE_FILES = TEXT_FILES +
 	BIN_FILES +
 	LIB_FILES + 
 	EXT_FILES + 
+	DATA_FILES + 
 	RAKE_TASKLIBS +
 	EXTRA_PKGFILES
 
@@ -130,8 +142,8 @@ SMTP_HOST = 'mail.faeriemud.org'
 SMTP_PORT = 465 # SMTP + SSL
 
 # Project constants
-PROJECT_HOST = 'deveiate.org'
-PROJECT_PUBDIR = "/usr/local/www/public/code"
+PROJECT_HOST = 'deveiate'
+PROJECT_PUBDIR = '/usr/local/www/public/code'
 PROJECT_DOCDIR = "#{PROJECT_PUBDIR}/#{PKG_NAME}"
 PROJECT_SCPPUBURL = "#{PROJECT_HOST}:#{PROJECT_PUBDIR}"
 PROJECT_SCPDOCURL = "#{PROJECT_HOST}:#{PROJECT_DOCDIR}"
@@ -142,9 +154,9 @@ RUBYFORGE_PROJECT = 'arrow'
 
 # Gem dependencies: gemname => version
 DEPENDENCIES = {
+	'pluginfactory' => '>= 1.0.3',
 	'formvalidator' => '>= 0.1.4',
 	'ruby-cache' => '>= 0.3.0',
-	'PluginFactory' => '>= 1.0.3',
 }
 
 # Developer Gem dependencies: gemname => version
@@ -166,7 +178,7 @@ DEVELOPMENT_DEPENDENCIES = {
 # Non-gem requirements: packagename => version
 REQUIREMENTS = {
 	'mod_ruby' => '>= 1.2.6',
-	'Apache' => '>= 2.2.6',
+	'Apache' => '>= 2.2.8',
 }
 
 # RubyGem specification
@@ -180,6 +192,14 @@ GEMSPEC   = Gem::Specification.new do |gem|
 	development of web applications under Apache easier and more fun without
 	sacrificing the power of being able to access the native Apache API.
 	EOD
+	gem.post_install_message = <<-EOD
+	You will need to install mod_ruby separately if you have not already done so.
+	
+	  http://modruby.net/
+	
+	There is a collection of example applets and templates you can check out in the
+	data/ directory.
+	EOD
 
 	gem.authors           = 'Michael Granger'
 	gem.email             = 'ged@FaerieMUD.org'
@@ -188,9 +208,15 @@ GEMSPEC   = Gem::Specification.new do |gem|
 
 	gem.has_rdoc          = true
 	gem.rdoc_options      = RDOC_OPTIONS
+	gem.extra_rdoc_files  = %w[ChangeLog README LICENSE]
 
 	gem.bindir            = BINDIR.relative_path_from(BASEDIR).to_s
-	
+	gem.executables       = BIN_FILES.select {|pn| pn.executable? }.
+		collect {|pn| pn.relative_path_from(BINDIR).to_s }
+
+	if EXTCONF.exist?
+		gem.extensions << EXTCONF.relative_path_from( BASEDIR ).to_s
+	end
 
 	gem.files             = RELEASE_FILES.
 		collect {|f| f.relative_path_from(BASEDIR).to_s }
@@ -275,7 +301,7 @@ end
 desc "Cruisecontrol build"
 task :cruise => [:clean, 'spec:quiet', :package] do |task|
 	raise "Artifacts dir not set." if ARTIFACTS_DIR.to_s.empty?
-	artifact_dir = ARTIFACTS_DIR.cleanpath
+	artifact_dir = ARTIFACTS_DIR.cleanpath + ENV['CC_BUILD_LABEL']
 	artifact_dir.mkpath
 	
 	coverage = BASEDIR + 'coverage'

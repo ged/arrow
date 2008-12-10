@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 # 
-# This file contains the Arrow::Wiki class, a small collection of data classes
+# The Arrow::Wiki class, a small collection of data classes
 # used by the demo Arrow wiki application.
 # 
 # == Subversion ID
@@ -11,9 +11,9 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #

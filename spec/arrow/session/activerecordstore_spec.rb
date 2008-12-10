@@ -11,7 +11,7 @@ BEGIN {
 
 begin
 	require 'digest/md5'
-	require 'spec/runner'
+	require 'spec'
 	require 'apache/fakerequest'
 	require 'arrow'
 	require 'arrow/session/sha1id'

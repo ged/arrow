@@ -1,8 +1,14 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Session::Id class, a derivative of
-# Arrow::Object. Instances of concrete derivatives of this class are used as
-# session IDs in Arrow::Session objects.
+
+require 'pluginfactory'
+
+require 'arrow/object'
+require 'arrow/mixins'
+require 'arrow/session'
+
+# The Arrow::Session::Id class, a derivative of Arrow::Object. Instances of 
+# concrete derivatives of this class are used as session IDs in Arrow::Session 
+# objects.
 # 
 # == Subversion Id
 #
@@ -12,21 +18,12 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'pluginfactory'
-
-require 'arrow/object'
-require 'arrow/mixins'
-require 'arrow/session'
-
-
-### Session ID class for in Arrow::Session objects.
 class Arrow::Session::Id < Arrow::Object
 	include PluginFactory
 

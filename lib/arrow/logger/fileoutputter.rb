@@ -1,7 +1,11 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Logger::FileOutputter class, a derivative of
-# Apache::Logger::Outputter. This is a logger outputter that writes to a
+
+require 'stringio'
+require 'arrow/logger'
+require 'arrow/logger/outputter'
+
+# The Arrow::Logger::FileOutputter class, a derivative of
+# Apache::Logger::Outputter. This is an outputter that writes to a
 # file or other filehandle.
 # 
 # == Subversion Id
@@ -12,17 +16,12 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'stringio'
-require 'arrow/logger'
-
-### This is an Arrow::Logger::Outputter that writes to an IO object.
 class Arrow::Logger::FileOutputter < Arrow::Logger::Outputter
 
 	# SVN Revision
@@ -32,10 +31,10 @@ class Arrow::Logger::FileOutputter < Arrow::Logger::Outputter
 	SVNId = %q$Id$
 
 	# The default description
-	DefaultDescription = "File Outputter"
+	DEFAULT_DESCRIPTION = "File Outputter"
 
 	# The default format (copied from the superclass)
-	DefaultFormat = Arrow::Logger::Outputter::DefaultFormat
+	DEFAULT_FORMAT = Arrow::Logger::Outputter::DEFAULT_FORMAT
 
 
 	#############################################################
@@ -48,7 +47,7 @@ class Arrow::Logger::FileOutputter < Arrow::Logger::Outputter
 	### to File.open, or an Integer file descriptor, in which case a new IO
 	### object is created which appends to the file handle matching that
 	### descriptor.
-	def initialize( uri, description=DefaultDescription, format=DefaultFormat )
+	def initialize( uri, description=DEFAULT_DESCRIPTION, format=DEFAULT_FORMAT )
 		if uri.hierarchical?
 			@io = File.open( uri.path, File::WRONLY|File::CREAT )
 		else

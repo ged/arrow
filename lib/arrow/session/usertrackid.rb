@@ -1,8 +1,11 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Session::UsertrackId class, a derivative of
-# Arrow::Session::Id. This class creates session id objects which uses Apache's
-# builtin mod_usertrack for the session key.
+
+require 'arrow/exceptions'
+require 'arrow/session/id'
+
+# The Arrow::Session::UsertrackId class, a derivative of Arrow::Session::Id. 
+# This class creates session id objects which uses Apache's builtin 
+# mod_usertrack for the session key.
 # 
 # == Subversion Id
 #
@@ -12,17 +15,12 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'arrow/exceptions'
-require 'arrow/session/id'
-
-### A session id object which uses Apache's builtin mod_usertrack id..
 class Arrow::Session::UserTrackId < Arrow::Session::Id
 
 	# SVN Revision

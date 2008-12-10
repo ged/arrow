@@ -152,7 +152,7 @@ class Arrow::TestCase < Test::Unit::TestCase
 	### Append a setup block for the current testcase
 	def self::addSetupBlock( &block )
 		@@methodCounter += 1
-		newMethodName = "setup_#{@@methodCounter}".intern
+		newMethodName = "setup_#{@@methodCounter}".to_sym
 		define_method( newMethodName, &block )
 		self.setupMethods.push newMethodName
 	end
@@ -161,7 +161,7 @@ class Arrow::TestCase < Test::Unit::TestCase
 	### Prepend a teardown block for the current testcase
 	def self::addTeardownBlock( &block )
 		@@methodCounter += 1
-		newMethodName = "teardown_#{@@methodCounter}".intern
+		newMethodName = "teardown_#{@@methodCounter}".to_sym
 		define_method( newMethodName, &block )
 		self.teardownMethods.unshift newMethodName
 	end
@@ -377,7 +377,7 @@ class Arrow::TestCase < Test::Unit::TestCase
 	### is equal to the specified +value+. The '@' at the beginning of the
 	### +sym+ will be prepended if not present.
 	def assert_ivar_equal( value, object, sym )
-		sym = "@#{sym}".intern unless /^@/ =~ sym.to_s
+		sym = "@#{sym}".to_sym unless /^@/ =~ sym.to_s
 		msg = "Instance variable '%s'\n\tof <%s>\n\texpected to be <%s>\n" %
 			[ sym, object.inspect, value.inspect ]
 		msg += "\tbut was: <%p>" % [ object.instance_variable_get(sym) ]

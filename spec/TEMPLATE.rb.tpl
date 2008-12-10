@@ -10,7 +10,7 @@ BEGIN {
 }
 
 begin
-	require 'spec/runner'
+	require 'spec'
 	require 'arrow'
 	require 'arrow/#{vars[:specified_class].downcase}'
 rescue LoadError

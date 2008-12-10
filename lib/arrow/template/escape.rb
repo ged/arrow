@@ -1,6 +1,10 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Template::EscapeDirective class, a derivative of
+
+require 'arrow/exceptions'
+require 'arrow/path'
+require 'arrow/template/call'
+
+# The Arrow::Template::EscapeDirective class, a derivative of
 # Arrow::Template::CallDirective. This is the class which defines the behaviour
 # of the 'escape' template directive., which HTML escapes the stringified
 # version of its associated attribute/s.
@@ -18,19 +22,12 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'arrow/exceptions'
-require 'arrow/utils'
-require 'arrow/template/call'
-
-### The class which defines the behaviour of the 'escape'
-### template directive.
 class Arrow::Template::EscapeDirective < Arrow::Template::CallDirective # :nodoc:
 
 	# SVN Revision

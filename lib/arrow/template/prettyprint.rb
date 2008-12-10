@@ -1,6 +1,12 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Template::PrettyPrintDirective class, a
+
+require 'arrow/exceptions'
+require 'arrow/path'
+require 'arrow/template/call'
+
+require 'pp'
+
+# The Arrow::Template::PrettyPrintDirective class, a
 # derivative of Arrow::Template::CallDirective. This is the class which
 # defines the behaviour of the 'prettyprint' template directive, which
 # prettyprints and HTML-escapes its associated attribute/s.
@@ -17,21 +23,12 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'arrow/exceptions'
-require 'arrow/utils'
-require 'arrow/template/call'
-
-require 'pp'
-
-### The class which defines the behaviour of the 'prettyprint'
-### template directive.
 class Arrow::Template::PrettyPrintDirective < Arrow::Template::CallDirective # :nodoc:
 
 	# SVN Revision

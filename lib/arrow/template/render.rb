@@ -1,6 +1,9 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Template::RenderDirective class, a derivative of
+
+require 'arrow/template/nodes'
+require 'arrow/template/parser'
+
+# The Arrow::Template::RenderDirective class, a derivative of
 # Arrow::Template::Directive. This is the class which defines the
 # behaviour of the 'render' template directive.
 # 
@@ -16,17 +19,12 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'arrow/template/nodes'
-require 'arrow/template/parser'
-
-### The class which defines the behaviour of the 'render' template directive.
 class Arrow::Template::RenderDirective < Arrow::Template::AttributeDirective # :nodoc:
 	include Arrow::Template::Parser::Patterns
 

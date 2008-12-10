@@ -1,24 +1,4 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Session::Lock class, which is the abstract
-# superclass for session lock object classes. Locks are objects which fulfill
-# the locking interface of Arrow::Session, providing a way of serializing
-# access to session data.
-# 
-# == Subversion Id
-#
-#  $Id$
-# 
-# == Authors
-# 
-# * Michael Granger <ged@FaerieMUD.org>
-# 
-#:include: LICENSE
-#
-#---
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
-#
 
 require 'uri'
 require 'pluginfactory'
@@ -29,9 +9,13 @@ require 'arrow/mixins'
 require 'arrow/session'
 
 
-# The abstract base class for session lock manager objects. To derive your own
-# lock manager classes from this class, you'll need to follow the following
-# interface:
+# The Arrow::Session::Lock class, which is the abstract
+# superclass for session lock object classes. Locks are objects which fulfill
+# the locking interface of Arrow::Session, providing a way of serializing
+# access to session data.
+# 
+# To derive your own lock manager classes from this class, you'll need to 
+# follow the following interface:
 #
 # === Derivative Interface ===
 # 
@@ -54,6 +38,20 @@ require 'arrow/session'
 # #release_write_lock::
 #   Release an exclusive lock on the session data.
 # 
+# == Subversion Id
+#
+#  $Id$
+# 
+# == Authors
+# 
+# * Michael Granger <ged@FaerieMUD.org>
+# 
+# :include: LICENSE
+#
+#--
+#
+# Please see the file LICENSE in the BASE directory for licensing details.
+#
 class Arrow::Session::Lock < Arrow::Object
 	include PluginFactory
 
@@ -263,8 +261,6 @@ class Arrow::Session::Lock < Arrow::Object
 			"%s does not provide an implementation of #release_write_lock." %
 			self.class.name
 	end
-
-
 
 end # class Arrow::Session::Lock
 

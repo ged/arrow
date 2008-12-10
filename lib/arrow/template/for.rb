@@ -1,6 +1,12 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Template::ForDirective class, a derivative of
+
+require 'arrow/exceptions'
+require 'arrow/path'
+require 'arrow/template'
+require 'arrow/template/nodes'
+require 'arrow/template/iterator'
+
+# The Arrow::Template::ForDirective class, a derivative of
 # Arrow::Template::BracketingDirective. This is the class which defines the
 # behaviour of the 'for' template directive.
 #
@@ -58,21 +64,12 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'arrow/exceptions'
-require 'arrow/utils'
-require 'arrow/template'
-require 'arrow/template/nodes'
-require 'arrow/template/iterator'
-
-### The class which defines the behaviour of the 'for'
-### template directive.
 class Arrow::Template::ForDirective < Arrow::Template::BracketingDirective # :nodoc:
 	include Arrow::Template::Parser::Patterns
 

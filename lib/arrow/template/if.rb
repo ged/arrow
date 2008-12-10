@@ -1,6 +1,9 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Template::IfDirective class, a derivative of
+
+require 'arrow/template'
+require 'arrow/template/nodes'
+
+# The Arrow::Template::IfDirective class, a derivative of
 # Arrow::Template::BracketingDirective. Instances of this class represent a
 # section of a template that is rendered conditionally.
 #
@@ -23,17 +26,12 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'arrow/template'
-require 'arrow/template/nodes'
-
-### Conditional directive node object class.
 class Arrow::Template::IfDirective < Arrow::Template::BracketingDirective # :nodoc:
 	include Arrow::Template::ConditionalDirective
 

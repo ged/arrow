@@ -1,24 +1,4 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Session::Store class, a derivative of
-# Arrow::Object. Instances of concrete deriviatives of this class provide
-# serialization and semi-permanent storage of session data for Arrow::Session
-# objects.
-#
-# == Subversion Id
-#
-#  $Id$
-# 
-# == Authors
-# 
-# * Michael Granger <ged@FaerieMUD.org>
-# 
-#:include: LICENSE
-#
-#---
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
-#
 
 require 'forwardable'
 require 'pluginfactory'
@@ -28,7 +8,9 @@ require 'arrow/exceptions'
 require 'arrow/session'
 require 'arrow/session/lock'
 
-# Serialization and semi-permanent session-data storage class.
+# The Arrow::Session::Store class, a derivative of Arrow::Object. Instances 
+# of concrete deriviatives of this class provide serialization and semi-permanent 
+# storage of session data for Arrow::Session objects.
 #
 # === Derivative Interface ===
 # 
@@ -104,7 +86,20 @@ require 'arrow/session/lock'
 #     return DBITransactionLock.new( idobj.to_s )
 #   end
 #
+# == Subversion Id
+#
+#  $Id$
 # 
+# == Authors
+# 
+# * Michael Granger <ged@FaerieMUD.org>
+# 
+# :include: LICENSE
+#
+#--
+#
+# Please see the file LICENSE in the BASE directory for licensing details.
+#
 class Arrow::Session::Store < Arrow::Object
 	include PluginFactory
 	extend Forwardable
@@ -382,6 +377,4 @@ class Arrow::Session::Store < Arrow::Object
 		return newhash
 	end
 	
-
-
 end # class Arrow::Session::Store

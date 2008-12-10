@@ -1,11 +1,19 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Template class, instances of which are used to
-# generate X(HT)ML output for Arrow applications.
+
+require 'forwardable'
+
+require 'arrow/mixins'
+require 'arrow/exceptions'
+require 'arrow/object'
+require 'arrow/path'
+
+
+# The Arrow::Template class, instances of which are used to
+# generate output for Arrow applications.
 # 
 # == Synopsis
 # 
-#   
+#   :TODO: Write some useful Arrow::Template examples
 # 
 # == Subversion Id
 #
@@ -15,24 +23,15 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'forwardable'
-
-require 'arrow/mixins'
-require 'arrow/exceptions'
-require 'arrow/object'
-require 'arrow/utils'
-
-
-### The default template class for Arrow.
 class Arrow::Template < Arrow::Object
 	extend Forwardable
+	include Arrow::HashUtilities
 
 	require 'arrow/template/parser'
 	require 'arrow/template/nodes'
@@ -47,7 +46,7 @@ class Arrow::Template < Arrow::Object
 
 	# Configuration defaults. Valid members are the same as those listed for
 	# the +config+ item of the #new method.
-	Defaults = {
+	DEFAULTS = {
 		:parserClass			=> Arrow::Template::Parser,
 		:elideDirectiveLines	=> true,
 		:debuggingComments		=> false,
@@ -55,11 +54,11 @@ class Arrow::Template < Arrow::Object
 		:commentEnd				=> ' -->',
 		:strictAttributes		=> false,
 	}
-	Defaults.freeze
+	DEFAULTS.freeze
 
 	# A Hash which specifies the default renderers for different classes of
 	# objects.
-	DefaultRenderers = {
+	DEFAULT_RENDERERS = {
 		Arrow::Template	=> lambda {|subtempl,templ|
 			subtempl.render( nil, nil, templ )
 		},
@@ -122,10 +121,10 @@ class Arrow::Template < Arrow::Object
 
 				# Add accessor and ivar for the definition if it doesn't
 				# already have one.
-				unless self.respond_to?( name.to_s.intern )
+				unless self.respond_to?( name.to_s.to_sym )
 					#self.log.debug "Adding accessor for %s" % name
 					(class << self; self; end).instance_eval {
-						attr_accessor name.to_s.intern
+						attr_accessor name.to_s.to_sym
 					}
 				else
 					#self.log.debug "Already have an accessor for '#{name}'"
@@ -159,7 +158,7 @@ class Arrow::Template < Arrow::Object
 				unless previousSet
 					#self.log.debug "Removing definition '%s' entirely" % name
 					(class << self; self; end).module_eval {
-						remove_method name.to_s.intern
+						remove_method name.to_s.to_sym
 					}
 					remove_instance_variable( "@#{name}" )
 
@@ -312,8 +311,8 @@ class Arrow::Template < Arrow::Object
 	###   +false+ by default, which causes method calls to generate
 	###   attributes with the same name.
 	def initialize( content=nil, config={} )
-		@config = Defaults.merge( config, &Arrow::HashMergeFunction )
-		@renderers = DefaultRenderers.dup
+		@config = DEFAULTS.merge( config, &HashMergeFunction )
+		@renderers = DEFAULT_RENDERERS.dup
 		@attributes = {}
 		@syntax_tree = []
 		@source = content
@@ -442,8 +441,8 @@ class Arrow::Template < Arrow::Object
 			unless @attributes.key?( node.name )
 				#self.log.debug "Installing an attribute for a node named %p" % node.name
 				@attributes[ node.name ] = nil
-				self.add_attribute_accessor( node.name.intern )
-				self.add_attribute_mutator( node.name.intern )
+				self.add_attribute_accessor( node.name.to_sym )
+				self.add_attribute_mutator( node.name.to_sym )
 			else
 				#self.log.debug "Already have a attribute named %p" % node.name
 			end

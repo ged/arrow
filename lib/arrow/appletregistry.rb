@@ -1,6 +1,9 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::AppletRegistry class, a derivative of
+
+require 'arrow/broker'
+require 'forwardable'
+
+# The Arrow::AppletRegistry class, a derivative of
 # Arrow::Object. Instances of this class are responsible for loading and
 # maintaining the collection of Arrow::Applets registered with an 
 # Arrow::Broker.
@@ -13,19 +16,12 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'arrow/broker'
-require 'forwardable'
-
-
-### Instances of this class are responsible for maintaining the collection of
-### Arrow::Applets in an application..
 class Arrow::AppletRegistry < Arrow::Object
 	extend Forwardable
 	include Enumerable, Arrow::Loggable
@@ -56,7 +52,6 @@ class Arrow::AppletRegistry < Arrow::Object
 			@appletclasses = nil
 			@timestamp = File.mtime( path )
 			@exception = nil
-			@loadTime = Time.at( 0 )
 		end
 
 		
@@ -126,7 +121,7 @@ class Arrow::AppletRegistry < Arrow::Object
 
 		### Return the lines from the applet's source as an Array.
 		def source_lines
-			File.readlines( @path )
+			return File.readlines( @path )
 		end
 
 
@@ -201,6 +196,35 @@ class Arrow::AppletRegistry < Arrow::Object
 	end
 
 
+	#################################################################
+	###	C L A S S   M E T H O D S
+	#################################################################
+
+	### Get the 'gem home' from RubyGems and check it for sanity. Returns +nil+ if it
+	### is not an extant, non-world-writable directory.
+	def self::get_safe_gemhome
+		gemhome = Pathname.new( Gem.user_home ) + 'gems'
+		gemhome.untaint
+
+		if ! gemhome.directory?
+			Arrow::Logger[ self ].notice "Gem home '%s' is not a directory; ignoring it" % [ gemhome ]
+			return nil
+		elsif (gemhome.stat.mode & 0002).nonzero?
+			Arrow::Logger[ self ].notice "Gem home '%s' is world-writable; ignoring it" % [ gemhome ]
+			return nil
+		end
+
+		Arrow::Logger[ self ].info "Got safe gem home: %p" % [ gemhome ]
+		return gemhome
+	end
+	
+
+
+
+	#################################################################
+	###	I N S T A N C E   M E T H O D S
+	#################################################################
+
 	# The stuff the registry needs:
 	#
 	# * Map of uri to applet object [maps incoming requests to applet/s]
@@ -210,25 +234,34 @@ class Arrow::AppletRegistry < Arrow::Object
 	def initialize( config )
 		@config = config
 	
+		@path = @config.applets.path
 		@classmap = nil
 		@filemap = {}
 		@urispace = {}
 		@template_factory = Arrow::TemplateFactory.new( config )
-		
+		@load_time = nil
+
+		self.load_gems
 		self.load_applets
+		
 		super()
 	end
+	
 	
 	### Copy initializer -- reload applets for cloned registries.
 	def initialize_copy( other ) # :nodoc:
 		@config = other.config.dup
 
+		@path = @config.applets.path.dup
 		@classmap = nil
 		@filemap = {}
 		@urispace = {}
 		@template_factory = Arrow::TemplateFactory.new( config )
-		
+		@load_time = nil
+
+		self.load_gems
 		self.load_applets
+		
 		super
 	end
 
@@ -247,42 +280,59 @@ class Arrow::AppletRegistry < Arrow::Object
 	# The Arrow::Config object which specified the registry's behavior.
 	attr_reader :config
 	
+	# The Arrow::TemplateFactory which will be given to any loaded applet
+	attr_reader :template_factory
+	
+	# The Time when the registry was last loaded
+	attr_accessor :load_time
+	
+	# The path the registry will search when looking for new/updated/deleted applets
+	attr_reader :path
+	
 
 	# Delegate hash-ish methods to the uri-keyed internal hash
 	def_delegators :@urispace, :[], :[]=, :key?, :keys, :length, :each
 
 
-	### Find the chain of applets indicated by the given +uri+ and return an
-	### Array of ChainLink structs. 
-	def find_applet_chain( uri )
-		self.log.debug "Searching urispace %p for appletchain for %p" %
-		 	[@urispace.keys.sort, uri]
-
-		uri_parts = uri.sub(%r{^/(?=.)}, '').split(%r{/}).grep( IDENTIFIER )
-		appletchain = []
-		args = []
-
-		# If there's an applet installed at the base, prepend it to the
-		# appletchain
-		if @urispace.key?( "" )
-			appletchain << ChainLink.new( @urispace[""], "", uri_parts )
-			self.log.debug "Added base applet to chain."
+	### Check the config for any gems to load, load them, and add their template and applet 
+	### directories to the appropriate parts of the config.
+	def load_gems
+		unless @config.respond_to?( :gems )
+			self.log.debug "No gems section in the config; skipping gemified applets"
+			return
 		end
 
-		# Only allow reference to internal handlers (handlers mapped to 
-		# directories that start with '_') if allow_internal is set.
-		self.log.debug "Split URI into parts: %p" % [uri_parts]
+		# Set this so RubyGems' user_home is untainted so it doesn't poop itself under $SAFE = 1
+		ENV['HOME'] = Apache.server_root.untaint
 
-		# Map uri fragments onto registry entries, stopping at any element 
-		# which isn't a valid Ruby identifier.
-		uri_parts.each_index do |i|
-			newuri = uri_parts[0,i+1].join("/")
-			self.log.debug "Testing %s against %p" % [ newuri, @urispace.keys.sort ]
-			appletchain << ChainLink.new( @urispace[newuri], newuri, uri_parts[(i+1)..-1] ) if
-				@urispace.key?( newuri )
+		# Make sure the 'gem home' is a directory and not world-writable; don't use it
+		# otherwise
+		gemhome = self.class.get_safe_gemhome
+		paths = @config.gems.path.collect {|path| path.untaint }
+		Gem.use_paths( gemhome, paths )
+
+		@config.gems.applets.to_h.each do |gemname, reqstring|
+			reqstring = '>= 0' if reqstring.nil? or reqstring.empty?
+
+			begin
+				self.log.info "Activating gem %s (%s)" % [ gemname, reqstring ]
+				Gem.activate( gemname.to_s, reqstring )
+			rescue LoadError => err
+				self.log.crit "%s while activating '%s': %s" %
+					[ err.class.name, gemname, err.message ]
+				err.backtrace.each do |frame|
+					self.log.debug "  " + frame
+				end
+			else
+				datadir = Pathname.new( Gem.datadir(gemname.to_s) )
+				appletdir = datadir + 'applets'
+				templatedir = datadir + 'templates'
+				self.log.debug "Adding appletdir %p and templatedir %p" %
+					[ appletdir, templatedir ]
+				@path << appletdir.to_s
+				@template_factory.path << templatedir.to_s
+			end
 		end
-
-		return appletchain
 	end
 
 
@@ -319,9 +369,42 @@ class Arrow::AppletRegistry < Arrow::Object
 				[ appletfile, @urispace.length ]
 		end
 
-		@loadTime = Time.now
+		self.load_time = Time.now
 	end
 	alias_method :reload_applets, :load_applets
+
+
+	### Find the chain of applets indicated by the given +uri+ and return an
+	### Array of ChainLink structs. 
+	def find_applet_chain( uri )
+		self.log.debug "Searching urispace for appletchain for %p" % [ uri ]
+
+		uri_parts = uri.sub(%r{^/(?=.)}, '').split(%r{/}).grep( IDENTIFIER )
+		appletchain = []
+		args = []
+
+		# If there's an applet installed at the base, prepend it to the
+		# appletchain
+		if @urispace.key?( "" )
+			appletchain << ChainLink.new( @urispace[""], "", uri_parts )
+			self.log.debug "Added base applet to chain."
+		end
+
+		# Only allow reference to internal handlers (handlers mapped to 
+		# directories that start with '_') if allow_internal is set.
+		self.log.debug "Split URI into parts: %p" % [uri_parts]
+
+		# Map uri fragments onto registry entries, stopping at any element 
+		# which isn't a valid Ruby identifier.
+		uri_parts.each_index do |i|
+			newuri = uri_parts[0,i+1].join("/")
+			# self.log.debug "Testing %s against %p" % [ newuri, @urispace.keys.sort ]
+			appletchain << ChainLink.new( @urispace[newuri], newuri, uri_parts[(i+1)..-1] ) if
+				@urispace.key?( newuri )
+		end
+
+		return appletchain
+	end
 
 
 	### Check the applets path for new/updated/deleted applets if the poll
@@ -329,8 +412,8 @@ class Arrow::AppletRegistry < Arrow::Object
 	def check_for_updates
 		interval = @config.applets.pollInterval
 		if interval.nonzero?
-			if Time.now - @loadTime > interval
-				self.log.debug "Checking for applet updates: poll interval at %ds" % interval
+			if Time.now - self.load_time > interval
+				self.log.debug "Checking for applet updates: poll interval at %ds" % [ interval ]
 				self.reload_applets
 			end
 		else
@@ -338,11 +421,6 @@ class Arrow::AppletRegistry < Arrow::Object
 		end
 	end
 
-
-
-	#########
-	protected
-	#########
 
 	### Remove the applets that were loaded from the given +missing_files+ from
 	### the registry.
@@ -469,25 +547,20 @@ class Arrow::AppletRegistry < Arrow::Object
 		files = []
 		dirCount = 0
 
-		# For each directory in the configured applets path,
-		# fully-qualify it and untaint the specified pathname.
-		@config.applets.path.each do |path|
+		# The Arrow::Path object will only give us extant directories...
+		@path.each do |path|
 
 			# Look for files under a directory
-			if File.directory?( path )
-				dirCount += 1
-				pat = File.join( path, @config.applets.pattern )
-				pat.untaint
+			dirCount += 1
+			pat = File.join( path, @config.applets.pattern )
+			pat.untaint
 
-				self.log.debug "Looking for applets: %p" % pat
-				files.push( *Dir[ pat ] )
-			elsif File.file?( path )
-				files.push( path )
-			end
+			self.log.debug "Looking for applets: %p" % [ pat ]
+			files.push( *Dir[ pat ] )
 		end
 
 		self.log.info "Fetched %d applet file paths from %d directories (out of %d)" %
-			[ files.nitems, dirCount, @config.applets.path.dirs.nitems ]
+			[ files.nitems, dirCount, @path.dirs.nitems ]
 
 		files.each {|file| file.untaint }
 		return files - excludeList

@@ -1,8 +1,15 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::FormValidator class, a derivative of
-# FormValidator. A FormValidator variant that adds some nicities and additional
-# validations.
+
+require 'uri'
+require 'forwardable'
+require 'formvalidator'
+require 'date'
+
+require 'arrow/mixins'
+require 'arrow/exceptions'
+require 'arrow/object'
+
+# A FormValidator variant that adds some convenience methods and additional validations.
 # 
 # == Usage
 #
@@ -50,9 +57,9 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
@@ -82,21 +89,10 @@
 #   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #   
 # 
-#---
+#--
 #
 # Please see the file COPYRIGHT in the 'docs' directory for licensing details.
 #
-
-require 'uri'
-require 'forwardable'
-require 'formvalidator'
-require 'date'
-
-require 'arrow/mixins'
-require 'arrow/exceptions'
-require 'arrow/object'
-
-### Add some Hash-ish methods for convenient access to FormValidator#valid.
 class Arrow::FormValidator < ::FormValidator
 	extend Forwardable
 	include Arrow::Loggable

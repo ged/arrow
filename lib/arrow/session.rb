@@ -1,22 +1,4 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Session class, a derivative of
-# Arrow::Object. This provides a container for maintaining state across multiple transactions.
-# 
-# == Subversion Id
-#
-#  $Id$
-# 
-# == Authors
-# 
-# * Michael Granger <ged@FaerieMUD.org>
-# 
-#:include: LICENSE
-#
-#---
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
-#
 
 require 'uri'
 require 'pluginfactory'
@@ -28,7 +10,23 @@ require 'arrow/logger'
 require 'arrow/config'
 
 
-### This provides a container for maintaining state across multiple transactions.
+# The Arrow::Session class, a container for maintaining state across multiple 
+# transactions.
+# 
+# == Subversion Id
+#
+#  $Id$
+# 
+# == Authors
+# 
+# * Michael Granger <ged@FaerieMUD.org>
+# 
+# :include: LICENSE
+#
+#--
+#
+# Please see the file LICENSE in the BASE directory for licensing details.
+#
 class Arrow::Session < Arrow::Object
 	include PluginFactory,
 		Enumerable,
@@ -52,6 +50,7 @@ class Arrow::Session < Arrow::Object
 	###	C L A S S   M E T H O D S
 	#############################################################
 
+	require 'arrow/config'
 	@config = Arrow::Config.new.session
 	class << self
 		attr_reader :config

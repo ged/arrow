@@ -1,10 +1,16 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Session::ActiveRecordStore class, a derivative of
+
+require 'arrow/exceptions'
+require 'arrow/session/store'
+
+require 'active_record'
+require 'yaml'
+
+# The Arrow::Session::ActiveRecordStore class, a derivative of
 # Arrow::Session::Store. Instances of this class store a session object as a
 # row via an ActiveRecord database abstraction.
 # 
-# == Config URI
+# == Config 
 #  session:
 #    storeType: activerecord:Blog::Session
 #    lockType: null
@@ -17,21 +23,12 @@
 # 
 # * Jeremiah Jordan <phaedrus@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'arrow/exceptions'
-require 'arrow/session/store'
-
-require 'active_record'
-require 'yaml'
-
-
-### ActiveRecord session store class.
 class Arrow::Session::ActiveRecordStore < Arrow::Session::Store
 
 	# SVN Revision

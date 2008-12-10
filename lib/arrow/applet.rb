@@ -1,7 +1,13 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Applet class, which is an abstract base
-# class for Arrow applets.
+
+require 'arrow/mixins'
+require 'arrow/exceptions'
+require 'arrow/object'
+require 'arrow/formvalidator'
+
+# An abstract base class for Arrow applets. Provides execution logic,
+# argument-parsing/untainting/validation, and templating through an injected
+# factory.
 # 
 # == Synopsis
 #
@@ -54,22 +60,12 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'arrow/mixins'
-require 'arrow/exceptions'
-require 'arrow/object'
-require 'arrow/formvalidator'
-
-
-### An abstract base class for Arrow applets. Provides execution logic,
-### argument-parsing/untainting/validation, and templating through an injected
-### factory.
 class Arrow::Applet < Arrow::Object
 
 	# SVN Revision
@@ -148,7 +144,7 @@ class Arrow::Applet < Arrow::Object
 		### Create a new proxy into the given +klass+'s Signature for the
 		### specified +action_name+.
 		def initialize( action_name, klass )
-			@action_name = action_name.to_s.intern
+			@action_name = action_name.to_s.to_sym
 			@signature = klass.signature
 			@signature[:templates] ||= {}
 			@signature[:validator_profiles] ||= {}
@@ -395,7 +391,7 @@ class Arrow::Applet < Arrow::Object
 		# Signature = Struct.new( :name, :description, :maintainer,
 		# 	:version, :config, :default_action, :templates, :validatorArgs,
 		# 	:monitors )
-		members = SignatureStruct.members.collect {|m| m.intern}
+		members = SignatureStruct.members.collect {|m| m.to_sym}
 		return SignatureStruct.new( *rawsig.values_at(*members) )
 	end
 
@@ -575,10 +571,10 @@ class Arrow::Applet < Arrow::Object
 		self.log.debug "In action_missing_action with: raction = %p, args = %p" %
 			[ raction, args ]
 
-		if raction && @signature.templates.key?( raction.to_s.intern )
+		if raction && @signature.templates.key?( raction.to_s.to_sym )
 			self.log.debug "Using template sender default action for %s" % raction
 			txn.vargs = self.make_validator( raction, txn )
-			tmpl = self.load_template( raction.intern )
+			tmpl = self.load_template( raction.to_sym )
 			tmpl.txn = txn
 			return tmpl
 		else

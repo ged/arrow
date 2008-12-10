@@ -1,6 +1,18 @@
 #!/usr/bin/env ruby
+
+require 'rubygems'
+
+require 'uri'
+require 'pluginfactory'
+require 'forwardable'
+require 'uri'
+
+require 'arrow/mixins'
+require 'arrow/exceptions'
+require 'arrow/object'
+
 # 
-# This file contains the Arrow::Config class, instances of which use used to
+# The Arrow::Config class, instances of which use used to
 # load and save configuration values for an Arrow application.
 # 
 # == Description
@@ -90,30 +102,14 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'pp'
-require 'uri'
-require 'pluginfactory'
-require 'forwardable'
-
-require 'arrow/mixins'
-require 'arrow/exceptions'
-require 'arrow/utils'
-require 'arrow/object'
-
-require 'stringio'
-require 'forwardable'
-require 'uri'
-
-### Instances of this class contain configuration values for for an Arrow
-### web application.
 class Arrow::Config < Arrow::Object
+	include Arrow::HashUtilities
 	extend Forwardable
 
 	# SVN Revision
@@ -122,10 +118,18 @@ class Arrow::Config < Arrow::Object
 	# SVN Id
 	SVNId = %q$Id$
 
+	require 'arrow/path'
 
 	# Define the layout and defaults for the underlying structs
 	DEFAULTS = {
 		:logging			=> { :global => 'notice' },
+
+		:gems               => {
+			:require_signed => false,
+			:autoinstall    => false,
+			:path           => Arrow::Path.new([ "gems", *Gem.path ]),
+			:applets        => {},
+		},
 
 		:applets => {
 			:path			=> Arrow::Path.new( "applets:/www/applets" ),
@@ -207,7 +211,7 @@ class Arrow::Config < Arrow::Object
 	### +confighash+ will be used instead of the defaults.
 	def initialize( confighash={} )
 		ihash = internify_keys( untaint_values(confighash) )
-		mergedhash = DEFAULTS.merge( ihash, &Arrow::HashMergeFunction )
+		mergedhash = DEFAULTS.merge( ihash, &HashMergeFunction )
 
 		@struct      = ConfigStruct.new( mergedhash )
 		@create_time = Time.now
@@ -269,7 +273,7 @@ class Arrow::Config < Arrow::Object
 
 	### Returns +true+ for methods which can be autoloaded
 	def respond_to?( sym )
-		return true if @struct.member?( sym.to_s.sub(/(=|\?)$/, '').intern )
+		return true if @struct.member?( sym.to_s.sub(/(=|\?)$/, '').to_sym )
 		super
 	end
 
@@ -307,7 +311,7 @@ class Arrow::Config < Arrow::Object
 
 		confighash = @loader.load( @name )
 		ihash = internify_keys( untaint_values(confighash) )
-		mergedhash = DEFAULTS.merge( ihash, &Arrow::HashMergeFunction )
+		mergedhash = DEFAULTS.merge( ihash, &HashMergeFunction )
 		
 		@struct = ConfigStruct.new( mergedhash )
 
@@ -327,7 +331,7 @@ class Arrow::Config < Arrow::Object
 
 	### Hook up delegators to struct-members as they are called
 	def method_missing( sym, *args )
-		key = sym.to_s.sub( /(=|\?)$/, '' ).intern
+		key = sym.to_s.sub( /(=|\?)$/, '' ).to_sym
 		return nil unless @struct.member?( key )
 
 		self.log.debug( "Autoloading #{key} accessors." )
@@ -381,43 +385,6 @@ class Arrow::Config < Arrow::Object
 	end
 
 
-	### Return a duplicate of the given +hash+ with its identifier-like keys
-	### transformed into symbols from whatever they were before.
-	def internify_keys( hash )
-		newhash = {}
-		
-		hash.each do |key,val|
-			keysym = key.to_s.dup.untaint.to_sym
-			
-			if val.is_a?( Hash )
-				newhash[ keysym ] = internify_keys( val )
-			else
-				newhash[ keysym ] = val
-			end
-		end
-
-		return newhash
-	end
-
-
-	### Return a version of the given +hash+ with its keys transformed
-	### into Strings from whatever they were before.
-	def stringify_keys( hash )
-		newhash = {}
-		
-		hash.each do |key,val|
-			if val.is_a?( Hash )
-				newhash[ key.to_s ] = stringify_keys( val )
-			else
-				newhash[ key.to_s ] = val
-			end
-		end
-
-		return newhash
-	end
-
-
-
 	#############################################################
 	###	I N T E R I O R   C L A S S E S
 	#############################################################
@@ -425,7 +392,7 @@ class Arrow::Config < Arrow::Object
 	### Hash-wrapper that allows struct-like accessor calls on nested
 	### hashes.
 	class ConfigStruct < Arrow::Object
-		include Enumerable
+		include Enumerable, Arrow::HashUtilities
 		extend Forwardable
 
 		# Mask most of Kernel's methods away so they don't collide with
@@ -437,7 +404,7 @@ class Arrow::Config < Arrow::Object
 		}
 
 		# Forward some methods to the internal hash
-		def_delegators :@hash, :keys, :key?, :values, :value?, :[], :[]=, :length,
+		def_delegators :@hash, :keys, :values, :value?, :[], :[]=, :length,
 		    :empty?, :clear
 
 
@@ -491,7 +458,7 @@ class Arrow::Config < Arrow::Object
 		### Return +true+ if the receiver responds to the given
 		### method. Overridden to grok autoloaded methods.
 		def respond_to?( sym, priv=false )
-			key = sym.to_s.sub( /(=|\?)$/, '' ).intern
+			key = sym.to_s.sub( /(=|\?)$/, '' ).to_sym
 			return true if @hash.key?( key )
 			super
 		end
@@ -506,8 +473,10 @@ class Arrow::Config < Arrow::Object
 		### Returns +true+ if the given +name+ is the name of a member of
 		### the receiver.
 		def member?( name )
-			return @hash.key?( name.to_s.intern )
+			return @hash.key?( name.to_s.to_sym )
 		end
+		alias_method :key?, :member?
+		alias_method :has_key?, :key?
 
 
 		### Call into the given block for each member of the receiver.
@@ -524,15 +493,15 @@ class Arrow::Config < Arrow::Object
 			case other
 			when Hash
 				@hash = self.to_h.merge( other,
-					&Arrow::HashMergeFunction )
+					&HashMergeFunction )
 
 			when ConfigStruct
 				@hash = self.to_h.merge( other.to_h,
-					&Arrow::HashMergeFunction )
+					&HashMergeFunction )
 
 			when Arrow::Config
 				@hash = self.to_h.merge( other.struct.to_h,
-					&Arrow::HashMergeFunction )
+					&HashMergeFunction )
 
 			else
 				raise TypeError,
@@ -560,7 +529,7 @@ class Arrow::Config < Arrow::Object
 
 		### Handle calls to key-methods
 		def method_missing( sym, *args )
-			key = sym.to_s.sub( /(=|\?)$/, '' ).intern
+			key = sym.to_s.sub( /(=|\?)$/, '' ).to_sym
 			return nil unless @hash.key?( key )
 
 			self.class.class_eval {

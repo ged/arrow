@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Session::NullLock class, a derivative of
+
+require 'arrow/session/lock'
+
+# The Arrow::Session::NullLock class, a derivative of
 # Arrow::Session::Lock. This is a null lock, in that it does not lock.
 # This is to be used with an ActiveRecord session store that uses
 # Optomistic Concurrency Control.
@@ -13,16 +15,12 @@
 # 
 # * Jeremiah Jordan <phaedrus@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'arrow/session/lock'
-
-### This lock type uses the 'posixlock' library..
 class Arrow::Session::NullLock < Arrow::Session::Lock
 
 	# SVN Revision

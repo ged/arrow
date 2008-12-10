@@ -14,7 +14,7 @@ try( "to subclass Struct as ConfigStruct" ) {
 	class ConfigStruct < Struct
 		def to_h
 			rhash = {}
-			self.members.collect {|name| name.intern}.each {|sym|
+			self.members.collect {|name| name.to_sym}.each {|sym|
 				val = self.send(sym)
 				case val
 				when ConfigStruct

@@ -22,7 +22,7 @@ unless defined? Arrow::TestCase
 	require 'arrow/testcase'
 end
 
-require 'arrow/utils'
+require 'arrow/path'
 
 ### This test suite tests the stage1 (static) parser and the metagrammar it
 ### parses in which the actual parser-generator's behaviour is defined.

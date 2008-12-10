@@ -1,6 +1,10 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Logger::ApacheOutputter class, a derivative of
+
+require 'arrow/mixins'
+require 'arrow/logger'
+require 'arrow/logger/outputter'
+
+# The Arrow::Logger::ApacheOutputter class, a derivative of
 # Apache::Logger::Outputter. Instances of this class write log messages of the
 # corresponding error level to the Apache log
 # 
@@ -12,19 +16,12 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'arrow/mixins'
-require 'arrow/logger'
-require 'arrow/logger/outputter'
-
-### Instances of this class write log messages of the corresponding error
-### level to the Apache log.
 class Arrow::Logger::ApacheOutputter < Arrow::Logger::Outputter
 
 	# SVN Revision

@@ -1,8 +1,10 @@
 #!/usr/bin/env ruby
+
+require 'pluginfactory'
+
 # 
-# This file contains the Arrow::Logger::Outputter class, which is the abstract
-# base class for objects that control where logging output is sent in an
-# Arrow::Logger object. 
+# The Arrow::Logger::Outputter class, which is the abstract base class for 
+# objects that control where logging output is sent in an Arrow::Logger object. 
 # 
 # == Subversion Id
 #
@@ -12,22 +14,12 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'pluginfactory'
-
-require 'arrow/utils'
-require 'arrow/exceptions'
-require 'arrow/logger'
-require 'arrow/mixins'
-
-### This class is the abstract base class for logging outputters for
-### Arrow::Logger.
 class Arrow::Logger::Outputter
 	include PluginFactory
 
@@ -39,11 +31,11 @@ class Arrow::Logger::Outputter
 
 
 	# The default description
-	DefaultDescription = "Logging Outputter"
+	DEFAULT_DESCRIPTION = "Logging Outputter"
 
 	# The default interpolatable string that's used to build the message to
 	# output
-	DefaultFormat =
+	DEFAULT_FORMAT =
 		%q{#{time.strftime('%Y/%m/%d %H:%M:%S')} [#{level}]: #{name} } +
 			%q{#{frame ? '('+frame+')' : ''}: #{msg[0,1024]}}
 
@@ -82,7 +74,7 @@ class Arrow::Logger::Outputter
 
 	### Create a new Arrow::Logger::Outputter object with the given +uri+,
 	### +description+ and sprintf-style +format+.
-	def initialize( uri, description=DefaultDescription, format=DefaultFormat )
+	def initialize( uri, description=DEFAULT_DESCRIPTION, format=DEFAULT_FORMAT )
 		@description = description
 		@format = format
 	end

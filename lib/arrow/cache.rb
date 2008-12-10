@@ -1,8 +1,19 @@
 #!/usr/bin/env ruby
+
+require 'cache'
+require 'forwardable'
+
+require 'arrow/logger'
+require 'arrow/mixins'
+
+
 # 
-# This file contains the Arrow::Cache class, a derivative of the Cache class
-# from the ruby-cache module. It adds a few convenience and introspection
-# methods to its parent.
+# A derivative of the Cache class from the ruby-cache module. It adds a few 
+# convenience and introspection methods to its parent.
+# 
+# Instances of this class are LRU caches for disk-based objects which keep
+# track of the cached object's modification time, expiring the cached
+# version when the disk-based version changes (e.g., for template caching).
 # 
 # == Subversion Id
 #
@@ -12,24 +23,12 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'cache'
-require 'forwardable'
-
-require 'arrow/config'
-require 'arrow/logger'
-require 'arrow/mixins'
-
-
-### Instances of this class are LRU caches for disk-based objects which keep
-### track of the cached object's modification time, expiring the cached
-### version when the disk-based version changes..
 class Arrow::Cache < ::Cache
 	extend Forwardable
 	include Arrow::Loggable
@@ -69,7 +68,7 @@ class Arrow::Cache < ::Cache
 		merged.each_key do |key|
 			lckey = key.to_s.gsub( /(.)([A-Z])/ ) {|match|
 				match[0,1] + "_" + match[1,1].downcase
-			}.intern
+			}.to_sym
 
 			next if key == lckey
 			merged[ lckey ] = merged.delete( key )

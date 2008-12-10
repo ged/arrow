@@ -1,6 +1,11 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the TemplateFactory class, which is responsible for
+
+require 'arrow/mixins'
+require 'arrow/object'
+require 'arrow/exceptions'
+require 'arrow/cache'
+
+# The TemplateFactory class, which is responsible for
 # interpreting the 'templates' section of the configuration, and providing 
 # template-loading and -caching according to that configuration, 
 # 
@@ -12,22 +17,14 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'arrow/mixins'
-require 'arrow/object'
-require 'arrow/exceptions'
-require 'arrow/cache'
-
-### AbstractFactory for templates -- defer specification of which templating
-### system to use until load time, and provide timestamp-based caching for
-### template files.
 class Arrow::TemplateFactory < Arrow::Object
+	require 'arrow/template'
 
 	# SVN Revision
 	SVNRev = %q$Rev$
@@ -53,9 +50,12 @@ class Arrow::TemplateFactory < Arrow::Object
 					"No such template loader class #{name} for #{mod.name}"
 			}
 
-		if klass.respond_to?( :load )
+		if klass.respond_to?( :load, false )
+			Arrow::Logger[ self ].debug "Loader (%s) class responds to ::load; using it directly: %p" %
+				[ klass.name, klass.method(:load) ]
 			return klass
 		else
+			Arrow::Logger[ self ].debug "Loader (%s) expects instantiation." % [ klass.name ]
 			return klass.new( config )
 		end
 	end

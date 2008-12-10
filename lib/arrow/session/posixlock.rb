@@ -1,6 +1,11 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Session::PosixLock class, a derivative of
+
+require 'posixlock'
+require 'ftools'
+
+require 'arrow/session/lock'
+
+# The Arrow::Session::PosixLock class, a derivative of
 # Arrow::Session::Lock. This lock type uses the 'posixlock' library
 # (http://raa.ruby-lang.org/project/posixlock/).
 # 
@@ -12,20 +17,12 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'posixlock'
-require 'ftools'
-
-require 'arrow/session/lock'
-
-
-### This lock type uses the 'posixlock' library..
 class Arrow::Session::PosixLock < Arrow::Session::Lock
 
 	# SVN Revision

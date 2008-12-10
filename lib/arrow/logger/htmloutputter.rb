@@ -1,7 +1,9 @@
 #!/usr/bin/env ruby
-# 
-# Output logging messages in HTML fragments with classes that match 
-# their level. 
+
+require 'arrow/mixins'
+require 'arrow/logger/fileoutputter'
+
+# Output logging messages in HTML fragments with classes that match their level. 
 # 
 # == Subversion Id
 #
@@ -11,17 +13,12 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'arrow/mixins'
-require 'arrow/logger/fileoutputter'
-
-### Output logging messages in ANSI colors according to their level
 class Arrow::Logger::HtmlOutputter < Arrow::Logger::FileOutputter
 	include Arrow::HTMLUtilities
 

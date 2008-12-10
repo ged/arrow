@@ -1,6 +1,11 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Template::Container class, a derivative of
+
+require 'forwardable'
+
+require 'arrow/exceptions'
+require 'arrow/path'
+
+# The Arrow::Template::Container class, a derivative of
 # Arrow::Object. Instances of this class are stateful containers for
 # ContainerDirective nodes .
 # 
@@ -12,20 +17,12 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'forwardable'
-
-require 'arrow/exceptions'
-require 'arrow/utils'
-
-### The class which defines the behaviour of the 'container'
-### template directive.
 class Arrow::Template::Container < Arrow::Object
 	extend Forwardable
 	include Enumerable

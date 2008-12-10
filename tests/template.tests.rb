@@ -83,7 +83,7 @@ class Arrow::TemplateTestCase < Arrow::TestCase
 			# Directive changes look like:
 			# # Set directive
 			when /^### (\w+) directive/i
-				section = $1.downcase.intern
+				section = $1.downcase.to_sym
 				TestTemplates[ section ] ||= {}
 
 			when /^#/
@@ -93,7 +93,7 @@ class Arrow::TemplateTestCase < Arrow::TestCase
 			# === Simple
 			when /^===\s*(.+)/
 				next unless section
-				template = $1.downcase.gsub( /\W+/, '_' ).intern
+				template = $1.downcase.gsub( /\W+/, '_' ).to_sym
 				TestTemplates[section][template] = {
 					:template => '',
 					:code => '',
@@ -162,11 +162,11 @@ class Arrow::TemplateTestCase < Arrow::TestCase
 
 							# Make sure all the attr_underbarred_* methods work
 							TemplateAttr.each do |ivar|
-								assert_has_ivar ivar.intern, template
+								assert_has_ivar ivar.to_sym, template
 								assert_nothing_raised do
-									rval = template.send( "_\#{ivar}".intern )
+									rval = template.send( "_\#{ivar}".to_sym )
 								end
-								assert_ivar_equal rval, template, ivar.intern
+								assert_ivar_equal rval, template, ivar.to_sym
 							end
 
 							# Test attribute hashish setting/getting

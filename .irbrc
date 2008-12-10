@@ -26,17 +26,17 @@ end
 begin
 	puts "Requiring Arrow..."
 	require 'apache/fakerequest'
-	require "arrow"
+	require 'arrow'
 
 	if $DEBUG
 		puts "Turning on logging..."
 		format = colored( %q{#{time} [#{level}]: }, 'cyan' ) +
 			colored( %q{#{name} #{frame ? '('+frame+')' : ''}: #{msg[0,1024]}}, 'white' )
-		outputter = Arrow::Logger::Outputter::create( 'file:deferr', ".irbrc", format )
-		Arrow::Logger::global.outputters << outputter
-		Arrow::Logger::global.level = :debug
+		outputter = Arrow::Logger::Outputter.create( 'file:deferr', ".irbrc", format )
+		Arrow::Logger.global.outputters << outputter
+		Arrow::Logger.global.level = :debug
 
-		Arrow::Logger::global.notice "Logging enabled."
+		Arrow::Logger.global.notice "Logging enabled."
 	end	
 rescue => e
 	$stderr.puts "Ack! Arrow library failed to load: #{e.message}\n\t" +

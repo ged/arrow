@@ -10,10 +10,10 @@ BEGIN {
 }
 
 begin
-	require 'spec/runner'
+	require 'spec'
 	require 'apache/fakerequest'
 	require 'arrow'
-	require 'arrow/spechelpers'
+	require 'spec/lib/helpers'
 	require 'arrow/broker'
 rescue LoadError
 	unless Object.const_defined?( :Gem )
@@ -24,28 +24,38 @@ rescue LoadError
 end
 
 
-module FixtureFunctions
-	ChainLink = Arrow::AppletRegistry::ChainLink
-	
-	TEST_CONFIG = {
-		:applets => {
-			:path			=> Arrow::Path.new( "" ),
-			:pattern		=> '*.rb',
-			:pollInterval	=> 0,
-			:missingApplet	=> '/missing',
-			:errorApplet	=> '/error',
+#####################################################################
+###	C O N T E X T S
+#####################################################################
 
-			:layout			=> {},
-			:config			=> {},
-		},
-	}
+describe Arrow::Broker do
+	include Arrow::SpecHelpers
+	
+	before( :all ) do
+		setup_logging( :crit )
+	end
+	
+	after( :all ) do
+		reset_logging()
+	end
+
+	
+	before( :each ) do
+		conf = Arrow::Config.new( TEST_CONFIG )
+		@broker = Arrow::Broker.new( conf )
+	end
+
+
+	#################################################################
+	###	H E L P E R   F U N C T I O N S
+	#################################################################
 	
 	def make_applet_chain( uri, *applets )
 		chain = []
 		uriparts = uri.split( %r{/} )
 
 		applets.each_with_index do |applet, i|
-			chain << ChainLink.new(
+			chain << Arrow::AppletRegistry::ChainLink.new(
 				applet,
 				uriparts[0..i+1].join('/'),
 				uriparts[i+2 .. -1] || []
@@ -54,32 +64,11 @@ module FixtureFunctions
 		
 		return chain
 	end
-end
 
 
-
-#####################################################################
-###	C O N T E X T S
-#####################################################################
-
-describe Arrow::Broker do
-	include FixtureFunctions
-	
-	# before( :all ) do
-	# 	Arrow::Logger.global.outputters << Arrow::Logger::Outputter.create( 'color:stderr', self )
-	# 	Arrow::Logger.global.level = :debug
-	# end
-	# 
-	# after( :all ) do
-	# 	Arrow::Logger.global.level = :error
-	# end
-	
-	before( :each ) do
-		conf = Arrow::Config.new( TEST_CONFIG )
-		@broker = Arrow::Broker.new( conf )
-	end
-
-	
+	#################################################################
+	###	E X A M P L E S
+	#################################################################
 
 	it "runs an applet when dispatching a uri that maps to it" do
 		applet = mock( "applet", :null_object => true )
@@ -136,32 +125,29 @@ describe Arrow::Broker do
 
 		@broker.delegate( txn ) #.should == :passed # RSpec 1.0 broke this
 	end
-end
 
+	describe " for a root-mounted dispatcher" do
 
-describe Arrow::Broker, " for a root-mounted dispatcher" do
-	include FixtureFunctions
+		it "runs the root applet for a request to an empty path" do
+			conf = Arrow::Config.new( TEST_CONFIG )
+			broker = Arrow::Broker.new( conf )
 
-	it "runs the root applet for a request to an empty path" do
-		conf = Arrow::Config.new( TEST_CONFIG )
-		broker = Arrow::Broker.new( conf )
+			applet = mock( "applet", :null_object => true )
+			appletchain = make_applet_chain( '/', applet )
+			broker.registry = stub( "applet registry",
+				:check_for_updates => true,
+				:find_applet_chain => appletchain
+			  )
 
-		applet = mock( "applet", :null_object => true )
-		appletchain = make_applet_chain( '/', applet )
-		broker.registry = stub( "applet registry",
-			:check_for_updates => true,
-			:find_applet_chain => appletchain
-		  )
+			txn = mock( "transaction", :null_object => true )
+			txn.should_receive( :path ).and_return( '' )
 
-		txn = mock( "transaction", :null_object => true )
-		txn.should_receive( :path ).and_return( '' )
+			applet.should_receive( :run ).
+				with( txn ).
+				and_return( :passed )
 
-		applet.should_receive( :run ).
-			with( txn ).
-			and_return( :passed )
-
-		broker.delegate( txn ).should == :passed
+			broker.delegate( txn ).should == :passed
+		end
 	end
+
 end
-
-

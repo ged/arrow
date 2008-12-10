@@ -3,7 +3,7 @@
 # Unit test for the Arrow::Applet class
 # $Id$
 #
-# Copyright (c) 2004, 2006 RubyCrafters, LLC. Most rights reserved.
+# Copyright (c) 2004-2008 RubyCrafters, LLC. Most rights reserved.
 # 
 # This work is licensed under the Creative Commons Attribution-ShareAlike
 # License. To view a copy of this license, visit
@@ -21,6 +21,7 @@ unless defined? Arrow::TestCase
 		$LOAD_PATH.include?( "#{basedir}/tests/lib" )
 
 	require 'arrow/testcase'
+	require 'arrow/applet'
 end
 
 

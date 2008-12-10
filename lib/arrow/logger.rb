@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'arrow/utils'
 require 'arrow/mixins'
 
 # A hierarchical logging class for the Arrow framework. It provides a
@@ -41,9 +40,9 @@ require 'arrow/mixins'
 #   
 # * Michael Granger <ged@FaerieMUD.org>
 #   
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
@@ -90,7 +89,12 @@ class Arrow::Logger
 	###	C L A S S   M E T H O D S
 	#############################################################
 
-	@global_logger = nil
+	# Loggers for Modules, keyed by Module
+	@logger_map = Hash.new do |h,mod|
+		h[ mod ] = self.new( mod )
+	end
+	class << self; attr_reader :logger_map ; end
+
 
     ### Configure logging from the 'logging' section of the config.
     def self::configure( config, dispatcher )
@@ -108,7 +112,7 @@ class Arrow::Logger
 				outputter = Arrow::Logger::Outputter.create( uri )
 			end
 
-			# The 'global' entry configured the global logger
+			# The 'global' entry configures the global logger
 			if klass == :global
 				self.global.level = level
 				self.global.outputters << outputter
@@ -154,31 +158,37 @@ class Arrow::Logger
 	### Return the Arrow::Logger for the given module +mod+, which can be a
 	### Module object, a Symbol, or a String.
 	def self::[]( mod=nil )
-		modname = mod.to_s
-		return self.global if modname.empty?
+		return self.global if mod.nil?
 
-		names = modname.split( /::/ )
+		case mod
+		when Module
+			return self.logger_map[ mod ]
 
-		# Create the global logger if it isn't already created
-		self.global
+		# If it's a String, try to map it to a class name, falling back on the global
+		# logger if that fails
+		when String
+			mod = mod.split('::').
+				inject( Object ) {|k, modname| k.const_get(modname) } rescue Object
+			return self.logger_map[ mod ]
+		else
+			
+			return self.logger_map[ mod.class ]
+		end
 
-		names.inject( @global_logger ) {|logger,key| logger[key]}
 	end
 
 
 	### Return the global Arrow logger, setting it up if it hasn't been
 	### already.
 	def self::global
-		# debug_msg "Creating the global logger" unless @global_logger
-		@global_logger ||= new( '' )
+		self.logger_map[ Object ]
 	end
 
 
 	### Reset the logging subsystem. Clears out any registered loggers and 
 	### their associated outputters.
 	def self::reset
-		# debug_msg "Resetting the global logger"
-		@global_logger = nil
+		self.logger_map.clear
 	end
 	
 
@@ -201,24 +211,23 @@ class Arrow::Logger
 	###	I N S T A N C E   M E T H O D S
 	#############################################################
 
-	### Create and return a new Arrow::Logger object with the given +name+
-	### at the specified +level+, with the specified +superlogger+. Any
-	### +outputters+ that are specified will be added.
-	def initialize( name, level=:info, superlogger=nil, *outputters )
-		if name.empty?
-			# debug_msg "Creating global logger"
-		else
-			# debug_msg "Creating logger for #{name}"
-		end
-
-		@name = name
+	### Create and return a new Arrow::Logger object for the given +mod+ (a Module object). If
+	### It will be configured at the given +level+. Any +outputters+ that are specified will be 
+	### added.
+	def initialize( mod, level=:info, *outputters )
+		@module     = mod
 		@outputters = outputters
-		@subloggers = {}
-		@superlogger = superlogger
-		@trace = false
-		@level = nil
+		@trace      = false
+		@level      = nil
 
-		self.level = level
+		# Cached Array of modules and classes between 
+		# this logger's module and Object
+		@supermods  = nil
+
+		# Level to force messages written to this logger to
+		@forced_level = nil
+
+		self.level  = level
 	end
 
 
@@ -226,23 +235,20 @@ class Arrow::Logger
 	public
 	######
 
-	# The name of this logger
-	attr_reader :name
+	# The module this logger is associated with
+	attr_reader :module
 
 	# The outputters attached to this branch of the logger tree.
 	attr_accessor :outputters
-
-	# The logger object that is this logger's parent (if any).
-	attr_reader :superlogger
-
-	# The branches of the logging hierarchy that fall below this one.
-	attr_accessor :subloggers
 
 	# Set to a true value to turn tracing on
 	attr_accessor :trace
 
 	# The integer level of the logger.
 	attr_reader :level
+	
+	# The level to force messages written to this logger to
+	attr_accessor :forced_level
 
 
 	### Return a human-readable string representation of the object.
@@ -269,16 +275,9 @@ class Arrow::Logger
 		  ]
 
 		details = []
-		
 		unless self.outputters.empty?
 			details << "Outputters:" << self.outputters.map {|op| op.inspect }
 		end
-		
-		unless self.subloggers.empty?
-			details << "Subloggers:" << 
-				self.subloggers.values.map {|sl| sl.inspect_details(level + 1) }
-		end
-		
 		details = details.flatten.compact.map {|line| indent + line }
 		
 		if level.zero?
@@ -291,10 +290,9 @@ class Arrow::Logger
 
 	### Return the name of the logger formatted to be suitable for reading.
 	def readable_name
-		logname = self.name.sub( /^::/, '' )
-		logname = '(global)' if logname.empty?
-
-		return logname
+		return '(global)' if self.module == Object
+		return self.module.inspect if self.module.name == ''
+		return self.module.name
 	end
 	
 
@@ -312,7 +310,7 @@ class Arrow::Logger
 
 		case level
 		when String
-			@level = LEVELS[ level.intern ]
+			@level = LEVELS[ level.to_sym ]
 		when Symbol
 			@level = LEVELS[ level ]
 		when Integer
@@ -331,43 +329,56 @@ class Arrow::Logger
 	end
 
 
+	### Return the Arrow::Logger for this instance's module's parent class if it's a Class, 
+	### and the global logger otherwise.
+	def superlogger
+		if @module == Object
+			return nil
+		elsif @module.respond_to?( :superclass )
+			Arrow::Logger[ @module.superclass ]
+		else
+			Arrow::Logger.global
+		end
+	end
+	
+	
+	### Return the Array of modules and classes the receiver's module includes 
+	### or inherits, inclusive of the receiver's module itself.
+	def supermods
+		unless @supermods
+			objflag = false
+			@supermods = self.module.ancestors.partition {|mod| objflag ||= (mod == Object) }.last
+			@supermods << Object
+		end
+		
+		return @supermods
+	end
+	
 
-	### Return a uniquified Array of the loggers which are more-generally
-	### related hierarchically to the receiver, inclusive. If called with a
-	### block, it will be called once for each Logger object. If +level+ is
-	### specified, only those loggers whose level is +level+ or lower will be
-	### selected.
-	def hierloggers( level=LEVELS[:emerg] )
-		loggers = []
-		logger = self
-		lastlogger = nil
+
+	### Return a uniquified Array of the loggers which are more-generally related 
+	### hierarchically to the receiver, inclusive, and whose level is +level+ or 
+	### lower.
+	def hierloggers( level=:emerg )
 		level = LEVELS[ level ] if level.is_a?( Symbol )
-
-		# debug_msg "Searching for loggers in the hierarchy above %s" % 
-			# [ logger.name.empty? ? "[Global]" : logger.name ]
-
-		# Traverse the logger hierarchy upward (more general), looking for ones
-		# whose level is below the argument.
-		begin
-			lastlogger = logger
+		
+		loggers = []
+		self.supermods.each do |mod|
+			logger = self.class.logger_map[ mod ]
 			next unless logger.level <= level
-
-			# When one is found, add it to the ones being returned and yield it
-			# if there's a block
-			# debug_msg "hierloggers: added %s" % logger.readable_name
-			loggers.push( logger )
+			
+			loggers << logger
 			yield( logger ) if block_given?
-
-		end while (( logger = lastlogger.superlogger ))
-
+		end
+		
 		return loggers
 	end
 
 
-	### Return a uniquified Array of all outputters for this logger and all of
-	### the loggers above it in the logging hierarchy. If called with a block,
-	### it will be called once for each outputter and the first logger to which
-	### it is attached.
+	### Return a uniquified Array of all outputters for this logger and all of the 
+	### loggers above it in the logging hierarchy that are set to +level+ or lower. 
+	### If called with a block, it will be called once for each outputter and the first 
+	### logger to which it is attached.
 	def hieroutputters( level=LEVELS[:emerg] )
 		outputters = []
 
@@ -395,7 +406,7 @@ class Arrow::Logger
 	### Write the given +args+ to any connected outputters if +level+ is
 	### less than or equal to this logger's level.
 	def write( level, *args )
-		debug_msg "Writing message at %p: %p" % [ level, args ]
+		# debug_msg "Writing message at %p from %s: %p" % [ level, caller(2).first, args ]
 
 		msg, frame = nil, nil
 		time = Time.now
@@ -407,22 +418,14 @@ class Arrow::Logger
 			 	caller(1).last
 		end
 
+		level = @forced_level if @forced_level
+
 		# Find the outputters that need to be written to, then write to them.
 		self.hieroutputters( level ) do |outp, logger|
-			debug_msg "Got outputter %p" % outp
-			msg ||= args.collect {|obj| self.stringify_object(obj)}.join
+			# debug_msg "Got outputter %p" % outp
+			msg ||= args.collect {|obj| self.stringify_object(obj) }.join
 			outp.write( time, level, self.readable_name, frame, msg )
 		end
-	end
-
-
-	### Return the sublogger for the given module +mod+ (a Module, a String,
-	### or a Symbol) under this logger. A new one will instantiated if it
-	### does not already exist.
-	def []( mod )
-		# debug_msg "creating sublogger for '#{mod}'" unless @subloggers.key?( mod.to_s )
-		@subloggers[ mod.to_s ] ||=
-			self.class.new( @name + "::" + mod.to_s, self.level, self )
 	end
 
 

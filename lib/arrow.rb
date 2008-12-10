@@ -1,6 +1,12 @@
 #!/usr/bin/env ruby
+
+require 'yaml'
+require 'tmpdir'
+
+require 'pathname'
+
 # 
-# This file contains the Arrow module, a namespace container for classes in the
+# The Arrow module, a namespace container for classes in the
 # Arrow web application framework.
 # 
 # == Subversion Id
@@ -13,20 +19,12 @@
 # * Michael Granger <mgranger@rubycrafters.com>
 # * David McCorkhill <dmccorkhill@rubycrafters.com>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-
-require 'yaml'
-require 'tmpdir'
-
-require 'pathname'
-
-### The module that serves as a namespace for all Arrow classes.
 module Arrow
 
 	# SVN Revision
@@ -36,18 +34,16 @@ module Arrow
 	SVNId = %q$Id$
 
 	# Library version
-	VERSION = '0.9.4'
+	VERSION = '0.9.5'
 
 
 	# Try loading stuff through Rubygems if the require fails and Rubygems isn't loaded yet
 	begin
 		require 'arrow/constants'
 		require 'arrow/monkeypatches'
-		require 'arrow/applet'
-		require 'arrow/dispatcher'
-		require 'arrow/broker'
 		require 'arrow/exceptions'
 		require 'arrow/mixins'
+		require 'arrow/logger'
 	rescue LoadError
 		if ! Object.constant_defined?( :Gem )
 			require 'rubygems'
@@ -59,7 +55,7 @@ module Arrow
 
 	# Hook up PluginFactory logging to Arrow logging
 	PluginFactory.logger_callback = lambda do |lvl, msg|
-		Arrow::Logger[PluginFactory].send( lvl, msg )
+		Arrow::Logger[PluginFactory].debug( msg )
 	end
 	PluginFactory.log( :debug, "Hooked up PluginFactory logging through Arrow's logger." )
 
@@ -74,6 +70,10 @@ module Arrow
 		### +hostsfile+, which is a YAML hash that maps dispatcher names to 
 		### a configfile path. 
 		def initialize( hostsfile )
+			require 'arrow/applet'
+			require 'arrow/dispatcher'
+			require 'arrow/broker'
+
 			@hostsfile = hostsfile
 		end
 		
@@ -102,8 +102,36 @@ module Arrow
 			raise
 		end
 
-	end	
+	end
+
+	###############
+	module_function
+	###############
+
+	### Search for and require ruby module files from subdirectories of the
+	### $LOAD_PATH specified by +subdir+. If exclude_pattern is a Regexp or a
+	### String, it will be used as a pattern to exclude matching module files.
+	def require_all_from_path( subdir="arrow", exclude_pattern=nil )
+		exclude_pattern = Regexp::compile( exclude_pattern.to_s ) unless
+			exclude_pattern.nil? || exclude_pattern.is_a?( Regexp )
+
+		subdir = Pathname.new( subdir ) unless subdir.is_a?( Pathname )
+
+		$LOAD_PATH.
+			collect {|dir| Pathname.new(dir) + subdir }.
+			find_all {|dir| dir.directory? }.
+			inject([]) {|files,dir|
+				files += dir.entries.find_all {|file|
+					/^[-.\w]+\.(rb|#{Config::CONFIG['DLEXT']})$/.match( file )
+				}
+			}.
+			uniq.
+			reject {|file| 
+				exclude_pattern.match(file) unless exclude_pattern.nil?
+			}.
+			each do |file|
+				require subdir + file
+			end
+	end
 
 end # module Arrow
-
-

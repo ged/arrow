@@ -1,51 +1,8 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the base node classes which are used to parse and define
-# behaviour for Arrow::Template objects.
-#
-# The classes defined in this file are:
-#
-# [<b>Arrow::Template::Node</b>]
-#   The abstract base node class.
-# 
-# [<b>Arrow::Template::TextNode</b>]
-#   The basic content node class. Used to contain chunks of the plain
-#   (non-directive) content of the template.
-# 
-# [<b>Arrow::Template::Directive</b>]
-#   The abstract superclass for directives. Directives are tags in the template
-#   source which define a particular behaviour and possibly rendered content for
-#   the template object.
-# 
-# [<b>Arrow::Template::AttributeDirective</b>]
-#   An abstract superclass for nodes which add a content field and
-#   accessor/mutator methods to the template object. Deriviatives of this class
-#   are like fill-in fields in the template that are populated with content by
-#   whatever system uses the template.
-# 
-# [<b>Arrow::Template::BracketingDirective</b>]
-#   An abstract superclass for nodes which contain other nodes as well as
-#   defining their own behaviour and content. Derivatives of this class are used
-#   to build conditional or iterated parts of a template.
-# 
-# == Subversion Id
-#
-#  $Id$
-# 
-# == Authors
-# 
-# * Michael Granger <ged@FaerieMUD.org>
-# 
-#:include: LICENSE
-#
-#---
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
-#
 
 require 'pluginfactory'
 
-require 'arrow/utils'
+require 'arrow/path'
 require 'arrow/mixins'
 require 'arrow/template'
 
@@ -377,7 +334,6 @@ class Arrow::Template
 
 
 	end # class Directive
-
 
 
 	### The attribute directive superclass. Attribute directives are those that

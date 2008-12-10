@@ -1,7 +1,10 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Cookie class, a class for parsing and
-# generating HTTP cookies.
+
+require 'date'
+require 'time'
+require 'uri'
+
+# The Arrow::Cookie class, a class for parsing and generating HTTP cookies.
 # 
 # Large parts of this code were copied from the Webrick::Cookie class
 # in the Ruby standard library. The copyright statements for that module
@@ -20,19 +23,12 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'date'
-require 'time'
-require 'uri'
-
-
-### A class for parsing and generating HTTP cookies
 class Arrow::Cookie < Arrow::Object
 
 	# SVN Revision

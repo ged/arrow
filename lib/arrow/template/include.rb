@@ -1,6 +1,10 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Template::IncludeDirective class, a derivative of
+
+require 'arrow/exceptions'
+require 'arrow/path'
+require 'arrow/template/nodes'
+
+# The Arrow::Template::IncludeDirective class, a derivative of
 # Arrow::Template::Directive. This is the class which defines the
 # behaviour of the 'include' template directive.
 # 
@@ -33,19 +37,12 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'arrow/exceptions'
-require 'arrow/utils'
-require 'arrow/template/nodes'
-
-### The class which defines the behaviour of the 'include'
-### template directive.
 class Arrow::Template::IncludeDirective < Arrow::Template::Directive # :nodoc:
 	include Arrow::Template::Parser::Patterns
 

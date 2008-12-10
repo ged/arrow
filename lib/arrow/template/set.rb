@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Template::SetDirective class, a derivative of
+
+require 'arrow/template/nodes'
+
+# The Arrow::Template::SetDirective class, a derivative of
 # Arrow::Template::Directive. This is the class which defines the behaviour of
 # the 'set' template directive.
 # 
@@ -16,16 +18,12 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'arrow/template/nodes'
-
-### The class which defines the behaviour of the 'set' template directive.
 class Arrow::Template::SetDirective < Arrow::Template::Directive # :nodoc:
 
 	# SVN Revision

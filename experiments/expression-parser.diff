@@ -24,7 +24,7 @@ diff -u -3 -p -u -r1.10 parser.rb
 @@ -28,6 +28,7 @@ require 'arrow/mixins'
  require 'arrow/exceptions'
  require 'arrow/template'
- require 'arrow/utils'
+ require 'arrow/path'
 +require 'arrow/rubytokenreactor'
  
  module Arrow

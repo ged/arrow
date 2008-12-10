@@ -1,6 +1,12 @@
 #!/usr/bin/env ruby
-# 
-# An object which provides a convenient way of accessing a set of Arrow::Cookies.
+
+require 'arrow'
+require 'arrow/cookie'
+require 'set'
+require 'forwardable'
+
+
+# An object class which provides a convenient way of accessing a set of Arrow::Cookies.
 # 
 # == Synopsis
 # 
@@ -26,21 +32,12 @@
 # * Michael Granger <ged@FaerieMUD.org>
 # * Jeremiah Jordan <phaedrus@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'arrow'
-require 'arrow/cookie'
-require 'set'
-require 'forwardable'
-
-
-### An object class which provides convenience functions for accessing a set of 
-### Arrow::Cookie objects.
 class Arrow::CookieSet < Arrow::Object
 	extend Forwardable
 	include Enumerable

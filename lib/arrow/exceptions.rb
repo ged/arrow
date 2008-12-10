@@ -1,28 +1,5 @@
 #!/usr/bin/env ruby
-# 
-# This file contains a collection of exception classes for the Arrow web
-# application framework.
-# 
-# == Synopsis
-# 
-#   
-# 
-# == Subversion Id
-#
-#  $Id$
-# 
-# == Authors
-# 
-# * Michael Granger <ged@FaerieMUD.org>
-# 
-#:include: LICENSE
-#
-#---
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
-#
-
-module Arrow
+module Arrow # :nodoc:
 
 	### Base exception class
 	class Exception < StandardError

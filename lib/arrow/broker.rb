@@ -1,23 +1,4 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Broker class. The broker is the applet
-# manager. It maintains a registry of applets, and delegates transactions
-# based on the request's URI.
-# 
-# == Subversion Id
-#
-#  $Id$
-# 
-# == Authors
-# 
-# * Michael Granger <mgranger@RubyCrafters.com>
-# 
-#:include: LICENSE
-#
-#---
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
-#
 
 require 'arrow/mixins'
 require 'arrow/exceptions'
@@ -27,7 +8,23 @@ require 'arrow/templatefactory'
 require 'arrow/appletregistry'
 
 
-### Instance of this class contain a map of applets registered to a given location..
+# The broker is the applet manager. It maintains a registry of applets, and delegates 
+# transactions based on the request's URI.
+# 
+# == Subversion Id
+#
+#  $Id$
+# 
+# == Authors
+# 
+# * Michael Granger <mgranger@RubyCrafters.com>
+# 
+# :include: LICENSE
+#
+#--
+#
+# Please see the file LICENSE in the BASE directory for licensing details.
+#
 class Arrow::Broker < Arrow::Object
 
 	### Class constants/methods

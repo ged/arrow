@@ -1,8 +1,12 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Session::MD5Id class, a derivative of
+
+require 'digest/sha1'
+
+require 'arrow/session/id'
+
+# The Arrow::Session::SHA1Id class, a derivative of
 # Arrow::Session::Id. Instances of this class are session IDs created by
-# MD5-hashing some semi-random data with
+# SHA1-hashing some semi-random data.
 # 
 # == Synopsis
 #
@@ -18,18 +22,12 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'digest/sha1'
-
-require 'arrow/session/id'
-
-### MD5 Session IDs class.
 class Arrow::Session::SHA1Id < Arrow::Session::Id
 
 	# SVN Revision

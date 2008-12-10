@@ -16,11 +16,12 @@ BEGIN {
 }
 
 begin
-	require 'spec/runner'
+	require 'spec'
 	require 'apache/fakerequest'
 	require 'arrow'
 	require 'arrow/applet'
-	require 'arrow/spechelpers'
+
+	require 'spec/lib/helpers'
 rescue LoadError
 	unless Object.const_defined?( :Gem )
 		require 'rubygems'
@@ -35,6 +36,17 @@ end
 #####################################################################
 
 describe Arrow::Applet, " (subclass)" do
+	include Arrow::SpecHelpers
+	
+	before( :all ) do
+		setup_logging( :crit )
+	end
+	
+	after( :all ) do
+		reset_logging()
+	end
+
+
 	before(:each) do
 		@appletclass = Class.new( Arrow::Applet ) do
 			def test_action( txn, *args )

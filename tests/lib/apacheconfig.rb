@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 # 
-# This file contains the ApacheServer::Config -- a convenience class for writing
+# The ApacheServer::Config -- a convenience class for writing
 # Apache configuration files for the mod_ruby test suite.
 # 
 # == Synopsis

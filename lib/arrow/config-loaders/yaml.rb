@@ -1,8 +1,13 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Config::YamlLoader class, a derivative of
-# Arrow::Config::Loader. It is used to load configuration files written in YAML
-# for the Arrow web application framework.
+
+require 'yaml'
+
+require 'arrow/config'
+require 'arrow/path'
+
+# The Arrow::Config::YamlLoader class, a derivative of Arrow::Config::Loader. It 
+# is used to load configuration files written in YAML for the Arrow web 
+# application framework.
 # 
 # == Subversion Id
 #
@@ -12,19 +17,12 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'yaml'
-
-require 'arrow/config'
-require 'arrow/utils'
-
-### A loader used by Arrow::Config to load configuration files written in YAML.
 class Arrow::Config::YamlLoader < Arrow::Config::Loader
 
 	# SVN Revision

@@ -58,7 +58,8 @@ templates:
 <?end?>
 
 All items in the configuration are optional; reasonable default values are provided by
-@Arrow::Config::DEFAULTS@. The sections you'll likely want to include in your config are the @applets/layout@, @applets/path@, and @templates/path@ variables.
+@Arrow::Config::DEFAULTS@. The sections you'll likely want to include in your config are 
+the @applets.layout@, @applets.path@, and @templates.path@ variables.
 
 
 The YAML format is fairly forgiving of some things, but not of inconsistent indentation.

@@ -1,6 +1,16 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Template::Parser class, a derivative of
+
+require 'strscan'
+require 'forwardable'
+require 'pluginfactory'
+
+require 'arrow/object'
+require 'arrow/mixins'
+require 'arrow/exceptions'
+require 'arrow/template'
+require 'arrow/path'
+
+# The Arrow::Template::Parser class, a derivative of
 # Arrow::Object. This is the default parser class for the default Arrow
 # templating system.
 # 
@@ -12,26 +22,14 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'strscan'
-require 'forwardable'
-require 'pluginfactory'
-
-require 'arrow/object'
-require 'arrow/mixins'
-require 'arrow/exceptions'
-require 'arrow/template'
-require 'arrow/utils'
-
-### Default parser object class -- parses template source into template
-### objects.
 class Arrow::Template::Parser < Arrow::Object
+	include Arrow::HashUtilities
 
 	### Regexp constants for parsing
 	module Patterns
@@ -262,7 +260,7 @@ class Arrow::Template::Parser < Arrow::Object
 	###   this is +false+, unrecognized PIs will raise an error at parse
 	###   time. Defaults to +true+.
 	def initialize( config={} )
-		@config = Defaults.merge( config, &Arrow::HashMergeFunction )
+		@config = Defaults.merge( config, &HashMergeFunction )
 	end
 
 

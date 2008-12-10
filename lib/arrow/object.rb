@@ -1,20 +1,17 @@
 #!/usr/bin/env ruby
+
+require 'arrow/path'
+require 'arrow/exceptions'
+require 'arrow/mixins'
+require 'arrow/logger'
+
+
+# This class is the abstract base class for all Arrow objects. Most of the
+# Arrow classes inherit from this. 
 # 
-# This file contains the Arrow::Object and Arrow::Version classes. Arrow::Object is
-# the base class for all objects in Arrow. Arrow::Version is a Comparable version
-# object class that is used to represent class versions.
+# == To Do
 # 
-# == Synopsis
-# 
-#   require 'arrow/object'
-#
-#   module Arrow
-#     class MyClass < Arrow::Object
-#       def initialize( *args )
-#         super()
-#       end
-#     end
-#   end
+# All of this stuff should really be factored out into mixins.
 # 
 # == Subversion Id
 #
@@ -24,46 +21,13 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'arrow/utils'
-
-
-### A couple of syntactic sugar aliases for the Module class.
-###
-### [<tt>Module.implements</tt>]
-###     An alias for <tt>include</tt>. This allows syntax of the form:
-###       class MyClass < Arrow::Object; implements Arrow::Debuggable, AbstracClass
-###         ...
-###       end
-###
-### [<tt>Module.implements?</tt>]
-###     An alias for <tt>Module#<</tt>, which allows one to ask
-###     <tt>SomeClass.implements?( Debuggable )</tt>.
-###
-class Module
-
-	# Syntactic sugar for mixin/interface modules.  (Borrowed from Hipster's
-	# component "conceptual script" - http://www.xs4all.nl/~hipster/)
-	alias :implements :include
-	alias :implements? :include?
-
-end
-
-
-require 'arrow/exceptions'
-require 'arrow/mixins'
-require 'arrow/logger'
-
-### This class is the abstract base class for all Arrow objects. Most of the
-### Arrow classes inherit from this.
 class Arrow::Object < ::Object
-
 	include Arrow::Loggable
 
 	# SVN Revision
@@ -86,7 +50,7 @@ class Arrow::Object < ::Object
 		# an appropriate warning message. Otherwise, just build a warning
 		# message.
 		if oldSym == newSym
-			newSym = ("__deprecated_" + oldSym.to_s + "__").intern
+			newSym = ("__deprecated_" + oldSym.to_s + "__").to_sym
 			warningMessage = "%s#%s is deprecated" %
 				[ self.name, oldSym.to_s ]
 			alias_method newSym, oldSym
@@ -122,7 +86,7 @@ class Arrow::Object < ::Object
 		# an appropriate warning message. Otherwise, just build a warning
 		# message.
 		if oldSym == newSym
-			newSym = ("__deprecated_" + oldSym.to_s + "__").intern
+			newSym = ("__deprecated_" + oldSym.to_s + "__").to_sym
 			warningMessage = "%s::%s is deprecated" %
 				[ self.name, oldSym.to_s ]
 			alias_class_method newSym, oldSym

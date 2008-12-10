@@ -1,82 +1,129 @@
 #!/usr/bin/env ruby
-# 
-# This file contains mixins which are used throughout the Arrow framework:
-#
-# == Arrow::Loggable
-#	 A mixin that adds a #log method to including classes that calls
-#	 Arrow::Logger with the class of the receiving object.
-#
-# === Usage
-# 
-#	require "arrow/mixins"
-#
-#	class MyClass
-#	  include Arrow::Loggable
-#	end
-# 
-# == Arrow::Configurable
-#	 A mixin that collects classes that expect to be configured by an 
-#	 Arrow::Config instance.
-#
-# === Usage
-# 
-#	require "arrow/mixins"
-#
-#	class MyClass
-#	  include Arrow::Configurable
-# 
-#	  config_key :myclass
-#
-#	  def self::configure( config )
-#		@@host = config.host
-#	  end
-#	end
-# 
-# == Arrow::Injectable
-#
-# Adds dependency-injection bejavior to a class. Classes which are Injectable
-# are loadable by name, making it easier to refer to them from a configuration
-# file or other symbolic source. Instead of classes explicitly referring to 
-# one another to satisfy their associations, these dependencies can be 
-# "injected" at runtime.
-#
-# Some references for the Dependency Injection pattern:
-#
-#  * http://www.martinfowler.com/articles/injection.html
-#  * http://en.wikipedia.org/wiki/Dependency_injection
-#
-# === Usage
-# 
-#	# in myclass.rb
-#	require 'arrow/mixins'
-#
-#	class MyClass
-#	  include Arrow::Injectable
-#	end
-#
-#	# somewhere else
-#	myclass = Arrow::Injectable.load_class( "myclass" )
-#
-#
-# == Subversion Id
-#
-#  $Id$
-# 
-# == Authors
-# 
-# * Michael Granger <ged@FaerieMUD.org>
-# 
-#:include: LICENSE
-#
-#---
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
-#
-
-# Dependencies follow the module because of dependency loops.
-
-# The module that serves as a namespace for all Arrow classes/mixins.
 module Arrow
+
+	require 'arrow/exceptions'
+	
+	### A collection of utilities for working with Hashes.
+	module HashUtilities
+
+		# Recursive hash-merge function
+		HashMergeFunction = Proc.new {|key, oldval, newval|
+			#debugMsg "Merging '%s': %s -> %s" %
+			#	[ key.inspect, oldval.inspect, newval.inspect ]
+			case oldval
+			when Hash
+				case newval
+				when Hash
+					#debugMsg "Hash/Hash merge"
+					oldval.merge( newval, &HashMergeFunction )
+				else
+					newval
+				end
+
+			when Array
+				case newval
+				when Array
+					#debugMsg "Array/Array union"
+					oldval | newval
+				else
+					newval
+				end
+
+			when Arrow::Path
+				if newval.is_a?( Arrow::Path )
+					newval
+				else
+					Arrow::Path.new( newval )
+				end
+
+			else
+				newval
+			end
+		}
+
+		###############
+		module_function
+		###############
+
+		### Return a version of the given +hash+ with its keys transformed
+		### into Strings from whatever they were before.
+		def stringify_keys( hash )
+			newhash = {}
+
+			hash.each do |key,val|
+				if val.is_a?( Hash )
+					newhash[ key.to_s ] = stringify_keys( val )
+				else
+					newhash[ key.to_s ] = val
+				end
+			end
+
+			return newhash
+		end
+
+
+		### Return a duplicate of the given +hash+ with its identifier-like keys
+		### transformed into symbols from whatever they were before.
+		def symbolify_keys( hash )
+			newhash = {}
+
+			hash.each do |key,val|
+				keysym = key.to_s.dup.untaint.to_sym
+
+				if val.is_a?( Hash )
+					newhash[ keysym ] = symbolify_keys( val )
+				else
+					newhash[ keysym ] = val
+				end
+			end
+
+			return newhash
+		end
+		alias_method :internify_keys, :symbolify_keys
+
+	end
+	
+
+	### A collection of utilities for working with Arrays.
+	module ArrayUtilities
+
+		###############
+		module_function
+		###############
+
+		### Return a version of the given +array+ with any Symbols contained in it turned into
+		### Strings.
+		def stringify_array( array )
+			return array.collect do |item|
+				case item
+				when Symbol
+					item.to_s
+				when Array
+					stringify_array( item )
+				else
+					item
+				end
+			end
+		end
+
+
+		### Return a version of the given +array+ with any Strings contained in it turned into
+		### Symbols.
+		def symbolify_array( array )
+			return array.collect do |item|
+				case item
+				when String
+					item.to_sym
+				when Array
+					symbolify_array( item )
+				else
+					item
+				end
+			end
+		end
+
+	end
+	
 
 	### A collection of HTML utility functions
 	module HTMLUtilities
@@ -98,7 +145,24 @@ module Arrow
 		
 	end # module HTMLUtiities
 
-	### A mixin that adds configurability via an Arrow::Config object. 
+
+	# A mixin that collects classes that expect to be configured by an 
+	# Arrow::Config instance.
+	#
+	# == Usage
+	# 
+	#	require "arrow/mixins"
+	#
+	#	class MyClass
+	#	  include Arrow::Configurable
+	# 
+	#	  config_key :myclass
+	#
+	#	  def self::configure( config )
+	#		@@host = config.host
+	#	  end
+	#	end
+	# 
 	module Configurable
 
 		@modules = []
@@ -120,7 +184,11 @@ module Arrow
 
 		### Generate a config key from the name of the given +klass+.
 		def self::make_key_from_classname( klass )
-			klass.name.sub( /^Arrow::/, '' ).gsub( /\W+/, '_' ).downcase.to_sym
+			unless klass.name == ''
+				return klass.name.sub( /^Arrow::/, '' ).gsub( /\W+/, '_' ).downcase.to_sym
+			else
+				return :anonymous
+			end
 		end
 		
 
@@ -208,10 +276,30 @@ module Arrow
 	end # module Configurable
 
 
-
-	### A mixin for adding injectability to a data class. Classes which 
-	### include this module can be loaded by name via Injectable.load_class, 
-	### and will be collected in Injectable.derivatives when they load.
+	# Adds dependency-injection bejavior to a class. Classes which are Injectable
+	# are loadable by name, making it easier to refer to them from a configuration
+	# file or other symbolic source. Instead of classes explicitly referring to 
+	# one another to satisfy their associations, these dependencies can be 
+	# "injected" at runtime.
+	#
+	# Some references for the Dependency Injection pattern:
+	#
+	#  * http://www.martinfowler.com/articles/injection.html
+	#  * http://en.wikipedia.org/wiki/Dependency_injection
+	#
+	# == Usage
+	# 
+	#	# in myclass.rb
+	#	require 'arrow/mixins'
+	#
+	#	class MyClass
+	#	  include Arrow::Injectable
+	#	end
+	#
+	#	# somewhere else
+	#	myclass = Arrow::Injectable.load_class( "myclass" )
+	#
+	#
 	module Injectable
 
 		@derivatives = {}
@@ -219,7 +307,7 @@ module Arrow
 
 		### Make the given object (which must be a Class) injectable.
 		def self::extend_object( obj )
-			raise ArgumentError, "can't make a #{obj.class} Configurable" unless
+			raise ArgumentError, "can't make a #{obj.class} Injectable" unless
 				obj.is_a?( Class )
 			super
 			@derivatives[ obj.name ] = obj
@@ -244,8 +332,7 @@ module Arrow
 				Arrow::Logger[self].debug "Class not loaded yet. Trying to " +
 					"load it from #{modname}"
 				require modname or
-					raise "%s didn't register with Injectable for some reason" %
-					classname
+					raise "%s didn't register with Injectable for some reason" % [ classname ]
 				Arrow::Logger[self].debug "Loaded injectable class %s (%d classes loaded)" %
 					[ classname, Arrow::Injectable.derivatives.length ]
 			end
@@ -268,9 +355,22 @@ module Arrow
 		
 	end # module Injectable
 
-
 	
-	### A mixin that adds logging to its including class.
+	# A mixin that adds a #log method to including classes that calls
+	# Arrow::Logger with the class of the receiving object.
+	#
+	# == Usage
+	# 
+	#	require "arrow/mixins"
+	#
+	#	class MyClass
+	#	  include Arrow::Loggable
+	#	  
+	#	  def some_method
+	#	    self.log.debug "A debugging message"
+	#	  end
+	#	end
+	# 
 	module Loggable
 		require 'arrow/logger'
 
@@ -288,4 +388,4 @@ module Arrow
 
 end # module Arrow
 
-require 'arrow/exceptions'
+

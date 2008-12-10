@@ -1,4 +1,7 @@
 #!/usr/bin/env ruby
+
+require 'arrow/constants'
+
 # 
 # A (hopefully) minimal collection of extensions to core classes.
 # 
@@ -12,14 +15,12 @@
 # * Michael Granger <mgranger@rubycrafters.com>
 # * David McCorkhill <dmccorkhill@rubycrafters.com>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'arrow/constants'
 
 ### Add some operator methods to regular expression objects for catenation,
 ### union, etc.
@@ -38,6 +39,7 @@ module Arrow::RegexpOperators
 	end
 end
 
+# Extended with Arrow::RegexpOperators
 class Regexp # :nodoc:
 	include Arrow::RegexpOperators
 end
@@ -77,6 +79,7 @@ module Arrow::StringExtensions
 
 end
 
+# Extended with Arrow::StringExtensions
 class String # :nodoc:
 	include Arrow::StringExtensions
 end

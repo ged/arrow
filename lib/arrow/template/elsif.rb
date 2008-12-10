@@ -1,6 +1,10 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Template::ElsifDirective class, a derivative of
+
+require 'arrow/exceptions'
+require 'arrow/path'
+require 'arrow/template/nodes'
+
+# The Arrow::Template::ElsifDirective class, a derivative of
 # Arrow::Template::Directive. This is the class which defines the behaviour of
 # the 'elsif' template directive.
 # 
@@ -12,18 +16,12 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'arrow/exceptions'
-require 'arrow/utils'
-require 'arrow/template/nodes'
-
-### The class which defines the behaviour of the 'elsif' template directive.
 class Arrow::Template::ElsifDirective < Arrow::Template::AttributeDirective # :nodoc:
 	include Arrow::Template::ConditionalDirective
 

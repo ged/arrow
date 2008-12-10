@@ -1,6 +1,11 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Template::TimeDeltaDirective class, a derivative of
+
+require 'arrow/exceptions'
+require 'arrow/path'
+require 'arrow/template/nodes'
+require 'arrow/template/call'
+
+# The Arrow::Template::TimeDeltaDirective class, a derivative of
 # Arrow::Template::CallDirective. This plugin defines the 'timedelta' template directive.
 # 
 # === Syntax
@@ -17,18 +22,10 @@
 # 
 #:include: COPYRIGHT
 #
-#---
+#--
 #
 # Please see the file COPYRIGHT in the 'docs' directory for licensing details.
 #
-
-require 'arrow/exceptions'
-require 'arrow/utils'
-require 'arrow/template/nodes'
-require 'arrow/template/call'
-
-### The class which defines the behaviour of the 'timedelta'
-### template directive.
 class Arrow::Template::TimeDeltaDirective < Arrow::Template::CallDirective # :nodoc:
 
 	# SVN Revision

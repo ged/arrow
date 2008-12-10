@@ -1,9 +1,14 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Session::FileLock class, a derivative of
-# Arrow::Session::Lock. Instances of this class provide file-based locking for
-# Arrow sessions using the flock(2) system call.  It (obviously) won't work on
-# platforms which don't support flock(2).
+
+require 'ftools'
+
+require 'arrow/session/lock'
+
+# The Arrow::Session::FileLock class, a derivative of Arrow::Session::Lock. 
+# Instances of this class provide file-based locking for Arrow sessions 
+# using the flock(2) system call.  It (obviously) won't work on platforms 
+# which don't support flock(2), or on filesystems which don't provide
+# flock-based locking semantics (e.g., NFS).
 # 
 # == Subversion Id
 #
@@ -13,19 +18,12 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'ftools'
-
-require 'arrow/session/lock'
-
-### File-based lock manager for Arrow sessions using the flock(2) system
-### call.
 class Arrow::Session::FileLock < Arrow::Session::Lock
 
 	# SVN Revision

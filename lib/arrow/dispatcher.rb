@@ -1,7 +1,20 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Dispatcher class, which is the mod_ruby handler
-# frontend for a web application.
+
+require 'benchmark'
+require 'tmpdir'
+
+require 'arrow/object'
+require 'arrow/config'
+require 'arrow/applet'
+require 'arrow/transaction'
+require 'arrow/broker'
+require 'arrow/template'
+require 'arrow/templatefactory'
+
+require 'arrow/fallbackhandler'
+
+
+# The Arrow::Dispatcher class -- the mod_ruby handler frontend for Arrow.
 # 
 # == Synopsis
 # 
@@ -61,33 +74,13 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'benchmark'
-require 'tmpdir'
-
-require 'arrow/object'
-require 'arrow/config'
-require 'arrow/applet'
-require 'arrow/transaction'
-require 'arrow/broker'
-require 'arrow/template'
-require 'arrow/templatefactory'
-require 'arrow/session'
-
-require 'arrow/fallbackhandler'
-
-
-### A mod_ruby handler class for dispatching requests to an Arrow web
-### application.
 class Arrow::Dispatcher < Arrow::Object
-
-	@@Instance = {}
 
 	# SVN Revision
 	SVNRev = %q$Rev$
@@ -95,6 +88,12 @@ class Arrow::Dispatcher < Arrow::Object
 	# SVN Id
 	SVNId = %q$Id$
 
+
+	#################################################################
+	###	C L A S S   M E T H O D S
+	#################################################################
+
+	@@Instance = {}
 
 	### Get the instance of the Dispatcher set up under the given +key+, which
 	### can either be a Symbol or a String containing the path to a

@@ -3,27 +3,42 @@
 # $Id$
 # 
 
-module TimeMatchers
-    class BeAfter
-        def initialize( expected )
-            @expected = expected
-        end
+BEGIN {
+	require 'pathname'
+	basedir = Pathname.new( __FILE__ ).dirname.parent.parent
+	
+	libdir = basedir + "lib"
+	
+	$LOAD_PATH.unshift( libdir ) unless $LOAD_PATH.include?( libdir )
+}
 
-        def matches?( actual )
-            @actual = actual
-            @actual > @expected
-        end
+require 'arrow'
 
-        def failure_message
-            "expected #{@actual} to be after #{@expected}"
-        end
+module Arrow
+	
+	module TimeMatchers
+	    class BeAfter
+	        def initialize( expected )
+	            @expected = expected
+	        end
 
-        def negative_failure_message
-            "expected #{@actual} not to be after #{@expected}"
-        end
-    end
+	        def matches?( actual )
+	            @actual = actual
+	            @actual > @expected
+	        end
 
-    def be_after( expected )
-        BeAfter.new( expected )
-    end
+	        def failure_message
+	            "expected #{@actual} to be after #{@expected}"
+	        end
+
+	        def negative_failure_message
+	            "expected #{@actual} not to be after #{@expected}"
+	        end
+	    end
+
+	    def be_after( expected )
+	        BeAfter.new( expected )
+	    end
+	end
+
 end

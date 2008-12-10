@@ -1,43 +1,4 @@
 #!/usr/bin/env ruby
-# 
-# This is an abstract test case class for building Test::Unit unit tests for
-# Arrow applets. 
-# 
-# == Synopsis
-# 
-#	$LOAD_PATH.unshift "tests/lib" unless $LOAD_PATH.include?("tests/lib")
-#	require 'applettestcase'
-#
-#	class MySomethingTest < Arrow::AppletTestCase
-#
-#		applet_under_test "jobs"
-#
-#		def test_default_request_should_return_object_list
-#			
-#		end
-#
-#		def test_default_request_with_oid_arg_should_display_details
-#			set_request_params :oid => 13
-#		end
-#
-#	end
-# 
-# == Rcsid
-# 
-#  $Id$
-# 
-# == Authors
-# 
-# * Michael Granger <ged@FaerieMUD.org>
-# 
-# Copyright (c) 2003, 2004, 2006 RubyCrafters, LLC.
-# 
-# This work is licensed under the Creative Commons Attribution License. To view
-# a copy of this license, visit http://creativecommons.org/licenses/by/1.0 or
-# send a letter to Creative Commons, 559 Nathan Abbott Way, Stanford, California
-# 94305, USA.
-#
-# 
 
 unless defined? Arrow::TestCase
 	testsdir = File.dirname( File.expand_path(__FILE__) )
@@ -87,7 +48,44 @@ unless FlexMock.instance_methods(false).include?("inspect")
 end
 
 
-### Test case class
+# This is an abstract test case class for building Test::Unit unit tests for
+# Arrow applets. 
+# 
+# == Synopsis
+# 
+#	$LOAD_PATH.unshift "tests/lib" unless $LOAD_PATH.include?("tests/lib")
+#	require 'applettestcase'
+#
+#	class MySomethingTest < Arrow::AppletTestCase
+#
+#		applet_under_test "jobs"
+#
+#		def test_default_request_should_return_object_list
+#			
+#		end
+#
+#		def test_default_request_with_oid_arg_should_display_details
+#			set_request_params :oid => 13
+#		end
+#
+#	end
+# 
+# == Rcsid
+# 
+#  $Id$
+# 
+# == Authors
+# 
+# * Michael Granger <ged@FaerieMUD.org>
+# 
+# Copyright (c) 2003, 2004, 2006 RubyCrafters, LLC.
+# 
+# This work is licensed under the Creative Commons Attribution License. To view
+# a copy of this license, visit http://creativecommons.org/licenses/by/1.0 or
+# send a letter to Creative Commons, 559 Nathan Abbott Way, Stanford, California
+# 94305, USA.
+#
+# 
 class Arrow::AppletTestCase < Test::Unit::TestCase
 	include Arrow::Loggable, Test::Unit::Assertions, FlexMock::TestCase
 

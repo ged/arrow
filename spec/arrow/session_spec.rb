@@ -9,19 +9,17 @@ BEGIN {
 	$LOAD_PATH.unshift( libdir ) unless $LOAD_PATH.include?( libdir )
 }
 
-begin
-	require 'spec/runner'
-	require 'apache/fakerequest'
-	require 'arrow'
-	require 'arrow/session'
-	require 'arrow/spechelpers'
-rescue LoadError
-	unless Object.const_defined?( :Gem )
-		require 'rubygems'
-		retry
-	end
-	raise
-end
+require 'rubygems'
+require 'spec/runner'
+require 'apache/fakerequest'
+require 'arrow'
+require 'arrow/session'
+
+require 'spec/lib/helpers'
+require 'spec/lib/constants'
+
+
+include Arrow::TestConstants
 
 
 #####################################################################
@@ -29,6 +27,7 @@ end
 #####################################################################
 
 describe Arrow::Session do
+	include Arrow::SpecHelpers
 
 	### Configuration
 	SESSION_DIR			= File.dirname( File.expand_path(__FILE__) ) + "/sessions"
@@ -43,88 +42,79 @@ describe Arrow::Session do
 
     TEST_SESSION_ID    = "6bfb3f041cf9204c3a2ea4611bd5c9d1"
 
-	TEST_CONFIG_HASH   = {
+	TEST_SESSION_CONFIG_HASH   = TEST_CONFIG_HASH.merge( :session => {
 		:idType           => TEST_ID_URI,
 		:idName           => TEST_ID_NAME,
 		:lockType         => TEST_LOCK_URI,
 		:storeType        => TEST_STORE_URI,
-	}
+	})
 
 
-	before( :each ) do
-		@config = Arrow::Config.new
-		@config.session = TEST_CONFIG_HASH
-		pending "Completion"
+	before( :all ) do
+		setup_logging( :crit )
+		@config = Arrow::Config.new( TEST_SESSION_CONFIG_HASH )
 	end
 	
+	after( :all ) do
+		reset_logging()
+	end
+
 
 	it "uses the id contained in the configured session cookie if present when creating the id" do
 		txn = mock( "transaction" )
+		request = stub( "request object" )
+		txn.stub!( :request ).and_return( request )
 		session_cookie = mock( "session cookie" )
+		cookieset = mock( "arrow cookieset" )
 		
-		txn.should_receive( :request_cookies ).and_return({ TEST_ID_NAME => session_cookie })
+		txn.should_receive( :request_cookies ).at_least( :once ).and_return( cookieset )
+		cookieset.should_receive( :include? ).with( TEST_ID_NAME ).and_return( true )
+		cookieset.should_receive( :[] ).with( TEST_ID_NAME ).and_return( session_cookie )
 		session_cookie.should_receive( :value ).and_return( TEST_SESSION_ID )
 		
-		Arrow::Session.create_id( @config, txn )
+		@config.session.idName.should == TEST_ID_NAME
+		Arrow::Session.create_id( @config.session, txn )
 	end
 	
-
-
-	#################################################################
-	###	T E S T S
-	#################################################################
-
-    def test_create_id_should_use_id_from_cookie_if_present
-        rval = nil
-        
-        FlexMock.use( "config", "txn", "request", "cookie" ) do |config, txn, request, cookie|
-            txn.should_receive( :request_cookies ).
-				and_return({ "test_id" => cookie }).at_least.twice
-            txn.should_receive( :request ).and_return( request )
-
-            config.should_receive( :idName ).and_return( "test_id" ).at_least.once
-            cookie.should_receive( :value ).and_return( TestSessionId ).once
-            config.should_receive( :idType ).and_return( DefaultIdUri )
-            
-            rval = Arrow::Session.create_id( config, txn )
-        end
-        
-        assert_kind_of Arrow::Session::Id, rval
-        assert_equal TestSessionId, rval.to_s
-    end        
-
-	def test_the_session_class_should_know_what_the_session_cookie_name_is
-		rval = nil
-		
-		FlexMock.use( "config" ) do |config|
-			config.should_receive( :idName ).and_return( 'cookie-name' )
-			Arrow::Session.configure( config )
-			rval = Arrow::Session.session_cookie_name
-		end
-		
-		assert_equal 'cookie-name', rval
+	
+	it "knows what the session cookie name is after being configured" do
+		Arrow::Session.configure( @config.session )
+		Arrow::Session.session_cookie_name.should == TEST_ID_NAME
 	end
 
-	def test_saving_should_add_the_session_cookie_to_the_request_via_the_transaction
-		cookieset = Arrow::CookieSet.new
-		config = Arrow::Config.new
-		config.session.idName = 'cookie-name'
-		Arrow::Session.configure( config.session )
-		
-		FlexMock.use( "config", "store", "txn", "lock" ) do |config, store, txn, lock|
-			store.should_receive( :[]= ).with( :_session_id, 'id' )
-			store.should_receive( :save )
-			
-			lock.should_receive( :release_all_locks )
-			txn.should_receive( :cookies ).and_return( cookieset )
-			
-			session = Arrow::Session.new( :id, lock, store, txn )
-			session.save
+	
+	describe "instance" do
+
+		before( :all ) do
+			Arrow::Session.configure( @config.session )
 		end
+		
+		
+		before( :each ) do
+			@cookieset = Arrow::CookieSet.new
+			@config = Arrow::Config.new
+			@config.session.idName = TEST_ID_NAME
+			@txn = mock( "transaction" )
+			@store = mock( "session store" )
+			@lock = mock( "session lock" )
 
-		assert cookieset.include?( 'cookie-name' )
+			Arrow::Session.configure( @config.session )
+
+			@store.stub!( :[]= )
+			@session = Arrow::Session.new( :id, @lock, @store, @txn )
+		end
+		
+		
+		it "adds the session cookie to the request when it is saved" do
+			@lock.stub!( :release_all_locks )
+			@txn.should_receive( :cookies ).and_return( @cookieset )
+
+			@store.should_receive( :save )
+			@session.save
+		end
+	
 	end
-
+	
 end
 
 

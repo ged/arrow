@@ -1,8 +1,10 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Session::FileStore class, a derivative of
-# Arrow::Session::Store. Instances of this class store a session object as a
-# marshalled hash on disk.
+
+require 'arrow/exceptions'
+require 'arrow/session/store'
+
+# The Arrow::Session::FileStore class, a derivative of Arrow::Session::Store. 
+# Instances of this class store a session object as a marshalled hash on disk.
 # 
 # == Subversion Id
 #
@@ -12,18 +14,12 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'arrow/exceptions'
-require 'arrow/session/store'
-
-### Instances of this class store a session object as a marshalled hash on
-### disk.
 class Arrow::Session::FileStore < Arrow::Session::Store
 
 	# SVN Revision

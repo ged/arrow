@@ -1,6 +1,16 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::Transaction class, a derivative of
+
+require 'forwardable'
+require 'uri'
+
+require 'arrow/mixins'
+require 'arrow/exceptions'
+require 'arrow/object'
+require 'arrow/cookie'
+require 'arrow/cookieset'
+require 'arrow/session'
+
+# The Arrow::Transaction class, a derivative of
 # Arrow::Object. Instances of this class encapsulate a transaction within a web
 # application implemented using the Arrow application framework.
 # 
@@ -12,24 +22,12 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-require 'forwardable'
-require 'uri'
-
-require 'arrow/mixins'
-require 'arrow/exceptions'
-require 'arrow/object'
-require 'arrow/cookie'
-require 'arrow/cookieset'
-
-
-### The transaction class for Arrow web applications.
 class Arrow::Transaction < Arrow::Object
 	extend Forwardable
 

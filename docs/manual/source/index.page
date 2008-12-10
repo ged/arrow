@@ -85,8 +85,8 @@ Arrow has "full API documentation":api/.
 h2. Cookbook
 
 Once the tutorial is a bit more complete, we'll start putting together some recipes for common
-tasks. For now, though, we suggest you take a look at the example applets in the @applets/@
-directory of the distribution, and their corresponding templates in the @templates/@ directory.
+tasks. For now, though, we suggest you take a look at the example applets in the @data/applets/@
+directory of the distribution, and their corresponding templates in the @data/templates/@ directory.
 
 
 

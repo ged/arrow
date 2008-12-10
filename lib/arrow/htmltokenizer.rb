@@ -1,26 +1,4 @@
 #!/usr/bin/env ruby
-# 
-# This file contains the Arrow::HTMLTokenizer class and a collection of token
-# classes. HTMLTokenizer is a simple HTML parser that can be used to break HTML
-# down into tokens.
-#
-# Some of the code and design were stolen from the excellent HTMLTokenizer
-# library by Ben Giddings <bg@infofiend.com>.
-# 
-# == Subversion Id
-#
-#  $Id$
-# 
-# == Authors
-# 
-# * Michael Granger <ged@FaerieMUD.org>
-# 
-#:include: LICENSE
-#
-#---
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
-#
 
 require 'strscan'
 require 'arrow/object'
@@ -29,8 +7,26 @@ require 'arrow/mixins'
 
 module Arrow
 
-	### A simple HTML tokenizer object class that can be used to break HTML down
-	### into tokens.
+	# The Arrow::HTMLTokenizer class -- a simple HTML parser that can be used to break HTML
+	# down into tokens.
+	#
+	# Some of the code and design were stolen from the excellent HTMLTokenizer
+	# library by Ben Giddings <bg@infofiend.com>.
+	# 
+	# == Subversion Id
+	#
+	#  $Id$
+	# 
+	# == Authors
+	# 
+	# * Michael Granger <ged@FaerieMUD.org>
+	# 
+	# :include: LICENSE
+	#
+	#--
+	#
+	# Please see the file LICENSE in the BASE directory for licensing details.
+	#
 	class HTMLTokenizer < Arrow::Object
 		include Enumerable
 
@@ -257,10 +253,10 @@ module Arrow
 					cval = value.nil? ? true : value.gsub(/^["']|['"]$/, '')
 
 					if ns.nil?
-						@attrs[ cname.intern ] = cval
+						@attrs[ cname.to_sym ] = cval
 					else
-						@attrs[ ns.intern ] ||= {}
-						@attrs[ ns.intern ][ name.intern ] = cval
+						@attrs[ ns.to_sym ] ||= {}
+						@attrs[ ns.to_sym ][ name.to_sym ] = cval
 					end
 				}
 			end
@@ -271,7 +267,7 @@ module Arrow
 
 		### Return the tag attribute with the specified name (if it exists).
 		def []( name )
-			self.attrs[ name.gsub(/-/, '_').downcase.intern ]
+			self.attrs[ name.gsub(/-/, '_').downcase.to_sym ]
 		end
 
 		

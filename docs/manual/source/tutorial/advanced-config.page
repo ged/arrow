@@ -90,7 +90,7 @@ to configuration values.
 
 		  	<dt>path</dt>
 			<dd>An Array of the paths that will be searched for templates. This path, in contrast to
-	        the <tt>applets/path</tt> setting, will not be searched recursively, but you can still keep
+	        the <tt>applets.path</tt> setting, will not be searched recursively, but you can still keep
 	        templates in directories other than the topmost one by referring to them with relative
 	        paths.</dd>
 			<dd class="default-value">The default template paths are: <code>templates</code>, 

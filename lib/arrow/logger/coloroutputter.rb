@@ -1,30 +1,24 @@
 #!/usr/bin/env ruby
-# 
-# Output logging messages in ANSI colors according to their level
-# 
-# == Synopsis
-# 
-#   
-# 
-# == Authors
-# 
-# * Michael Granger <mgranger@laika.com>
-# 
-# == Copyright
-#
-# Copyright (c) 2006 Laika, Inc
-# 
-# This work is proprietary source code, and may not be copied or transferred
-# without permission.
-# 
-# == Version
-#
-#  $Id$
-# 
 
 require 'arrow/logger/fileoutputter'
 
-### Output logging messages in ANSI colors according to their level
+# A derivative of Arrow::Logger::FileOutputter that outputs logging messages 
+# in ANSI colors according to their level.
+# 
+# == Subversion Id
+#
+#  $Id$
+# 
+# == Authors
+# 
+# * Michael Granger <ged@FaerieMUD.org>
+# 
+# :include: LICENSE
+#
+#--
+#
+# Please see the file LICENSE in the BASE directory for licensing details.
+#
 class Arrow::Logger::ColorOutputter < Arrow::Logger::FileOutputter
 
 	# SVN Revision

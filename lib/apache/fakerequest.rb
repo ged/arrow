@@ -3,11 +3,13 @@
 # when mod_ruby.so is.
 #
 
+# :stopdoc:
+
 require 'fileutils'
 require 'uri'
 require 'forwardable'
 
-class Integer
+class Integer # :nodoc: all
 	def of
 		accum = []
 		self.times do |i|
@@ -17,7 +19,7 @@ class Integer
 	end
 end
 
-module Apache # :nodoc:
+module Apache # :nodoc: all
 
 	M_GET       = 0
 	M_PUT       = 1

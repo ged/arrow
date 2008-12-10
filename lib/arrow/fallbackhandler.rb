@@ -1,7 +1,10 @@
 #!/usr/bin/env ruby
+
+require 'arrow'
+
 # 
-# This file contains the Arrow::FallbackHandler class, a request handler for
-# Arrow that is used to handle misconfigured handler requests.
+# The Arrow::FallbackHandler class, a request handler for Arrow that is used to 
+# handle misconfigured handler requests.
 # 
 # == Rcsid
 # 
@@ -11,16 +14,12 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-
-
-### A little handler to be returned for keys given to the dispatcher for which
-### real instances haven't been created.
 class Arrow::FallbackHandler
 
 	### Create a new instance for the given +key+ and +instances+.

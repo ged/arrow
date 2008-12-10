@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 # 
-# This file contains the Arrow::Template::Iterator class, instances of which can
+# The Arrow::Template::Iterator class, instances of which can
 # be used to provide an iteration context to nodes in an Arrow template.
 # 
 # Lots of the ideas for this class were stolen/influenced in no small way by Hal
@@ -14,15 +14,15 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: LICENSE
+# :include: LICENSE
 #
-#---
+#--
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
 
 require 'arrow/exceptions'
-require 'arrow/utils'
+require 'arrow/path'
 require 'arrow/template'
 
 ### Iterator class for reflecting on the state of enumerable template 
