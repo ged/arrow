@@ -219,6 +219,8 @@ class Arrow::Dispatcher < Arrow::Object
 
 			# Create a dispatcher and put it in the table by both its key and
 			# the normalized path to its configfile.
+			msg = "Creating dispatcher %p from %p" % [ key, configfile ]
+			Apache.request.server.log_notice( msg ) if defined?( Apache )
 			instances[ key ] = instances[ configfile ] = new( key, config )
 		end
 

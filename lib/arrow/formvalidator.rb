@@ -1,9 +1,12 @@
 #!/usr/bin/env ruby
 
+require 'rubygems'
+gem 'formvalidator'
+
 require 'uri'
 require 'forwardable'
-require 'formvalidator'
 require 'date'
+require 'formvalidator'
 
 require 'arrow/mixins'
 require 'arrow/exceptions'

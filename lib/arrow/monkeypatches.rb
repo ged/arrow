@@ -85,3 +85,18 @@ class String # :nodoc:
 end
 
 
+### Override RubyGem's use of values out of ENV since they're always tainted.
+module Gem
+	def self::find_home
+		if defined?( Apache )
+			return Apache.server_root
+		else
+			homedir = ENV['HOME']
+			homedir.untaint
+
+			return homedir
+		end
+	end
+end
+
+

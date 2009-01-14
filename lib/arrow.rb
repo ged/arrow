@@ -4,6 +4,8 @@ require 'yaml'
 require 'tmpdir'
 
 require 'pathname'
+require 'rubygems'
+
 
 # 
 # The Arrow module, a namespace container for classes in the

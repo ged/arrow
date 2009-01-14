@@ -3,6 +3,8 @@
 require 'arrow/broker'
 require 'forwardable'
 
+
+
 # The Arrow::AppletRegistry class, a derivative of
 # Arrow::Object. Instances of this class are responsible for loading and
 # maintaining the collection of Arrow::Applets registered with an 
@@ -302,14 +304,11 @@ class Arrow::AppletRegistry < Arrow::Object
 			return
 		end
 
-		# Set this so RubyGems' user_home is untainted so it doesn't poop itself under $SAFE = 1
-		ENV['HOME'] = Apache.server_root.untaint
-
 		# Make sure the 'gem home' is a directory and not world-writable; don't use it
 		# otherwise
 		gemhome = self.class.get_safe_gemhome
 		paths = @config.gems.path.collect {|path| path.untaint }
-		Gem.use_paths( gemhome, paths )
+		Gem.use_paths( Apache.server_root, paths )
 
 		@config.gems.applets.to_h.each do |gemname, reqstring|
 			reqstring = '>= 0' if reqstring.nil? or reqstring.empty?

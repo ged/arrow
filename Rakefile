@@ -4,7 +4,7 @@
 #
 # Based on various other Rakefiles, especially one by Ben Bleything
 #
-# Copyright (c) 2008 The FaerieMUD Consortium
+# Copyright (c) 2009 The FaerieMUD Consortium
 #
 # Authors:
 #  * Michael Granger <ged@FaerieMUD.org>
@@ -134,7 +134,8 @@ RDOC_OPTIONS = [
 	'-SHN',
 	'-i', '.',
 	'-m', 'README',
-	'-W', 'http://deveiate.org/projects/Arrow//browser/trunk/'
+	'-t', PKG_NAME,
+	'-W', 'http://deveiate.org/projects/Arrow/browser/trunk/'
   ]
 
 # Release constants
@@ -187,19 +188,19 @@ GEMSPEC   = Gem::Specification.new do |gem|
 	gem.version           = PKG_VERSION
 
 	gem.summary           = PKG_SUMMARY
-	gem.description       = <<-EOD
-	Arrow is a web application framework for mod_ruby. It was designed to make
-	development of web applications under Apache easier and more fun without
-	sacrificing the power of being able to access the native Apache API.
-	EOD
-	gem.post_install_message = <<-EOD
-	You will need to install mod_ruby separately if you have not already done so.
-	
-	  http://modruby.net/
-	
-	There is a collection of example applets and templates you can check out in the
-	data/ directory.
-	EOD
+	gem.description       = [
+		"Arrow is a web application framework for mod_ruby. It was designed to make",
+		"development of web applications under Apache easier and more fun without",
+		"sacrificing the power of being able to access the native Apache API.",
+  	  ].join( "\n" )
+	gem.post_install_message = [
+		"You will need to install mod_ruby separately if you have not already done so.",
+		"",
+		"  http://modruby.net/",
+		"",
+		"There is a collection of example applets and templates you can check out in the",
+		"data/ directory.",
+	  ].join( "\n" )
 
 	gem.authors           = 'Michael Granger'
 	gem.email             = 'ged@FaerieMUD.org'
