@@ -192,6 +192,12 @@ class Arrow::Template::Iterator < Arrow::Object
 	end
 
 
+	### Returns either "even" if the iteration is in even-numbered iteration, or "odd".
+	def even_or_odd
+		return self.odd? ? "odd" : "even"
+	end
+	
+
 	### Returns +true+ if the current iteration is an odd-numbered
 	### iteration.
 	def odd?

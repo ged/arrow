@@ -10,7 +10,7 @@ BEGIN {
 }
 
 require 'rubygems'
-require 'spec/runner'
+require 'spec'
 require 'apache/fakerequest'
 require 'arrow'
 require 'arrow/session'
