@@ -9,6 +9,8 @@ require 'arrow/object'
 require 'arrow/cookie'
 require 'arrow/cookieset'
 require 'arrow/session'
+require 'arrow/acceptparam'
+
 
 # The Arrow::Transaction class, a derivative of
 # Arrow::Object. Instances of this class encapsulate a transaction within a web
@@ -37,8 +39,11 @@ class Arrow::Transaction < Arrow::Object
 	# SVN Id
 	SVNId = %q$Id$
 
-
-	HTMLDoc = <<-"EOF".gsub(/^\t/, '')
+	# Regex to match the mimetypes that browsers use for sending form data
+	FORM_CONTENT_TYPES = %r{application/x-www-form-urlencoded|multipart/form-data}i
+	
+	# A minimal HTML document for #status_doc
+	HTML_DOC = <<-"EOF".gsub(/^\t/, '')
 	<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
 	<html>
 	  <head><title>%d %s</title></head>
@@ -46,8 +51,8 @@ class Arrow::Transaction < Arrow::Object
 	</html>
 	EOF
 
-	# Status names
-	StatusName = {
+	# Names for redirect statuses for #status_doc
+	STATUS_NAME = {
 		300		=> "Multiple Choices",
 		301		=> "Moved Permanently",
 		302		=> "Found",
@@ -95,6 +100,7 @@ class Arrow::Transaction < Arrow::Object
 		@data            = {}
 		@request_cookies = parse_cookies( request )
 		@cookies         = Arrow::CookieSet.new()
+		@accepted_types  = nil
 
 		# Check for a "RubyOption root_dispatcher true"
 		if @request.options.key?('root_dispatcher') &&
@@ -396,6 +402,37 @@ class Arrow::Transaction < Arrow::Object
 	end
 	
 	
+	# 
+	# HTTP content negotiation
+	# 
+	
+	### Return the contents of the 'Accept' header as an Array of Arrow::AcceptParam objects.
+	def accepted_types
+		@accepted_types ||= parse_accept_header( self.headers_in['Accept'] )
+		return @accepted_types
+	end
+
+
+	### Returns boolean true/false if the requestor can handle the given
+	### +content_type+.
+	def accepts?( content_type )
+		return self.accepted_types.find {|type| type =~ content_type } ? true : false
+	end
+	alias_method :accept?, :accepts?
+
+
+	### Returns boolean true/false if the requestor can handle the given
+	### +content_type+, not including mime wildcards.
+	def explicitly_accepts?( content_type )
+		self.accepted_types.reject { |param| param.subtype.nil? }.
+			find {|type| type =~ content_type } ? true : false
+	end
+	alias_method :explicitly_accept?, :explicitly_accepts?
+
+
+	# 
+	# Browser detection/workarounds
+	# 
 
 	### Returns true if the User-Agent header indicates that the remote
 	### browser is Internet Explorer. Useful for making the inevitable IE 
@@ -422,8 +459,6 @@ class Arrow::Transaction < Arrow::Object
 		return false
 	end
 	
-	
-	FORM_CONTENT_TYPES = %r{application/x-www-form-urlencoded|multipart/form-data}i
 	
 	### Return +true+ if there are HTML form parameters in the request, either in the
 	### query string with a GET request, or in the body of a POST with a mimetype of 
@@ -456,10 +491,10 @@ class Arrow::Transaction < Arrow::Object
 
 		#<head><title>%d %s</title></head>
 		#<body><h1>%s</h1><p>%s</p></body>
-		return HTMLDoc % [
+		return HTML_DOC % [
 			status_code,
-			StatusName[status_code],
-			StatusName[status_code],
+			STATUS_NAME[status_code],
+			STATUS_NAME[status_code],
 			body
 		]
 	end
@@ -526,6 +561,38 @@ class Arrow::Transaction < Arrow::Object
 		return Arrow::CookieSet.new( hash.values )
 	end
 	
+
+	### Parse the given +header+ and return a list of mimetypes in order of
+	### specificity and q-value, with most-specific and highest q-values sorted
+	### first.
+	def parse_accept_header( header )
+		rval = []
+
+		# Handle the case where there's more than one 'Accept:' header by
+		# forcing everything to an Array
+		header = [header] unless header.is_a?( Array )
+
+		# Accept         = "Accept" ":"
+		#                 #( media-range [ accept-params ] )
+		#
+		# media-range    = ( "*/*"
+		#                  | ( type "/" "*" )
+		#                  | ( type "/" subtype )
+		#                  ) *( ";" parameter )
+		# accept-params  = ";" "q" "=" qvalue *( accept-extension )
+		# accept-extension = ";" token [ "=" ( token | quoted-string ) ]
+		header.compact.flatten.each do |headerval|
+			params = headerval.split( /\s*,\s*/ )
+
+			params.each do |param|
+				rval << Arrow::AcceptParam.parse( param )
+			end
+		end
+
+		rval << Arrow::AcceptParam.new( '*', '*' ) if rval.empty?
+		return rval
+	end
+
 
 end # class Arrow::Transaction
 
