@@ -479,52 +479,42 @@ class Arrow::Applet < Arrow::Object
 	### Run the specified +action+ for the given +txn+ and the specified
 	### +args+.
 	def run( txn, action=nil, *args )
-		starttimes = Process.times
 		self.log.debug "Running %s" % [ self.signature.name ]
 
-		action = nil if action.to_s.empty?
-		action ||= @signature.default_action or
-			raise Arrow::AppletError, "Missing default handler '#{default}'"
+		return self.time_request do
+			action = nil if action.to_s.empty?
+			action ||= @signature.default_action or
+				raise Arrow::AppletError, "Missing default handler '#{default}'"
 
-		# Do any initial preparation of the transaction that can be factored out
-		# of all the actions.
-		self.prep_transaction( txn )
-		meth, *args = self.lookup_action_method( txn, action, *args )
-		self.log.debug "Action method is: %p" % [meth]
-		txn.vargs = self.make_validator( action, txn )
+			# Do any initial preparation of the transaction that can be factored out
+			# of all the actions.
+			self.prep_transaction( txn )
+			meth, *args = self.lookup_action_method( txn, action, *args )
+			self.log.debug "Action method is: %p" % [meth]
+			txn.vargs = self.make_validator( action, txn )
 		
-		# Now either pass control to the block, if given, or invoke the
-		# action
-		if block_given?
-			self.log.debug "Yielding to passed block"
-			rval = yield( meth, txn, *args )
-		else
-			self.log.debug "Applet action arity: %d; args = %p" %
-				[ meth.arity, args ]
-
-			# Invoke the action with the right number of arguments.
-			if meth.arity < 0
-				rval = meth.call( txn, *args )
-			elsif meth.arity >= 1
-				args.unshift( txn )
-				until args.length >= meth.arity do args << nil end
-				rval = meth.call( *(args[0, meth.arity]) )
+			# Now either pass control to the block, if given, or invoke the
+			# action
+			if block_given?
+				self.log.debug "Yielding to passed block"
+				rval = yield( meth, txn, *args )
 			else
-				raise Arrow::AppletError,
-					"Malformed action: Must accept at least a transaction argument"
+				self.log.debug "Applet action arity: %d; args = %p" %
+					[ meth.arity, args ]
+
+				# Invoke the action with the right number of arguments.
+				if meth.arity < 0
+					rval = meth.call( txn, *args )
+				elsif meth.arity >= 1
+					args.unshift( txn )
+					until args.length >= meth.arity do args << nil end
+					rval = meth.call( *(args[0, meth.arity]) )
+				else
+					raise Arrow::AppletError,
+						"Malformed action: Must accept at least a transaction argument"
+				end
 			end
 		end
-
-		# Calculate CPU times
-		runtimes = Process.times
-		@run_count += 1
-		@total_utime += utime = (runtimes.utime - starttimes.utime)
-		@total_stime += stime = (runtimes.stime - starttimes.stime)
-		self.log.info \
-			"[PID %d] Runcount: %d, User: %0.2f/%0.2f, System: %0.2f/%0.2f" %
-			[ Process.pid, @run_count, utime, @total_utime, stime, @total_stime ]
-
-		return rval
 	end
 
 
@@ -606,6 +596,25 @@ class Arrow::Applet < Arrow::Object
 	#########
 	protected
 	#########
+
+	### Time the block, logging the result
+	def time_request
+		starttimes = Process.times
+
+		result = yield
+		
+		# Calculate CPU times
+		runtimes = Process.times
+		@run_count += 1
+		@total_utime += utime = (runtimes.utime - starttimes.utime)
+		@total_stime += stime = (runtimes.stime - starttimes.stime)
+		self.log.info \
+			"[PID %d] Runcount: %d, User: %0.2f/%0.2f, System: %0.2f/%0.2f" %
+			[ Process.pid, @run_count, utime, @total_utime, stime, @total_stime ]
+
+		return result
+	end
+	
 
 	### Run an action with a duped transaction (e.g., from another action)
 	def subrun( action, txn, *args )
