@@ -430,6 +430,19 @@ class Arrow::Transaction < Arrow::Object
 	alias_method :explicitly_accept?, :explicitly_accepts?
 
 
+	### Returns true if the request's content-negotiation headers indicate that it can 
+	### accept either 'text/html' or 'application/xhtml+xml'
+	def accepts_html?
+		return self.accepts?( XHTML_MIMETYPE ) || self.accepts?( HTML_MIMETYPE )
+	end
+	
+	
+	### Return a normalized list of acceptable types, sorted by q-value and specificity.
+	def normalized_accept_string
+		return self.accepted_types.sort.collect {|ap| ap.to_s }.join( ', ' )
+	end
+	
+
 	# 
 	# Browser detection/workarounds
 	# 

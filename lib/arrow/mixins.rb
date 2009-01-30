@@ -128,6 +128,39 @@ module Arrow
 	### A collection of HTML utility functions
 	module HTMLUtilities
 
+		###############
+		module_function
+		###############
+
+		# The name of the Thread-local variable to keep the serialized-object
+		# cache in (i.e., Thread[ THREAD_DUMP_KEY ] = {}). The cache is keyed by
+		# object_id
+		THREAD_DUMP_KEY = :__to_html_cache__
+
+		# The HTML fragment to wrap around Hash objects
+		HASH_HTML_CONTAINER = %{<div class="hash-members">%s</div>}
+
+		# The HTML fragment to use for pairs of a Hash
+		HASH_PAIR_HTML = %{<div class="hash-pair"><div class="key">%s</div>} +
+			%{<div class="value">%s</div></div>\n}
+
+		# The HTML fragment to wrap around Array objects
+		ARRAY_HTML_CONTAINER = %{<ol class="array-members"><li>%s</li></ol>}
+
+		# The HTML fragment to wrap around immediate objects
+		IMMEDIATE_OBJECT_HTML_CONTAINER = %{<span class="immediate-object">%s</span>}
+
+		# The HTML fragment to wrap around objects other than Arrays and Hashes.
+		OBJECT_HTML_CONTAINER = %{<div id="object-%d" class="object %s">%s</div>}
+
+		# The HTML fragment to use for instance variables inside of object DIVs.
+		IVAR_HTML_FRAGMENT = %Q{
+		  <div class="instance-variable">
+			<div class="name">%s</div>
+			<div class="value">%s</div>
+		  </div>
+		}
+
 		### Escape special characters in the given +string+ for display in an
 		### HTML inspection interface. This escapes common invisible characters
 		### like tabs and carriage-returns in additional to the regular HTML
@@ -143,7 +176,117 @@ module Arrow
 				gsub(/\t/, '&#8594;')
 		end
 		
-	end # module HTMLUtiities
+
+		### Return an HTML fragment describing the specified +object+.
+		def make_html_for_object( object )
+			object_html = []
+
+			case object
+			when Hash
+				object_html << "\n<!-- Hash -->\n"
+				if object.empty?
+					object_html << '{}'
+				else
+					object_html << HASH_HTML_CONTAINER % [
+						object.collect {|k,v|
+							HASH_PAIR_HTML % [make_html_for_object(k), make_html_for_object(v)]
+						}
+					]
+				end
+
+			when Array
+				object_html << "\n<!-- Array -->\n"
+				if object.empty?
+					object_html << '[]'
+				else
+					object_html << ARRAY_HTML_CONTAINER % [
+						object.collect {|o| make_html_for_object(o) }.join('</li><li>')
+					]
+				end
+
+			else
+				if object.instance_variables.empty?
+					return IMMEDIATE_OBJECT_HTML_CONTAINER % 
+						[ HTMLUtilities.escape_html(object.inspect) ]
+				else
+					object_html << make_object_html_wrapper( object )
+				end
+			end
+
+			return object_html.join("\n")
+
+		end # module HTMLUtilities
+
+
+		### Wrap up the various parts of a complex object in an HTML fragment. If the
+		### object has already been wrapped, returns a link to the previous rendering
+		### instead.
+		def make_object_html_wrapper( object )
+
+			# If the object has been rendered already, just return a link to the previous
+			# HTML fragment
+			Thread.current[ THREAD_DUMP_KEY ] ||= {}
+			if Thread.current[ THREAD_DUMP_KEY ].key?( object.object_id )
+				return %Q{<a href="#object-%d" class="cache-link" title="jump to previous details">%s</a>} % [
+					object.object_id,
+					%{&rarr; %s #%d} % [ object.class.name, object.object_id ]
+				]
+			else
+				Thread.current[ THREAD_DUMP_KEY ][ object.object_id ] = true
+			end
+
+			# Assemble the innards as an array of parts
+			parts = [
+				%{<div class="object-header">},
+				%{<span class="object-class">#{object.class.name}</span>},
+				%{<span class="object-id">##{object.object_id}</span>},
+				%{</div>},
+				%{<div class="object-body">},
+			]
+
+			object.instance_variables.each do |ivar|
+				html = make_html_for_object( object.instance_variable_get(ivar) )
+				parts << IVAR_HTML_FRAGMENT % [ ivar, html ]
+			end
+
+			parts << %{</div>}
+
+			# Make HTML class names out of the object's namespaces
+			namespaces = object.class.name.downcase.split(/::/)
+			classes = []
+			namespaces.each_index do |i|
+				classes << namespaces[0..i].join('-') + '-object'
+			end
+
+			# Glue the whole thing together and return it
+			return OBJECT_HTML_CONTAINER % [
+				object.object_id,
+				classes.join(" "),
+				parts.join("\n")
+			]
+		end
+
+	end # module ObjectHtmlFunctions
+
+
+	### Add a #html_inspect method to the including object that is capable of dumping its
+	### state as an HTML fragment.
+	###
+	###   class MyObject
+	###       include HtmlInspectableObject
+	###   end
+	###
+	###   irb> MyObject.new.html_inspect
+	###      ==> "<span class=\"immediate-object\">#&lt;MyObject:0x56e780&gt;</span>"
+	module HtmlInspectableObject
+		include Arrow::HTMLUtilities
+
+		### Return the receiver as an HTML fragment.
+		def html_inspect
+			return make_html_for_object( self )
+		end
+
+	end # HtmlInspectableObject
 
 
 	# A mixin that collects classes that expect to be configured by an 

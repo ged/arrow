@@ -514,6 +514,8 @@ class Arrow::Applet < Arrow::Object
 						"Malformed action: Must accept at least a transaction argument"
 				end
 			end
+			
+			rval
 		end
 	end
 

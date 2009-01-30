@@ -288,6 +288,24 @@ describe Arrow::Transaction do
 			@txn.accepts?( 'application/x-yaml' ).should be_true()
 		end
 
+		it "knows that the request accepts HTML if its Accept: header indicates it accepts " +
+		   "'text/html'" do
+			@headers_in[ 'Accept' ] = 'text/html, text/plain; q=0.5, image/*;q=0.1'
+			@txn.accepts_html?.should be_true()
+		end
+		
+		it "knows that the request accepts HTML if its Accept: header indicates it accepts " +
+		   "'application/xhtml+xml'" do
+			@headers_in[ 'Accept' ] = 'application/xhtml+xml, text/plain; q=0.5, image/*;q=0.1'
+			@txn.accepts_html?.should be_true()
+		end
+		
+		it "knows that the request doesn't accept HTML if its Accept: header indicates it doesn't" do
+			@headers_in[ 'Accept' ] = 'text/plain; q=0.5, image/*;q=0.1'
+			@txn.accepts_html?.should be_false()
+		end
+		
+
 	end
 end
 

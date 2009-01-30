@@ -76,6 +76,7 @@ Once you have things up and running, you can start writing Ruby.
 # "Configuration":tutorial/advanced-config.html
 # "Logging":tutorial/logging.html
 # "Handling Errors":tutorial/error-handling.html
+# "REST Services":tutorial/services.html
 
 
 h2. API Documentation

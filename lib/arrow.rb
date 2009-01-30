@@ -54,6 +54,8 @@ module Arrow
 		raise
 	end
 
+	include Arrow::Constants
+	
 
 	# Hook up PluginFactory logging to Arrow logging
 	PluginFactory.logger_callback = lambda do |lvl, msg|

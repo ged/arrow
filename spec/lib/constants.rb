@@ -7,10 +7,13 @@
 
 require 'arrow'
 require 'arrow/config'
+require 'arrow/constants'
 
 
 ### A module of testing constants
 module Arrow::TestConstants
+
+	include Arrow::Constants
 
 	# Testing config values
 	TEST_CONFIG_HASH = {
