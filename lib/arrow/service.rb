@@ -33,7 +33,8 @@ require 'arrow/acceptparam'
 #
 class Arrow::Service < Arrow::Applet
 	include Arrow::Loggable,
-	        Arrow::HTMLUtilities
+	        Arrow::HTMLUtilities,
+	        Arrow::Constants
 
 	# Subversion revision
 	SVNRev = %q$Rev$
@@ -114,7 +115,7 @@ class Arrow::Service < Arrow::Applet
 			# http_status_response should contain a StatusResponse struct
 			http_status_response = catch( :finish ) do
 				if has_args
-					id = validate_id( args.shift )
+					id = self.validate_id( args.shift )
 					content = action.call( txn, id, *args )
 				else
 					content = action.call( txn )
@@ -125,14 +126,23 @@ class Arrow::Service < Arrow::Applet
 			end
 			
 			# Handle finishing with a status first
-			if http_status_response
+			if content
+				txn.status = Apache::HTTP_OK
+				return self.negotiate_content( txn, content )
+			elsif http_status_response
 				status_code = http_status_response[:status].to_i
 				msg = http_status_response[:message]
-				content = self.prepare_status_response( txn, status_code, msg )
+				return self.prepare_status_response( txn, status_code, msg )
 			end
 
-			self.negotiate_content( txn, content )
+			return nil
 		end
+	rescue => err
+		raise if err.class.name =~ /^Spec::/
+		
+		msg = "%s: %s %s" % [ err.class.name, err.message, err.backtrace.first ]
+		self.log.error( msg )
+		return self.prepare_status_response( txn, Apache::SERVER_ERROR, msg )
 	end
 
 
@@ -159,8 +169,11 @@ class Arrow::Service < Arrow::Applet
 			# See if SERIALIZERS has an available transform that the request
 			# accepts and the content supports.
 			SERIALIZERS.each do |type, msg|
-				return content.send( msg ) if
-					txn.explicitly_accepts?( type ) && content.respond_to?( msg )
+				if txn.explicitly_accepts?( type ) && content.respond_to?( msg )
+					serialized = content.send( msg )
+					txn.content_type = type
+					return serialized
+				end
 			end
 
 			# If the client can accept HTML, try to make an HTML response from whatever we have.
@@ -247,7 +260,7 @@ class Arrow::Service < Arrow::Applet
 			find_all {|msym| self.respond_to?(msym) }.
 			inject([]) {|ary,msym| ary << HTTP_METHOD_MAPPING[type][msym]; ary }
 
-		txn.err_headers_out[:allow] = allowed.uniq.sort.join(', ')
+		txn.err_headers_out['Allow'] = allowed.uniq.sort.join(', ')
 		finish_with( Apache::METHOD_NOT_ALLOWED, "%s is not allowed" % [txn.request_method] )
 	end
 

@@ -602,10 +602,8 @@ class Arrow::Applet < Arrow::Object
 	### Time the block, logging the result
 	def time_request
 		starttimes = Process.times
-
-		result = yield
-		
-		# Calculate CPU times
+		return yield
+	ensure
 		runtimes = Process.times
 		@run_count += 1
 		@total_utime += utime = (runtimes.utime - starttimes.utime)
@@ -613,8 +611,6 @@ class Arrow::Applet < Arrow::Object
 		self.log.info \
 			"[PID %d] Runcount: %d, User: %0.2f/%0.2f, System: %0.2f/%0.2f" %
 			[ Process.pid, @run_count, utime, @total_utime, stime, @total_stime ]
-
-		return result
 	end
 	
 

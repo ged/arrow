@@ -1,3 +1,76 @@
+-- Fri, 30 Jan 2009 22:11:28 -0000 by deveiant (r490) -----
+   Added:   data/templates/service-response.tmpl (new)
+   Changed: lib/arrow/constants.rb
+            spec/lib/appletmatchers.rb
+            spec/lib/constants.rb
+            spec/arrow/service_spec.rb
+            lib/arrow/service.rb
+            lib/arrow.rb (and 6 other/s)
+
+    * Started work on HTTP content negotiation for Arrow::Service
+    * Added content-negotiation predicates to Arrow::Transaction for HTML content types.
+    * Added Arrow::HTMLUtilities.make_html_for_object.
+
+
+-- Wed, 28 Jan 2009 01:11:43 -0000 by deveiant (r489) -----
+   Added:   spec/lib/appletmatchers.rb (new)
+            spec/arrow/service_spec.rb (new)
+            lib/arrow/service.rb (new)
+   Changed: lib/arrow/applet.rb
+
+    * Added Arrow::Service, an Arrow::Applet derivative for making REST services.
+    * Added a matcher library for RSpec specs about Arrow::Applets.
+    * Factored the request-timing stuff in Arrow::Applet out into #time_request.
+
+
+-- Tue, 27 Jan 2009 02:22:19 -0000 by deveiant (r488) -----
+   Changed: spec/arrow/transaction_spec.rb
+            lib/arrow/transaction.rb
+
+   * Added support for HTTP content-negotiation checks.
+
+
+-- Tue, 27 Jan 2009 01:33:41 -0000 by deveiant (r487) -----
+   Added:   spec/arrow/acceptparam_spec.rb (new)
+            lib/arrow/acceptparam.rb (new)
+   Changed: README
+
+   Imported Arrow::AcceptParam from [http://opensource.laika.com/wiki/ThingFish Thingfish] for upcoming HTTP content-negotiation work.
+
+
+-- Fri, 23 Jan 2009 23:04:12 -0000 by deveiant (r486) -----
+   Changed: /trunk
+
+   Added weird gem-related directories that keep appearing to the svn:ignore list, as I've grown tired of trying to figure out where the hell they're coming from.
+
+
+-- Fri, 23 Jan 2009 22:55:11 -0000 by deveiant (r485) -----
+   Added:   spec/arrow/template (new)
+            spec/arrow/template/iterator_spec.rb
+            -> renamed from /trunk/tests/template_iterator.tests.rb@r484
+   Changed: lib/arrow.rb
+            spec/arrow/session_spec.rb
+            lib/arrow/template/iterator.rb
+            spec/arrow/dispatcher_spec.rb
+            spec/arrow/mixins_spec.rb
+   Deleted: tests/template_iterator.tests.rb
+
+    * Converted Arrow::Template::Iterator test to spec
+    * Added Arrow::Template::Iterator#even_or_odd
+
+
+-- Wed, 14 Jan 2009 23:39:25 -0000 by deveiant (r484) -----
+   Changed: lib/arrow/appletregistry.rb
+            Rakefile
+            lib/arrow.rb
+            ChangeLog
+            lib/arrow/dispatcher.rb
+            lib/arrow/formvalidator.rb (and 2 other/s)
+
+    * Updated build system
+    * Eliminated $SAFE = 1 issues with RubyGems via a monkeypatch.
+
+
 -- Wed, 10 Dec 2008 01:01:00 -0000 by deveiant (r483) -----
    Added:   spec/lib/constants.rb
             -> renamed from /branches/gem-applet-experiment/spec/lib/constants.rb@r482

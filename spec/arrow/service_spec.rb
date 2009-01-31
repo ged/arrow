@@ -31,7 +31,7 @@ describe Arrow::Service do
 	        Arrow::AppletMatchers
 
 	before( :all ) do
-		setup_logging( :debug )
+		setup_logging( :crit )
 	end
 
 	after( :all ) do
@@ -71,23 +71,27 @@ describe Arrow::Service do
 		
 		it "maps a GET without an ID to #fetch_all" do
 			@txn.stub!( :request_method ).and_return( 'GET' )
+			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
 			@service.run( @txn ).should == :resource_collection
 		end
 	
 		it "maps a GET with an ID to #fetch" do
 			@txn.stub!( :request_method ).and_return( 'GET' )
 			@txn.stub!( :uri ).and_return( @uri + '/18' )
+			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
 			@service.run( @txn, '18' ).should == :one_resource
 		end
 	
 		it "maps a HEAD without an ID to #fetch_all" do
 			@txn.stub!( :request_method ).and_return( 'HEAD' )
+			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
 			@service.run( @txn ).should == :resource_collection
 		end
 	
 		it "maps a HEAD with an ID to #fetch" do
 			@txn.stub!( :request_method ).and_return( 'HEAD' )
 			@txn.stub!( :uri ).and_return( @uri + '/18' )
+			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
 			@service.run( @txn, '18' ).should == :one_resource
 		end
 	
@@ -96,7 +100,7 @@ describe Arrow::Service do
 			@txn.stub!( :err_headers_out ).and_return( err_headers )
 			@txn.stub!( :request_method ).and_return( 'POST' )
 
-			err_headers.should_receive( :[]= ).with( :allow, 'GET, HEAD' )
+			err_headers.should_receive( :[]= ).with( 'Allow', 'GET, HEAD' )
 			@txn.should_receive( :status= ).with( Apache::METHOD_NOT_ALLOWED )
 			@txn.should_receive( :content_type= ).with( 'text/plain' )
 
@@ -108,7 +112,7 @@ describe Arrow::Service do
 			@txn.stub!( :err_headers_out ).and_return( err_headers )
 			@txn.stub!( :request_method ).and_return( 'PUT' )
 
-			err_headers.should_receive( :[]= ).with( :allow, 'GET, HEAD' )
+			err_headers.should_receive( :[]= ).with( 'Allow', 'GET, HEAD' )
 			@txn.should_receive( :status= ).with( Apache::METHOD_NOT_ALLOWED )
 			@txn.should_receive( :content_type= ).with( 'text/plain' )
 
@@ -120,7 +124,7 @@ describe Arrow::Service do
 			@txn.stub!( :err_headers_out ).and_return( err_headers )
 			@txn.stub!( :request_method ).and_return( 'DELETE' )
 
-			err_headers.should_receive( :[]= ).with( :allow, 'GET, HEAD' )
+			err_headers.should_receive( :[]= ).with( 'Allow', 'GET, HEAD' )
 			@txn.should_receive( :status= ).with( Apache::METHOD_NOT_ALLOWED )
 			@txn.should_receive( :content_type= ).with( 'text/plain' )
 
@@ -153,24 +157,28 @@ describe Arrow::Service do
 		
 		it "maps a GET without an ID to #fetch_all" do
 			@txn.stub!( :request_method ).and_return( 'GET' )
+			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
 			@service.run( @txn ).should == :resource_collection
 		end
 	
 		it "maps a GET with an ID to #fetch" do
 			@txn.stub!( :request_method ).and_return( 'GET' )
 			@txn.stub!( :uri ).and_return( @uri + '/199' )
+			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
 			@service.run( @txn, '199' ).should == :one_resource
 		end
 	
 		it "maps a POST without an ID to #create" do
 			@txn.stub!( :request_method ).and_return( 'POST' )
 			@txn.stub!( :uri ).and_return( @uri )
+			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
 			@service.run( @txn ).should == :new_resource
 		end
 	
 		it "maps a POST with an ID to #create" do
 			@txn.stub!( :request_method ).and_return( 'POST' )
 			@txn.stub!( :uri ).and_return( @uri + '/199' )
+			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
 			@service.run( @txn, '199' ).should == :new_resource
 		end
 	
@@ -233,6 +241,9 @@ describe Arrow::Service do
 					@objects.each {|o| o.extend(Arrow::HtmlInspectableObject) }
 					super
 				end
+
+				attr_reader :objects
+				
 				def fetch( txn, id )
 					return @objects[ id - 1 ]
 				end
@@ -257,10 +268,10 @@ describe Arrow::Service do
 
 			@txn.stub!( :content_type ).and_return( nil )
 			@txn.stub!( :accepts? ).and_return( true )
+			@txn.stub!( :explicitly_accepts? ).and_return( false )
 			@txn.stub!( :normalized_accept_string ).and_return( "acceptable types" )
 		end
 		
-
 		it "serves a single fetched object as HTML if the request doesn't specify acceptable " +
 		   "content types" do
 			template = mock( "service template" ).as_null_object
@@ -269,6 +280,7 @@ describe Arrow::Service do
 			@txn.stub!( :explicitly_accepts? ).and_return( false )
 			@txn.should_receive( :accepts_html? ).and_return( true )
 			@txn.should_receive( :content_type= ).with( HTML_MIMETYPE )
+			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
 			template.should_receive( :body= ).with( /value4/ )
 
 			@service.run( @txn, '2' ).should == template
@@ -276,20 +288,121 @@ describe Arrow::Service do
 		
 		it "serves an object collection as HTML if the request doesn't specify acceptable " +
 		   "content types" do
-			
+			template = mock( "service template" ).as_null_object
+			@factory.should_receive( :get_template ).and_return( template )
+
+			@txn.stub!( :explicitly_accepts? ).and_return( false )
+			@txn.should_receive( :accepts_html? ).and_return( true )
+			@txn.should_receive( :content_type= ).with( HTML_MIMETYPE )
+			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
+			template.should_receive( :body= ).with( /value4/ )
+
+			@service.run( @txn ).should == template
 		end
 
-		it "serves a single fetched object as HTML if the request prefers it"
-		it "serves an object collection as HTML if the request prefers it"
+		it "serves a single fetched object as JSON if the request prefers it" do
+			@txn.stub!( :explicitly_accepts? ).with( 'application/json' ).
+				and_return( true )
+			@txn.should_receive( :content_type= ).with( 'application/json' )
+			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
 
-		it "serves a single fetched object as JSON if the request prefers it"
-		it "serves an object collection as JSON if the request prefers it"
+			@service.objects[1].should_receive( :to_json ).and_return( :json_object2 )
+				
+			@txn.should_not_receive( :accepts_html? ).and_return( true )
 
-		it "serves a single fetched object as YAML if the request prefers it"
-		it "serves an object collection as YAML if the request prefers it"
+			@service.run( @txn, '2' ).should == :json_object2
+		end
+		
+		it "serves an object collection as JSON if the request prefers it" do
+			@txn.stub!( :explicitly_accepts? ).with( 'application/json' ).
+				and_return( true )
+			@txn.should_receive( :content_type= ).with( 'application/json' )
+			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
 
-		it "serves a single fetched object as XML if the request prefers it"
-		it "serves an object collection as XML if the request prefers it"
+			@txn.should_not_receive( :accepts_html? ).and_return( true )
+
+			@service.objects.should_receive( :to_json ).and_return( :json_object_collection )
+				
+			@service.run( @txn ).should == :json_object_collection
+		end
+
+		it "serves a single fetched object as YAML if the request prefers it" do
+			@txn.stub!( :explicitly_accepts? ).with( 'text/x-yaml' ).
+				and_return( true )
+			@txn.should_receive( :content_type= ).with( 'text/x-yaml' )
+			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
+
+			@service.objects[1].should_receive( :to_yaml ).and_return( :yaml_object2 )
+
+			@txn.should_not_receive( :accepts_html? ).and_return( true )
+
+			@service.run( @txn, '2' ).should == :yaml_object2
+		end
+		
+		it "serves an object collection as YAML if the request prefers it" do
+			@txn.stub!( :explicitly_accepts? ).with( 'text/x-yaml' ).
+				and_return( true )
+			@txn.should_receive( :content_type= ).with( 'text/x-yaml' )
+			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
+
+			@txn.should_not_receive( :accepts_html? ).and_return( true )
+
+			@service.objects.should_receive( :to_yaml ).and_return( :yaml_object_collection )
+
+			@service.run( @txn ).should == :yaml_object_collection
+		end
+
+		it "serves a single fetched object as XML if the request prefers it" do
+			@txn.stub!( :explicitly_accepts? ).with( 'text/xml' ).
+				and_return( true )
+			@txn.should_receive( :content_type= ).with( 'text/xml' )
+			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
+
+			@service.objects[1].should_receive( :to_xml ).and_return( :xml_object2 )
+
+			@txn.should_not_receive( :accepts_html? ).and_return( true )
+
+			@service.run( @txn, '2' ).should == :xml_object2
+		end
+		
+		it "serves an object collection as XML if the request prefers it" do
+			@txn.stub!( :explicitly_accepts? ).with( 'text/xml' ).
+				and_return( true )
+			@txn.should_receive( :content_type= ).with( 'text/xml' )
+			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
+
+			@txn.should_not_receive( :accepts_html? ).and_return( true )
+
+			@service.objects.should_receive( :to_xml ).and_return( :xml_object_collection )
+
+			@service.run( @txn ).should == :xml_object_collection
+		end
+
+		it "serves a single fetched object as plain text if the request prefers it" do
+			@txn.stub!( :explicitly_accepts? ).with( 'text/plain' ).
+				and_return( true )
+			@txn.should_receive( :content_type= ).with( 'text/plain' )
+			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
+
+			@service.objects[1].should_receive( :to_s ).and_return( :string_object2 )
+
+			@txn.should_not_receive( :accepts_html? ).and_return( true )
+
+			@service.run( @txn, '2' ).should == :string_object2
+		end
+		
+		it "serves an object collection as XML if the request prefers it" do
+			@txn.stub!( :explicitly_accepts? ).with( 'text/plain' ).
+				and_return( true )
+			@txn.should_receive( :content_type= ).with( 'text/plain' )
+			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
+
+			@txn.should_not_receive( :accepts_html? ).and_return( true )
+
+			@service.objects.should_receive( :to_s ).and_return( :string_object_collection )
+
+			@service.run( @txn ).should == :string_object_collection
+		end
 
 	end
 

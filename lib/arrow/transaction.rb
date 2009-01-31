@@ -10,6 +10,7 @@ require 'arrow/cookie'
 require 'arrow/cookieset'
 require 'arrow/session'
 require 'arrow/acceptparam'
+require 'arrow/constants'
 
 
 # The Arrow::Transaction class, a derivative of
@@ -32,6 +33,7 @@ require 'arrow/acceptparam'
 #
 class Arrow::Transaction < Arrow::Object
 	extend Forwardable
+	include Arrow::Constants
 
 	# SVN Revision
 	SVNRev = %q$Rev$
