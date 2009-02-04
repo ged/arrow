@@ -13,5 +13,11 @@ module Arrow::Constants
 	# The mimetype to use for HTML content
 	HTML_MIMETYPE = 'text/html'
 
+	# The mimetype to use for marshalled Ruby objects
+	RUBY_MARSHALLED_MIMETYPE = 'application/x-ruby-marshalled-object'
+
+	# The mimetype to use for raw Ruby objects
+	RUBY_OBJECT_MIMETYPE = 'application/x-ruby-object'
+
 end
 

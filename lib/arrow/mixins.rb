@@ -138,11 +138,11 @@ module Arrow
 		THREAD_DUMP_KEY = :__to_html_cache__
 
 		# The HTML fragment to wrap around Hash objects
-		HASH_HTML_CONTAINER = %{<div class="hash-members">%s</div>}
+		HASH_HTML_CONTAINER = %{<dl class="hash-members">%s</dl>}
 
 		# The HTML fragment to use for pairs of a Hash
-		HASH_PAIR_HTML = %{<div class="hash-pair"><div class="key">%s</div>} +
-			%{<div class="value">%s</div></div>\n}
+		HASH_PAIR_HTML = %{<dt class="hash-pair key">%s</dt>} +
+			%{<dd class="hash-pair value">%s</dd>\n}
 
 		# The HTML fragment to wrap around Array objects
 		ARRAY_HTML_CONTAINER = %{<ol class="array-members"><li>%s</li></ol>}
@@ -155,9 +155,9 @@ module Arrow
 
 		# The HTML fragment to use for instance variables inside of object DIVs.
 		IVAR_HTML_FRAGMENT = %Q{
-		  <div class="instance-variable">
-			<div class="name">%s</div>
-			<div class="value">%s</div>
+		  <div class="%s">
+			<span class="name">%s</span>
+			<span class="value">%s</span>
 		  </div>
 		}
 
@@ -215,7 +215,7 @@ module Arrow
 
 			return object_html.join("\n")
 
-		end # module HTMLUtilities
+		end
 
 
 		### Wrap up the various parts of a complex object in an HTML fragment. If the
@@ -245,8 +245,11 @@ module Arrow
 			]
 
 			object.instance_variables.each do |ivar|
-				html = make_html_for_object( object.instance_variable_get(ivar) )
-				parts << IVAR_HTML_FRAGMENT % [ ivar, html ]
+				value = object.instance_variable_get( ivar )
+				html = make_html_for_object( value )
+				classes = %w[instance-variable]
+				classes << if value.instance_variables.empty? then 'simple' else 'complex' end
+				parts << IVAR_HTML_FRAGMENT % [ classes.join(' '), ivar, html ]
 			end
 
 			parts << %{</div>}
@@ -266,7 +269,7 @@ module Arrow
 			]
 		end
 
-	end # module ObjectHtmlFunctions
+	end # module HTMLUtilities
 
 
 	### Add a #html_inspect method to the including object that is capable of dumping its

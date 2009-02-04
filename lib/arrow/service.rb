@@ -85,12 +85,20 @@ class Arrow::Service < Arrow::Applet
 		['application/json', :to_json],
 		['text/x-yaml',      :to_yaml],
 		['text/xml',         :to_xml],
-		['text/plain',       :to_s],
 	]
+
+	# The list of content-types and the corresponding method on the service to use to
+	# transform it into something useful.
+	DESERIALIZERS = {
+		'application/json'        => :deserialize_json_body,
+		'text/x-yaml'             => :deserialize_yaml_body,
+		RUBY_MARSHALLED_MIMETYPE  => :deserialize_marshalled_body,
+	}
+
 
 	# The content-type that's used for HTTP content negotiation if none
 	# is set on the transaction
-	DEFAULT_CONTENT_TYPE = 'application/x-ruby-object'
+	DEFAULT_CONTENT_TYPE = RUBY_OBJECT_MIMETYPE
 	
 
 	# Struct for containing thrown HTTP status responses
@@ -106,7 +114,7 @@ class Arrow::Service < Arrow::Applet
 		self.time_request do
 			self.log.debug "Looking up service action for %s %s" % [ txn.request_method, txn.uri ]
 			has_args = ! args.empty?
-			action = self.lookup_action( txn, has_args )
+			action = self.lookup_action_method( txn, has_args )
 			content = nil
 			
 			# Run the action. If it executes normally, 'content' will contain the
@@ -163,21 +171,24 @@ class Arrow::Service < Arrow::Applet
 				[ current_type, txn.normalized_accept_string ]
 			return content 
 		else
-			self.log.info "Negotiating a response which matches '%s' from a '%s' entity body" %
-				[ txn.normalized_accept_string, current_type ]
+			self.log.info "Negotiating a response which matches '%s' from a %p entity body" %
+				[ txn.normalized_accept_string, current_type || content.class ]
 
 			# See if SERIALIZERS has an available transform that the request
 			# accepts and the content supports.
 			SERIALIZERS.each do |type, msg|
 				if txn.explicitly_accepts?( type ) && content.respond_to?( msg )
+					self.log.debug "  using %p to serialize the content to %p" % [ msg, type ]
 					serialized = content.send( msg )
 					txn.content_type = type
 					return serialized
 				end
 			end
+			self.log.debug "  no matching serializers, trying a hypertext response"
 
 			# If the client can accept HTML, try to make an HTML response from whatever we have.
 			if txn.accepts_html?
+				self.log.debug "  client accepts HTML"
 				return prepare_hypertext_response( txn, content )
 			end
 		
@@ -210,11 +221,15 @@ class Arrow::Service < Arrow::Applet
 	### its #html_inspect method (if it has one), or via 
 	### Arrow::HtmlInspectableObject#make_html_for_object
 	def prepare_hypertext_response( txn, content )
+		self.log.debug "Preparing a hypertext response out of %p" %
+			[ txn.content_type || content.class ]
 		body = nil
 		
 		if content.respond_to?( :html_inspect )
+			self.log.debug "  using the object's own #html_inspect"
 			body = content.html_inspect
 		else
+			self.log.debug "  using the generic HTML inspector"
 			body = make_html_for_object( content )
 		end
 		
@@ -235,7 +250,7 @@ class Arrow::Service < Arrow::Applet
 
 	### Look up which service action should be invoked based on the HTTP
 	### request method and the number of arguments.
-	def lookup_action( txn, has_args=false )
+	def lookup_action_method( txn, has_args=false )
 		http_method = txn.request_method
 
 		tuple = METHOD_MAPPING[ txn.request_method ]
@@ -278,6 +293,49 @@ class Arrow::Service < Arrow::Applet
 		return Integer( id )
 	end
 
+
+	### Read the request body from the specified transaction, deserialize it if 
+	### necessary, and return one or more Ruby objects. If there isn't a deserializer
+	### in DESERIALIZERS that matches the request's `Content-type`, the request
+	### is aborted with an "Unsupported Media Type" (415) response.
+	def deserialize_request_body( txn )
+		content_type = txn.headers_in['content-type']
+		self.log.debug "Trying to deserialize a %p request body." % [ content_type ]
+
+		mname = DESERIALIZERS[ content_type ]
+		
+		if mname && self.respond_to?( mname )
+			self.log.debug "  calling deserializer: #%s" % [ mname ]
+			return self.send( mname, txn ) 
+		else
+			self.log.error "  no support for %p requests: %s" % [
+				content_type,
+				mname ? "no implementation of the #{mname} method" : "unknown content-type"
+			  ]
+			finish_with( Apache::HTTP_UNSUPPORTED_MEDIA_TYPE,
+				"don't know how to handle %p requests" % [content_type, txn.request_method] )
+		end
+	end
+	
+	
+	### Deserialize the given transaction's request body as JSON and return it.
+	def deserialize_json_body( txn )
+		return JSON.load( txn )
+	end
+	
+
+	### Deserialize the given transaction's request body as YAML and return it.
+	def deserialize_yaml_body( txn )
+		return YAML.load( txn )
+	end
+	
+
+	### Deserialize the given transaction's request body as a marshalled Ruby 
+	### object and return it.
+	def deserialize_marshalled_body( txn )
+		return Marshal.load( txn )
+	end
+	
 
 	#######
 	private

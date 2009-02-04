@@ -50,6 +50,53 @@ describe Arrow::Service do
 		@txn.stub!( :accepted_types ).and_return( @accepted_types )
 	end
 
+
+	describe " subclass" do
+		before( :all ) do
+			@service_class = Class.new( Arrow::Service ) do
+				public :deserialize_request_body
+			end
+		end
+		
+		before( :each ) do
+			@request_headers = mock( "request headers" )
+			@service = @service_class.new( @config, @factory, @uri )
+			@txn.stub!( :request_method ).and_return( 'POST' )
+			@txn.stub!( :headers_in ).and_return( @request_headers )
+		end
+
+		it "returns an UNSUPPORTED MEDIA TYPE response if given a body in an unsupported format" do
+			@request_headers.should_receive( :[] ).with( 'content-type' ).
+				and_return( 'application/x-bungtruck' )
+
+			lambda {
+				@service.deserialize_request_body( @txn )
+			}.should finish_with( Apache::HTTP_UNSUPPORTED_MEDIA_TYPE, /don't know how to handle/i )
+		end
+
+		it "knows how to deserialize incoming request bodies in JSON format" do
+			@request_headers.should_receive( :[] ).with( 'content-type' ).
+				and_return( 'application/json' )
+
+			JSON.should_receive( :load ).with( @txn ).and_return( :ruby_objects )
+			@service.deserialize_request_body( @txn ).should == :ruby_objects
+		end
+
+		it "knows how to deserialize incoming request bodies in YAML format" do
+			@request_headers.should_receive( :[] ).with( 'content-type' ).
+				and_return( 'text/x-yaml' )
+
+			YAML.should_receive( :load ).with( @txn ).and_return( :ruby_objects )
+			@service.deserialize_request_body( @txn ).should == :ruby_objects
+		end
+
+		it "knows how to deserialize incoming request bodies in marshalled format" do
+			@request_headers.should_receive( :[] ).with( 'content-type' ).
+				and_return( RUBY_MARSHALLED_MIMETYPE )
+			Marshal.should_receive( :load ).with( @txn ).and_return( :ruby_objects )
+			@service.deserialize_request_body( @txn ).should == :ruby_objects
+		end
+	end
 	
 	describe " subclass which supports only GET operations" do
 
@@ -376,32 +423,6 @@ describe Arrow::Service do
 			@service.objects.should_receive( :to_xml ).and_return( :xml_object_collection )
 
 			@service.run( @txn ).should == :xml_object_collection
-		end
-
-		it "serves a single fetched object as plain text if the request prefers it" do
-			@txn.stub!( :explicitly_accepts? ).with( 'text/plain' ).
-				and_return( true )
-			@txn.should_receive( :content_type= ).with( 'text/plain' )
-			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
-
-			@service.objects[1].should_receive( :to_s ).and_return( :string_object2 )
-
-			@txn.should_not_receive( :accepts_html? ).and_return( true )
-
-			@service.run( @txn, '2' ).should == :string_object2
-		end
-		
-		it "serves an object collection as XML if the request prefers it" do
-			@txn.stub!( :explicitly_accepts? ).with( 'text/plain' ).
-				and_return( true )
-			@txn.should_receive( :content_type= ).with( 'text/plain' )
-			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
-
-			@txn.should_not_receive( :accepts_html? ).and_return( true )
-
-			@service.objects.should_receive( :to_s ).and_return( :string_object_collection )
-
-			@service.run( @txn ).should == :string_object_collection
 		end
 
 	end
