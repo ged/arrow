@@ -45,11 +45,11 @@ class Arrow::Service < Arrow::Applet
 	# Map of HTTP methods to their Ruby equivalents as tuples of the form:
 	#   [ :method_without_args, :method_with_args ]
 	METHOD_MAPPING = {
-		'GET'    => [ :fetch,  :fetch_all  ],
-		'HEAD'   => [ :fetch,  :fetch_all  ],
-		'POST'   => [ :create, :create     ],
-		'PUT'    => [ :update, :update_all ],
-		'DELETE' => [ :delete, :delete_all ],
+		'GET'    => [ :fetch_all,  :fetch  ],
+		'HEAD'   => [ :fetch_all,  :fetch  ],
+		'POST'   => [ :create,     :create ],
+		'PUT'    => [ :update_all, :update ],
+		'DELETE' => [ :delete_all, :delete ],
 	  }
 
 	# Map of Ruby methods to their HTTP equivalents from either the single or collection URIs
@@ -112,9 +112,10 @@ class Arrow::Service < Arrow::Applet
 	### Overridden to provide content-negotiation and error-handling.
 	def run( txn, *args )
 		self.time_request do
-			self.log.debug "Looking up service action for %s %s" % [ txn.request_method, txn.uri ]
+			self.log.debug "Looking up service action for %s %s (%p)" %
+				[ txn.request_method, txn.uri, args ]
 			has_args = ! args.empty?
-			action = self.lookup_action_method( txn, has_args )
+			action = self.lookup_action_method( txn, args ) or return nil
 			content = nil
 			
 			# Run the action. If it executes normally, 'content' will contain the
@@ -124,7 +125,7 @@ class Arrow::Service < Arrow::Applet
 			http_status_response = catch( :finish ) do
 				if has_args
 					id = self.validate_id( args.shift )
-					content = action.call( txn, id, *args )
+					content = action.call( txn, id )
 				else
 					content = action.call( txn )
 				end
@@ -135,7 +136,7 @@ class Arrow::Service < Arrow::Applet
 			
 			# Handle finishing with a status first
 			if content
-				txn.status = Apache::HTTP_OK
+				txn.status ||= Apache::HTTP_OK
 				return self.negotiate_content( txn, content )
 			elsif http_status_response
 				status_code = http_status_response[:status].to_i
@@ -158,6 +159,70 @@ class Arrow::Service < Arrow::Applet
 	#########
 	protected
 	#########
+
+	### Look up which service action should be invoked based on the HTTP
+	### request method and the number of arguments.
+	def lookup_action_method( txn, args )
+		http_method = txn.request_method
+
+		tuple = METHOD_MAPPING[ txn.request_method ] or return self.method( :not_allowed )
+		self.log.debug "Method mapping for %s is %p" % [ txn.request_method, tuple ]
+
+		if args.length <= 1
+			self.log.debug "  URI is canonical (args = %p)" % [ args ]
+			msym = tuple[ args.length ]
+			self.log.debug "  picked the %p method (%s arguments)" %
+				[ msym, args.empty? ? 'no' : 'with' ]
+			
+		else
+			self.log.debug "  URI is not canonical (args = %p)" % [ args ]
+			ops = args[1..-1].collect {|arg| arg[/^([a-z]\w+)$/, 1].untaint }
+			
+			mname = "%s_%s" % [ tuple[1], ops.compact.join('_') ]
+			msym = mname.to_sym
+			self.log.debug "  picked the %p method (args = %p)" % [ msym, args ]
+			
+		end
+
+		# If the method exists, just return a Method object for it
+		return self.method( msym ) if self.respond_to?( msym )
+
+		# Otherwise, return an appropriate error response
+		self.log.error "request for unimplemented %p action for %s" % [ msym, txn.uri ]
+
+		return args.length <= 1 ? self.method( :not_allowed ) : nil
+	end
+
+
+	### Return a METHOD_NOT_ALLOWED response
+	def not_allowed( txn, *args )
+		allowed = nil
+
+		# Pick the allowed methods based on whether the request was to the collection resource or a
+        # single resource
+		type = args.empty? ? :collection : :single
+		allowed = HTTP_METHOD_MAPPING[ type ].keys.
+			find_all {|msym| self.respond_to?(msym) }.
+			inject([]) {|ary,msym| ary << HTTP_METHOD_MAPPING[type][msym]; ary }
+
+		txn.err_headers_out['Allow'] = allowed.uniq.sort.join(', ')
+		finish_with( Apache::METHOD_NOT_ALLOWED, "%s is not allowed" % [txn.request_method] )
+	end
+
+
+	### Validates the given string as a non-negative integer, either
+	### returning it after untainting it or aborting with BAD_REQUEST. Override this
+	### in your service if your resource IDs aren't integers.
+	def validate_id( id )
+		self.log.debug "validating ID %p" % [ id ]
+		finish_with Apache::BAD_REQUEST, "missing ID" if id.nil?
+		finish_with Apache::BAD_REQUEST, "malformed or invalid ID: #{id}" unless
+			id =~ /^\d+$/
+
+		id.untaint
+		return Integer( id )
+	end
+
 
 	### Format the given +content+ according to the content-negotiation
 	### headers of the request in the given +txn+. 
@@ -248,58 +313,12 @@ class Arrow::Service < Arrow::Applet
 	template :service => 'service-response.tmpl'
 	
 
-	### Look up which service action should be invoked based on the HTTP
-	### request method and the number of arguments.
-	def lookup_action_method( txn, has_args=false )
-		http_method = txn.request_method
-
-		tuple = METHOD_MAPPING[ txn.request_method ]
-		self.log.debug "Method mapping for %s is %p" % [ txn.request_method, tuple ]
-		msym = tuple[ has_args ? 0 : 1 ] if tuple
-		self.log.debug "  picked the %p method (%s arguments)" % [ msym, has_args ? 'with' : 'no' ]
-
-		return self.method( msym ) if msym && self.respond_to?( msym )
-		self.log.error "request for unimplemented %p action for %s" % [ msym, txn.uri ]
-		return self.method( :not_allowed )
-	end
-
-
-	### Return a METHOD_NOT_ALLOWED response
-	def not_allowed( txn, *args )
-		allowed = nil
-
-		# Pick the allowed methods based on whether the request was to the collection resource or a
-        # single resource
-		type = args.empty? ? :collection : :single
-		allowed = HTTP_METHOD_MAPPING[ type ].keys.
-			find_all {|msym| self.respond_to?(msym) }.
-			inject([]) {|ary,msym| ary << HTTP_METHOD_MAPPING[type][msym]; ary }
-
-		txn.err_headers_out['Allow'] = allowed.uniq.sort.join(', ')
-		finish_with( Apache::METHOD_NOT_ALLOWED, "%s is not allowed" % [txn.request_method] )
-	end
-
-
-	### Validates the given string as a non-negative integer, either
-	### returning it after untainting it or aborting with BAD_REQUEST. Override this
-	### in your service if your resource IDs aren't integers.
-	def validate_id( id )
-		self.log.debug "validating ID %p" % [ id ]
-		finish_with Apache::BAD_REQUEST, "missing ID" if id.nil?
-		finish_with Apache::BAD_REQUEST, "malformed or invalid ID: #{id}" unless
-			id =~ /^\d+$/
-
-		id.untaint
-		return Integer( id )
-	end
-
-
 	### Read the request body from the specified transaction, deserialize it if 
 	### necessary, and return one or more Ruby objects. If there isn't a deserializer
 	### in DESERIALIZERS that matches the request's `Content-type`, the request
 	### is aborted with an "Unsupported Media Type" (415) response.
 	def deserialize_request_body( txn )
-		content_type = txn.headers_in['content-type']
+		content_type = txn.headers_in['content-type'].sub( /;.*/, '' ).strip
 		self.log.debug "Trying to deserialize a %p request body." % [ content_type ]
 
 		mname = DESERIALIZERS[ content_type ]

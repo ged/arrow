@@ -138,11 +138,13 @@ module Arrow
 		THREAD_DUMP_KEY = :__to_html_cache__
 
 		# The HTML fragment to wrap around Hash objects
-		HASH_HTML_CONTAINER = %{<dl class="hash-members">%s</dl>}
+		HASH_HTML_CONTAINER = %{<div class="hash-members">%s</div>}
 
 		# The HTML fragment to use for pairs of a Hash
-		HASH_PAIR_HTML = %{<dt class="hash-pair key">%s</dt>} +
-			%{<dd class="hash-pair value">%s</dd>\n}
+		HASH_PAIR_HTML = %{<div class="hash-pair %s">\n} +
+			%{<div class="key">%s</div>\n} +
+			%{<div class="value">%s</div>\n} +
+			%{</div>\n}
 
 		# The HTML fragment to wrap around Array objects
 		ARRAY_HTML_CONTAINER = %{<ol class="array-members"><li>%s</li></ol>}
@@ -189,7 +191,14 @@ module Arrow
 				else
 					object_html << HASH_HTML_CONTAINER % [
 						object.collect {|k,v|
-							HASH_PAIR_HTML % [make_html_for_object(k), make_html_for_object(v)]
+							pairclass = v.instance_variables.empty? ? 
+								"simple-hash-pair" :
+								"complex-hash-pair"
+							HASH_PAIR_HTML % [
+								pairclass,
+								make_html_for_object(k),
+								make_html_for_object(v),
+							  ]
 						}
 					]
 				end
@@ -244,7 +253,7 @@ module Arrow
 				%{<div class="object-body">},
 			]
 
-			object.instance_variables.each do |ivar|
+			object.instance_variables.sort.each do |ivar|
 				value = object.instance_variable_get( ivar )
 				html = make_html_for_object( value )
 				classes = %w[instance-variable]
