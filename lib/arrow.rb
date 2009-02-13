@@ -4,7 +4,6 @@ require 'yaml'
 require 'tmpdir'
 
 require 'pathname'
-require 'rubygems'
 
 
 # 
@@ -58,10 +57,10 @@ module Arrow
 	
 
 	# Hook up PluginFactory logging to Arrow logging
-	PluginFactory.logger_callback = lambda do |lvl, msg|
-		Arrow::Logger[PluginFactory].debug( msg )
-	end
-	PluginFactory.log( :debug, "Hooked up PluginFactory logging through Arrow's logger." )
+	# PluginFactory.logger_callback = lambda do |lvl, msg|
+	# 	Arrow::Logger[PluginFactory].debug( msg )
+	# end
+	# PluginFactory.log( :debug, "Hooked up PluginFactory logging through Arrow's logger." )
 
 
 	### A +RubyChildInitHandler+ class which loads one or more dispatchers

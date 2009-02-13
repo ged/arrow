@@ -1,8 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'rubygems'
-gem 'formvalidator'
-
 require 'uri'
 require 'forwardable'
 require 'date'

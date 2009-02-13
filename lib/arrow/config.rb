@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'rubygems'
-
 require 'uri'
 require 'pluginfactory'
 require 'forwardable'

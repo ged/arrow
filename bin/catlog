@@ -1,7 +1,0 @@
-#!/bin/sh
-
-if [ -z "$1" ]; then
-    echo "catlog /path/to/logfile" ; exit
-fi
-
-tail -f $1 | perl -p -e 's/\\n\\t/\n\t/g'

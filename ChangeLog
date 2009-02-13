@@ -1,3 +1,45 @@
+-- Thu, 05 Feb 2009 02:37:51 -0000 by deveiant (r493) -----
+   Changed: spec/arrow/service_spec.rb
+            lib/arrow/service.rb
+            lib/arrow/mixins.rb
+
+   Arrow::Service
+   * Made deserializers ignore everything but the media type of the incoming Content-type.
+   * Added resource attribute method mapping (GET /api/{id}/attr => #fetch_attr)
+   * Tweaked the HTML output
+
+
+-- Wed, 04 Feb 2009 18:10:19 -0000 by deveiant (r492) -----
+   Changed: lib/arrow/constants.rb
+            spec/arrow/service_spec.rb
+            lib/arrow/service.rb
+            lib/arrow/mixins.rb
+
+    * Arrow::Service
+    - Added #deserialize_request_body
+    - Renamed #lookup_action to #lookup_action_method so it's not invokable via a request.
+    * Arrow::Constants
+    - Added RUBY_MARSHALLED_MIMETYPE and RUBY_OBJECT_MIMETYPE
+    * Arrow::HTMLUtilities
+    - Represent Hashes with DLs instead of nested DIVs
+    - Added a class to allow inlining of simple key/value pairs
+
+
+-- Sat, 31 Jan 2009 01:41:00 -0000 by deveiant (r491) -----
+   Changed: spec/arrow/service_spec.rb
+            lib/arrow/service.rb
+            ChangeLog
+            lib/arrow/applet.rb
+            lib/arrow/transaction.rb
+
+    * Laika::Service
+    - Set the status to 200 explicitly if the action returns content
+    * Laika::Applet
+    - Writes the timing stats to the log in an ensure so returning from the
+    block doesn't circumvent it.
+    * Fix missing constants.
+
+
 -- Fri, 30 Jan 2009 22:11:28 -0000 by deveiant (r490) -----
    Added:   data/templates/service-response.tmpl (new)
    Changed: lib/arrow/constants.rb

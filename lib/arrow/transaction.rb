@@ -555,6 +555,14 @@ class Arrow::Transaction < Arrow::Object
 	end
 	deprecate_method :arrowVersion, :arrow_version
 
+
+	# 
+	# SSL convenience methods
+	# 
+	
+	
+	
+	
 	
 	#######
 	private

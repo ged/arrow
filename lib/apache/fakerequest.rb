@@ -291,6 +291,8 @@ module Apache # :nodoc: all
 	
 	# Apache::Request
 	class Request < ModRubySimObject
+def the_request(  ); end
+		def status(  ); end
 	
 		INSTANCE_METHODS = %w{
 			<< add_cgi_vars add_common_vars all_params allow_options
@@ -341,12 +343,14 @@ module Apache # :nodoc: all
 			@options = {}
 			@uploads = {}
 			@method_number = Apache::M_GET
+			@connection = Apache::Connection.new
 		end
 
 		attr_writer :server
 		attr_accessor :allowed, :sync_header, :content_type, :uri,
 			:hostname, :paramtable, :cookies, :options, :uploads,
-			:path_info, :headers_in, :headers_out, :method_number
+			:path_info, :headers_in, :headers_out, :method_number,
+			:connection
 		alias_method :params, :paramtable
 		alias_method :unparsed_uri, :uri
 
@@ -412,6 +416,7 @@ module Apache # :nodoc: all
 	end
 
 	class Connection < ModRubySimObject
+def remote_host(  ); end
 	end	  
 		  
 	class Cookie < ModRubySimObject

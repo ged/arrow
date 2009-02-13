@@ -70,7 +70,7 @@ class ExamplesFilter < Manual::Page::Filter
 	RENDERER_OPTIONS = YAML.load( File.read(__FILE__).split(/^__END__/, 2).last )
 	
 
-	### Defer loading of dependenies until the filter is loaded
+	### Defer loading of dependencies until the filter is loaded
 	def initialize( *args )
 		begin
 			require 'pathname'

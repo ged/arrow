@@ -126,6 +126,11 @@ describe Arrow::Transaction do
 		end
 
 
+		#it "knows that it wasn't served over secure transport if its request's schema isn't 'https'" do
+		#	@request.should_receive( :unparsed_uri ).and_return( )
+		#end
+		
+
 		it "should indicate a successful response when the status is 200" do
 			@request.should_receive( :status ).at_least( :once ).and_return( Apache::HTTP_OK )
 			@txn.is_success?.should be_true

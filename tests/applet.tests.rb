@@ -3,7 +3,7 @@
 # Unit test for the Arrow::Applet class
 # $Id$
 #
-# Copyright (c) 2004-2008 RubyCrafters, LLC. Most rights reserved.
+# Copyright (c) 2004-2009 RubyCrafters, LLC. Most rights reserved.
 # 
 # This work is licensed under the Creative Commons Attribution-ShareAlike
 # License. To view a copy of this license, visit
@@ -414,7 +414,7 @@ class Arrow::Applet::TestCase < Arrow::TestCase
 		args = []
 
 		assert_nothing_raised do
-			rval, *args = @applet.lookup_action_method( nil, "test" )
+			rval, *args = @applet.send( :lookup_action_method, nil, "test" )
 		end
 
 		assert_instance_of Method, rval
@@ -427,7 +427,7 @@ class Arrow::Applet::TestCase < Arrow::TestCase
 		args = []
 
 		assert_nothing_raised do
-			rval, *args = @applet.lookup_action_method( nil, 'pass' )
+			rval, *args = @applet.send( :lookup_action_method, nil, 'pass' )
 		end
 
 		assert_instance_of Method, rval

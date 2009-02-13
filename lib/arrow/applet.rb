@@ -4,6 +4,7 @@ require 'arrow/mixins'
 require 'arrow/exceptions'
 require 'arrow/object'
 require 'arrow/formvalidator'
+require 'arrow/transaction'
 
 # An abstract base class for Arrow applets. Provides execution logic,
 # argument-parsing/untainting/validation, and templating through an injected
@@ -478,7 +479,7 @@ class Arrow::Applet < Arrow::Object
 
 	### Run the specified +action+ for the given +txn+ and the specified
 	### +args+.
-	def run( txn, action=nil, *args )
+	def run( txn, action=nil, *args, &block )
 		self.log.debug "Running %s" % [ self.signature.name ]
 
 		return self.time_request do
@@ -486,60 +487,10 @@ class Arrow::Applet < Arrow::Object
 			action ||= @signature.default_action or
 				raise Arrow::AppletError, "Missing default handler '#{default}'"
 
-			# Do any initial preparation of the transaction that can be factored out
-			# of all the actions.
-			self.prep_transaction( txn )
-			meth, *args = self.lookup_action_method( txn, action, *args )
-			self.log.debug "Action method is: %p" % [meth]
-			txn.vargs = self.make_validator( action, txn )
-		
-			# Now either pass control to the block, if given, or invoke the
-			# action
-			if block_given?
-				self.log.debug "Yielding to passed block"
-				rval = yield( meth, txn, *args )
-			else
-				self.log.debug "Applet action arity: %d; args = %p" %
-					[ meth.arity, args ]
-
-				# Invoke the action with the right number of arguments.
-				if meth.arity < 0
-					rval = meth.call( txn, *args )
-				elsif meth.arity >= 1
-					args.unshift( txn )
-					until args.length >= meth.arity do args << nil end
-					rval = meth.call( *(args[0, meth.arity]) )
-				else
-					raise Arrow::AppletError,
-						"Malformed action: Must accept at least a transaction argument"
-				end
-			end
-			
-			rval
+			self.prep_transaction( txn, action )
+			self.call_action_method( txn, action, args, &block )
 		end
 	end
-
-
-	### Given an +action+ name (or +nil+ for the default action), return a
-	### Method for the action method which should be invoked on the specified +txn+.
-	def lookup_action_method( txn, action, *args )
-		self.log.debug "Mapping %s( %p ) to an action" % [ action, args ]
-
-		# Look up the Method object that needs to be called
-		if (( match = @actions_regexp.match(action.to_s) ))
-			action = match.captures[0]
-			action.untaint
-			self.log.debug "Matched action = #{action}"
-		else
-			self.log.info "Couldn't find specified action %p. "\
-				"Defaulting to the 'action_missing' action." % action
-			args.unshift( action )
-			action = "action_missing"
-		end
-
-		return self.method( "#{action}_action" ), *args
-	end
-
 
 
 	### Wrapper method for a delegation (chained) request.
@@ -614,6 +565,59 @@ class Arrow::Applet < Arrow::Object
 	end
 	
 
+	### Look up the appropriate method based on the specified +action+ and call it with 
+	### the +txn+ after massaging the given +args+ to fit its signature.
+	def call_action_method( txn, action, args, &block )
+		meth, *args = self.lookup_action_method( txn, action, *args )
+		self.log.debug "Action method is: %p" % [meth]
+
+		# Now either pass control to the block, if given, or invoke the
+		# action
+		if block
+			self.log.debug "Yielding to passed block"
+			rval = block.call( meth, txn, *args )
+		else
+			self.log.debug "Applet action arity: %d; args = %p" %
+				[ meth.arity, args ]
+
+			# Invoke the action with the right number of arguments.
+			if meth.arity < 0
+				rval = meth.call( txn, *args )
+			elsif meth.arity >= 1
+				args.unshift( txn )
+				until args.length >= meth.arity do args << nil end
+				rval = meth.call( *(args[0, meth.arity]) )
+			else
+				raise Arrow::AppletError,
+					"Malformed action: Must accept at least a transaction argument"
+			end
+		end
+		
+		return rval
+	end
+	
+
+	### Given an +action+ name (or +nil+ for the default action), return a
+	### Method for the action method which should be invoked on the specified +txn+.
+	def lookup_action_method( txn, action, *args )
+		self.log.debug "Mapping %s( %p ) to an action" % [ action, args ]
+
+		# Look up the Method object that needs to be called
+		if (( match = @actions_regexp.match(action.to_s) ))
+			action = match.captures[0]
+			action.untaint
+			self.log.debug "Matched action = #{action}"
+		else
+			self.log.info "Couldn't find specified action %p. "\
+				"Defaulting to the 'action_missing' action." % action
+			args.unshift( action )
+			action = "action_missing"
+		end
+
+		return self.method( "#{action}_action" ), *args
+	end
+
+
 	### Run an action with a duped transaction (e.g., from another action)
 	def subrun( action, txn, *args )
 		action, txn = txn, action if action.is_a?( Arrow::Transaction )
@@ -623,10 +627,7 @@ class Arrow::Applet < Arrow::Object
 		# Make sure the transaction has stuff loaded. This is necessary when
 		# #subrun is called without going through #run first (e.g., via 
 		# #delegate)
-		if txn.vargs.nil?
-			self.prep_transaction( txn )
-			txn.vargs = self.make_validator( action, txn )
-		end
+		self.prep_transaction( txn, action ) if txn.vargs.nil?
 
 		meth, *args = self.lookup_action_method( txn, action, *args )
 		return meth.call( txn, *args )
@@ -636,7 +637,8 @@ class Arrow::Applet < Arrow::Object
 	### Prepares the transaction (+txn+) for applet execution. By default, this
 	### method sets the content type of the response to 'text/html' and turns off
 	### buffering for the header.
-	def prep_transaction( txn )
+	def prep_transaction( txn, action )
+		txn.vargs = self.make_validator( action, txn )
 		txn.request.content_type = "text/html"
 		txn.request.sync_header = true
 	end
