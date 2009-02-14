@@ -291,6 +291,10 @@ describe Arrow::AccessControls do
 						return :login
 					end
 					
+					def logout_action( txn, *args )
+						return :logout
+					end
+					
 					def deny_access_action( txn, *args )
 						return :deny_access
 					end
@@ -335,6 +339,10 @@ describe Arrow::AccessControls do
 					
 					def login_action( txn, *args )
 						return :login
+					end
+					
+					def logout_action( txn, *args )
+						return :logout
 					end
 					
 					def deny_access_action( txn, *args )

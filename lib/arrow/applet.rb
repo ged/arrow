@@ -483,12 +483,7 @@ class Arrow::Applet < Arrow::Object
 		self.log.debug "Running %s" % [ self.signature.name ]
 
 		return self.time_request do
-			action = nil if action.to_s.empty?
-			action ||= @signature.default_action or
-				raise Arrow::AppletError, "Missing default handler '#{default}'"
-
-			self.prep_transaction( txn, action )
-			self.call_action_method( txn, action, args, &block )
+			self.call_action_method( txn, action, *args, &block )
 		end
 	end
 
@@ -553,7 +548,7 @@ class Arrow::Applet < Arrow::Object
 	### Time the block, logging the result
 	def time_request
 		starttimes = Process.times
-		return yield
+		yield
 	ensure
 		runtimes = Process.times
 		@run_count += 1
@@ -567,7 +562,15 @@ class Arrow::Applet < Arrow::Object
 
 	### Look up the appropriate method based on the specified +action+ and call it with 
 	### the +txn+ after massaging the given +args+ to fit its signature.
-	def call_action_method( txn, action, args, &block )
+	def call_action_method( txn, action=nil, *args, &block )
+		action = nil if action.to_s.empty?
+		action ||= @signature.default_action or
+			raise Arrow::AppletError, "Missing default handler '#{default}'"
+
+		# Add a validator to the transaction based on which action got picked
+		txn.vargs = self.make_validator( action, txn )
+
+		# Turn the action into a Method object
 		meth, *args = self.lookup_action_method( txn, action, *args )
 		self.log.debug "Action method is: %p" % [meth]
 
@@ -627,20 +630,10 @@ class Arrow::Applet < Arrow::Object
 		# Make sure the transaction has stuff loaded. This is necessary when
 		# #subrun is called without going through #run first (e.g., via 
 		# #delegate)
-		self.prep_transaction( txn, action ) if txn.vargs.nil?
+		txn.vargs = self.make_validator( action, txn ) if txn.vargs.nil?
 
 		meth, *args = self.lookup_action_method( txn, action, *args )
 		return meth.call( txn, *args )
-	end
-
-
-	### Prepares the transaction (+txn+) for applet execution. By default, this
-	### method sets the content type of the response to 'text/html' and turns off
-	### buffering for the header.
-	def prep_transaction( txn, action )
-		txn.vargs = self.make_validator( action, txn )
-		txn.request.content_type = "text/html"
-		txn.request.sync_header = true
 	end
 
 

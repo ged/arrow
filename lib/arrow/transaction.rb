@@ -114,6 +114,7 @@ class Arrow::Transaction < Arrow::Object
 			@root_dispatcher = false
 		end
 
+		@request.sync_header = true
 		super()
 	end
 

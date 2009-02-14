@@ -43,6 +43,7 @@ describe Arrow::Transaction do
 		@headers_out = Apache::Table.new
 		@request.stub!( :headers_in ).and_return( @headers_in )
 		@request.stub!( :headers_out ).and_return( @headers_out )
+		@request.stub!( :sync_header= )
 	end
 	
 

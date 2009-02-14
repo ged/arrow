@@ -32,6 +32,10 @@ module Arrow
 	#   Override this method if you wish to customize the login process. By default,
 	#   this returns a response that prompts the client using Basic HTTP 
 	#   authentication.
+	# [[#logout_action]]
+	#   Override this method if you wish to customize the logout process. By default,
+	#   this declines the request, which will tell Apache to try to handle the 
+	#   request itself.
 	# [[#deny_access_action]]
 	#   Override this method if you wish to customize what happens when the client
 	#   sends a request for a resource they are not authorized to interact with. By
@@ -60,6 +64,15 @@ module Arrow
 			self.log.info "Prompting the client for authentication"
 			# :TODO: This really needs to set the WWW-Authenticate header...
 			return Apache::HTTP_UNAUTHORIZED
+		end
+		
+
+		### Default AppletAuthentication API: provides login functionality for actions that
+		### require authorization; override this to customize the logout process. By default, this
+		### just returns +nil+, which will decline the request.
+		def logout_action( txn, *args )
+			self.log.info "No logout action provided, passing the request off to the server"
+			return Apache::DECLINED
 		end
 		
 
@@ -175,7 +188,7 @@ module Arrow
 			if self.class.unauthenticated_actions.include?( action )
 				super
 			else
-				with_authorization( txn, action ) do
+				with_authorization( txn, action, *args ) do
 					super
 				end
 			end

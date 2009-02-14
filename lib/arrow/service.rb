@@ -105,47 +105,45 @@ class Arrow::Service < Arrow::Applet
 	StatusResponse = Struct.new( "ArrowServiceStatusResponse", :status, :message )
 	
 
-	######
-	public
-	######
+	#########
+	protected
+	#########
 
 	### Overridden to provide content-negotiation and error-handling.
-	def run( txn, *args )
-		self.time_request do
-			self.log.debug "Looking up service action for %s %s (%p)" %
-				[ txn.request_method, txn.uri, args ]
-			has_args = ! args.empty?
-			action = self.lookup_action_method( txn, args ) or return nil
-			content = nil
-			
-			# Run the action. If it executes normally, 'content' will contain the
-			# object that should make up the response entity body. If :finish is
-			# thrown early, e.g. via #finish_with, content will be nil and
-			# http_status_response should contain a StatusResponse struct
-			http_status_response = catch( :finish ) do
-				if has_args
-					id = self.validate_id( args.shift )
-					content = action.call( txn, id )
-				else
-					content = action.call( txn )
-				end
-
-				self.log.debug "  service finished successfully"
-				nil # rvalue for catch
-			end
-			
-			# Handle finishing with a status first
-			if content
-				txn.status ||= Apache::HTTP_OK
-				return self.negotiate_content( txn, content )
-			elsif http_status_response
-				status_code = http_status_response[:status].to_i
-				msg = http_status_response[:message]
-				return self.prepare_status_response( txn, status_code, msg )
+	def call_action_method( txn, id=nil, *args, &block )
+		self.log.debug "Looking up service action for %s %s (%p)" %
+			[ txn.request_method, txn.uri, args ]
+		has_args = ! args.empty?
+		action = self.lookup_action_method( txn, id, *args ) or return nil
+		content = nil
+		
+		# Run the action. If it executes normally, 'content' will contain the
+		# object that should make up the response entity body. If :finish is
+		# thrown early, e.g. via #finish_with, content will be nil and
+		# http_status_response should contain a StatusResponse struct
+		http_status_response = catch( :finish ) do
+			if id
+				id = self.validate_id( id )
+				content = action.call( txn, id )
+			else
+				content = action.call( txn )
 			end
 
-			return nil
+			self.log.debug "  service finished successfully"
+			nil # rvalue for catch
 		end
+		
+		# Handle finishing with a status first
+		if content
+			txn.status ||= Apache::HTTP_OK
+			return self.negotiate_content( txn, content )
+		elsif http_status_response
+			status_code = http_status_response[:status].to_i
+			msg = http_status_response[:message]
+			return self.prepare_status_response( txn, status_code, msg )
+		end
+
+		return nil
 	rescue => err
 		raise if err.class.name =~ /^Spec::/
 		
@@ -156,32 +154,27 @@ class Arrow::Service < Arrow::Applet
 
 
 
-	#########
-	protected
-	#########
-
 	### Look up which service action should be invoked based on the HTTP
 	### request method and the number of arguments.
-	def lookup_action_method( txn, args )
+	def lookup_action_method( txn, id, *args )
 		http_method = txn.request_method
 
 		tuple = METHOD_MAPPING[ txn.request_method ] or return self.method( :not_allowed )
 		self.log.debug "Method mapping for %s is %p" % [ txn.request_method, tuple ]
 
-		if args.length <= 1
-			self.log.debug "  URI is canonical (args = %p)" % [ args ]
-			msym = tuple[ args.length ]
+		if args.empty?
+			self.log.debug "  URI is top-level resource"
+			msym = tuple[ id ? 1 : 0 ]
 			self.log.debug "  picked the %p method (%s arguments)" %
-				[ msym, args.empty? ? 'no' : 'with' ]
+				[ msym, id ? 'no' : 'with' ]
 			
 		else
-			self.log.debug "  URI is not canonical (args = %p)" % [ args ]
-			ops = args[1..-1].collect {|arg| arg[/^([a-z]\w+)$/, 1].untaint }
+			self.log.debug "  URI is sub-resource (args = %p)" % [ args ]
+			ops = args.collect {|arg| arg[/^([a-z]\w+)$/, 1].untaint }
 			
 			mname = "%s_%s" % [ tuple[1], ops.compact.join('_') ]
 			msym = mname.to_sym
 			self.log.debug "  picked the %p method (args = %p)" % [ msym, args ]
-			
 		end
 
 		# If the method exists, just return a Method object for it
@@ -190,7 +183,7 @@ class Arrow::Service < Arrow::Applet
 		# Otherwise, return an appropriate error response
 		self.log.error "request for unimplemented %p action for %s" % [ msym, txn.uri ]
 
-		return args.length <= 1 ? self.method( :not_allowed ) : nil
+		return args.empty? ? self.method( :not_allowed ) : nil
 	end
 
 
