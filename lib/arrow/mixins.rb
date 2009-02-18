@@ -150,7 +150,7 @@ module Arrow
 		ARRAY_HTML_CONTAINER = %{<ol class="array-members"><li>%s</li></ol>}
 
 		# The HTML fragment to wrap around immediate objects
-		IMMEDIATE_OBJECT_HTML_CONTAINER = %{<span class="immediate-object">%s</span>}
+		IMMEDIATE_OBJECT_HTML_CONTAINER = %{<div class="immediate-object">%s</div>}
 
 		# The HTML fragment to wrap around objects other than Arrays and Hashes.
 		OBJECT_HTML_CONTAINER = %{<div id="object-%d" class="object %s">%s</div>}
@@ -158,8 +158,8 @@ module Arrow
 		# The HTML fragment to use for instance variables inside of object DIVs.
 		IVAR_HTML_FRAGMENT = %Q{
 		  <div class="%s">
-			<span class="name">%s</span>
-			<span class="value">%s</span>
+			<div class="name">%s</div>
+			<div class="value">%s</div>
 		  </div>
 		}
 
@@ -257,7 +257,11 @@ module Arrow
 				value = object.instance_variable_get( ivar )
 				html = make_html_for_object( value )
 				classes = %w[instance-variable]
-				classes << if value.instance_variables.empty? then 'simple' else 'complex' end
+				if value.instance_variables.empty? && !value.respond_to?( :values_at )
+					classes << 'simple'
+				else
+					classes << 'complex'
+				end
 				parts << IVAR_HTML_FRAGMENT % [ classes.join(' '), ivar, html ]
 			end
 
