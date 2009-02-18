@@ -331,10 +331,18 @@ describe Arrow::AccessControls do
 				@applet_class = Class.new( Arrow::Applet ) do
 					include Arrow::AccessControls
 					
-					unauthenticated_actions :willy_nilly
+					unauthenticated_actions :willy_nilly, :action_missing
 					
 					def action_missing_action( txn, action, *args )
-						return action
+						return :action_missing
+					end
+					
+					def willy_nilly_action( txn, *args )
+						return :willy_nilly
+					end
+					
+					def serenity_action( txn, *args )
+						return :serenity
 					end
 					
 					def login_action( txn, *args )
@@ -372,6 +380,10 @@ describe Arrow::AccessControls do
 			
 			it "doesn't require authentication for actions declared as unauthenticated" do
 				@applet.run( @txn, :willy_nilly ).should == :willy_nilly
+			end
+			
+			it "doesn't require authentication for remapped actions declared as unauthenticated" do
+				@applet.run( @txn, :klang_locke ).should == :action_missing
 			end
 			
 			it "requires authentication for any other action" do

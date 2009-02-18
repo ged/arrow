@@ -43,7 +43,7 @@ describe Arrow::Config do
 	include Arrow::SpecHelpers
 	
 	before( :all ) do
-		setup_logging( :debug )
+		setup_logging( :crit )
 	end
 	
 	after( :all ) do

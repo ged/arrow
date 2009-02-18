@@ -48,6 +48,8 @@ describe Arrow::Service do
 		@txn = mock( "transaction" )
 		@txn.stub!( :vargs ).and_return( nil )
 		@txn.stub!( :accepted_types ).and_return( @accepted_types )
+		@txn.stub!( :form_request? ).and_return( false )
+		@txn.stub!( :vargs= )
 	end
 
 

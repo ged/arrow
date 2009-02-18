@@ -182,12 +182,15 @@ module Arrow
 		end
 		
 
-		### Wrap all actions except the ones defined by the applet class's 
-		### @unauthenticated_actions
-		def call_action_method( txn, action, *args )
+		### Overridden to map the +action+ to the authorization action's method if
+		### +action+ isn't one of the ones that's defined as unauthenticated.
+		def find_action_method( txn, action=nil, *args )
 			if self.class.unauthenticated_actions.include?( action )
+				self.log.debug "Supering to unauthenticated action %p" % [ action ]
 				super
 			else
+				self.log.debug "Action %p wasn't marked as unauthenticated; checking authorization." %
+					[ action ]
 				with_authorization( txn, action, *args ) do
 					super
 				end

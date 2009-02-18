@@ -479,11 +479,23 @@ class Arrow::Applet < Arrow::Object
 
 	### Run the specified +action+ for the given +txn+ and the specified
 	### +args+.
-	def run( txn, action=nil, *args, &block )
+	def run( txn, *args )
 		self.log.debug "Running %s" % [ self.signature.name ]
 
 		return self.time_request do
-			self.call_action_method( txn, action, *args, &block )
+			name, *newargs = self.get_action_name( txn, *args )
+			txn.vargs = self.make_validator( name, txn )
+			action = self.find_action_method( txn, name, *newargs )
+			
+			# Decline the request if the action isn't a callable object
+			unless action.respond_to?( :arity )
+				self.log.info "action method (%p) doesn't do #arity, returning it as-is." %
+					[ action ]
+				return action
+			end
+			
+			self.log.debug "calling action method %p with args (%p)" % [ action, newargs ]
+			self.call_action_method( txn, action, *newargs )
 		end
 	end
 
@@ -559,53 +571,16 @@ class Arrow::Applet < Arrow::Object
 			[ Process.pid, @run_count, utime, @total_utime, stime, @total_stime ]
 	end
 	
-
-	### Look up the appropriate method based on the specified +action+ and call it with 
-	### the +txn+ after massaging the given +args+ to fit its signature.
-	def call_action_method( txn, action=nil, *args, &block )
+	
+	### Get the expected action name from the specified +txn+ and the +args+ extracted from the
+	### URI path; return the action as a Symbol and the remaining arguments as a splatted Array.
+	def get_action_name( txn, *args )
+		action = args.shift
 		action = nil if action.to_s.empty?
 		action ||= @signature.default_action or
 			raise Arrow::AppletError, "Missing default handler '#{default}'"
 
-		# Add a validator to the transaction based on which action got picked
-		txn.vargs = self.make_validator( action, txn )
-
-		# Turn the action into a Method object
-		meth, *args = self.lookup_action_method( txn, action, *args )
-		self.log.debug "Action method is: %p" % [meth]
-
-		# Now either pass control to the block, if given, or invoke the
-		# action
-		if block
-			self.log.debug "Yielding to passed block"
-			rval = block.call( meth, txn, *args )
-		else
-			self.log.debug "Applet action arity: %d; args = %p" %
-				[ meth.arity, args ]
-
-			# Invoke the action with the right number of arguments.
-			if meth.arity < 0
-				rval = meth.call( txn, *args )
-			elsif meth.arity >= 1
-				args.unshift( txn )
-				until args.length >= meth.arity do args << nil end
-				rval = meth.call( *(args[0, meth.arity]) )
-			else
-				raise Arrow::AppletError,
-					"Malformed action: Must accept at least a transaction argument"
-			end
-		end
-		
-		return rval
-	end
-	
-
-	### Given an +action+ name (or +nil+ for the default action), return a
-	### Method for the action method which should be invoked on the specified +txn+.
-	def lookup_action_method( txn, action, *args )
-		self.log.debug "Mapping %s( %p ) to an action" % [ action, args ]
-
-		# Look up the Method object that needs to be called
+		# Match it against the Regex of declared actions
 		if (( match = @actions_regexp.match(action.to_s) ))
 			action = match.captures[0]
 			action.untaint
@@ -617,30 +592,55 @@ class Arrow::Applet < Arrow::Object
 			action = "action_missing"
 		end
 
-		return self.method( "#{action}_action" ), *args
+		return action.to_sym, *args
+	end
+	
+	
+	### Given an +action+ name and any other URI path +args+ from the request, return 
+	### a Method object that will handle the request, and the remaining arguments
+	### as a splatted Array.
+	def find_action_method( txn, action, *args )
+		self.log.debug "Mapping %s( %p ) to an action" % [ action, args ]
+		return self.method( "#{action}_action" )
 	end
 
+
+	### Invoke the specified +action+ (an object that responds to #arity and #call) with the 
+	### given +txn+ and the +args+ which it can accept based on its arity.
+	def call_action_method( txn, action, *args )
+		self.log.debug "Applet action arity: %d; args = %p" %
+			[ action.arity, args ]
+
+		# Invoke the action with the right number of arguments.
+		if action.arity < 0
+			return action.call( txn, *args )
+		elsif action.arity >= 1
+			args.unshift( txn )
+			until args.length >= action.arity do args << nil end
+			return action.call( *(args[0, action.arity]) )
+		else
+			raise Arrow::AppletError,
+				"Malformed action: Must accept at least a transaction argument"
+		end
+	end
+	
 
 	### Run an action with a duped transaction (e.g., from another action)
 	def subrun( action, txn, *args )
 		action, txn = txn, action if action.is_a?( Arrow::Transaction )
+
+		txn.vargs ||= self.make_validator( action, txn )
+		action = self.method( "#{action}_action" ) unless action.respond_to?( :arity )
 		self.log.debug "Running subordinate action '%s' from '%s'" %
 			[ action, caller[0] ]
 
-		# Make sure the transaction has stuff loaded. This is necessary when
-		# #subrun is called without going through #run first (e.g., via 
-		# #delegate)
-		txn.vargs = self.make_validator( action, txn ) if txn.vargs.nil?
-
-		meth, *args = self.lookup_action_method( txn, action, *args )
-		return meth.call( txn, *args )
+		return self.call_action_method( txn, action, *args )
 	end
 
 
 	### Load and return the template associated with the given +key+ according
 	### to the applet's signature. Returns +nil+ if no such template exists.
 	def load_template( key )
-		
 		tname = @signature.templates[key] or
 			raise Arrow::AppletError, 
 				"No such template %p defined in the signature for %s (%s)" %
@@ -651,6 +651,32 @@ class Arrow::Applet < Arrow::Object
 		return @template_factory.get_template( tname )
 	end
 	alias_method :template, :load_template
+
+
+	### Create a FormValidator object for the specified +action+ which has
+	### been given the arguments from the given +txn+.
+	def make_validator( action, txn )
+		profile = self.get_validator_profile_for_action( action, txn ) or
+			return nil
+
+		# Create a new validator object, map the request args into a regular
+		# hash, and then send them to the validaator with the applicable profile
+		self.log.debug "Creating form validator for profile: %p" % [ profile ]
+
+		params = {}
+
+		# Only try to parse form parameters if there's a form
+		if txn.form_request?
+			txn.request.paramtable.each do |key,val|
+				# Multi-valued vs. single params
+				params[key] = val.to_a.length > 1 ? val.to_a : val.to_s
+			end
+		end
+		validator = Arrow::FormValidator.new( profile, params )
+
+		self.log.debug "Validator: %p" % validator
+		return validator
+	end
 
 
 	### Return the validator profile that corresponds to the +action+ which
@@ -676,32 +702,6 @@ class Arrow::Applet < Arrow::Object
 		end
 
 		return profile
-	end
-	
-
-	### Create a FormValidator object for the specified +action+ which has
-	### been given the arguments from the given +txn+.
-	def make_validator( action, txn )
-		profile = self.get_validator_profile_for_action( action, txn ) or
-			return nil
-
-		# Create a new validator object, map the request args into a regular
-		# hash, and then send them to the validaator with the applicable profile
-		self.log.debug "Creating form validator for profile: %p" % [ profile ]
-
-		params = {}
-
-		# Only try to parse form parameters if there's a form
-		if txn.form_request?
-			txn.request.paramtable.each do |key,val|
-				# Multi-valued vs. single params
-				params[key] = val.to_a.length > 1 ? val.to_a : val.to_s
-			end
-		end
-		validator = Arrow::FormValidator.new( profile, params )
-
-		self.log.debug "Validator: %p" % validator
-		return validator
 	end
 
 end # class Arrow::Applet

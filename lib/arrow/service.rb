@@ -109,12 +109,50 @@ class Arrow::Service < Arrow::Applet
 	protected
 	#########
 
-	### Overridden to provide content-negotiation and error-handling.
-	def call_action_method( txn, id=nil, *args, &block )
+	### Map the request in the given +txn+ to an action and return its name as a Symbol.
+	def get_action_name( txn, id=nil, *args )
+		http_method = txn.request_method
 		self.log.debug "Looking up service action for %s %s (%p)" %
-			[ txn.request_method, txn.uri, args ]
-		has_args = ! args.empty?
-		action = self.lookup_action_method( txn, id, *args ) or return nil
+			[ http_method, txn.uri, args ]
+
+		tuple = METHOD_MAPPING[ txn.request_method ] or return :not_allowed
+		self.log.debug "Method mapping for %s is %p" % [ txn.request_method, tuple ]
+
+		if args.empty?
+			self.log.debug "  URI refers to top-level resource"
+			msym = tuple[ id ? 1 : 0 ]
+			self.log.debug "  picked the %p method (%s ID argument)" %
+				[ msym, id ? 'has an' : 'no' ]
+			
+		else
+			self.log.debug "  URI refers to a sub-resource (args = %p)" % [ args ]
+			ops = args.collect {|arg| arg[/^([a-z]\w+)$/, 1].untaint }
+			
+			mname = "%s_%s" % [ tuple[1], ops.compact.join('_') ]
+			msym = mname.to_sym
+			self.log.debug "  picked the %p method (args = %p)" % [ msym, args ]
+		end
+
+		return msym, id, *args
+	end
+	
+
+	### Given a +txn+, an +action+ name, and any other remaining URI path +args+ from 
+	### the request, return a Method object that will handle the request (or at least something
+	### #call-able with #arity).
+	def find_action_method( txn, action, *args )
+		return self.method( action ) if self.respond_to?( action )
+
+		# Otherwise, return an appropriate error response
+		self.log.error "request for unimplemented %p action for %s" % [ action, txn.uri ]
+		return self.method( :not_allowed )
+	end
+
+
+	### Overridden to provide content-negotiation and error-handling.
+	def call_action_method( txn, action, id=nil, *args )
+		self.log.debug "calling %p( id: %p, args: %p ) for service request" %
+			[ action, id, args ]
 		content = nil
 		
 		# Run the action. If it executes normally, 'content' will contain the
@@ -150,40 +188,6 @@ class Arrow::Service < Arrow::Applet
 		msg = "%s: %s %s" % [ err.class.name, err.message, err.backtrace.first ]
 		self.log.error( msg )
 		return self.prepare_status_response( txn, Apache::SERVER_ERROR, msg )
-	end
-
-
-
-	### Look up which service action should be invoked based on the HTTP
-	### request method and the number of arguments.
-	def lookup_action_method( txn, id, *args )
-		http_method = txn.request_method
-
-		tuple = METHOD_MAPPING[ txn.request_method ] or return self.method( :not_allowed )
-		self.log.debug "Method mapping for %s is %p" % [ txn.request_method, tuple ]
-
-		if args.empty?
-			self.log.debug "  URI is top-level resource"
-			msym = tuple[ id ? 1 : 0 ]
-			self.log.debug "  picked the %p method (%s arguments)" %
-				[ msym, id ? 'no' : 'with' ]
-			
-		else
-			self.log.debug "  URI is sub-resource (args = %p)" % [ args ]
-			ops = args.collect {|arg| arg[/^([a-z]\w+)$/, 1].untaint }
-			
-			mname = "%s_%s" % [ tuple[1], ops.compact.join('_') ]
-			msym = mname.to_sym
-			self.log.debug "  picked the %p method (args = %p)" % [ msym, args ]
-		end
-
-		# If the method exists, just return a Method object for it
-		return self.method( msym ) if self.respond_to?( msym )
-
-		# Otherwise, return an appropriate error response
-		self.log.error "request for unimplemented %p action for %s" % [ msym, txn.uri ]
-
-		return args.empty? ? self.method( :not_allowed ) : nil
 	end
 
 

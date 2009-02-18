@@ -24,12 +24,15 @@ unless defined? Arrow::TestCase
 	require 'arrow/applet'
 end
 
+require 'spec/lib/helpers'
 
 ### Collection of tests for the Arrow::Applet class.
 class Arrow::Applet::TestCase < Arrow::TestCase
-
+	include Arrow::SpecHelpers
 
     def setup
+		setup_logging( :crit )
+	
         @appletclass = Class.new( Arrow::Applet ) {
 			applet_maintainer "ged@FaerieMUD.org"
 			default_action :test
@@ -61,6 +64,7 @@ class Arrow::Applet::TestCase < Arrow::TestCase
     def teardown
         Arrow::Applet.newly_loaded.clear
         Arrow::Applet.derivatives.clear
+		reset_logging()
     end
 
 
@@ -359,28 +363,6 @@ class Arrow::Applet::TestCase < Arrow::TestCase
 	end
 
 
-	def test_run_with_block_yields_action_method_and_transaction_instead_of_invoking
-		rval, meth, rtxn, rargs = nil
-
-		with_run_fixtured_transaction do |txn|
-			rval = @applet.run( txn, "test", "arg1", "arg2" ) do |metharg, txn2, *args|
-				meth = metharg
-				rtxn = txn2
-				rargs = args
-
-				:passed
-			end
-
-			assert_instance_of Method, meth
-			assert_match( /#test_action/, meth.to_s )
-			assert_same txn, rtxn
-			assert_equal ["arg1", "arg2"], rargs
-
-			assert_equal :passed, rval
-		end
-	end
-
-
 	def test_run_with_parameterless_action_method_raises_an_appleterror
 		@applet.def_action_body do
 			flunk "Expected exception before action body was run"
@@ -406,35 +388,6 @@ class Arrow::Applet::TestCase < Arrow::TestCase
 		end
 
 		assert_equal true, invoked, "Default action was not invoked"
-	end
-
-
-	def test_looking_up_a_valid_action_method_should_return_method_object_for_it
-		rval = nil
-		args = []
-
-		assert_nothing_raised do
-			rval, *args = @applet.send( :lookup_action_method, nil, "test" )
-		end
-
-		assert_instance_of Method, rval
-		assert_match( /#test_action/, rval.to_s )
-	end
-
-
-	def test_lookup_of_invalid_action_returns_action_missing_action_and_adds_an_arg
-		rval = nil
-		args = []
-
-		assert_nothing_raised do
-			rval, *args = @applet.send( :lookup_action_method, nil, 'pass' )
-		end
-
-		assert_instance_of Method, rval
-		assert_equal 1, args.length, "args: %p" % [args]
-		assert_equal "pass", args.first
-		assert_match( /#action_missing_action/, rval.to_s )
-	
 	end
 
 
