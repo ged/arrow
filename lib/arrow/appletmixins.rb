@@ -169,6 +169,7 @@ module Arrow
 				@unauthenticated_actions.push( *actions )
 				return @unauthenticated_actions
 			end
+			alias :unauthenticated_action :unauthenticated_actions
 			
 		end
 		

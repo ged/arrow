@@ -145,6 +145,10 @@ describe Arrow::Applet do
 					return [ one, two ]
 				end
 				
+				def action_missing_action( txn, missing, *args )
+					return [ :missing, missing, *args ]
+				end
+				
 				def load_template_action( txn, template_name )
 					return self.load_template( template_name )
 				end
@@ -176,6 +180,11 @@ describe Arrow::Applet do
 		
 		it "appends nil URI arguments to match the arity of actions with two arguments" do
 			@applet.run( @txn, 'two_args', :first ).should == [:first, nil]
+		end
+
+
+		it "maps invocations of nonexistent actions to the action_missing action" do
+			@applet.run( @txn, "nonexistent", :first ).should == [ :missing, "nonexistent", :first ]
 		end
 		
 
@@ -431,20 +440,6 @@ describe Arrow::Applet do
 		end
 
 
-		def test_lookup_of_invalid_action_returns_action_missing_action_and_adds_an_arg
-			rval = nil
-			args = []
-
-			assert_nothing_raised do
-				rval, *args = @applet.send( :lookup_action_method, nil, 'pass' )
-			end
-
-			assert_instance_of Method, rval
-			assert_equal 1, args.length, "args: %p" % [args]
-			assert_equal "pass", args.first
-			assert_match( /#action_missing_action/, rval.to_s )
-	
-		end
 
 
 		def test_default_delegation_method_just_yields

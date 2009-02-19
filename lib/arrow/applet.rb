@@ -575,24 +575,37 @@ class Arrow::Applet < Arrow::Object
 	### Get the expected action name from the specified +txn+ and the +args+ extracted from the
 	### URI path; return the action as a Symbol and the remaining arguments as a splatted Array.
 	def get_action_name( txn, *args )
-		action = args.shift
-		action = nil if action.to_s.empty?
-		action ||= @signature.default_action or
-			raise Arrow::AppletError, "Missing default handler '#{default}'"
+		self.log.debug "Fetching the intended action name from txn = %p, args = %p" % [ txn, args ]
 
-		# Match it against the Regex of declared actions
+		name = args.shift
+		name = nil if name.to_s.empty?
+		name ||= @signature.default_action or
+			raise Arrow::AppletError, "Missing default handler"
+
+		if (( action = self.map_to_valid_action(name) ))
+			self.log.debug "  found what looks like a valid action (%p)" % [ action ]
+			return action.to_sym, *args
+		else
+			self.log.debug "  didn't find a valid action; returning :action_missing"
+			return :action_missing, name, *args
+		end
+	end
+
+
+	### Map the given +action+ name to an action that's been declared, or else map it to a
+	### fallback action ('action_missing' by default).
+	def map_to_valid_action( action )
+		self.log.debug "trying to map %p to a valid action method" % [ action ]
+		
 		if (( match = @actions_regexp.match(action.to_s) ))
 			action = match.captures[0]
 			action.untaint
 			self.log.debug "Matched action = #{action}"
+			return action
 		else
-			self.log.info "Couldn't find specified action %p. "\
-				"Defaulting to the 'action_missing' action." % action
-			args.unshift( action )
-			action = "action_missing"
+			self.log.debug "  no matching action method in %p" % [ @actions_regexp ]
+			return nil
 		end
-
-		return action.to_sym, *args
 	end
 	
 	
