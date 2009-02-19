@@ -119,7 +119,7 @@ module Arrow
 					return yield
 				else
 					self.log.warning "Access denied to %s for %s" % [ user, txn.the_request ]
-					return self.subrun( :deny_access, txn, *args )
+					return self.subrun( :deny_access, txn )
 				end
 			end
 		end
