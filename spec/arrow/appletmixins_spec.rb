@@ -84,12 +84,14 @@ describe Arrow::AppletAuthentication do
 			end
 	
 			it "returns an UNAUTHORIZED response for an action wrapped in authentication" do
-				@applet.authenticated_action( @txn ).should == Apache::HTTP_UNAUTHORIZED
+				@txn.should_receive( :status= ).with( Apache::HTTP_UNAUTHORIZED )
+				@applet.authenticated_action( @txn ).should =~ /requires auth/i
 				@applet.authenticated.should be_false()
 			end
 	
 			it "returns an UNAUTHORIZED response for an action wrapped in authorization" do
-				@applet.authorized_action( @txn ).should == Apache::HTTP_UNAUTHORIZED
+				@txn.should_receive( :status= ).with( Apache::HTTP_UNAUTHORIZED )
+				@applet.authorized_action( @txn ).should =~ /requires auth/i
 				@applet.authorized.should be_false()
 			end
 	
@@ -134,7 +136,8 @@ describe Arrow::AppletAuthentication do
 	
 			it "returns an UNAUTHORIZED response for an action wrapped in authentication if " +
 			   "the transaction doesn't contain a user" do
-				@applet.authenticated_action( @txn ).should == Apache::HTTP_UNAUTHORIZED
+				@txn.should_receive( :status= ).with( Apache::HTTP_UNAUTHORIZED )
+				@applet.authenticated_action( @txn ).should =~ /requires auth/i
 				@applet.authenticated.should be_false()
 			end
 	
@@ -147,14 +150,16 @@ describe Arrow::AppletAuthentication do
 	
 			it "returns an UNAUTHORIZED response for an action wrapped in authorization if " +
 			   "the transaction doesn't contain a user" do
-				@applet.authorized_action( @txn ).should == Apache::HTTP_UNAUTHORIZED
+				@txn.should_receive( :status= ).with( Apache::HTTP_UNAUTHORIZED )
+				@applet.authenticated_action( @txn ).should =~ /requires auth/i
 				@applet.authorized.should be_false()
 			end
 	
 			it "returns a FORBIDDEN response for an action wrapped in authorization if " +
 			   "the transaction does contain a user" do
 				@txn.stub!( :user ).and_return( :blinky_the_wombat )
-				@applet.authorized_action( @txn ).should == Apache::FORBIDDEN
+				@txn.should_receive( :status= ).with( Apache::FORBIDDEN )
+				@applet.authorized_action( @txn ).should =~ /access denied/i
 				@applet.authorized.should be_false()
 			end
 	
@@ -207,7 +212,8 @@ describe Arrow::AppletAuthentication do
 	
 			it "returns an UNAUTHORIZED response for an action wrapped in authentication if " +
 			   "the transaction doesn't contain a user" do
-				@applet.authenticated_action( @txn ).should == Apache::HTTP_UNAUTHORIZED
+				@txn.should_receive( :status= ).with( Apache::HTTP_UNAUTHORIZED )
+				@applet.authenticated_action( @txn ).should =~ /requires auth/i
 				@applet.authenticated.should be_false()
 				@applet.authorized.should be_false()
 			end
@@ -222,14 +228,16 @@ describe Arrow::AppletAuthentication do
 	
 			it "returns an UNAUTHORIZED response for an action wrapped in authorization if " +
 			   "the transaction doesn't contain a user" do
-				@applet.authorized_action( @txn ).should == Apache::HTTP_UNAUTHORIZED
+				@txn.should_receive( :status= ).with( Apache::HTTP_UNAUTHORIZED )
+				@applet.authenticated_action( @txn ).should =~ /requires auth/i
 				@applet.authorized.should be_false()
 			end
 	
 			it "returns a FORBIDDEN response for an action wrapped in authorization if " +
 			   "the transaction does contain a user, but the user isn't authorized" do
 				@txn.stub!( :user ).and_return( :gurney_halleck )
-				@applet.authorized_action( @txn ).should == Apache::FORBIDDEN
+				@txn.should_receive( :status= ).with( Apache::FORBIDDEN )
+				@applet.authorized_action( @txn ).should =~ /access denied/i
 				@applet.authorized.should be_false()
 			end
 	

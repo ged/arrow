@@ -63,7 +63,8 @@ module Arrow
 		def login_action( txn, *args )
 			self.log.info "Prompting the client for authentication"
 			# :TODO: This really needs to set the WWW-Authenticate header...
-			return Apache::HTTP_UNAUTHORIZED
+			txn.status = Apache::HTTP_UNAUTHORIZED
+			return "this resource requires authentication"
 		end
 		
 
@@ -81,7 +82,8 @@ module Arrow
 		### page. By default, this just returns an HTTP FORBIDDEN response.
 		def deny_access_action( txn, *args )
 			self.log.error "Unauthorized request for %s" % [ txn.uri ]
-			return Apache::FORBIDDEN
+			txn.status = Apache::FORBIDDEN
+			return "access denied"
 		end
 		
 
