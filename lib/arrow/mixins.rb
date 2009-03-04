@@ -181,6 +181,7 @@ module Arrow
 
 		### Return an HTML fragment describing the specified +object+.
 		def make_html_for_object( object )
+			return object.html_inspect if object.respond_to?( :html_inspect )
 			object_html = []
 
 			case object
@@ -223,7 +224,6 @@ module Arrow
 			end
 
 			return object_html.join("\n")
-
 		end
 
 
@@ -299,7 +299,7 @@ module Arrow
 
 		### Return the receiver as an HTML fragment.
 		def html_inspect
-			return make_html_for_object( self )
+			return make_object_html_wrapper( self )
 		end
 
 	end # HtmlInspectableObject

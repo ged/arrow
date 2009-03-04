@@ -291,9 +291,7 @@ module Apache # :nodoc: all
 	
 	# Apache::Request
 	class Request < ModRubySimObject
-def the_request(  ); end
-		def status(  ); end
-	
+
 		INSTANCE_METHODS = %w{
 			<< add_cgi_vars add_common_vars all_params allow_options
             allow_overrides allowed allowed= args args= attributes auth_name
@@ -381,6 +379,19 @@ def the_request(  ); end
 			@method_number = Apache::METHOD_NAMES_TO_NUMBERS[ methodname ] or
 				raise "No such HTTP method '%s'" % [methodname]
 		end
+
+		def remote_host( lookup=nil )
+			return '127.0.0.1'
+		end
+
+		def the_request
+			return 'GET / HTTP/1.1'
+		end
+
+		def status
+			return Apache::OK
+		end
+	
 	end
 
 	class Server < ModRubySimObject
@@ -416,7 +427,9 @@ def the_request(  ); end
 	end
 
 	class Connection < ModRubySimObject
-def remote_host(  ); end
+		def remote_host
+			return '127.0.0.1'
+		end
 	end	  
 		  
 	class Cookie < ModRubySimObject

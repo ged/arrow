@@ -106,9 +106,26 @@ describe Arrow::Service do
 			Marshal.should_receive( :load ).with( @txn ).and_return( :ruby_objects )
 			@service.deserialize_request_body( @txn ).should == :ruby_objects
 		end
+
+		it "knows how to deserialize incoming request bodies in " +
+		   "'application/x-www-form-urlencoded' format" do
+			@request_headers.should_receive( :[] ).with( 'content-type' ).
+				and_return( 'application/x-www-form-urlencoded' )
+			@txn.should_receive( :all_params ).and_return( :form_fields )
+
+			@service.deserialize_request_body( @txn ).should == :form_fields
+		end
+
+		it "knows how to deserialize incoming request bodies in 'multipart/form-data' format" do
+			@request_headers.should_receive( :[] ).with( 'content-type' ).
+				and_return( 'multipart/form-data' )
+			@txn.should_receive( :all_params ).and_return( :form_fields )
+
+			@service.deserialize_request_body( @txn ).should == :form_fields
+		end
 	end
 	
-	describe " subclass which doesn't overload the requested operation" do
+	describe " subclass which doesn't provide implementations of any operation" do
 
 		before( :all ) do
 			@service_class = Class.new( Arrow::Service )
@@ -119,6 +136,10 @@ describe Arrow::Service do
 			@txn.stub!( :uri ).and_return( @uri )
 			@err_headers = mock( "error headers table" )
 			@txn.stub!( :err_headers_out ).and_return( @err_headers )
+		end
+		
+		it "knows that it " do
+			
 		end
 		
 		it "maps a GET to #not_allowed" do
@@ -199,7 +220,7 @@ describe Arrow::Service do
 	
 	end
 
-	describe " subclass which supports all operations" do
+	describe " subclass which provides implementations of all operations" do
 		before( :all ) do
 			@service_class = Class.new( Arrow::Service ) do
 				def fetch( txn, id ); :one_resource; end
@@ -283,10 +304,11 @@ describe Arrow::Service do
 		before( :all ) do
 			@service_class = Class.new( Arrow::Service ) do
 				def fetch_test( txn, id ); :one_resource_test; end
-				def fetch_test_fuckhose( txn, id ); :one_resource_test_fuckhose; end
+				def fetch_test_subresource( txn, id ); :one_resource_test_subresource; end
 				def create_test( txn, id=nil ); :new_resource_test; end
 				def update_test( txn, id ); :updated_resource_test; end
 				def delete_test( txn, id ); :deleted_resource_test; end
+				def delete_test_subresource( txn, id ); :deleted_resource_test_subresource; end
 				def validate_id( id ); return id; end
 			end
 		end
@@ -310,9 +332,18 @@ describe Arrow::Service do
 	
 		it "maps a GET with an ID and two operations to #fetch_«op1»_«op2»" do
 			@txn.stub!( :request_method ).and_return( 'GET' )
-			@txn.stub!( :uri ).and_return( @uri + '/199/test/fuckhose' )
+			@txn.stub!( :uri ).and_return( @uri + '/199/test/subresource' )
 			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
-			@service.run( @txn, '199', 'test', 'fuckhose' ).should == :one_resource_test_fuckhose
+			@service.run( @txn, '199', 'test', 'subresource' ).
+				should == :one_resource_test_subresource
+		end
+	
+		it "maps a DELETE with an ID and two operations to #fetch_«op1»_«op2»" do
+			@txn.stub!( :request_method ).and_return( 'DELETE' )
+			@txn.stub!( :uri ).and_return( @uri + '/199/test/subresource' )
+			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
+			@service.run( @txn, '199', 'test', 'subresource' ).
+				should == :deleted_resource_test_subresource
 		end
 	
 		it "maps a POST with an ID and operation to #create_«operation»" do
@@ -392,7 +423,6 @@ describe Arrow::Service do
 			@service_class = Class.new( Arrow::Service ) do
 				def initialize( *args )
 					@objects = TEST_SERVICE_OBJECTS.dup
-					@objects.each {|o| o.extend(Arrow::HtmlInspectableObject) }
 					super
 				end
 

@@ -1,3 +1,89 @@
+-- Fri, 20 Feb 2009 04:37:21 -0000 by deveiant (r500) -----
+   Changed: spec/arrow/appletmixins_spec.rb
+            lib/arrow/appletmixins.rb
+            lib/arrow.rb
+
+    * Made the failures in Arrow::AppletAuthentication#login_action and #deny_access_action
+    set the status directly and return error descriptions for generic handling
+    * Bumped version number for release.
+
+
+-- Thu, 19 Feb 2009 19:18:16 -0000 by deveiant (r499) -----
+   Changed: lib/arrow/appletmixins.rb
+
+   Don't pass arguments from the original action to the :access_denied action.
+
+
+-- Thu, 19 Feb 2009 03:09:49 -0000 by deveiant (r498) -----
+   Changed: lib/arrow/appletmixins.rb
+            spec/arrow/applet_spec.rb
+            lib/arrow/applet.rb
+
+     * Converted some more Arrow::Applet tests to specs.
+     * Added a singular alias for Arrow::AccessControls#unauthenticated_actions
+     * Arrow::Applet: Factored out mapping an action name to a valid action into a separate
+     method for smallness and ease of overriding.
+
+
+-- Wed, 18 Feb 2009 18:35:08 -0000 by deveiant (r497) -----
+   Changed: lib/arrow/mixins.rb
+
+    * Arrow::HTMLUtilities
+    - Make generated HTML valid by always generating DIVs instead of SPANs, as a
+    DIV can't live in a SPAN.
+    - Make generated instance-variable values which are Arrays or Hashes get the
+    'complex' style class instead of 'simple' for correct inline/block display.
+
+
+-- Wed, 18 Feb 2009 00:06:11 -0000 by deveiant (r496) -----
+   Changed: docs/manual/source/tutorial/error-handling.page
+            spec/arrow/service_spec.rb
+            lib/arrow/service.rb
+            docs/manual/layouts/default.page
+            spec/arrow/config_spec.rb
+            docs/manual/source/tutorial/logging.page (and 16 other/s)
+
+    * Updated keywords props on manual pages
+    * Reworked Applet's execution strategy again to un-break service applets that
+    depend on query args.
+    * Started conversion of the applet unit tests to specs.
+
+
+-- Sat, 14 Feb 2009 02:01:33 -0000 by deveiant (r495) -----
+   Changed: spec/arrow/appletmixins_spec.rb
+            lib/arrow/appletmixins.rb
+            lib/arrow/service.rb
+            spec/arrow/transaction_spec.rb
+            lib/arrow/applet.rb
+            lib/arrow/transaction.rb (and 2 other/s)
+
+    * More work on the auth mixins
+
+
+-- Fri, 13 Feb 2009 15:52:27 -0000 by deveiant (r494) -----
+   Added:   docs/original-design-notes.txt
+            -> renamed from /trunk/notes.txt@r493
+            spec/arrow/appletmixins_spec.rb (new)
+            lib/arrow/appletmixins.rb (new)
+   Changed: lib/arrow.rb
+            lib/arrow/config.rb
+            lib/apache/fakerequest.rb
+            lib/arrow/formvalidator.rb
+            docs/manual/lib/examples-filter.rb
+            Rakefile (and 6 other/s)
+   Deleted: utils.rb
+            TODO
+            MANIFEST
+            notes.txt
+            inactive-applets
+            TEMPLATE.rb.tpl (and 4 other/s)
+
+    * Tweaked the Textmate logging helper to distinguish between debug-/info- and notice-level
+    messages.
+    * Added an appletmixins.rb file and the first applet mixin, Arrow::AppletAuthentication
+    * Started removing all the explicit rubygems requires everywhere.
+
+
 -- Thu, 05 Feb 2009 02:37:51 -0000 by deveiant (r493) -----
    Changed: spec/arrow/service_spec.rb
             lib/arrow/service.rb

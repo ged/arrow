@@ -44,7 +44,7 @@ describe Arrow::AppletAuthentication do
 		@connection = stub( "apache connnection", :remote_host => 'host' )
 		@txn = stub( "transaction", :uri => @uri, :vargs => true, :user => nil, 
 			:authorized => false, :the_request => 'the request',
-			:connection => @connection )
+			:connection => @connection, :remote_host => '127.0.0.1' )
 	end
 	
 

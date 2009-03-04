@@ -103,7 +103,7 @@ module Arrow
 				return yield( user )
 			else
 				self.log.warning "Authentication failed from %s for %s" %
-					[ txn.connection.remote_host, txn.the_request ]
+					[ txn.remote_host(Apache::REMOTE_NOLOOKUP), txn.the_request ]
 				return self.subrun( :login, txn, *args )
 			end
 		end

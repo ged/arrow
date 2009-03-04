@@ -102,7 +102,6 @@ describe Arrow::TemplateFactory do
 
 
 		it "has the loader instance registered as its loader" do
-			pending "Figuring out what the hell is adding this: #<Method: Class(Object)#load>"
 		    @factory.loader.should be_an_instance_of( Arrow::TestingInstanceTemplateLoader )
 		end
 	

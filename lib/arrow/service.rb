@@ -90,9 +90,11 @@ class Arrow::Service < Arrow::Applet
 	# The list of content-types and the corresponding method on the service to use to
 	# transform it into something useful.
 	DESERIALIZERS = {
-		'application/json'        => :deserialize_json_body,
-		'text/x-yaml'             => :deserialize_yaml_body,
-		RUBY_MARSHALLED_MIMETYPE  => :deserialize_marshalled_body,
+		'application/json'                  => :deserialize_json_body,
+		'text/x-yaml'                       => :deserialize_yaml_body,
+		'application/x-www-form-urlencoded' => :deserialize_form_body,
+		'multipart/form-data'               => :deserialize_form_body,
+		RUBY_MARSHALLED_MIMETYPE            => :deserialize_marshalled_body,
 	}
 
 
@@ -285,16 +287,9 @@ class Arrow::Service < Arrow::Applet
 	def prepare_hypertext_response( txn, content )
 		self.log.debug "Preparing a hypertext response out of %p" %
 			[ txn.content_type || content.class ]
-		body = nil
-		
-		if content.respond_to?( :html_inspect )
-			self.log.debug "  using the object's own #html_inspect"
-			body = content.html_inspect
-		else
-			self.log.debug "  using the generic HTML inspector"
-			body = make_html_for_object( content )
-		end
-		
+
+		body = self.make_hypertext_from_content( content )
+
 		# Generate an HTML response
 		tmpl = self.load_template( :service )
 		tmpl.body = body
@@ -306,8 +301,26 @@ class Arrow::Service < Arrow::Applet
 		
 		return tmpl
 	end
-	
 	template :service => 'service-response.tmpl'
+
+
+	### Make HTML from the given +content+, either via its #html_inspect method, or via
+	### Arrow::HTMLUtilities.make_html_for_object if it doesn't respond to #html_inspect.
+	def make_hypertext_from_content( content )
+		if content.respond_to?( :html_inspect )
+			self.log.debug "  making hypertext from %p using %p" %
+				[ content, content.method(:html_inspect) ]
+			body = content.html_inspect
+		elsif content.respond_to?( :fetch )
+			self.log.debug "  recursively hypertexting a collection"
+			body = content.collect {|o| self.make_hypertext_from_content(o) }.join("\n")
+		else
+			self.log.debug "  using the generic HTML inspector"
+			body = make_html_for_object( content )
+		end
+
+		return body
+	end
 	
 
 	### Read the request body from the specified transaction, deserialize it if 
@@ -334,6 +347,12 @@ class Arrow::Service < Arrow::Applet
 	end
 	
 	
+	### Deserialize the given transaction's request body from an HTML form.
+	def deserialize_form_body( txn )
+		return txn.all_params
+	end
+	
+
 	### Deserialize the given transaction's request body as JSON and return it.
 	def deserialize_json_body( txn )
 		return JSON.load( txn )
