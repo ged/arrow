@@ -38,6 +38,10 @@ class Arrow::TestingInstanceTemplateLoader
 	def initialize( config )
 	end
 
+	class << self
+		undef_method :load
+	end
+
 	def load( *args )
 		# Mocked
 	end

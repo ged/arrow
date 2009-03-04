@@ -1,3 +1,21 @@
+-- Wed, 04 Mar 2009 18:46:18 -0000 by deveiant (r501) -----
+   Changed: spec/arrow/appletmixins_spec.rb
+            lib/arrow/appletmixins.rb
+            spec/arrow/service_spec.rb
+            LICENSE
+            Rakefile
+            lib/arrow/service.rb (and 5 other/s)
+
+    * Updated build system.
+    * Template loader issue resolved by upgrading RSpec
+    * Added some additional specs for service sub-resources, cleaned up example names.
+    * Fleshed out FakeRequest with some more stub methods.
+    * Added a deserializer for the two form-data content types to Arrow::Service
+    * Made HTMLUtilities look for an #html_inspect method on the objects it's serializing,
+    and then made HtmlInspectableObject use the inner html wrapper function instead of
+    #make_html_for_object so objects can define their own HTML serialization more easily.
+
+
 -- Fri, 20 Feb 2009 04:37:21 -0000 by deveiant (r500) -----
    Changed: spec/arrow/appletmixins_spec.rb
             lib/arrow/appletmixins.rb
