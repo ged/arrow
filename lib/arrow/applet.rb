@@ -521,16 +521,25 @@ class Arrow::Applet < Arrow::Object
 		self.log.debug "In action_missing_action with: raction = %p, args = %p" %
 			[ raction, args ]
 
-		if raction && @signature.templates.key?( raction.to_s.to_sym )
-			self.log.debug "Using template sender default action for %s" % raction
-			txn.vargs = self.make_validator( raction, txn )
-			tmpl = self.load_template( raction.to_sym )
-			tmpl.txn = txn
-			return tmpl
-		else
-			raise Arrow::AppletError, "No such action '%s' in %s" %
-				[ raction, self.signature.name ]
+		if raction && raction.to_s =~ /^([a-z]\w+)$/
+			tmplkey = $1.untaint
+			self.log.debug "tmpl is: %p (%stainted)" %
+				[ tmplkey, tmplkey.tainted? ? "" : "not " ]
+
+			if @signature.templates.key?( tmplkey.to_sym )
+				self.log.debug "Using template sender default action for %s" % raction
+				txn.vargs = self.make_validator( tmplkey, txn )
+
+				tmpl = self.load_template( raction.to_sym )
+				tmpl.txn = txn
+				tmpl.applet = self
+
+				return tmpl
+			end
 		end
+
+		raise Arrow::AppletError, "No such action '%s' in %s" %
+			[ raction, self.signature.name ]
 	end
 
 

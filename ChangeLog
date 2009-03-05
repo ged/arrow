@@ -1,3 +1,12 @@
+-- Wed, 04 Mar 2009 19:08:32 -0000 by deveiant (r502) -----
+   Changed: lib/arrow.rb
+            spec/arrow/templatefactory_spec.rb
+            ChangeLog
+
+    * Adding a fix to the templatefactory spec for a load-order problem (I think?)
+    * Bumping version to 1.0.2
+
+
 -- Wed, 04 Mar 2009 18:46:18 -0000 by deveiant (r501) -----
    Changed: spec/arrow/appletmixins_spec.rb
             lib/arrow/appletmixins.rb

@@ -1,20 +1,20 @@
 
 = Arrow
 
-A Ruby web application framework for Apache.
+A web application framework for mod_ruby.
 
 == Authors
 
- * Michael Granger
- * Dave McCorkhill
- * Martin Chase
+* Michael Granger
+* Dave McCorkhill
+* Martin Chase
 
 == Contributors
 
- * Aaron Son
- * Ben Bleything
- * Kim Wallmark
- * Mahlon E. Smith
+* Aaron Son
+* Ben Bleything
+* Kim Wallmark
+* Mahlon E. Smith
 
 == General Information
 
@@ -28,7 +28,7 @@ sacrificing the power of being able to access the native Apache API.
 We're working on a manual which will provide more comprehensive instructions
 and an in-depth tutorial. You can view it at:
 
-  http://deveiate.org/projects/Arrow/manual/
+  http://deveiate.org/code/Arrow-manual/
 
 We'd be happy to hear your suggestions, bug reports, or complaints.
 
@@ -46,9 +46,9 @@ If you use RubyGems, appropriate versions can be installed using the
 'install_dependencies' Rakefile task. Otherwise, you'll need to build and
 install these by hand:
 
-ruby-cache-0.3::      http://raa.ruby-lang.org/project/ruby-cache
-formvalidator-0.1.4:: http://raa.ruby-lang.org/project/formvalidator
-PluginFactory-1.0.3:: http://deveiate.org/projects/PluginFactory
+ruby-cache (0.3.0)::    `gem install ruby-cache`
+formvalidator (0.1.4):: `gem install formvalidator`
+pluginfactory (1.0.4):: `gem install pluginfactory`
 
 
 ==== Quickstart
@@ -68,37 +68,8 @@ advice about how to configure your server.
 
 == Legal
 
-Copyright © 2003-2008 The FaerieMUD Consortium.
+:include: LICENSE
 
-All rights reserved.
+---
 
-Redistribution and use in source and binary forms, with or without modification, are
-permitted provided that the following conditions are met:
-
-    * Redistributions of source code must retain the above copyright notice, this list of
-      conditions and the following disclaimer.
-
-    * Redistributions in binary form must reproduce the above copyright notice, this list
-      of conditions and the following disclaimer in the documentation and/or other
-      materials provided with the distribution.
-
-    * Neither the name of FaerieMUD nor the names of its contributors may be used
-      to endorse or promote products derived from this software without specific prior
-      written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-
- $Id$
-
-
+See the LICENSE file included with the distribution for licensing details.

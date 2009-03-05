@@ -365,12 +365,12 @@ class Arrow::Session::Store < Arrow::Object
 		newhash.each_key {|key|
 			case newhash[ key ]
 			when Hash
-				newHash[ key ] = strip_hash( newhash[key], false )
+				newhash[ key ] = strip_hash( newhash[key], false )
 				
 			when Proc, Method, UnboundMethod, IO
 				self.log.warning "Stripping unserializable object from session " \
 					"hash: %p" % newhash[ key ]
-				newHash[ key ] = "[Can't serialize a %s]" % newhash[ key ].class
+				newhash[ key ] = "[Can't serialize a %s]" % newhash[ key ].class
 			end
 		}
 		

@@ -186,7 +186,70 @@ describe Arrow::Applet do
 		it "maps invocations of nonexistent actions to the action_missing action" do
 			@applet.run( @txn, "nonexistent", :first ).should == [ :missing, "nonexistent", :first ]
 		end
+
+		it "doesn't use libapreq's param parser for a POST with content-type " +
+		        "other than 'application/www-form-url-encoded" do
+			request = mock( "request", :null_object => true )
+			request.should_not_receive( :paramtable )
+
+			txn = mock( "transaction", :null_object => true )
+			txn.should_receive( :form_request? ).at_least(1).and_return( false )
+			txn.stub!( :request ).and_return( request )
+
+			@applet.run( txn, 'test' )
+		end
+
+	end # describe "concrete subclass"
+	
+	
+	describe "instance without an #action_missing_action method" do
+		before( :all ) do
+			setup_logging( :crit )
+		end
 		
+		before( :each ) do
+			@appletclass = Class.new( Arrow::Applet ) do
+				template :test => 'test.tmpl'
+			end
+			
+			@uri = '/test'
+			@factory = mock( "template factory" )
+			
+			@applet = @appletclass.new( nil, @factory, @uri )
+
+			@txn = stub( "transaction", :vargs => nil, :form_request? => false, :vargs= => nil )
+		end
+
+		it "maps missing actions to like-named templates" do
+			template = stub( "test template" )
+			@factory.should_receive( :get_template ).with( 'test.tmpl' ).and_return( template )
+
+			template.should_receive( :txn= ).with( @txn )
+			template.should_receive( :applet= ).with( @applet )
+
+			@applet.run( @txn, 'test' ).should == template
+		end
+		
+		it "untaints the action before using it to look up the missing action template" do
+			template = stub( "test template" )
+			@factory.should_receive( :get_template ).with( 'test.tmpl' ).and_return( template )
+
+			template.should_receive( :txn= ).with( @txn )
+			template.should_receive( :applet= ).with( @applet )
+
+			action = 'test'
+			action.taint
+
+			Thread.new do
+				Thread.current.abort_on_exception = true
+				$SAFE = 1
+				lambda {
+					@applet.run( @txn, action )
+				}.should_not raise_error()
+			end.join
+		end
+		
+	
 
 		### TODO: Convert these to specs
 	
@@ -478,18 +541,6 @@ describe Arrow::Applet do
 
 		end
 	
-		it "doesn't use libapreq's param parser for a POST with content-type " +
-		        "other than 'application/www-form-url-encoded" do
-			request = mock( "request", :null_object => true )
-			request.should_not_receive( :paramtable )
-
-			txn = mock( "transaction", :null_object => true )
-			txn.should_receive( :form_request? ).at_least(1).and_return( false )
-			txn.stub!( :request ).and_return( request )
-
-			@applet.run( txn, 'test' )
-		end
-
 	end # describe "concrete subclass"
 	
 end
