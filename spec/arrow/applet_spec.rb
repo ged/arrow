@@ -15,20 +15,13 @@ BEGIN {
 	$LOAD_PATH.unshift( libdir ) unless $LOAD_PATH.include?( libdir )
 }
 
-begin
-	require 'spec'
-	require 'apache/fakerequest'
-	require 'arrow'
-	require 'arrow/applet'
+require 'spec'
 
-	require 'spec/lib/helpers'
-rescue LoadError
-	unless Object.const_defined?( :Gem )
-		require 'rubygems'
-		retry
-	end
-	raise
-end
+require 'apache/fakerequest'
+require 'arrow'
+require 'arrow/applet'
+
+require 'spec/lib/helpers'
 
 
 #####################################################################
