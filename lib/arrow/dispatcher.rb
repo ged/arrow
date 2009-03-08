@@ -237,9 +237,10 @@ class Arrow::Dispatcher < Arrow::Object
 	def initialize( name, config )
 		@name = name
 		@config = config
-		@broker = Arrow::Broker.new( config )
 
 		self.configure( config )
+
+		@broker = Arrow::Broker.new( config )
 	rescue ::Exception => err
 		msg = "%s while creating dispatcher: %s\n%s" %
 			[ err.class.name, err.message, err.backtrace.join("\n\t") ]

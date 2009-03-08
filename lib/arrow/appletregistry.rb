@@ -299,6 +299,8 @@ class Arrow::AppletRegistry < Arrow::Object
 	### Check the config for any gems to load, load them, and add their template and applet 
 	### directories to the appropriate parts of the config.
 	def load_gems
+		self.log.info "Loading gems."
+
 		unless @config.respond_to?( :gems )
 			self.log.debug "No gems section in the config; skipping gemified applets"
 			return
@@ -332,6 +334,8 @@ class Arrow::AppletRegistry < Arrow::Object
 				@template_factory.path << templatedir.to_s
 			end
 		end
+		
+		self.log.info "  done loading gems (path is now: %p)." % [ @path ]
 	end
 
 
