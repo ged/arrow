@@ -84,6 +84,43 @@ describe Arrow::Service do
 			@service.deserialize_request_body( @txn ).should == :ruby_objects
 		end
 
+		it "knows how to deserialize incoming single values from request bodies in JSON format" do
+			@request_headers.should_receive( :[] ).with( 'content-type' ).
+				and_return( 'application/json' )
+
+			special_key = Arrow::Service::SPECIAL_JSON_KEY
+
+			JSON.should_receive( :load ).with( @txn ).and_return({ special_key => 'single_value' })
+			@service.deserialize_request_body( @txn ).should == 'single_value'
+		end
+
+		it "doesn't try to unwrap single-value hashes" do
+			@request_headers.should_receive( :[] ).with( 'content-type' ).
+				and_return( 'application/json' )
+
+			special_key = Arrow::Service::SPECIAL_JSON_KEY
+			structure = {
+				'non-special-key' => 'a second value'
+			}
+
+			JSON.should_receive( :load ).with( @txn ).and_return( structure )
+			@service.deserialize_request_body( @txn ).should == structure
+		end
+
+		it "doesn't try to unwrap hashes that contain the special key, but aren't just one pair" do
+			@request_headers.should_receive( :[] ).with( 'content-type' ).
+				and_return( 'application/json' )
+
+			special_key = Arrow::Service::SPECIAL_JSON_KEY
+			structure = {
+				special_key       => 'single value',
+				'non-special-key' => 'a second value'
+			}
+
+			JSON.should_receive( :load ).with( @txn ).and_return( structure )
+			@service.deserialize_request_body( @txn ).should == structure
+		end
+
 		it "knows how to deserialize incoming request bodies in JSON format with a charset" do
 			@request_headers.should_receive( :[] ).with( 'content-type' ).
 				and_return( 'application/json; charset=UTF-8' )

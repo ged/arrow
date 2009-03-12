@@ -1,3 +1,22 @@
+-- Thu, 05 Mar 2009 23:52:22 -0000 by deveiant (r505) -----
+   Changed: lib/arrow.rb
+
+   Bumping version to 1.0.3.
+
+
+-- Thu, 05 Mar 2009 20:41:38 -0000 by deveiant (r504) -----
+   Changed: README
+            lib/arrow/session/store.rb
+            LICENSE
+            spec/arrow/applet_spec.rb
+            ChangeLog
+            lib/arrow/applet.rb (and 1 other/s)
+
+    * Added multipart/form-data to the request body deserializers
+    * Fixed (I think?) a security problem in the default Arrow::Applet#action_missing_action 
+    * Fixed a bug in the session store for complex session values.
+
+
 -- Wed, 04 Mar 2009 19:08:32 -0000 by deveiant (r502) -----
    Changed: lib/arrow.rb
             spec/arrow/templatefactory_spec.rb

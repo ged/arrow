@@ -102,6 +102,10 @@ class Arrow::Service < Arrow::Applet
 	# is set on the transaction
 	DEFAULT_CONTENT_TYPE = RUBY_OBJECT_MIMETYPE
 	
+	# The key for POSTed/PUT JSON entity bodies that will be unwrapped as a simple string value.
+	# This is necessary because JSON doesn't have a simple value type of its own, whereas all
+	# the other serialization types do.
+	SPECIAL_JSON_KEY = 'single_value'
 
 	# Struct for containing thrown HTTP status responses
 	StatusResponse = Struct.new( "ArrowServiceStatusResponse", :status, :message )
@@ -352,10 +356,15 @@ class Arrow::Service < Arrow::Applet
 		return txn.all_params
 	end
 	
-
+	
 	### Deserialize the given transaction's request body as JSON and return it.
 	def deserialize_json_body( txn )
-		return JSON.load( txn )
+		rval = JSON.load( txn )
+		if rval.is_a?( Hash ) && rval.keys == [ SPECIAL_JSON_KEY ]
+			return rval[ SPECIAL_JSON_KEY ]
+		else
+			return rval
+		end
 	end
 	
 
