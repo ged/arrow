@@ -44,6 +44,10 @@ PROJECT_NAME  = 'Arrow'
 PKG_NAME      = PROJECT_NAME.downcase
 PKG_SUMMARY   = 'A mod_ruby web application framework'
 
+# Cruisecontrol stuff
+CC_BUILD_LABEL     = ENV['CC_BUILD_LABEL']
+CC_BUILD_ARTIFACTS = ENV['CC_BUILD_ARTIFACTS'] || 'artifacts'
+
 VERSION_FILE  = LIBDIR + 'arrow.rb'
 if VERSION_FILE.exist? && buildrev = ENV['CC_BUILD_LABEL']
 	PKG_VERSION = VERSION_FILE.read[ /VERSION\s*=\s*['"](\d+\.\d+\.\d+)['"]/, 1 ] + '.' + buildrev
@@ -58,29 +62,29 @@ GEM_FILE_NAME = "#{PKG_FILE_NAME}.gem"
 
 EXTCONF       = EXTDIR + 'extconf.rb'
 
-ARTIFACTS_DIR = Pathname.new( ENV['CC_BUILD_ARTIFACTS'] || 'artifacts' )
+ARTIFACTS_DIR = Pathname.new( CC_BUILD_ARTIFACTS )
 
 TEXT_FILES    = %w( Rakefile ChangeLog README LICENSE ).collect {|filename| BASEDIR + filename }
-BIN_FILES     = Pathname.glob( BINDIR + '*' ).delete_if {|item| item =~ /\.svn/ }
-LIB_FILES     = Pathname.glob( LIBDIR + '**/*.rb' ).delete_if {|item| item =~ /\.svn/ }
-EXT_FILES     = Pathname.glob( EXTDIR + '**/*.{c,h,rb}' ).delete_if {|item| item =~ /\.svn/ }
-DATA_FILES    = Pathname.glob( DATADIR + '**/*' ).delete_if {|item| item =~ /\.svn/ }
+BIN_FILES     = Pathname.glob( "#{BINDIR}/*" ).delete_if {|item| item.to_s =~ /\.svn/ }
+LIB_FILES     = Pathname.glob( "#{LIBDIR}/**/*.rb" ).delete_if {|item| item.to_s =~ /\.svn/ }
+EXT_FILES     = Pathname.glob( "#{EXTDIR}/**/*.{c,h,rb}" ).delete_if {|item| item.to_s =~ /\.svn/ }
+DATA_FILES    = Pathname.glob( "#{DATADIR}/**/*" ).delete_if {|item| item.to_s =~ /\.svn/ }
 
 SPECDIR       = BASEDIR + 'spec'
 SPECLIBDIR    = SPECDIR + 'lib'
-SPEC_FILES    = Pathname.glob( SPECDIR + '**/*_spec.rb' ).delete_if {|item| item =~ /\.svn/ } +
-                Pathname.glob( SPECLIBDIR + '**/*.rb' ).delete_if {|item| item =~ /\.svn/ }
+SPEC_FILES    = Pathname.glob( "#{SPECDIR}/**/*_spec.rb" ).delete_if {|item| item.to_s =~ /\.svn/ } +
+                Pathname.glob( "#{SPECLIBDIR}/**/*.rb" ).delete_if {|item| item.to_s =~ /\.svn/ }
 
 TESTDIR       = BASEDIR + 'tests'
-TEST_FILES    = Pathname.glob( TESTDIR + '**/*.tests.rb' ).delete_if {|item| item =~ /\.svn/ }
+TEST_FILES    = Pathname.glob( "#{TESTDIR}/**/*.tests.rb" ).delete_if {|item| item.to_s =~ /\.svn/ }
 
 RAKE_TASKDIR  = BASEDIR + 'rake'
-RAKE_TASKLIBS = Pathname.glob( RAKE_TASKDIR + '*.rb' )
+RAKE_TASKLIBS = Pathname.glob( "#{RAKE_TASKDIR}/*.rb" )
 
 LOCAL_RAKEFILE = BASEDIR + 'Rakefile.local'
 
 EXTRA_PKGFILES = []
-EXTRA_PKGFILES.concat Pathname.glob( BASEDIR + 'docs/manual/{layouts,lib,resources,source}/**' ).delete_if {|item| item =~ /\.svn/ } 
+EXTRA_PKGFILES.concat Pathname.glob( "#{BASEDIR}/docs/manual/{layouts,lib,resources,source}/**" ).delete_if {|item| item.to_s =~ /\.svn/ } 
 
 RELEASE_FILES = TEXT_FILES + 
 	SPEC_FILES + 
@@ -200,8 +204,8 @@ GEMSPEC   = Gem::Specification.new do |gem|
 		"data/ directory.",
 	  ].join( "\n" )
 
-	gem.authors           = 'Michael Granger'
-	gem.email             = 'ged@FaerieMUD.org'
+	gem.authors           = "Michael Granger"
+	gem.email             = "ged@FaerieMUD.org"
 	gem.homepage          = 'http://deveiate.org/projects/Arrow/'
 	gem.rubyforge_project = RUBYFORGE_PROJECT
 
@@ -249,9 +253,10 @@ $dryrun = Rake.application.options.dryrun ? true : false
 
 # Load any remaining task libraries
 RAKE_TASKLIBS.each do |tasklib|
-	next if tasklib =~ %r{/(helpers|svn|verifytask)\.rb$}
+	next if tasklib.to_s =~ %r{/(helpers|svn|verifytask)\.rb$}
 	begin
-		require tasklib
+		trace "  loading tasklib %s" % [ tasklib ]
+		require tasklib.expand_path
 	rescue ScriptError => err
 		fail "Task library '%s' failed to load: %s: %s" %
 			[ tasklib, err.class.name, err.message ]
@@ -300,7 +305,7 @@ end
 desc "Cruisecontrol build"
 task :cruise => [:clean, 'spec:quiet', :package] do |task|
 	raise "Artifacts dir not set." if ARTIFACTS_DIR.to_s.empty?
-	artifact_dir = ARTIFACTS_DIR.cleanpath + ENV['CC_BUILD_LABEL']
+	artifact_dir = ARTIFACTS_DIR.cleanpath + (CC_BUILD_LABEL || Time.now.strftime('%Y%m%d-%T'))
 	artifact_dir.mkpath
 	
 	coverage = BASEDIR + 'coverage'
