@@ -47,7 +47,7 @@ class ExamplesFilter < Manual::Page::Filter
 		:line_numbers => :inline,
 		:tab_width    => 4,
 		:hint         => :debug,
-		:testable     => true
+		:testable     => false,
 	}
 
 	# PI	   ::= '<?' PITarget (S (Char* - (Char* '?>' Char*)))? '?>'
@@ -56,11 +56,11 @@ class ExamplesFilter < Manual::Page::Filter
 			example				# Instruction Target
 			(?:					# Optional instruction body
 			\s+
-			(					# [$1]
-				[^?]*			# Anything but a question mark
+			((?:				# [$1]
+				[^?]*			# Run of anything but a question mark
 				|				# -or-
 				\?(?!>)			# question mark not followed by a closing angle bracket
-			)
+			)*)
 			)?
 		\?>
 	  }x
@@ -121,7 +121,7 @@ class ExamplesFilter < Manual::Page::Filter
 				contentpos = scanner.pos
 				scanner.skip_until( EndPI ) or
 					raise "Unterminated example at line %d" % 
-						[ scanner[0..scanner.pos].count("\n") ]
+						[ scanner.string[0..scanner.pos].count("\n") ]
 				
 				# Now build the example and append to the buffer
 				if ( scanner.pos - contentpos > scanner.matched.length )
@@ -129,8 +129,8 @@ class ExamplesFilter < Manual::Page::Filter
 					contents = scanner.string[ contentpos..offset ]
 				end
 
-				#$stderr.puts "Processing with params: %p, contents: %p" % [ params, contents ]
-				buffer << self.process_example( params, contents )
+				trace "Processing with params: %p, contents: %p" % [ params, contents ]
+				buffer << self.process_example( params, contents, page )
 			else
 				break
 			end
@@ -146,14 +146,14 @@ class ExamplesFilter < Manual::Page::Filter
 	### Filter out 'example' macros, doing syntax highlighting, and running
 	### 'testable' examples through a validation process appropriate to the
 	### language the example is in.
-	def process_example( params, body )
+	def process_example( params, body, page )
 		options = self.parse_options( params )
 		caption = options.delete( :caption )
 		content = ''
 		
 		# Test it if it's testable
 		if options[:testable]
-			content = test_content( body, options[:language] )
+			content = test_content( body, options[:language], page )
 		else
 			content = body
 		end
@@ -185,13 +185,13 @@ class ExamplesFilter < Manual::Page::Filter
 	
 
 	### Test the given +content+ with a rule specific to the given +language+.
-	def test_content( body, language )
+	def test_content( body, language, page )
 		case language.to_sym
 		when :ruby
-			return self.test_ruby_content( body )
+			return self.test_ruby_content( body, page )
 
 		when :yaml
-			return self.test_yaml_content( body )
+			return self.test_yaml_content( body, page )
 
 		else
 			return body
@@ -200,25 +200,35 @@ class ExamplesFilter < Manual::Page::Filter
 	
 		
 	### Test the specified Ruby content for valid syntax
-	def test_ruby_content( source )
+	def test_ruby_content( source, page )
 		# $stderr.puts "Testing ruby content..."
 		libdir = Pathname.new( __FILE__ ).dirname.parent.parent.parent + 'lib'
+		extdir = Pathname.new( __FILE__ ).dirname.parent.parent.parent + 'ext'
 
 		options = Rcodetools::XMPFilter::INITIALIZE_OPTS.dup
-		options[:include_paths] << libdir.to_s
+		options[:include_paths] |= [ libdir.to_s, extdir.to_s ]
+		options[:width] = 80
+
+		if page.config['example_prelude']
+			prelude = page.config['example_prelude']
+			trace "  prepending prelude:\n#{prelude}"
+			source = prelude.strip + "\n\n" + source.strip
+		else
+			trace "  no prelude; page config is: %p" % [ page.config ]
+		end
 
 		rval = Rcodetools::XMPFilter.run( source, options )
 
-		# $stderr.puts "test output: ", rval
+		trace "test output: ", rval
 		return rval.join
 	rescue Exception => err
-		return "%s while testing %s: %s\n  %s" %
-			[ err.class.name, sourcefile, err.message, err.backtrace.join("\n  ") ]
+		return "%s while testing: %s\n  %s" %
+			[ err.class.name, err.message, err.backtrace.join("\n  ") ]
 	end
 	
 	
 	### Test the specified YAML content for valid syntax
-	def test_yaml_content( source )
+	def test_yaml_content( source, metadata )
 		YAML.load( source )
 	rescue YAML::Error => err
 		return "# Invalid YAML: " + err.message + "\n" + source

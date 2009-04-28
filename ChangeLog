@@ -1,3 +1,43 @@
+-- Tue, 28 Apr 2009 14:40:15 -0000 by deveiant (r512) -----
+   Added:   docs/manual/src
+            -> renamed from /trunk/docs/manual/source@r506
+   Changed: Rakefile
+   Deleted: docs/manual/source
+
+    * Updated build system.
+    * Renamed the manual source directory so the manual-generation tasks work again.
+
+
+-- Thu, 12 Mar 2009 21:19:27 -0000 by deveiant (r510) -----
+   Changed: spec/arrow/service_spec.rb
+            lib/arrow/service.rb
+            ChangeLog
+
+    * Made Arrow::Service JSON body deserialization unwrap a hash with a single key-value pair
+    with a key of Arrow::Service::SPECIAL_JSON_KEY ('single_value') as a single scalar value. This
+    works around the fact that every other serialization format can represent a scalar, and
+    JSON cannot.
+
+
+-- Sun, 08 Mar 2009 23:14:13 -0000 by deveiant (r508) -----
+   Changed: lib/arrow/appletregistry.rb
+            lib/arrow.rb
+            lib/arrow/dispatcher.rb
+
+    * Set up the configuration before the broker loads. This will mean that other configurable
+    stuff will need to be preloaded, but it's better than having the logging system unconfigured
+    when applets are loading.
+    * Added some more logging around gem-loading parts of AppletRegistry.
+    * Bumped version to 1.0.4.
+
+
+-- Fri, 06 Mar 2009 15:36:02 -0000 by deveiant (r507) -----
+   Changed: lib/arrow/spechelpers.rb
+            spec/arrow/applet_spec.rb
+
+    * Added (the implementation of) the Arrow::SpecHelpers module
+
+
 -- Thu, 05 Mar 2009 23:52:22 -0000 by deveiant (r505) -----
    Changed: lib/arrow.rb
 

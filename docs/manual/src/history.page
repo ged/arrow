@@ -36,7 +36,7 @@ The first is performance. I've heard all the FUD(Fear, Uncertainty, and Doubt) a
 mod_ruby, but I've seen first-hand evidence that refutes it. I've been a programmer for almost 12
 years as of this writing, deployed code for several very high-traffic sites
 ("Livejournal":http://livejournal.com/, "Active.com":http://www.active.com/), and my experience with
-Apache and an embedded interpreter has shown it to be a stable, fast, and extremely flexible to
+Apache and an embedded interpreter has shown it to be a stable, fast, and extremely flexible way to
 deploy applications for the web. I've seen Apache and @mod_perl@ handle 40-50 million dynamic page
 views per day, and I trust that experience over uncorroborated conjecture and new-shiny-toy appeal
 of the web server _du jour_ any day. I've been using Arrow in production for both intranet and

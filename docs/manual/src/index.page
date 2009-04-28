@@ -5,6 +5,8 @@ filters:
   - erb
   - examples
   - textile
+example_prelude: |-
+  require 'arrow'
 ---
 
 h1. Arrow
