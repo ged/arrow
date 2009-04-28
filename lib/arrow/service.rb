@@ -82,9 +82,10 @@ class Arrow::Service < Arrow::Applet
 	# The list of content-types and the corresponding message to send to transform
 	# a Ruby object to that content type, in order of preference. See #negotiate_content.
 	SERIALIZERS = [
-		['application/json', :to_json],
-		['text/x-yaml',      :to_yaml],
-		['text/xml',         :to_xml],
+		['application/json',           :to_json],
+		['text/x-yaml',                :to_yaml],
+		['application/xml+rubyobject', :to_xml],
+		[RUBY_MARSHALLED_MIMETYPE,     :dump],
 	]
 
 	# The list of content-types and the corresponding method on the service to use to
@@ -315,7 +316,7 @@ class Arrow::Service < Arrow::Applet
 			self.log.debug "  making hypertext from %p using %p" %
 				[ content, content.method(:html_inspect) ]
 			body = content.html_inspect
-		elsif content.respond_to?( :fetch )
+		elsif content.respond_to?( :fetch ) && content.respond_to?( :collect )
 			self.log.debug "  recursively hypertexting a collection"
 			body = content.collect {|o| self.make_hypertext_from_content(o) }.join("\n")
 		else

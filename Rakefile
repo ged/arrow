@@ -176,6 +176,9 @@ DEVELOPMENT_DEPENDENCIES = {
 	'tmail'       => '>= 1.2.3.1',
 	'ultraviolet' => '>= 0.10.2',
 	'libxml-ruby' => '>= 0.8.3',
+	'activerecord' => '=2.1.1',
+	'flexmock' => '>=0.8.2',
+	'json' => '>=1.1.3',
 }
 
 # Non-gem requirements: packagename => version

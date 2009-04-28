@@ -21,7 +21,10 @@ project_name: Arrow
 version_file: arrow.rb
 additional_pkgfiles: 
 - docs/manual/{layouts,lib,resources,source}/**
-dev_dependencies: {}
+dev_dependencies:
+  json: >=1.1.3
+  activerecord: =2.1.1
+  flexmock: >=0.8.2
 
 author_email: ged@FaerieMUD.org
 post_install_message: |-

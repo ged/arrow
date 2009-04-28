@@ -20,11 +20,11 @@ require 'arrow/template/call'
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-#:include: COPYRIGHT
+#:include: LICENSE
 #
 #--
 #
-# Please see the file COPYRIGHT in the 'docs' directory for licensing details.
+# Please see the file LICENSE in the 'docs' directory for licensing details.
 #
 class Arrow::Template::TimeDeltaDirective < Arrow::Template::CallDirective # :nodoc:
 

@@ -91,7 +91,7 @@ module Gem
 		if defined?( Apache )
 			return Apache.server_root
 		else
-			homedir = ENV['HOME']
+			homedir = ENV['HOME'].dup
 			homedir.untaint
 
 			return homedir

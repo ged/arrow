@@ -575,9 +575,9 @@ describe Arrow::Service do
 		end
 
 		it "serves a single fetched object as XML if the request prefers it" do
-			@txn.stub!( :explicitly_accepts? ).with( 'text/xml' ).
+			@txn.stub!( :explicitly_accepts? ).with( 'application/xml+rubyobject' ).
 				and_return( true )
-			@txn.should_receive( :content_type= ).with( 'text/xml' )
+			@txn.should_receive( :content_type= ).with( 'application/xml+rubyobject' )
 			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
 
 			@service.objects[1].should_receive( :to_xml ).and_return( :xml_object2 )
@@ -588,9 +588,9 @@ describe Arrow::Service do
 		end
 		
 		it "serves an object collection as XML if the request prefers it" do
-			@txn.stub!( :explicitly_accepts? ).with( 'text/xml' ).
+			@txn.stub!( :explicitly_accepts? ).with( 'application/xml+rubyobject' ).
 				and_return( true )
-			@txn.should_receive( :content_type= ).with( 'text/xml' )
+			@txn.should_receive( :content_type= ).with( 'application/xml+rubyobject' )
 			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
 
 			@txn.should_not_receive( :accepts_html? ).and_return( true )
