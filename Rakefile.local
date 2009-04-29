@@ -56,3 +56,9 @@ file DEMO_APPLETS_GEM.to_s => [PKGDIR.to_s] + DEMO_APPLETS_GEM_FILES do
 	end
 end
 	
+
+configlib = LIBDIR + 'arrow/config.rb'
+file 'default.cfg'
+task 'default.cfg' => [configlib.to_s] do
+	Arrow::Logger[ self.class ].level = :debug
+end

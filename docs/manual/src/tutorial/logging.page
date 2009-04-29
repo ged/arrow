@@ -11,3 +11,7 @@ h1. Logging
 
 You can log stuff. Yeah! Kudos!
 
+* Consists of two pieces: loggers and ouputters
+** Loggers pass messages up the inheritance hierarchy, looking for outputters
+** Outputters are registered with one or more loggers, and have a logging level. If a message at or above its level passes through one of the loggers it is registered with, it packages up the message and outputs it.
+
