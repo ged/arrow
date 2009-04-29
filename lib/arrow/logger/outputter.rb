@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 
+require 'arrow/monkeypatches'
 require 'pluginfactory'
+require 'uri'
 
 # 
 # The Arrow::Logger::Outputter class, which is the abstract base class for 
