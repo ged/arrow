@@ -45,22 +45,25 @@ class Arrow::Service < Arrow::Applet
 	# Map of HTTP methods to their Ruby equivalents as tuples of the form:
 	#   [ :method_without_args, :method_with_args ]
 	METHOD_MAPPING = {
-		'GET'    => [ :fetch_all,  :fetch  ],
-		'HEAD'   => [ :fetch_all,  :fetch  ],
-		'POST'   => [ :create,     :create ],
-		'PUT'    => [ :update_all, :update ],
-		'DELETE' => [ :delete_all, :delete ],
+		'OPTIONS' => [ :options,    :options ],
+		'GET'     => [ :fetch_all,  :fetch   ],
+		'HEAD'    => [ :fetch_all,  :fetch   ],
+		'POST'    => [ :create,     :create  ],
+		'PUT'     => [ :update_all, :update  ],
+		'DELETE'  => [ :delete_all, :delete  ],
 	  }
 
 	# Map of Ruby methods to their HTTP equivalents from either the single or collection URIs
 	HTTP_METHOD_MAPPING = {
 		:single => {
+			:options    => 'OPTIONS',
 			:fetch      => 'GET, HEAD',
 			:create     => 'POST',
 			:update     => 'PUT',
 			:delete     => 'DELETE',
 		},
 		:collection => {
+			:options    => 'OPTIONS',
 			:fetch_all  => 'GET, HEAD',
 			:create     => 'POST',
 			:update_all => 'PUT',
@@ -110,6 +113,17 @@ class Arrow::Service < Arrow::Applet
 
 	# Struct for containing thrown HTTP status responses
 	StatusResponse = Struct.new( "ArrowServiceStatusResponse", :status, :message )
+	
+	
+	######
+	public
+	######
+
+	### OPTIONS /
+	### Return a service document containing links to all 
+	def options( txn, *args )
+		
+	end
 	
 
 	#########

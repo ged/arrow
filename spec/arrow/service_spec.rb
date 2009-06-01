@@ -175,14 +175,19 @@ describe Arrow::Service do
 			@txn.stub!( :err_headers_out ).and_return( @err_headers )
 		end
 		
-		it "knows that it " do
-			
+		it "knows that it doesn't implement any HTTP method except OPTIONS" do
+			@txn.stub!( :request_method ).and_return( 'OPTIONS' )
+
+			@err_headers.should_receive( :[]= ).with( 'Allow', 'OPTIONS' )
+			@txn.should_receive( :content_type= ).with( 'text/plain' )
+
+			@service.run( @txn )
 		end
 		
 		it "maps a GET to #not_allowed" do
 			@txn.stub!( :request_method ).and_return( 'GET' )
 
-			@err_headers.should_receive( :[]= ).with( 'Allow', '' )
+			@err_headers.should_receive( :[]= ).with( 'Allow', 'OPTIONS' )
 			@txn.should_receive( :status= ).with( Apache::METHOD_NOT_ALLOWED )
 			@txn.should_receive( :content_type= ).with( 'text/plain' )
 
@@ -193,7 +198,7 @@ describe Arrow::Service do
 			@txn.stub!( :request_method ).and_return( 'GET' )
 			@txn.stub!( :uri ).and_return( @uri + '/18' )
 
-			@err_headers.should_receive( :[]= ).with( 'Allow', '' )
+			@err_headers.should_receive( :[]= ).with( 'Allow', 'OPTIONS' )
 			@txn.should_receive( :status= ).with( Apache::METHOD_NOT_ALLOWED )
 			@txn.should_receive( :content_type= ).with( 'text/plain' )
 
@@ -203,7 +208,7 @@ describe Arrow::Service do
 		it "maps a HEAD without an ID to #not_allowed" do
 			@txn.stub!( :request_method ).and_return( 'HEAD' )
 
-			@err_headers.should_receive( :[]= ).with( 'Allow', '' )
+			@err_headers.should_receive( :[]= ).with( 'Allow', 'OPTIONS' )
 			@txn.should_receive( :status= ).with( Apache::METHOD_NOT_ALLOWED )
 			@txn.should_receive( :content_type= ).with( 'text/plain' )
 
@@ -214,7 +219,7 @@ describe Arrow::Service do
 			@txn.stub!( :request_method ).and_return( 'HEAD' )
 			@txn.stub!( :uri ).and_return( @uri + '/18' )
 
-			@err_headers.should_receive( :[]= ).with( 'Allow', '' )
+			@err_headers.should_receive( :[]= ).with( 'Allow', 'OPTIONS' )
 			@txn.should_receive( :status= ).with( Apache::METHOD_NOT_ALLOWED )
 			@txn.should_receive( :content_type= ).with( 'text/plain' )
 
@@ -224,7 +229,7 @@ describe Arrow::Service do
 		it "maps a POST to #not_allowed" do
 			@txn.stub!( :request_method ).and_return( 'POST' )
 
-			@err_headers.should_receive( :[]= ).with( 'Allow', '' )
+			@err_headers.should_receive( :[]= ).with( 'Allow', 'OPTIONS' )
 			@txn.should_receive( :status= ).with( Apache::METHOD_NOT_ALLOWED )
 			@txn.should_receive( :content_type= ).with( 'text/plain' )
 
@@ -236,7 +241,7 @@ describe Arrow::Service do
 			@txn.stub!( :err_headers_out ).and_return( @err_headers )
 			@txn.stub!( :request_method ).and_return( 'PUT' )
 
-			@err_headers.should_receive( :[]= ).with( 'Allow', '' )
+			@err_headers.should_receive( :[]= ).with( 'Allow', 'OPTIONS' )
 			@txn.should_receive( :status= ).with( Apache::METHOD_NOT_ALLOWED )
 			@txn.should_receive( :content_type= ).with( 'text/plain' )
 
@@ -248,7 +253,7 @@ describe Arrow::Service do
 			@txn.stub!( :err_headers_out ).and_return( @err_headers )
 			@txn.stub!( :request_method ).and_return( 'DELETE' )
 
-			@err_headers.should_receive( :[]= ).with( 'Allow', '' )
+			@err_headers.should_receive( :[]= ).with( 'Allow', 'OPTIONS' )
 			@txn.should_receive( :status= ).with( Apache::METHOD_NOT_ALLOWED )
 			@txn.should_receive( :content_type= ).with( 'text/plain' )
 
