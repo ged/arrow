@@ -3,7 +3,10 @@ title: Sessions
 template: tutorial
 filters:
   - erb
+  - links
   - examples
+  - editorial
+  - api
   - textile
 ---
 
@@ -66,8 +69,8 @@ Beyond the initial configuration, Arrow makes using sessions transparent and nat
 interface is set up automatically inside your applets - you need only treat it as a user-specific
 hash, accessing and altering data like normal.
 
-<?example { language: ruby, test: true, caption: '' } ?>
-  def_action :counter do |txn|
+<?example { language: ruby, testable: true, caption: 'Declaring an applet action' } ?>
+  def counter_action( txn )
     txn.session["accesses"] ||= 0
     txn.session["accesses"] += 1
     return <<-EOF

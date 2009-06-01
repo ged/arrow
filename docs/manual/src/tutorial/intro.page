@@ -1,10 +1,14 @@
 ---
 title: Introduction
 template: tutorial
+cleanup: false
 filters:
   - erb
-  - textile
+  - links
   - examples
+  - editorial
+  - api
+  - textile
 ---
 
 h1. Arrow Tutorial: Introduction
@@ -52,12 +56,9 @@ decisions:
 		even that you necessarily want to use one. It provides some (optional) lightweight 
 		facilities for doing "dependency injection":IOCandDI, but doesn't otherwise assume anything 
 		about where you might want to store your data. There are of course plenty of implementations 
-		of the "Active Record":ARpattern you can use, as well as some other "exciting 
+		of the "Active Record pattern":ARpattern you can use, as well as some other "exciting 
 		alternatives":Sequel that reduce the impedence mismatch inherent in a ORM layer backed by an 
 		RDBMS.</dd>
-		
-	<dt class="todo">(more...)</dt>
-	<dd class="todo">&nbsp;</dd>
 </dl>
 
 
@@ -67,26 +68,23 @@ An Arrow blogging application might look conceptually something like this:
 
 !.<%= page.basepath %>/images/basic-structure.png!
 
-h3. Dispatcher
+h3. <?api "Dispatcher":Arrow::Dispatcher ?>
 
-The Dispatcher is the mod_ruby request handler that is invoked by Apache; it loads the configuration
-(or reloads it if it has changed since the last time it was read), sets up the Broker, creates
-Transaction objects for each incoming request, sends the response headers, and renders the resulting
-output.
+The Dispatcher is the mod_ruby request handler that is invoked by Apache; it loads and reloads the configuration, sets up the Broker, creates Transaction objects for each incoming request, sends the response headers, and renders the resulting output.
 
-h3. Transaction
+h3. <?api "Transaction":Arrow::Transaction ?>
 
 A new Transaction object is created by the Dispatcher for each request, and then passed to the
 Broker for handling. It encapsulates the incoming @Apache::Request@ object, providing easy access to
 request values, configuration values, session data, and validated query arguments.
 
-h3. Broker
+h3. <?api "Broker":Arrow::Broker ?>
 
 The Broker decides how Transaction objects get handled by loading and building a registry of Applet
 objects. When the transaction calls its @#delegate@ method with a Transaction object, it searches
 its Registry for applets which have been mapped to all or part of the incoming request's URI.
 
-h3. Applets
+h3. <?api "Applets":Arrow::Applet ?>
 
 Applets are objects which handle user requests, and define the basic logic of different parts of the
 application. They can also be combined to run in sequence via delegation (aka chaining). The writing

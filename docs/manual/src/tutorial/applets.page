@@ -232,7 +232,7 @@ applets:
 After the config has been loaded, requests for @/<arrow-root>/hello/greet@ (and simply
 @/<arrow-root>/hello@, because @greet@ is the default action) will return something that looks like:
 
-h2. Passing REST-style Arguments
+h2. Passing Arguments in the URL
 
 Now let's add a bit of personalization to the applet. Perhaps it should be able to generate
 customizable messages in addition to greeting the entire world. To do this, we can make the @greet@
@@ -266,3 +266,12 @@ h2. Special Applets
 h3. Error Handlers
 
 h3. Missing Applet Applet
+
+h3. REST services with Arrow::Service
+
+h4. HTTP Verbs
+
+h4. Content-negotiation
+
+
+

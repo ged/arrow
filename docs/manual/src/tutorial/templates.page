@@ -3,7 +3,10 @@ title: Templating
 template: tutorial
 filters:
   - erb
+  - links
   - examples
+  - editorial
+  - api
   - textile
 ---
 
@@ -59,7 +62,7 @@ table(line-comments).
 |=. 3 | The @path@ config item takes one or more directories to search when loading a template. Any
 templates which aren't loaded via an absolute path are searched for relative to the paths in the
 @templates.path@. |
-|=.6 & 7| Turn on caching and set up the LRU cache |
+|=.6–7| Turn on caching and set up the LRU cache |
 
 Now declare the templates your applet will use:
 
