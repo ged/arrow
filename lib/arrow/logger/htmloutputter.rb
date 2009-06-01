@@ -60,8 +60,6 @@ class Arrow::Logger::HtmlOutputter < Arrow::Logger::FileOutputter
 		escaped_name = escape_html( name )
 		html = @format.interpolate( binding )
 
-		raise "Fuckery: " + self.inspect if html =~ /<div/
-
 		@io.puts( html )
 	end
 

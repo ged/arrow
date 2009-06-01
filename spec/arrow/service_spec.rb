@@ -31,7 +31,7 @@ describe Arrow::Service do
 	        Arrow::AppletMatchers
 
 	before( :all ) do
-		setup_logging( :crit )
+		setup_logging( :fatal )
 	end
 
 	after( :all ) do

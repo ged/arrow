@@ -39,7 +39,7 @@ DEMO_APPLETS_GEMSPEC = Gem::Specification.new do |gem|
 	gem.has_rdoc          = false
 
 	gem.files             = DEMO_APPLETS + DEMO_TEMPLATES
-		
+
 	gem.add_runtime_dependency( 'arrow', PKG_VERSION )
 end
 
@@ -55,7 +55,7 @@ file DEMO_APPLETS_GEM.to_s => [PKGDIR.to_s] + DEMO_APPLETS_GEM_FILES do
 		end
 	end
 end
-	
+
 
 configlib = LIBDIR + 'arrow/config.rb'
 file 'default.cfg'

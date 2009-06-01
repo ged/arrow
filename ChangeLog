@@ -1,3 +1,63 @@
+-- Mon, 01 Jun 2009 19:13:42 -0000 by deveiant (r517) -----
+   Changed: docs/manual/src/tutorial/sessions.page
+            Rakefile
+            docs/manual/src/tutorial/applets.page
+            docs/manual/src/tutorial/intro.page
+            docs/manual/src/tutorial/templates.page
+
+   Committing some work on the manual and build system update
+
+
+-- Wed, 29 Apr 2009 17:03:23 -0000 by deveiant (r516) -----
+   Changed: .irbrc
+            docs/manual/src/tutorial/logging.page
+            default.cfg
+            demo.cfg
+            docs/Structural-Overview.graffle
+            Rakefile.local (and 1 other/s)
+
+    * Brought the example configs up to date with Arrow::Config.
+    * Added some manual copy.
+    * Fixed the .irbrc
+
+
+-- Wed, 29 Apr 2009 15:20:39 -0000 by mahlon (r515) -----
+   Changed: lib/arrow/logger/outputter.rb
+
+   Add dependency requires to the logger outputter.
+
+
+-- Tue, 28 Apr 2009 23:09:47 -0000 by deveiant (r514) -----
+   Changed: spec/arrow/service_spec.rb
+            Rakefile
+            lib/arrow/service.rb
+            lib/arrow.rb
+            lib/arrow/template/timedelta.rb
+            project.yml (and 3 other/s)
+
+    * Updated build system; added dev dependencies. Thanks to Mahlon for the heads-up.
+    * Arrow::Service: 
+    - don't serialize to XML unless the client explicitly accepts
+    application/xml+rubyobject.
+    - Support serialization to Ruby Marshal format
+    - Recurse while converting to HTML only if the object responds to #fetch *and* 
+    #collect.
+    * Tune HTML inspection a bit more for deep data structures
+    * Bump version to 1.0.5.
+
+
+-- Tue, 28 Apr 2009 14:59:16 -0000 by deveiant (r513) -----
+   Added:   docs/manual/lib/editorial-filter.rb (new)
+   Changed: docs/manual/lib/examples-filter.rb
+            docs/manual/src/index.page
+            docs/manual/lib/links-filter.rb
+            ChangeLog
+            docs/manual/src/history.page
+
+    * Updated manual filters.
+    * Wording fix in the History page of the manual.
+
+
 -- Tue, 28 Apr 2009 14:40:15 -0000 by deveiant (r512) -----
    Added:   docs/manual/src
             -> renamed from /trunk/docs/manual/source@r506
