@@ -9,9 +9,9 @@
 BEGIN {
 	require 'pathname'
 	basedir = Pathname.new( __FILE__ ).dirname.parent.parent
-	
+
 	libdir = basedir + "lib"
-	
+
 	$LOAD_PATH.unshift( libdir ) unless $LOAD_PATH.include?( libdir )
 }
 
@@ -30,11 +30,11 @@ require 'spec/lib/helpers'
 
 describe Arrow::Applet do
 	include Arrow::SpecHelpers
-	
+
 	before( :all ) do
 		setup_logging( :crit )
 	end
-	
+
 	after( :all ) do
 		reset_logging()
 	end
@@ -62,13 +62,13 @@ describe Arrow::Applet do
 			end
 		}.should raise_error( ::ScriptError, 'Inappropriate arity for no_arg_action' )
 	end
-	
+
 
 	describe "concrete child and grandchild classes" do
 		before(:each) do
 			@appletclass = Class.new( Arrow::Applet ) do
 				default_action :test
-			
+
 				applet_name "SuperApplet"
 				applet_description "A superclass applet"
 				applet_version 177
@@ -84,9 +84,9 @@ describe Arrow::Applet do
 			Kernel.stub!( :load ).and_return do
 				Arrow::Applet.newly_loaded << @appletclass << @appletsubclass
 			end
-	
+
 			applets = Arrow::Applet.load( 'stubbedapplet' )
-	
+
 			applets.should have(1).member
 			applets.should_not include( @appletclass )
 			applets.should include( @appletsubclass )
@@ -97,9 +97,9 @@ describe Arrow::Applet do
 			Kernel.stub!( :load ).and_return do
 				Arrow::Applet.newly_loaded << @appletclass << @appletsubclass
 			end
-	
+
 			applets = Arrow::Applet.load( 'stubbedapplet', true )
-	
+
 			applets.should have(2).members
 			applets.should include( @appletclass )
 			applets.should include( @appletsubclass )
@@ -117,45 +117,45 @@ describe Arrow::Applet do
 			@appletsubclass.signature.description.should == '(none)'
 		end
 	end
-	
-	
+
+
 	describe "instance" do
 		before( :all ) do
 			setup_logging( :crit )
 		end
-		
+
 		before( :each ) do
 			@appletclass = Class.new( Arrow::Applet ) do
 				def test_action( txn, *args )
 					return [txn, args]
 				end
-				
+
 				def one_arg_action( txn, one )
 					return one
 				end
-				
+
 				def two_args_action( txn, one, two )
 					return [ one, two ]
 				end
-				
+
 				def action_missing_action( txn, missing, *args )
 					return [ :missing, missing, *args ]
 				end
-				
+
 				def load_template_action( txn, template_name )
 					return self.load_template( template_name )
 				end
 				template :devdas, "dola/re/dola.tmpl"
 			end
-			
+
 			@uri = '/test'
 			@factory = mock( "template factory" )
-			
+
 			@applet = @appletclass.new( nil, @factory, @uri )
 
 			@txn = stub( "transaction", :vargs => nil, :form_request? => false, :vargs= => nil )
 		end
-		
+
 
 		it "delegates template-loading to its template factory" do
 			@factory.should_receive( :get_template ).with( 'dola/re/dola.tmpl' ).
@@ -166,11 +166,11 @@ describe Arrow::Applet do
 		it "eliminates URI arguments to match the arity of actions with only one argument" do
 			@applet.run( @txn, 'one_arg', :first, :second, :third ).should == :first
 		end
-		
+
 		it "eliminates URI arguments to match the arity of actions with two arguments" do
 			@applet.run( @txn, 'two_args', :first, :second, :third ).should == [:first, :second]
 		end
-		
+
 		it "appends nil URI arguments to match the arity of actions with two arguments" do
 			@applet.run( @txn, 'two_args', :first ).should == [:first, nil]
 		end
@@ -193,21 +193,21 @@ describe Arrow::Applet do
 		end
 
 	end # describe "concrete subclass"
-	
-	
+
+
 	describe "instance without an #action_missing_action method" do
 		before( :all ) do
 			setup_logging( :crit )
 		end
-		
+
 		before( :each ) do
 			@appletclass = Class.new( Arrow::Applet ) do
 				template :test => 'test.tmpl'
 			end
-			
+
 			@uri = '/test'
 			@factory = mock( "template factory" )
-			
+
 			@applet = @appletclass.new( nil, @factory, @uri )
 
 			@txn = stub( "transaction", :vargs => nil, :form_request? => false, :vargs= => nil )
@@ -222,7 +222,7 @@ describe Arrow::Applet do
 
 			@applet.run( @txn, 'test' ).should == template
 		end
-		
+
 		it "untaints the action before using it to look up the missing action template" do
 			template = stub( "test template" )
 			@factory.should_receive( :get_template ).with( 'test.tmpl' ).and_return( template )
@@ -241,11 +241,11 @@ describe Arrow::Applet do
 				}.should_not raise_error()
 			end.join
 		end
-		
-	
+
+
 
 		### TODO: Convert these to specs
-	
+
 		def test_load_template_should_raise_an_error_for_templates_not_in_the_signature
 			assert_raises( Arrow::AppletError ) do
 				applet = @appletclass.new( nil, nil, nil )
@@ -262,7 +262,7 @@ describe Arrow::Applet do
 					template :foo, "foo.tmpl"
 				end
 			end
-		
+
 			assert_equal "foo.tmpl", @appletclass.signature.templates[:foo]
 		end
 
@@ -274,7 +274,7 @@ describe Arrow::Applet do
 					template :foo => "foo.tmpl"
 				end
 			end
-		
+
 			assert_equal "foo.tmpl", @appletclass.signature.templates[:foo]
 		end
 
@@ -288,7 +288,7 @@ describe Arrow::Applet do
 						:bar => "bar.tmpl"
 				end
 			end
-		
+
 			assert_equal "foo.tmpl", @appletclass.signature.templates[:foo]
 			assert_equal "bar.tmpl", @appletclass.signature.templates[:bar]
 		end
@@ -301,7 +301,7 @@ describe Arrow::Applet do
 					applet_name "foo"
 				end
 			end
-		
+
 			assert_equal "foo", @appletclass.signature.name
 		end
 
@@ -313,7 +313,7 @@ describe Arrow::Applet do
 					applet_description "foo"
 				end
 			end
-		
+
 			assert_equal "foo", @appletclass.signature.description
 		end
 
@@ -325,7 +325,7 @@ describe Arrow::Applet do
 					applet_maintainer "foo"
 				end
 			end
-		
+
 			assert_equal "foo", @appletclass.signature.maintainer
 		end
 
@@ -337,7 +337,7 @@ describe Arrow::Applet do
 					applet_maintainer "foo.png"
 				end
 			end
-		
+
 			assert_equal "foo.png", @appletclass.signature.maintainer
 		end
 
@@ -349,7 +349,7 @@ describe Arrow::Applet do
 					applet_version "200.1"
 				end
 			end
-		
+
 			assert_equal "200.1", @appletclass.signature.version
 		end
 
@@ -361,7 +361,7 @@ describe Arrow::Applet do
 					default_action :edit
 				end
 			end
-		
+
 			assert_equal "edit", @appletclass.signature.default_action
 		end
 
@@ -369,7 +369,7 @@ describe Arrow::Applet do
 		def test_run_should_track_run_times
 			assert_equal 0.0, @applet.total_utime
 			assert_equal 0.0, @applet.total_stime
-		
+
 			@applet.def_action_body do |txn|
 				# This will hopefully take more than 0.0 seconds on any machine.
 				10_000.times do
@@ -390,7 +390,7 @@ describe Arrow::Applet do
 				"Applet stime after run: %0.5f" % [@applet.total_stime]
 		end
 
-	
+
 		def test_defining_an_action_method_with_inappropriate_arity_should_raise_scripterror
 			assert_raises( ScriptError ) do
 				@appletclass.class_eval { def malformed_action; end }
@@ -510,7 +510,7 @@ describe Arrow::Applet do
 
 
 		def test_subrun_from_delegation_populates_txn_vargs
-		
+
 			# Define the delegator and an action to subrun
 			@appletclass.class_eval do
 				def delegate( txn, chain, *args )
@@ -519,9 +519,9 @@ describe Arrow::Applet do
 				def test_vargs_action( txn, *args )
 				end
 			end
-		
+
 			applet = @appletclass.new( nil, nil, nil )
-		
+
 			# Even though it's not a real #run, the transaction should be
 			# set up the same way passing through #subrun
 			with_run_fixtured_transaction do |txn, req|
@@ -533,9 +533,9 @@ describe Arrow::Applet do
 			end
 
 		end
-	
+
 	end # describe "concrete subclass"
-	
+
 end
 
 

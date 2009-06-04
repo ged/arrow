@@ -3,9 +3,9 @@
 BEGIN {
 	require 'pathname'
 	basedir = Pathname.new( __FILE__ ).dirname.parent.parent
-	
+
 	libdir = basedir + "lib"
-	
+
 	$LOAD_PATH.unshift( libdir ) unless $LOAD_PATH.include?( libdir )
 }
 
@@ -14,7 +14,7 @@ begin
 	require 'apache/fakerequest'
 	require 'arrow'
 	require 'spec/lib/helpers'
-	require 'arrow/transaction'
+	require 'arrow/formvalidator'
 	require 'date'
 rescue LoadError
 	unless Object.const_defined?( :Gem )
@@ -54,27 +54,26 @@ TestProfile = {
 
 
 describe Arrow::FormValidator do
+	include Arrow::SpecHelpers
+
 	before( :all ) do
-		outputter = Arrow::Logger::Outputter.
-			create( 'color:stderr', "formvalidator-spec" )
-		Arrow::Logger::global.outputters << outputter
-		Arrow::Logger::global.level = :crit
+		setup_logging( :crit )
 	end
-	
+
 	before(:each) do
 		@validator = Arrow::FormValidator.new( TestProfile )
 	end
 
 	after( :all ) do
-		Arrow::Logger.global.outputters.clear
+		reset_logging()
 	end
 
-	
+
 
 	# Test index operator interface
 	it "should provide read and write access to valid args via the index operator" do
 		rval = nil
-		
+
 		@validator.validate( {'required' => "1"} )
 		@validator[:required].should == "1"
 
@@ -87,12 +86,12 @@ describe Arrow::FormValidator do
 		rval = nil
 		tainted_one = "1"
 		tainted_one.taint
-		
+
 		@validator.validate( {'required' => 1, 'number' => tainted_one},
 			:untaint_all_constraints => true )
-			
+
 		Arrow::Logger.global.notice "Validator: %p" % [@validator]
-			
+
 		@validator[:number].should == "1"
 		@validator[:number].tainted?.should be_false()
 	end
@@ -102,12 +101,12 @@ describe Arrow::FormValidator do
 		rval = nil
 		tainted_one = "1"
 		tainted_one.taint
-		
+
 		@validator.validate( {'required' => 1, 'number' => tainted_one},
 			:untaint_all_constraints => true )
-			
+
 		Arrow::Logger.global.notice "Validator: %p" % [@validator]
-			
+
 		@validator[:number].should == "1"
 		@validator[:number].tainted?.should be_false()
 	end
@@ -116,22 +115,22 @@ describe Arrow::FormValidator do
 	it "should return the capture from a regexp constraint if it has only one" do
 		rval = nil
 		params = { 'required' => 1, 'regexp_w_one_capture' => "   ygdrassil   " }
-		
+
 		@validator.validate( params, :untaint_all_constraints => true )
-			
+
 		Arrow::Logger.global.notice "Validator: %p" % [@validator]
-			
+
 		@validator[:regexp_w_one_capture].should == 'ygdrassil'
 	end
 
 	it "should return the captures from a regexp constraint as an array if it has more than one" do
 		rval = nil
 		params = { 'required' => 1, 'regexp_w_captures' => "   the1tree(!)   " }
-		
+
 		@validator.validate( params, :untaint_all_constraints => true )
-			
+
 		Arrow::Logger.global.notice "Validator: %p" % [@validator]
-			
+
 		@validator[:regexp_w_captures].should == ['the1tree', '(!)']
 	end
 
@@ -139,11 +138,11 @@ describe Arrow::FormValidator do
 		"even if an optional capture doesn't match anything" do
 		rval = nil
 		params = { 'required' => 1, 'regexp_w_captures' => "   the1tree   " }
-		
+
 		@validator.validate( params, :untaint_all_constraints => true )
-			
+
 		Arrow::Logger.global.notice "Validator: %p" % [@validator]
-			
+
 		@validator[:regexp_w_captures].should == ['the1tree', nil]
 	end
 
@@ -152,7 +151,7 @@ describe Arrow::FormValidator do
 
 		@validator.should have_errors()
 		@validator.should_not be_okay()
-		
+
 		@validator.missing.should have(1).members
 		@validator.missing.should == ['required']
 	end
@@ -163,7 +162,7 @@ describe Arrow::FormValidator do
 
 		@validator.should have_errors()
 		@validator.should_not be_okay()
-		
+
 		@validator.invalid.should have(1).keys
 		@validator.invalid.keys.should == ['number']
 	end
@@ -175,7 +174,7 @@ describe Arrow::FormValidator do
 
 		@validator.should have_errors()
 		@validator.should_not be_okay()
-		
+
 		@validator.error_fields.should have(2).members
 		@validator.error_fields.should include('number')
 		@validator.error_fields.should include('required')
@@ -218,11 +217,11 @@ describe Arrow::FormValidator do
 	it "capitalizes the names of simple fields for descriptions" do
 		@validator.get_description( "required" ).should == 'Required'
 	end
-	
+
 	it "splits apart underbarred field names into capitalized words for descriptions" do
 		@validator.get_description( "rodent_size" ).should == 'Rodent Size'
 	end
-	
+
 	it "uses the key for descriptions of hash fields" do
 		@validator.get_description( "rodent[size]" ).should == 'Size'
 	end
@@ -250,7 +249,7 @@ describe Arrow::FormValidator do
 			'recipe[ingredient][cost]' => '$0.18',
 			'recipe[yield]' => '2 loaves',
 		}
-	
+
 		@validator.validate( args, profile )
 		@validator.valid.should == {
 			'recipe' => {
@@ -281,7 +280,7 @@ describe Arrow::FormValidator do
 			'recipe[ingredient][cost]'.taint => '$0.18'.taint,
 			'recipe[yield]'.taint => '2 loaves'.taint,
 		}
-	
+
 		@validator.validate( args, profile )
 
 		@validator.valid.should == {
@@ -303,7 +302,7 @@ describe Arrow::FormValidator do
 
 	it "accepts the value 'true' for fields with boolean constraints" do
 		params = {'required' => '1', 'bool_constraint' => 'true'}
-	
+
 		@validator.validate( params )
 
 		@validator.should be_okay()
@@ -311,10 +310,10 @@ describe Arrow::FormValidator do
 
 		@validator[:bool_constraint].should be_true()
 	end
-	
+
 	it "accepts the value 't' for fields with boolean constraints" do
 		params = {'required' => '1', 'bool_constraint' => 't'}
-	
+
 		@validator.validate( params )
 
 		@validator.should be_okay()
@@ -322,10 +321,10 @@ describe Arrow::FormValidator do
 
 		@validator[:bool_constraint].should be_true()
 	end
-	
+
 	it "accepts the value 'yes' for fields with boolean constraints" do
 		params = {'required' => '1', 'bool_constraint' => 'yes'}
-	
+
 		@validator.validate( params )
 
 		@validator.should be_okay()
@@ -333,10 +332,10 @@ describe Arrow::FormValidator do
 
 		@validator[:bool_constraint].should be_true()
 	end
-	
+
 	it "accepts the value 'y' for fields with boolean constraints" do
 		params = {'required' => '1', 'bool_constraint' => 'y'}
-	
+
 		@validator.validate( params )
 
 		@validator.should be_okay()
@@ -344,10 +343,10 @@ describe Arrow::FormValidator do
 
 		@validator[:bool_constraint].should be_true()
 	end
-	
+
 	it "accepts the value '1' for fields with boolean constraints" do
 		params = {'required' => '1', 'bool_constraint' => '1'}
-	
+
 		@validator.validate( params )
 
 		@validator.should be_okay()
@@ -355,10 +354,10 @@ describe Arrow::FormValidator do
 
 		@validator[:bool_constraint].should be_true()
 	end
-	
+
 	it "accepts the value 'false' for fields with boolean constraints" do
 		params = {'required' => '1', 'bool_constraint' => 'false'}
-	
+
 		@validator.validate( params )
 
 		@validator.should be_okay()
@@ -366,10 +365,10 @@ describe Arrow::FormValidator do
 
 		@validator[:bool_constraint].should be_false()
 	end
-	
+
 	it "accepts the value 'f' for fields with boolean constraints" do
 		params = {'required' => '1', 'bool_constraint' => 'f'}
-	
+
 		@validator.validate( params )
 
 		@validator.should be_okay()
@@ -377,10 +376,10 @@ describe Arrow::FormValidator do
 
 		@validator[:bool_constraint].should be_false()
 	end
-	
+
 	it "accepts the value 'no' for fields with boolean constraints" do
 		params = {'required' => '1', 'bool_constraint' => 'no'}
-	
+
 		@validator.validate( params )
 
 		@validator.should be_okay()
@@ -388,10 +387,10 @@ describe Arrow::FormValidator do
 
 		@validator[:bool_constraint].should be_false()
 	end
-	
+
 	it "accepts the value 'n' for fields with boolean constraints" do
 		params = {'required' => '1', 'bool_constraint' => 'n'}
-	
+
 		@validator.validate( params )
 
 		@validator.should be_okay()
@@ -402,7 +401,7 @@ describe Arrow::FormValidator do
 
 	it "accepts the value '0' for fields with boolean constraints" do
 		params = {'required' => '1', 'bool_constraint' => '0'}
-	
+
 		@validator.validate( params )
 
 		@validator.should be_okay()
@@ -413,7 +412,7 @@ describe Arrow::FormValidator do
 
 	it "rejects non-boolean parameters for fields with boolean constraints" do
 		params = {'required' => '1', 'bool_constraint' => 'peanut'}
-	
+
 		@validator.validate( params )
 
 		@validator.should_not be_okay()
@@ -421,10 +420,10 @@ describe Arrow::FormValidator do
 
 		@validator[:bool_constraint].should be_nil()
 	end
-	
+
 	it "accepts simple integers for fields with integer constraints" do
 		params = {'required' => '1', 'int_constraint' => '11'}
-	
+
 		@validator.validate( params )
 
 		@validator.should be_okay()
@@ -432,10 +431,10 @@ describe Arrow::FormValidator do
 
 		@validator[:int_constraint].should == 11
 	end
-	
+
 	it "accepts '0' for fields with integer constraints" do
 		params = {'required' => '1', 'int_constraint' => '0'}
-	
+
 		@validator.validate( params )
 
 		@validator.should be_okay()
@@ -443,10 +442,10 @@ describe Arrow::FormValidator do
 
 		@validator[:int_constraint].should == 0
 	end
-	
+
 	it "accepts negative integers for fields with integer constraints" do
 		params = {'required' => '1', 'int_constraint' => '-407'}
-	
+
 		@validator.validate( params )
 
 		@validator.should be_okay()
@@ -454,10 +453,10 @@ describe Arrow::FormValidator do
 
 		@validator[:int_constraint].should == -407
 	end
-	
+
 	it "rejects non-integers for fields with integer constraints" do
 		params = {'required' => '1', 'int_constraint' => '11.1'}
-	
+
 		@validator.validate( params )
 
 		@validator.should_not be_okay()
@@ -465,10 +464,10 @@ describe Arrow::FormValidator do
 
 		@validator[:int_constraint].should be_nil()
 	end
-	
+
 	it "rejects integer values with other cruft in them for fields with integer constraints" do
 		params = {'required' => '1', 'int_constraint' => '88licks'}
-	
+
 		@validator.validate( params )
 
 		@validator.should_not be_okay()
@@ -476,7 +475,7 @@ describe Arrow::FormValidator do
 
 		@validator[:int_constraint].should be_nil()
 	end
-	
+
 	ValidURIs = %w{
 		http://127.0.0.1
 		http://127.0.0.1/
@@ -498,7 +497,7 @@ describe Arrow::FormValidator do
 
 		ftp://ftp.ruby-lang.org/pub/ruby/1.0/ruby-0.49.tar.gz
 		ftp://crashoverride:god@gibson.ellingsonmineral.com/root/.workspace/.garbage.
-		
+
 		ldap:/o=University%20of%20Michigan,c=US
 		ldap://ldap.itd.umich.edu/o=University%20of%20Michigan,c=US
 		ldap://ldap.itd.umich.edu/o=University%20of%20Michigan,c=US?postalAddress
@@ -513,7 +512,7 @@ describe Arrow::FormValidator do
 	ValidURIs.each do |uri_string|
 		it "accepts #{uri_string} for fields with URI constraints" do
 			params = {'required' => '1', 'uri_constraint' => uri_string}
-	
+
 			@validator.validate( params )
 
 			@validator.should be_okay()
@@ -528,7 +527,7 @@ describe Arrow::FormValidator do
 	# be invalidly-occurring in the wild
 	InvalidURIs = %W{
 		glark:
-		
+
 		http:
 		http://
 		http://_com/vlog/rb_08_feb_01
@@ -548,7 +547,7 @@ describe Arrow::FormValidator do
 		ftp:
 		ftp:ruby-0.49.tar.gz
 		ftp://crashoverride:god@/root/.workspace/.garbage.
-		
+
 		ldap:
 		ldap:/o=University\x20of\x20Michigan,c=US
 		ldap://ldap.itd.umich.edu/o=University+\x00of+Michigan
@@ -557,7 +556,7 @@ describe Arrow::FormValidator do
 	InvalidURIs.each do |uri_string|
 		it "rejects #{uri_string} for fields with URI constraints" do
 			params = {'required' => '1', 'uri_constraint' => uri_string}
-	
+
 			# lambda {
 				@validator.validate( params )
 			# }.should_not raise_error()
@@ -571,7 +570,7 @@ describe Arrow::FormValidator do
 
 	it "accepts simple RFC822 addresses for fields with email constraints" do
 		params = {'required' => '1', 'email_constraint' => 'jrandom@hacker.ie'}
-	
+
 		@validator.validate( params )
 
 		@validator.should be_okay()
@@ -582,7 +581,7 @@ describe Arrow::FormValidator do
 
 	it "accepts hyphenated domains in RFC822 addresses for fields with email constraints" do
 		params = {'required' => '1', 'email_constraint' => 'jrandom@just-another-hacquer.fr'}
-	
+
 		@validator.validate( params )
 
 		@validator.should be_okay()
@@ -600,7 +599,7 @@ describe Arrow::FormValidator do
 	ComplexAddresses.each do |addy|
 		it "accepts #{addy} for fields with email constraints" do
 			params = {'required' => '1', 'email_constraint' => addy}
-	
+
 			@validator.validate( params )
 
 			@validator.should be_okay()
@@ -621,7 +620,7 @@ describe Arrow::FormValidator do
 	BogusAddresses.each do |addy|
 		it "rejects #{addy} for fields with email constraints" do
 			params = {'required' => '1', 'email_constraint' => addy}
-	
+
 			@validator.validate( params )
 
 			@validator.should_not be_okay()
@@ -664,7 +663,7 @@ describe Arrow::FormValidator do
 	BogusHosts.each do |hostname|
 		it "rejects #{hostname} for fields with host constraints" do
 			params = {'required' => '1', 'host_constraint' => hostname}
-	
+
 			@validator.validate( params )
 
 			@validator.should_not be_okay()
@@ -676,7 +675,7 @@ describe Arrow::FormValidator do
 
 	it "accepts alpha characters for fields with alpha constraints" do
 		params = {'required' => '1', 'alpha_constraint' => 'abelincoln'}
-	
+
 		@validator.validate( params )
 
 		@validator.should be_okay()
@@ -684,10 +683,10 @@ describe Arrow::FormValidator do
 
 		@validator[:alpha_constraint].should == 'abelincoln'
 	end
-	
+
 	it "rejects non-alpha characters for fields with alpha constraints" do
 		params = {'required' => '1', 'alpha_constraint' => 'duck45'}
-	
+
 		@validator.validate( params )
 
 		@validator.should_not be_okay()
@@ -695,11 +694,11 @@ describe Arrow::FormValidator do
 
 		@validator[:alpha_constraint].should be_nil()
 	end
-	
+
 	### 'alphanumeric'
 	it "accepts alphanumeric characters for fields with alphanumeric constraints" do
 		params = {'required' => '1', 'alphanumeric_constraint' => 'zombieabe11'}
-	
+
 		@validator.validate( params )
 
 		@validator.should be_okay()
@@ -707,10 +706,10 @@ describe Arrow::FormValidator do
 
 		@validator[:alphanumeric_constraint].should == 'zombieabe11'
 	end
-	
+
 	it "rejects non-alphanumeric characters for fields with alphanumeric constraints" do
 		params = {'required' => '1', 'alphanumeric_constraint' => 'duck!ling'}
-	
+
 		@validator.validate( params )
 
 		@validator.should_not be_okay()
@@ -718,7 +717,7 @@ describe Arrow::FormValidator do
 
 		@validator[:alphanumeric_constraint].should be_nil()
 	end
-	
+
 	### 'printable'
 	it "accepts printable characters for fields with 'printable' constraints" do
 		test_content = <<-EOF
@@ -731,7 +730,7 @@ describe Arrow::FormValidator do
 			'required' => '1',
 			'printable_constraint' => test_content
 		}
-	
+
 		@validator.validate( params )
 
 		@validator.should be_okay()
@@ -739,10 +738,10 @@ describe Arrow::FormValidator do
 
 		@validator[:printable_constraint].should == test_content
 	end
-	
+
 	it "rejects non-printable characters for fields with 'printable' constraints" do
 		params = {'required' => '1', 'printable_constraint' => %{\0Something cold\0}}
-	
+
 		@validator.validate( params )
 
 		@validator.should_not be_okay()
@@ -750,13 +749,13 @@ describe Arrow::FormValidator do
 
 		@validator[:printable_constraint].should be_nil()
 	end
-	
-	
+
+
 	it "accepts parameters for fields with Proc constraints if the Proc " +
 		"returns a true value" do
 		test_date = '2007-07-17'
 		params = {'required' => '1', 'proc_constraint' => test_date}
-	
+
 		@validator.validate( params )
 
 		@validator.should be_okay()
@@ -764,12 +763,12 @@ describe Arrow::FormValidator do
 
 		@validator[:proc_constraint].should == Date.parse( test_date )
 	end
-	
+
 	it "rejects parameters for fields with Proc constraints if the Proc " +
 		"returns a false value" do
 
 		params = {'required' => '1', 'proc_constraint' => %{::::}}
-	
+
 		@validator.validate( params )
 
 		@validator.should_not be_okay()
@@ -777,6 +776,6 @@ describe Arrow::FormValidator do
 
 		@validator[:proc_constraint].should be_nil()
 	end
-	
+
 end
 

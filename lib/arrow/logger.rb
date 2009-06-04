@@ -130,7 +130,7 @@ class Arrow::Logger
 			Arrow::Logger[ realclass ].level = level
 			Arrow::Logger[ realclass ].outputters << outputter
 		end
-		
+
     end
 
 
@@ -150,10 +150,10 @@ class Arrow::Logger
 	def self::parse_log_setting( setting )
 		level, rawuri = setting.split( ' ', 2 )
 		uri = rawuri.nil? ? nil : URI.parse( rawuri )
-		
+
 		return level.to_sym, uri
 	end
-	
+
 
 	### Return the Arrow::Logger for the given module +mod+, which can be a
 	### Module object, a Symbol, or a String.
@@ -171,7 +171,7 @@ class Arrow::Logger
 				inject( Object ) {|k, modname| k.const_get(modname) } rescue Object
 			return self.logger_map[ mod ]
 		else
-			
+
 			return self.logger_map[ mod.class ]
 		end
 
@@ -190,7 +190,7 @@ class Arrow::Logger
 	def self::reset
 		self.logger_map.clear
 	end
-	
+
 
 	### Autoload global logging methods for the log levels
 	def self::method_missing( sym, *args )
@@ -246,7 +246,7 @@ class Arrow::Logger
 
 	# The integer level of the logger.
 	attr_reader :level
-	
+
 	# The level to force messages written to this logger to
 	attr_accessor :forced_level
 
@@ -262,8 +262,8 @@ class Arrow::Logger
 			self.trace ? "on" : "off",
 		]
 	end
-	
-	
+
+
 	### Return a (more-detailed) human-readable string representation of the object.
 	def inspect_details( level=0 )
 		indent = '  ' * (level + 1)
@@ -279,14 +279,14 @@ class Arrow::Logger
 			details << "Outputters:" << self.outputters.map {|op| op.inspect }
 		end
 		details = details.flatten.compact.map {|line| indent + line }
-		
+
 		if level.zero?
 			return [ prelude, *details ].join( "\n" )
 		else
 			return [ prelude, *details ]
 		end
 	end
-	
+
 
 	### Return the name of the logger formatted to be suitable for reading.
 	def readable_name
@@ -294,13 +294,13 @@ class Arrow::Logger
 		return self.module.inspect if self.module.name == ''
 		return self.module.name
 	end
-	
+
 
 	### Return the logger's level as a Symbol.
 	def readable_level
 		return LEVEL_NAMES[ @level ]
 	end
-	
+
 
 	### Set the level of this logger to +level+. The +level+ can be a
 	### String, a Symbol, or an Integer.
@@ -324,7 +324,7 @@ class Arrow::Logger
 		if @level.nil?
 			@level = LEVELS[ :notice ]
 			raise ArgumentError, "Illegal log level specification: %p for %s" %
-				[ level, self.name ]
+				[ level, self.readable_name ]
 		end
 	end
 
@@ -340,8 +340,8 @@ class Arrow::Logger
 			Arrow::Logger.global
 		end
 	end
-	
-	
+
+
 	### Return the Array of modules and classes the receiver's module includes 
 	### or inherits, inclusive of the receiver's module itself.
 	def supermods
@@ -350,10 +350,10 @@ class Arrow::Logger
 			@supermods = self.module.ancestors.partition {|mod| objflag ||= (mod == Object) }.last
 			@supermods << Object
 		end
-		
+
 		return @supermods
 	end
-	
+
 
 
 	### Return a uniquified Array of the loggers which are more-generally related 
@@ -361,16 +361,16 @@ class Arrow::Logger
 	### lower.
 	def hierloggers( level=:emerg )
 		level = LEVELS[ level ] if level.is_a?( Symbol )
-		
+
 		loggers = []
 		self.supermods.each do |mod|
 			logger = self.class.logger_map[ mod ]
 			next unless logger.level <= level
-			
+
 			loggers << logger
 			yield( logger ) if block_given?
 		end
-		
+
 		return loggers
 	end
 
@@ -436,7 +436,7 @@ class Arrow::Logger
 		self.write( :debug, obj )
 		return self
 	end
-	
+
 
 	#########
 	protected
@@ -469,11 +469,11 @@ class Arrow::Logger
 
 		when /^\w+$/
 			code = self.make_writer_method( level )
-			
+
 		else
 			return super
 		end
-			
+
 		self.class.send( :define_method, sym, &code )
 		return self.method( sym ).call( *args )
 	end
