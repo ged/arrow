@@ -1,17 +1,92 @@
+-- Mon, 01 Jun 2009 19:20:49 -0000 by deveiant (r519) -----
+   Changed: lib/arrow/service.rb
+            lib/arrow/dispatcher.rb
+            spec/arrow/service_spec.rb
+
+   Checkpoint commit
+
+
+-- Mon, 01 Jun 2009 19:17:06 -0000 by deveiant (r518) -----
+   Added:   /branches/service-options
+            -> renamed from /trunk@r517
+
+   Branching for work on Arrow::Service OPTIONS implementation
+
+
+-- Mon, 01 Jun 2009 19:13:42 -0000 by deveiant (r517) -----
+   Changed: /trunk/docs/manual/src/tutorial/sessions.page
+            /trunk/Rakefile
+            /trunk/docs/manual/src/tutorial/applets.page
+            /trunk/docs/manual/src/tutorial/intro.page
+            /trunk/docs/manual/src/tutorial/templates.page
+
+   Committing some work on the manual and build system update
+
+
+-- Wed, 29 Apr 2009 17:03:23 -0000 by deveiant (r516) -----
+   Changed: /trunk/.irbrc
+            /trunk/docs/manual/src/tutorial/logging.page
+            /trunk/default.cfg
+            /trunk/demo.cfg
+            /trunk/docs/Structural-Overview.graffle
+            /trunk/Rakefile.local (and 1 other/s)
+
+    * Brought the example configs up to date with Arrow::Config.
+    * Added some manual copy.
+    * Fixed the .irbrc
+
+
+-- Wed, 29 Apr 2009 15:20:39 -0000 by mahlon (r515) -----
+   Changed: /trunk/lib/arrow/logger/outputter.rb
+
+   Add dependency requires to the logger outputter.
+
+
+-- Tue, 28 Apr 2009 23:09:47 -0000 by deveiant (r514) -----
+   Changed: /trunk/spec/arrow/service_spec.rb
+            /trunk/Rakefile
+            /trunk/lib/arrow/service.rb
+            /trunk/lib/arrow.rb
+            /trunk/lib/arrow/template/timedelta.rb
+            /trunk/project.yml (and 3 other/s)
+
+    * Updated build system; added dev dependencies. Thanks to Mahlon for the heads-up.
+    * Arrow::Service: 
+    - don't serialize to XML unless the client explicitly accepts
+    application/xml+rubyobject.
+    - Support serialization to Ruby Marshal format
+    - Recurse while converting to HTML only if the object responds to #fetch *and* 
+    #collect.
+    * Tune HTML inspection a bit more for deep data structures
+    * Bump version to 1.0.5.
+
+
+-- Tue, 28 Apr 2009 14:59:16 -0000 by deveiant (r513) -----
+   Added:   /trunk/docs/manual/lib/editorial-filter.rb (new)
+   Changed: /trunk/docs/manual/lib/examples-filter.rb
+            /trunk/docs/manual/src/index.page
+            /trunk/docs/manual/lib/links-filter.rb
+            /trunk/ChangeLog
+            /trunk/docs/manual/src/history.page
+
+    * Updated manual filters.
+    * Wording fix in the History page of the manual.
+
+
 -- Tue, 28 Apr 2009 14:40:15 -0000 by deveiant (r512) -----
-   Added:   docs/manual/src
+   Added:   /trunk/docs/manual/src
             -> renamed from /trunk/docs/manual/source@r506
-   Changed: Rakefile
-   Deleted: docs/manual/source
+   Changed: /trunk/Rakefile
+   Deleted: /trunk/docs/manual/source
 
     * Updated build system.
     * Renamed the manual source directory so the manual-generation tasks work again.
 
 
 -- Thu, 12 Mar 2009 21:19:27 -0000 by deveiant (r510) -----
-   Changed: spec/arrow/service_spec.rb
-            lib/arrow/service.rb
-            ChangeLog
+   Changed: /trunk/spec/arrow/service_spec.rb
+            /trunk/lib/arrow/service.rb
+            /trunk/ChangeLog
 
     * Made Arrow::Service JSON body deserialization unwrap a hash with a single key-value pair
     with a key of Arrow::Service::SPECIAL_JSON_KEY ('single_value') as a single scalar value. This
@@ -20,9 +95,9 @@
 
 
 -- Sun, 08 Mar 2009 23:14:13 -0000 by deveiant (r508) -----
-   Changed: lib/arrow/appletregistry.rb
-            lib/arrow.rb
-            lib/arrow/dispatcher.rb
+   Changed: /trunk/lib/arrow/appletregistry.rb
+            /trunk/lib/arrow.rb
+            /trunk/lib/arrow/dispatcher.rb
 
     * Set up the configuration before the broker loads. This will mean that other configurable
     stuff will need to be preloaded, but it's better than having the logging system unconfigured
@@ -32,25 +107,25 @@
 
 
 -- Fri, 06 Mar 2009 15:36:02 -0000 by deveiant (r507) -----
-   Changed: lib/arrow/spechelpers.rb
-            spec/arrow/applet_spec.rb
+   Changed: /trunk/lib/arrow/spechelpers.rb
+            /trunk/spec/arrow/applet_spec.rb
 
     * Added (the implementation of) the Arrow::SpecHelpers module
 
 
 -- Thu, 05 Mar 2009 23:52:22 -0000 by deveiant (r505) -----
-   Changed: lib/arrow.rb
+   Changed: /trunk/lib/arrow.rb
 
    Bumping version to 1.0.3.
 
 
 -- Thu, 05 Mar 2009 20:41:38 -0000 by deveiant (r504) -----
-   Changed: README
-            lib/arrow/session/store.rb
-            LICENSE
-            spec/arrow/applet_spec.rb
-            ChangeLog
-            lib/arrow/applet.rb (and 1 other/s)
+   Changed: /trunk/README
+            /trunk/lib/arrow/session/store.rb
+            /trunk/LICENSE
+            /trunk/spec/arrow/applet_spec.rb
+            /trunk/ChangeLog
+            /trunk/lib/arrow/applet.rb (and 1 other/s)
 
     * Added multipart/form-data to the request body deserializers
     * Fixed (I think?) a security problem in the default Arrow::Applet#action_missing_action 
@@ -58,21 +133,21 @@
 
 
 -- Wed, 04 Mar 2009 19:08:32 -0000 by deveiant (r502) -----
-   Changed: lib/arrow.rb
-            spec/arrow/templatefactory_spec.rb
-            ChangeLog
+   Changed: /trunk/lib/arrow.rb
+            /trunk/spec/arrow/templatefactory_spec.rb
+            /trunk/ChangeLog
 
     * Adding a fix to the templatefactory spec for a load-order problem (I think?)
     * Bumping version to 1.0.2
 
 
 -- Wed, 04 Mar 2009 18:46:18 -0000 by deveiant (r501) -----
-   Changed: spec/arrow/appletmixins_spec.rb
-            lib/arrow/appletmixins.rb
-            spec/arrow/service_spec.rb
-            LICENSE
-            Rakefile
-            lib/arrow/service.rb (and 5 other/s)
+   Changed: /trunk/spec/arrow/appletmixins_spec.rb
+            /trunk/lib/arrow/appletmixins.rb
+            /trunk/spec/arrow/service_spec.rb
+            /trunk/LICENSE
+            /trunk/Rakefile
+            /trunk/lib/arrow/service.rb (and 5 other/s)
 
     * Updated build system.
     * Template loader issue resolved by upgrading RSpec
@@ -85,9 +160,9 @@
 
 
 -- Fri, 20 Feb 2009 04:37:21 -0000 by deveiant (r500) -----
-   Changed: spec/arrow/appletmixins_spec.rb
-            lib/arrow/appletmixins.rb
-            lib/arrow.rb
+   Changed: /trunk/spec/arrow/appletmixins_spec.rb
+            /trunk/lib/arrow/appletmixins.rb
+            /trunk/lib/arrow.rb
 
     * Made the failures in Arrow::AppletAuthentication#login_action and #deny_access_action
     set the status directly and return error descriptions for generic handling
@@ -95,15 +170,15 @@
 
 
 -- Thu, 19 Feb 2009 19:18:16 -0000 by deveiant (r499) -----
-   Changed: lib/arrow/appletmixins.rb
+   Changed: /trunk/lib/arrow/appletmixins.rb
 
    Don't pass arguments from the original action to the :access_denied action.
 
 
 -- Thu, 19 Feb 2009 03:09:49 -0000 by deveiant (r498) -----
-   Changed: lib/arrow/appletmixins.rb
-            spec/arrow/applet_spec.rb
-            lib/arrow/applet.rb
+   Changed: /trunk/lib/arrow/appletmixins.rb
+            /trunk/spec/arrow/applet_spec.rb
+            /trunk/lib/arrow/applet.rb
 
      * Converted some more Arrow::Applet tests to specs.
      * Added a singular alias for Arrow::AccessControls#unauthenticated_actions
@@ -112,7 +187,7 @@
 
 
 -- Wed, 18 Feb 2009 18:35:08 -0000 by deveiant (r497) -----
-   Changed: lib/arrow/mixins.rb
+   Changed: /trunk/lib/arrow/mixins.rb
 
     * Arrow::HTMLUtilities
     - Make generated HTML valid by always generating DIVs instead of SPANs, as a
@@ -122,12 +197,12 @@
 
 
 -- Wed, 18 Feb 2009 00:06:11 -0000 by deveiant (r496) -----
-   Changed: docs/manual/source/tutorial/error-handling.page
-            spec/arrow/service_spec.rb
-            lib/arrow/service.rb
-            docs/manual/layouts/default.page
-            spec/arrow/config_spec.rb
-            docs/manual/source/tutorial/logging.page (and 16 other/s)
+   Changed: /trunk/docs/manual/source/tutorial/error-handling.page
+            /trunk/spec/arrow/service_spec.rb
+            /trunk/lib/arrow/service.rb
+            /trunk/docs/manual/layouts/default.page
+            /trunk/spec/arrow/config_spec.rb
+            /trunk/docs/manual/source/tutorial/logging.page (and 16 other/s)
 
     * Updated keywords props on manual pages
     * Reworked Applet's execution strategy again to un-break service applets that
@@ -136,33 +211,33 @@
 
 
 -- Sat, 14 Feb 2009 02:01:33 -0000 by deveiant (r495) -----
-   Changed: spec/arrow/appletmixins_spec.rb
-            lib/arrow/appletmixins.rb
-            lib/arrow/service.rb
-            spec/arrow/transaction_spec.rb
-            lib/arrow/applet.rb
-            lib/arrow/transaction.rb (and 2 other/s)
+   Changed: /trunk/spec/arrow/appletmixins_spec.rb
+            /trunk/lib/arrow/appletmixins.rb
+            /trunk/lib/arrow/service.rb
+            /trunk/spec/arrow/transaction_spec.rb
+            /trunk/lib/arrow/applet.rb
+            /trunk/lib/arrow/transaction.rb (and 2 other/s)
 
     * More work on the auth mixins
 
 
 -- Fri, 13 Feb 2009 15:52:27 -0000 by deveiant (r494) -----
-   Added:   docs/original-design-notes.txt
+   Added:   /trunk/docs/original-design-notes.txt
             -> renamed from /trunk/notes.txt@r493
-            spec/arrow/appletmixins_spec.rb (new)
-            lib/arrow/appletmixins.rb (new)
-   Changed: lib/arrow.rb
-            lib/arrow/config.rb
-            lib/apache/fakerequest.rb
-            lib/arrow/formvalidator.rb
-            docs/manual/lib/examples-filter.rb
-            Rakefile (and 6 other/s)
-   Deleted: utils.rb
-            TODO
-            MANIFEST
-            notes.txt
-            inactive-applets
-            TEMPLATE.rb.tpl (and 4 other/s)
+            /trunk/spec/arrow/appletmixins_spec.rb (new)
+            /trunk/lib/arrow/appletmixins.rb (new)
+   Changed: /trunk/lib/arrow.rb
+            /trunk/lib/arrow/config.rb
+            /trunk/lib/apache/fakerequest.rb
+            /trunk/lib/arrow/formvalidator.rb
+            /trunk/docs/manual/lib/examples-filter.rb
+            /trunk/Rakefile (and 6 other/s)
+   Deleted: /trunk/utils.rb
+            /trunk/TODO
+            /trunk/MANIFEST
+            /trunk/notes.txt
+            /trunk/inactive-applets
+            /trunk/TEMPLATE.rb.tpl (and 4 other/s)
 
     * Tweaked the Textmate logging helper to distinguish between debug-/info- and notice-level
     messages.
@@ -171,9 +246,9 @@
 
 
 -- Thu, 05 Feb 2009 02:37:51 -0000 by deveiant (r493) -----
-   Changed: spec/arrow/service_spec.rb
-            lib/arrow/service.rb
-            lib/arrow/mixins.rb
+   Changed: /trunk/spec/arrow/service_spec.rb
+            /trunk/lib/arrow/service.rb
+            /trunk/lib/arrow/mixins.rb
 
    Arrow::Service
    * Made deserializers ignore everything but the media type of the incoming Content-type.
@@ -182,10 +257,10 @@
 
 
 -- Wed, 04 Feb 2009 18:10:19 -0000 by deveiant (r492) -----
-   Changed: lib/arrow/constants.rb
-            spec/arrow/service_spec.rb
-            lib/arrow/service.rb
-            lib/arrow/mixins.rb
+   Changed: /trunk/lib/arrow/constants.rb
+            /trunk/spec/arrow/service_spec.rb
+            /trunk/lib/arrow/service.rb
+            /trunk/lib/arrow/mixins.rb
 
     * Arrow::Service
     - Added #deserialize_request_body
@@ -198,11 +273,11 @@
 
 
 -- Sat, 31 Jan 2009 01:41:00 -0000 by deveiant (r491) -----
-   Changed: spec/arrow/service_spec.rb
-            lib/arrow/service.rb
-            ChangeLog
-            lib/arrow/applet.rb
-            lib/arrow/transaction.rb
+   Changed: /trunk/spec/arrow/service_spec.rb
+            /trunk/lib/arrow/service.rb
+            /trunk/ChangeLog
+            /trunk/lib/arrow/applet.rb
+            /trunk/lib/arrow/transaction.rb
 
     * Laika::Service
     - Set the status to 200 explicitly if the action returns content
@@ -213,13 +288,13 @@
 
 
 -- Fri, 30 Jan 2009 22:11:28 -0000 by deveiant (r490) -----
-   Added:   data/templates/service-response.tmpl (new)
-   Changed: lib/arrow/constants.rb
-            spec/lib/appletmatchers.rb
-            spec/lib/constants.rb
-            spec/arrow/service_spec.rb
-            lib/arrow/service.rb
-            lib/arrow.rb (and 6 other/s)
+   Added:   /trunk/data/templates/service-response.tmpl (new)
+   Changed: /trunk/lib/arrow/constants.rb
+            /trunk/spec/lib/appletmatchers.rb
+            /trunk/spec/lib/constants.rb
+            /trunk/spec/arrow/service_spec.rb
+            /trunk/lib/arrow/service.rb
+            /trunk/lib/arrow.rb (and 6 other/s)
 
     * Started work on HTTP content negotiation for Arrow::Service
     * Added content-negotiation predicates to Arrow::Transaction for HTML content types.
@@ -227,10 +302,10 @@
 
 
 -- Wed, 28 Jan 2009 01:11:43 -0000 by deveiant (r489) -----
-   Added:   spec/lib/appletmatchers.rb (new)
-            spec/arrow/service_spec.rb (new)
-            lib/arrow/service.rb (new)
-   Changed: lib/arrow/applet.rb
+   Added:   /trunk/spec/lib/appletmatchers.rb (new)
+            /trunk/spec/arrow/service_spec.rb (new)
+            /trunk/lib/arrow/service.rb (new)
+   Changed: /trunk/lib/arrow/applet.rb
 
     * Added Arrow::Service, an Arrow::Applet derivative for making REST services.
     * Added a matcher library for RSpec specs about Arrow::Applets.
@@ -238,16 +313,16 @@
 
 
 -- Tue, 27 Jan 2009 02:22:19 -0000 by deveiant (r488) -----
-   Changed: spec/arrow/transaction_spec.rb
-            lib/arrow/transaction.rb
+   Changed: /trunk/spec/arrow/transaction_spec.rb
+            /trunk/lib/arrow/transaction.rb
 
    * Added support for HTTP content-negotiation checks.
 
 
 -- Tue, 27 Jan 2009 01:33:41 -0000 by deveiant (r487) -----
-   Added:   spec/arrow/acceptparam_spec.rb (new)
-            lib/arrow/acceptparam.rb (new)
-   Changed: README
+   Added:   /trunk/spec/arrow/acceptparam_spec.rb (new)
+            /trunk/lib/arrow/acceptparam.rb (new)
+   Changed: /trunk/README
 
    Imported Arrow::AcceptParam from [http://opensource.laika.com/wiki/ThingFish Thingfish] for upcoming HTTP content-negotiation work.
 
@@ -259,124 +334,124 @@
 
 
 -- Fri, 23 Jan 2009 22:55:11 -0000 by deveiant (r485) -----
-   Added:   spec/arrow/template (new)
-            spec/arrow/template/iterator_spec.rb
+   Added:   /trunk/spec/arrow/template (new)
+            /trunk/spec/arrow/template/iterator_spec.rb
             -> renamed from /trunk/tests/template_iterator.tests.rb@r484
-   Changed: lib/arrow.rb
-            spec/arrow/session_spec.rb
-            lib/arrow/template/iterator.rb
-            spec/arrow/dispatcher_spec.rb
-            spec/arrow/mixins_spec.rb
-   Deleted: tests/template_iterator.tests.rb
+   Changed: /trunk/lib/arrow.rb
+            /trunk/spec/arrow/session_spec.rb
+            /trunk/lib/arrow/template/iterator.rb
+            /trunk/spec/arrow/dispatcher_spec.rb
+            /trunk/spec/arrow/mixins_spec.rb
+   Deleted: /trunk/tests/template_iterator.tests.rb
 
     * Converted Arrow::Template::Iterator test to spec
     * Added Arrow::Template::Iterator#even_or_odd
 
 
 -- Wed, 14 Jan 2009 23:39:25 -0000 by deveiant (r484) -----
-   Changed: lib/arrow/appletregistry.rb
-            Rakefile
-            lib/arrow.rb
-            ChangeLog
-            lib/arrow/dispatcher.rb
-            lib/arrow/formvalidator.rb (and 2 other/s)
+   Changed: /trunk/lib/arrow/appletregistry.rb
+            /trunk/Rakefile
+            /trunk/lib/arrow.rb
+            /trunk/ChangeLog
+            /trunk/lib/arrow/dispatcher.rb
+            /trunk/lib/arrow/formvalidator.rb (and 2 other/s)
 
     * Updated build system
     * Eliminated $SAFE = 1 issues with RubyGems via a monkeypatch.
 
 
 -- Wed, 10 Dec 2008 01:01:00 -0000 by deveiant (r483) -----
-   Added:   spec/lib/constants.rb
+   Added:   /trunk/spec/lib/constants.rb
             -> renamed from /branches/gem-applet-experiment/spec/lib/constants.rb@r482
-            spec/data
+            /trunk/spec/data
             -> renamed from /branches/gem-applet-experiment/spec/data@r482
-            spec/arrow/mixins_spec.rb
+            /trunk/spec/arrow/mixins_spec.rb
             -> renamed from /branches/gem-applet-experiment/spec/arrow/mixins_spec.rb@r482
-            Rakefile.local
+            /trunk/Rakefile.local
             -> renamed from /branches/gem-applet-experiment/Rakefile.local@r482
-            spec/arrow/logger_spec.rb
+            /trunk/spec/arrow/logger_spec.rb
             -> renamed from /branches/gem-applet-experiment/spec/arrow/logger_spec.rb@r482
-            lib/arrow/path.rb
+            /trunk/lib/arrow/path.rb
             -> renamed from /branches/gem-applet-experiment/lib/arrow/path.rb@r482 (and 3 other/s)
-   Changed: lib/arrow/template/container.rb
-            lib/arrow/fallbackhandler.rb
-            project.yml
-            lib/arrow/mixins.rb
-            lib/arrow/testcase.rb
-            lib/arrow/template/prettyprint.rb (and 97 other/s)
-   Deleted: lib/arrow/template/TEMPLATE.rb.tpl
-            tests/appletregistry.tests.rb
-            templates
-            lib/arrow/response.rb
-            lib/arrow/logger/TEMPLATE.tb.tpl
-            redist/child_init_handler_fix.patch (and 20 other/s)
+   Changed: /trunk/lib/arrow/template/container.rb
+            /trunk/lib/arrow/fallbackhandler.rb
+            /trunk/project.yml
+            /trunk/lib/arrow/mixins.rb
+            /trunk/lib/arrow/testcase.rb
+            /trunk/lib/arrow/template/prettyprint.rb (and 97 other/s)
+   Deleted: /trunk/lib/arrow/template/TEMPLATE.rb.tpl
+            /trunk/tests/appletregistry.tests.rb
+            /trunk/templates
+            /trunk/lib/arrow/response.rb
+            /trunk/lib/arrow/logger/TEMPLATE.tb.tpl
+            /trunk/redist/child_init_handler_fix.patch (and 20 other/s)
 
    Merged RubyGem integration from [log:branches/gem-applet-experiment@463:482 from the Gem Applet experiment branch].
 
 
 -- Tue, 11 Nov 2008 16:15:34 -0000 by deveiant (r471) -----
-   Deleted: redist/formvalidator-0.1.4.tar.gz
+   Deleted: /trunk/redist/formvalidator-0.1.4.tar.gz
 
    Removing old tarball
 
 
 -- Tue, 11 Nov 2008 16:15:07 -0000 by deveiant (r470) -----
-   Added:   redist/formvalidator-0.1.4.gem (new)
+   Added:   /trunk/redist/formvalidator-0.1.4.gem (new)
 
    Exchanging formvalidator tarball for the equivalent Rubygem
 
 
 -- Fri, 03 Oct 2008 18:22:58 -0000 by deveiant (r464) -----
-   Changed: Rakefile
+   Changed: /trunk/Rakefile
 
    Updated build system.
 
 
 -- Fri, 03 Oct 2008 17:56:35 -0000 by deveiant (r462) -----
-   Changed: Rakefile
-            project.yml
-            lib/arrow/applet.rb
+   Changed: /trunk/Rakefile
+            /trunk/project.yml
+            /trunk/lib/arrow/applet.rb
 
     * Updated build system
     * Fixed the formvalidator log message in Arrow::Applet.
 
 
 -- Thu, 28 Aug 2008 00:24:56 -0000 by deveiant (r461) -----
-   Added:   docs/manual/resources/js/jquery.ThickBox.js (new)
-            docs/manual/resources/js/manual.js (new)
-            docs/manual/resources/js/jquery.js (new)
-            docs/manual/resources/js/search.js (new)
-   Changed: spec/arrow/formvalidator_spec.rb
-            lib/arrow/formvalidator.rb
+   Added:   /trunk/docs/manual/resources/js/jquery.ThickBox.js (new)
+            /trunk/docs/manual/resources/js/manual.js (new)
+            /trunk/docs/manual/resources/js/jquery.js (new)
+            /trunk/docs/manual/resources/js/search.js (new)
+   Changed: /trunk/spec/arrow/formvalidator_spec.rb
+            /trunk/lib/arrow/formvalidator.rb
 
     * Added some more javascript stuff to the manual resources dir
     * Made boolean constraints accept '1' or '0' in Arrow::FormValidator
 
 
 -- Wed, 20 Aug 2008 01:46:52 -0000 by deveiant (r460) -----
-   Changed: project.yml
-            ChangeLog
+   Changed: /trunk/project.yml
+            /trunk/ChangeLog
 
    Updated build system.
 
 
 -- Sat, 16 Aug 2008 02:28:50 -0000 by deveiant (r459) -----
-   Added:   spec/arrow/session_spec.rb (new)
-   Changed: README
-            docs/manual/resources/css/screen.css
-            spec/arrow/appletregistry_spec.rb
-            arrow.css
-            LICENSE
-            Rakefile (and 9 other/s)
+   Added:   /trunk/spec/arrow/session_spec.rb (new)
+   Changed: /trunk/README
+            /trunk/docs/manual/resources/css/screen.css
+            /trunk/spec/arrow/appletregistry_spec.rb
+            /trunk/arrow.css
+            /trunk/LICENSE
+            /trunk/Rakefile (and 9 other/s)
 
     * Updated the build system
     * Started conversion of unit tests for Arrow::Session to Rspec
 
 
 -- Fri, 25 Jul 2008 02:53:27 -0000 by deveiant (r458) -----
-   Added:   spec/arrow/appletregistry_spec.rb (new)
-   Changed: docs/manual/source/tutorial/intro.page
-            spec/arrow/applet_spec.rb
+   Added:   /trunk/spec/arrow/appletregistry_spec.rb (new)
+   Changed: /trunk/docs/manual/source/tutorial/intro.page
+            /trunk/spec/arrow/applet_spec.rb
 
     * Updated intro page of the manual with more detail about templates, and clarified how
     applets fit together a bit better.
@@ -384,32 +459,32 @@
 
 
 -- Fri, 18 Jul 2008 16:56:49 -0000 by deveiant (r457) -----
-   Changed: Rakefile
-            project.yml
+   Changed: /trunk/Rakefile
+            /trunk/project.yml
 
    Synced build system with the latest tasklibs
 
 
 -- Tue, 15 Jul 2008 20:56:56 -0000 by deveiant (r455) -----
-   Changed: docs/Structural-Overview.graffle
+   Changed: /trunk/docs/Structural-Overview.graffle
 
    Tweaked for presentation
 
 
 -- Sat, 12 Jul 2008 01:00:34 -0000 by deveiant (r454) -----
-   Added:   project.yml (new)
+   Added:   /trunk/project.yml (new)
    Changed: /trunk
-            Rakefile
-            lib/arrow.rb
-   Deleted: rake
+            /trunk/Rakefile
+            /trunk/lib/arrow.rb
+   Deleted: /trunk/rake
 
     * Started conversion to unified cross-project rake-based build system
 
 
 -- Tue, 24 Jun 2008 17:46:09 -0000 by deveiant (r453) -----
-   Added:   lib/arrow/template/timedelta.rb (new)
-   Changed: spec/arrow/formvalidator_spec.rb
-            lib/arrow/formvalidator.rb
+   Added:   /trunk/lib/arrow/template/timedelta.rb (new)
+   Changed: /trunk/spec/arrow/formvalidator_spec.rb
+            /trunk/lib/arrow/formvalidator.rb
 
 
     * Added another component to the untainting of keys in the form validator
@@ -418,37 +493,37 @@
 
 
 -- Mon, 23 Jun 2008 05:47:00 -0000 by deveiant (r452) -----
-   Added:   LICENSE
+   Added:   /trunk/LICENSE
             -> renamed from /releases/Arrow-0.9.3/LICENSE@r451
-   Changed: lib/arrow/fallbackhandler.rb
-            lib/arrow/template/container.rb
-            lib/arrow/config-loaders/yaml.rb
-            lib/arrow/template/for.rb
-            lib/arrow/rubytokenreactor.rb
-            lib/arrow/mixins.rb (and 74 other/s)
-   Deleted: docs/COPYRIGHT
+   Changed: /trunk/lib/arrow/fallbackhandler.rb
+            /trunk/lib/arrow/template/container.rb
+            /trunk/lib/arrow/config-loaders/yaml.rb
+            /trunk/lib/arrow/template/for.rb
+            /trunk/lib/arrow/rubytokenreactor.rb
+            /trunk/lib/arrow/mixins.rb (and 74 other/s)
+   Deleted: /trunk/docs/COPYRIGHT
 
    Merged hotfix from the 0.9.3 [log:branches/Arrow-0.9.3@450:451 release branch].
 
 
 -- Sun, 22 Jun 2008 21:21:00 -0000 by deveiant (r450) -----
-   Added:   rake/publishing.rb
+   Added:   /trunk/rake/publishing.rb
             -> renamed from /trunk/rake/publication.rb@r448
-   Changed: lib/arrow/constants.rb
-            Rakefile
-            lib/arrow.rb
-            lib/arrow/mixins.rb
-            rake/svn.rb
-   Deleted: rake/publication.rb
+   Changed: /trunk/lib/arrow/constants.rb
+            /trunk/Rakefile
+            /trunk/lib/arrow.rb
+            /trunk/lib/arrow/mixins.rb
+            /trunk/rake/svn.rb
+   Deleted: /trunk/rake/publication.rb
 
 
     * Merged publication task from PluginFactory
 
 
 -- Wed, 18 Jun 2008 23:17:56 -0000 by deveiant (r448) -----
-   Added:   docs/manual/lib/api-filter.rb (new)
-   Changed: Rakefile
-            rake/packaging.rb
+   Added:   /trunk/docs/manual/lib/api-filter.rb (new)
+   Changed: /trunk/Rakefile
+            /trunk/rake/packaging.rb
 
     * Reorganized Rakefile and merged some fixes from other projects to the
     packaging tasklib.
@@ -456,23 +531,23 @@
 
 
 -- Mon, 16 Jun 2008 22:44:21 -0000 by deveiant (r447) -----
-   Changed: Rakefile
-            rake/packaging.rb
+   Changed: /trunk/Rakefile
+            /trunk/rake/packaging.rb
 
    Updated dependency list, added better diagnostics of task load failures.
 
 
 -- Thu, 29 May 2008 22:20:59 -0000 by deveiant (r446) -----
-   Added:   docs/manual/lib/links-filter.rb (new)
-   Changed: docs/manual/lib/examples-filter.rb
-            docs/manual/source/tutorial/intro.page
-            docs/manual/source/tutorial/templates.page
-            rake/manual.rb
-            Rakefile
-            docs/manual/layouts/default.page (and 4 other/s)
-   Deleted: docs/manual/source/tutorial/monitors.page
-            docs/manual/source/tutorial/apps.page
-            docs/manual/source/tutorial/sources.page
+   Added:   /trunk/docs/manual/lib/links-filter.rb (new)
+   Changed: /trunk/docs/manual/lib/examples-filter.rb
+            /trunk/docs/manual/source/tutorial/intro.page
+            /trunk/docs/manual/source/tutorial/templates.page
+            /trunk/rake/manual.rb
+            /trunk/Rakefile
+            /trunk/docs/manual/layouts/default.page (and 4 other/s)
+   Deleted: /trunk/docs/manual/source/tutorial/monitors.page
+            /trunk/docs/manual/source/tutorial/apps.page
+            /trunk/docs/manual/source/tutorial/sources.page
 
     * Merged some manual stuff back from ThingFish
     * Cleaned up the manual source
@@ -480,25 +555,25 @@
 
 
 -- Sat, 03 May 2008 03:01:15 -0000 by deveiant (r445) -----
-   Changed: rake/manual.rb
-            spec/arrow/formvalidator_spec.rb
-            lib/arrow/formvalidator.rb
+   Changed: /trunk/rake/manual.rb
+            /trunk/spec/arrow/formvalidator_spec.rb
+            /trunk/lib/arrow/formvalidator.rb
 
     * Merged some improvements back from ThingFish. Paired with Mahlon.
     * Aesthetic fixes for the FormValidator.
 
 
 -- Tue, 29 Apr 2008 13:35:21 -0000 by deveiant (r444) -----
-   Added:   docs/manual/resources/images/shadows/large-70.png (new)
-            docs/manual/resources/images/shadows/tl.png (new)
-            docs/manual/resources/images/shadows/smaller-30.png (new)
-            docs/manual/resources/images/shadows/medium.png (new)
-            docs/manual/resources/images/shadows/smaller-50.png (new)
-            docs/manual/resources/images/shadows/smaller-70.png (new) (and 22 other/s)
-   Changed: docs/manual/resources/css/manual.css
-            docs/manual/source/tutorial/validation.page
-            docs/manual/lib/examples-filter.rb
-            docs/manual/source/tutorial/templates.page
+   Added:   /trunk/docs/manual/resources/images/shadows/large-70.png (new)
+            /trunk/docs/manual/resources/images/shadows/tl.png (new)
+            /trunk/docs/manual/resources/images/shadows/smaller-30.png (new)
+            /trunk/docs/manual/resources/images/shadows/medium.png (new)
+            /trunk/docs/manual/resources/images/shadows/smaller-50.png (new)
+            /trunk/docs/manual/resources/images/shadows/smaller-70.png (new) (and 22 other/s)
+   Changed: /trunk/docs/manual/resources/css/manual.css
+            /trunk/docs/manual/source/tutorial/validation.page
+            /trunk/docs/manual/lib/examples-filter.rb
+            /trunk/docs/manual/source/tutorial/templates.page
 
     * Committing some more work on the manual.
     * Fixed a bug in the grammar advisory code of the examples manual plugin.
@@ -506,33 +581,33 @@
 
 
 -- Fri, 18 Apr 2008 06:04:47 -0000 by deveiant (r443) -----
-   Changed: Rakefile
+   Changed: /trunk/Rakefile
 
    Fixed the rdoc-generation task I broke by passing fully-qualified paths to RDoc. Grrr...
 
 
 -- Thu, 17 Apr 2008 16:46:45 -0000 by deveiant (r442) -----
-   Added:   docs/manual/source/tutorial/error-handling.page (new)
-            docs/manual/source/tutorial/logging.page (new)
-   Changed: docs/manual/source/installation.page
-            docs/manual/source/tutorial/advanced-config.page
+   Added:   /trunk/docs/manual/source/tutorial/error-handling.page (new)
+            /trunk/docs/manual/source/tutorial/logging.page (new)
+   Changed: /trunk/docs/manual/source/installation.page
+            /trunk/docs/manual/source/tutorial/advanced-config.page
 
    Checkpoint of some docs work last night.
 
 
 -- Thu, 17 Apr 2008 06:52:35 -0000 by deveiant (r441) -----
-   Changed: docs/manual/source/tutorial/validation.page
-            docs/manual/source/index.page
-            docs/manual/resources/css/manual.css
-            docs/manual/source/tutorial/applets.page
+   Changed: /trunk/docs/manual/source/tutorial/validation.page
+            /trunk/docs/manual/source/index.page
+            /trunk/docs/manual/resources/css/manual.css
+            /trunk/docs/manual/source/tutorial/applets.page
 
    Checkpointing manual work.
 
 
 -- Wed, 16 Apr 2008 14:59:26 -0000 by deveiant (r440) -----
-   Changed: README
-            lib/arrow/template.rb
-            Rakefile
+   Changed: /trunk/README
+            /trunk/lib/arrow/template.rb
+            /trunk/Rakefile
 
    * Added the 'install' task to the Rakefile. Thanks to Mahlon and Ben for bugging
    me about this.
@@ -540,18 +615,18 @@
 
 
 -- Thu, 10 Apr 2008 23:27:34 -0000 by deveiant (r439) -----
-   Added:   docs/manual/resources/images/caution-bars.png (new)
-            docs/manual/resources/images/helloworld_thumb.png (new)
-            docs/manual/resources/images/helloworld.png (new)
-            docs/manual/resources/css/deveiate.css (new)
-            docs/manual/resources/images/basic-structure.png (new)
-            docs/manual/source/tutorial/advanced-config.page (new) (and 1 other/s)
-   Changed: lib/arrow/logger/apacheoutputter.rb
-            rake/manual.rb
-            docs/manual/layouts/default.page
-            lib/arrow/config.rb
-            docs/Structural-Overview.graffle
-            docs/manual/resources/css/manual.css (and 17 other/s)
+   Added:   /trunk/docs/manual/resources/images/caution-bars.png (new)
+            /trunk/docs/manual/resources/images/helloworld_thumb.png (new)
+            /trunk/docs/manual/resources/images/helloworld.png (new)
+            /trunk/docs/manual/resources/css/deveiate.css (new)
+            /trunk/docs/manual/resources/images/basic-structure.png (new)
+            /trunk/docs/manual/source/tutorial/advanced-config.page (new) (and 1 other/s)
+   Changed: /trunk/lib/arrow/logger/apacheoutputter.rb
+            /trunk/rake/manual.rb
+            /trunk/docs/manual/layouts/default.page
+            /trunk/lib/arrow/config.rb
+            /trunk/docs/Structural-Overview.graffle
+            /trunk/docs/manual/resources/css/manual.css (and 17 other/s)
 
     * Lots of work on the manual, including a new Rake-based generation system.
     * Updated design diagrams
@@ -560,36 +635,36 @@
 
 
 -- Sun, 30 Mar 2008 03:48:14 -0000 by deveiant (r438) -----
-   Changed: rake/manual.rb
-            docs/manual/layouts/default.page
+   Changed: /trunk/rake/manual.rb
+            /trunk/docs/manual/layouts/default.page
 
    Added an attribute to the Manual::Page object for relative paths in generated
    links.
 
 
 -- Fri, 28 Mar 2008 00:49:20 -0000 by deveiant (r437) -----
-   Added:   spec/arrow/session (new)
-            spec/arrow/formvalidator_spec.rb
+   Added:   /trunk/spec/arrow/session (new)
+            /trunk/spec/arrow/formvalidator_spec.rb
             -> renamed from /trunk/spec/formvalidator_spec.rb@r435
-            spec/arrow/templatefactory_spec.rb
+            /trunk/spec/arrow/templatefactory_spec.rb
             -> renamed from /trunk/spec/templatefactory_spec.rb@r435
-            docs/manual/source/installation.page
+            /trunk/docs/manual/source/installation.page
             -> renamed from /trunk/docs/manual/source/download.page@r435
-            spec/arrow (new)
-            spec/arrow/dispatcher_spec.rb
+            /trunk/spec/arrow (new)
+            /trunk/spec/arrow/dispatcher_spec.rb
             -> renamed from /trunk/spec/dispatcher_spec.rb@r435 (and 6 other/s)
-   Changed: applets/view-template.rb
-            applets/tutorial/imgtext.rb
-            lib/arrow/template/container.rb
-            lib/arrow/fallbackhandler.rb
-            rake/testing.rb
-            tests/session_id.tests.rb (and 145 other/s)
-   Deleted: docs/manual/source/tutorial.page
-            spec/activerecordstore_spec.rb
-            install.rb
-            spec/templatefactory_spec.rb
-            makedist.rb
-            spec/cookieset_spec.rb (and 8 other/s)
+   Changed: /trunk/applets/view-template.rb
+            /trunk/applets/tutorial/imgtext.rb
+            /trunk/lib/arrow/template/container.rb
+            /trunk/lib/arrow/fallbackhandler.rb
+            /trunk/rake/testing.rb
+            /trunk/tests/session_id.tests.rb (and 145 other/s)
+   Deleted: /trunk/docs/manual/source/tutorial.page
+            /trunk/spec/activerecordstore_spec.rb
+            /trunk/install.rb
+            /trunk/spec/templatefactory_spec.rb
+            /trunk/makedist.rb
+            /trunk/spec/cookieset_spec.rb (and 8 other/s)
 
     * Removed the test.rb file now that testing has been converted to Rake tasks
     * More manual-generation task work
@@ -598,12 +673,12 @@
 
 
 -- Thu, 20 Mar 2008 18:01:26 -0000 by deveiant (r436) -----
-   Changed: tests/cookie.tests.rb
-            lib/arrow/config-loaders/yaml.rb
-            lib/arrow/logger/htmloutputter.rb
-            lib/arrow/logger.rb
-            lib/arrow/config.rb
-            lib/arrow/logger/fileoutputter.rb (and 2 other/s)
+   Changed: /trunk/tests/cookie.tests.rb
+            /trunk/lib/arrow/config-loaders/yaml.rb
+            /trunk/lib/arrow/logger/htmloutputter.rb
+            /trunk/lib/arrow/logger.rb
+            /trunk/lib/arrow/config.rb
+            /trunk/lib/arrow/logger/fileoutputter.rb (and 2 other/s)
 
     * removed unnecessary breakpoint dependency
     * added escaping to the HTML outputter
@@ -612,15 +687,15 @@
 
 
 -- Mon, 03 Mar 2008 14:03:23 -0000 by deveiant (r435) -----
-   Added:   docs/manual/resources/css/screen.css (new)
-            docs/manual/resources/css/print.css (new)
-            docs/manual/resources/css/ie.css (new)
-   Changed: rake/manual.rb
-            rake/testing.rb
-            Rakefile
-            docs/manual/layouts/default.page
-            lib/arrow/session.rb
-            rake/packaging.rb (and 1 other/s)
+   Added:   /trunk/docs/manual/resources/css/screen.css (new)
+            /trunk/docs/manual/resources/css/print.css (new)
+            /trunk/docs/manual/resources/css/ie.css (new)
+   Changed: /trunk/rake/manual.rb
+            /trunk/rake/testing.rb
+            /trunk/Rakefile
+            /trunk/docs/manual/layouts/default.page
+            /trunk/lib/arrow/session.rb
+            /trunk/rake/packaging.rb (and 1 other/s)
 
     * Added a subtask to copy resources to the output when generating the manual.
     * Refactored Manual::GenTask#define
@@ -628,21 +703,21 @@
 
 
 -- Sun, 02 Mar 2008 08:30:17 -0000 by deveiant (r434) -----
-   Added:   rake/publication.rb (new)
-            lib/arrow/constants.rb (new)
-            docs/manual/source/history.page
+   Added:   /trunk/rake/publication.rb (new)
+            /trunk/lib/arrow/constants.rb (new)
+            /trunk/docs/manual/source/history.page
             -> renamed from /trunk/docs/manual/source/whatis.page@r433
-            rake/testing.rb (new)
-            rake/packaging.rb (new)
-            lib/arrow/monkeypatches.rb (new) (and 1 other/s)
-   Changed: lib/arrow/config-loaders/yaml.rb
-            Rakefile
-            lib/arrow/utils.rb
-            lib/arrow.rb
-            docs/manual/source/index.page
-            docs (and 2 other/s)
-   Deleted: docs/manual/source/whatis.page
-            docs/manual/source/install.page
+            /trunk/rake/testing.rb (new)
+            /trunk/rake/packaging.rb (new)
+            /trunk/lib/arrow/monkeypatches.rb (new) (and 1 other/s)
+   Changed: /trunk/lib/arrow/config-loaders/yaml.rb
+            /trunk/Rakefile
+            /trunk/lib/arrow/utils.rb
+            /trunk/lib/arrow.rb
+            /trunk/docs/manual/source/index.page
+            /trunk/docs (and 2 other/s)
+   Deleted: /trunk/docs/manual/source/whatis.page
+            /trunk/docs/manual/source/install.page
 
     * Split tasks out of the toplevel Rakefile into tasklibs in rake/.
     * Split toplevel constants out of arrow.rb into arrow/constants.rb so they can be loaded without
@@ -654,26 +729,26 @@
 
 
 -- Sat, 01 Mar 2008 18:30:51 -0000 by deveiant (r433) -----
-   Added:   docs/manual/source/tutorial/monitors.page
+   Added:   /trunk/docs/manual/source/tutorial/monitors.page
             -> renamed from /trunk/docs/manual/source/tutorial/monitors.textile@r432
-            docs/manual/source/tutorial/sources.page
+            /trunk/docs/manual/source/tutorial/sources.page
             -> renamed from /trunk/docs/manual/source/tutorial/sources.textile@r432
-            docs/manual/lib (new)
-            docs/manual/source/tutorial/templates.page
+            /trunk/docs/manual/lib (new)
+            /trunk/docs/manual/source/tutorial/templates.page
             -> renamed from /trunk/docs/manual/source/tutorial/templates.textile@r432
-            docs/manual/source/tutorial.page
+            /trunk/docs/manual/source/tutorial.page
             -> renamed from /trunk/docs/manual/source/tutorial.textile@r432
-            docs/manual/source/tutorial/apps.page
+            /trunk/docs/manual/source/tutorial/apps.page
             -> renamed from /trunk/docs/manual/source/tutorial/apps.textile@r432 (and 13 other/s)
    Changed: /trunk
-            Rakefile
-            docs/manual
-   Deleted: docs/manual/source/tutorial/monitors.textile
-            Arrow TextMate Project.tmproj
-            rake/verifytask.rb
-            spec/rake
-            docs/manual/source/tutorial/intro.textile
-            docs/manual/source/tutorial/templates.textile (and 12 other/s)
+            /trunk/Rakefile
+            /trunk/docs/manual
+   Deleted: /trunk/docs/manual/source/tutorial/monitors.textile
+            /trunk/Arrow TextMate Project.tmproj
+            /trunk/rake/verifytask.rb
+            /trunk/spec/rake
+            /trunk/docs/manual/source/tutorial/intro.textile
+            /trunk/docs/manual/source/tutorial/templates.textile (and 12 other/s)
 
     * Added manual-generation system.
     * Added several publication tasks to the Rakefile
@@ -682,12 +757,12 @@
 
 
 -- Wed, 20 Feb 2008 19:26:10 -0000 by deveiant (r432) -----
-   Changed: spec/activerecordstore_spec.rb
-            lib/arrow/logger/htmloutputter.rb
-            lib/arrow/logger.rb
-            lib/arrow.rb
-            lib/arrow/session.rb
-            lib/arrow/template/nodes.rb (and 4 other/s)
+   Changed: /trunk/spec/activerecordstore_spec.rb
+            /trunk/lib/arrow/logger/htmloutputter.rb
+            /trunk/lib/arrow/logger.rb
+            /trunk/lib/arrow.rb
+            /trunk/lib/arrow/session.rb
+            /trunk/lib/arrow/template/nodes.rb (and 4 other/s)
 
     * Updated the Arrow::Session::ActiveRecordStore to work under ActiveRecord 2.x.
     * Factored out some HTML utility methods from the templating system (arrow/template/nodes.rb) into
@@ -698,27 +773,27 @@
 
 
 -- Thu, 14 Feb 2008 08:10:49 -0000 by deveiant (r431) -----
-   Added:   docs/manual/resources/images/hello-world-sshot.png
+   Added:   /trunk/docs/manual/resources/images/hello-world-sshot.png
             -> renamed from /trunk/docs/manual/hello-world-sshot.png@r430
-            docs/manual/source/tutorial/monitors.textile
+            /trunk/docs/manual/source/tutorial/monitors.textile
             -> renamed from /trunk/docs/manual/tutorial-monitors.html@r430
-            docs/manual/source (new)
-            docs/manual/resources/images/structural-overview2.png
+            /trunk/docs/manual/source (new)
+            /trunk/docs/manual/resources/images/structural-overview2.png
             -> renamed from /trunk/docs/manual/structural-overview2.png@r430
-            docs/manual/layouts (new)
-            docs/manual/source/tutorial (new) (and 23 other/s)
-   Changed: README
-            docs/COPYRIGHT
-            Arrow TextMate Project.tmproj
-            lib/arrow/formvalidator.rb
-            spec/formvalidator_spec.rb
-            Rakefile (and 2 other/s)
-   Deleted: docs/manual/hello-dave-sshot.png
-            docs/manual/tutorial-templates.html
-            docs/manual/tutorial.html
-            docs/manual/tutorial-apps.html
-            docs/manual/download.html
-            docs/manual/index.html (and 17 other/s)
+            /trunk/docs/manual/layouts (new)
+            /trunk/docs/manual/source/tutorial (new) (and 23 other/s)
+   Changed: /trunk/README
+            /trunk/docs/COPYRIGHT
+            /trunk/Arrow TextMate Project.tmproj
+            /trunk/lib/arrow/formvalidator.rb
+            /trunk/spec/formvalidator_spec.rb
+            /trunk/Rakefile (and 2 other/s)
+   Deleted: /trunk/docs/manual/hello-dave-sshot.png
+            /trunk/docs/manual/tutorial-templates.html
+            /trunk/docs/manual/tutorial.html
+            /trunk/docs/manual/tutorial-apps.html
+            /trunk/docs/manual/download.html
+            /trunk/docs/manual/index.html (and 17 other/s)
 
     * Merged some of the stuff I like from the ThingFish Rakefile, started trying to
     write publication tasks.
@@ -733,40 +808,40 @@
 
 
 -- Fri, 18 Jan 2008 20:36:29 -0000 by deveiant (r430) -----
-   Added:   lib/arrow/logger/htmloutputter.rb (new)
+   Added:   /trunk/lib/arrow/logger/htmloutputter.rb (new)
    Changed: /trunk
-            docs/makedocs.rb
-            Rakefile
-            Arrow TextMate Project.tmproj
-            lib/arrow/transaction.rb
-            docs (and 4 other/s)
+            /trunk/docs/makedocs.rb
+            /trunk/Rakefile
+            /trunk/Arrow TextMate Project.tmproj
+            /trunk/lib/arrow/transaction.rb
+            /trunk/docs (and 4 other/s)
 
     * Changed docs to use Darkfish instead of the default RDoc template.
     * Added an HTML log outputter.
 
 
 -- Tue, 21 Aug 2007 20:56:22 -0000 by deveiant (r426) -----
-   Changed: lib/arrow.rb
+   Changed: /trunk/lib/arrow.rb
 
    Preparing for 0.9.2 release
 
 
 -- Tue, 21 Aug 2007 20:54:59 -0000 by deveiant (r425) -----
-   Changed: lib/arrow/mixins.rb
+   Changed: /trunk/lib/arrow/mixins.rb
 
    Clarified some debugging statements in Arrow::Injectable
 
 
 -- Mon, 20 Aug 2007 20:54:26 -0000 by phaedrus (r424) -----
-   Changed: lib/arrow/config.rb
+   Changed: /trunk/lib/arrow/config.rb
 
    Changed self::load in config.rb so that it tries to untaint a copy of the source name, instead of the actual one (which is a frozen object in some cases).
    lib/arrow/config.rb
 
 
 -- Wed, 15 Aug 2007 18:50:16 -0000 by deveiant (r423) -----
-   Changed: Arrow TextMate Project.tmproj
-            lib/arrow/applet.rb
+   Changed: /trunk/Arrow TextMate Project.tmproj
+            /trunk/lib/arrow/applet.rb
 
     * Fixed the bug that caused an inappropriate exception to be raised when an invalid
     action was called. Invalid actions now get the __default__ validator profile, or
@@ -774,16 +849,16 @@
 
 
 -- Wed, 15 Aug 2007 06:22:24 -0000 by deveiant (r422) -----
-   Changed: spec/formvalidator_spec.rb
-            lib/arrow/formvalidator.rb
+   Changed: /trunk/spec/formvalidator_spec.rb
+            /trunk/lib/arrow/formvalidator.rb
 
     * Fixed a bug in Proc constraints in Arrow::FormValidator spotted by 
     Jeremiah Jordan <phaedrus (at) faeriemud (at) org>
 
 
 -- Mon, 13 Aug 2007 21:58:46 -0000 by phaedrus (r421) -----
-   Changed: lib/arrow/transaction.rb
-            spec/transaction_spec.rb
+   Changed: /trunk/lib/arrow/transaction.rb
+            /trunk/spec/transaction_spec.rb
 
    Added PUT & DELETE functionality.
    spec/transaction_spec.rb
@@ -791,28 +866,28 @@
 
 
 -- Mon, 13 Aug 2007 19:39:47 -0000 by deveiant (r420) -----
-   Changed: spec/formvalidator_spec.rb
-            lib/arrow/formvalidator.rb
+   Changed: /trunk/spec/formvalidator_spec.rb
+            /trunk/lib/arrow/formvalidator.rb
 
    Fixed the unexpected behavior of returning a single-item Array for a 
    FormValidator regexp matcher which has only one paren-group.
 
 
 -- Thu, 09 Aug 2007 21:00:11 -0000 by deveiant (r419) -----
-   Changed: spec/formvalidator_spec.rb
-            Arrow TextMate Project.tmproj
-            lib/arrow/applet.rb
-            lib/arrow/mixins.rb
-            lib/arrow/formvalidator.rb
+   Changed: /trunk/spec/formvalidator_spec.rb
+            /trunk/Arrow TextMate Project.tmproj
+            /trunk/lib/arrow/applet.rb
+            /trunk/lib/arrow/mixins.rb
+            /trunk/lib/arrow/formvalidator.rb
 
     * Adding new validator constraint types: 'alpha', 'alphanumeric', and 
     'printable'.
 
 
 -- Tue, 31 Jul 2007 18:21:32 -0000 by deveiant (r418) -----
-   Changed: Arrow TextMate Project.tmproj
-            lib/arrow/applet.rb
-            lib/arrow/formvalidator.rb
+   Changed: /trunk/Arrow TextMate Project.tmproj
+            /trunk/lib/arrow/applet.rb
+            /trunk/lib/arrow/formvalidator.rb
 
     * Factor out validator name lookup from #make_validator for easy 
     overriding.
@@ -821,7 +896,7 @@
 
 
 -- Thu, 26 Jul 2007 00:49:41 -0000 by deveiant (r417) -----
-   Changed: lib/arrow/applet.rb
+   Changed: /trunk/lib/arrow/applet.rb
 
 
     * Fixed method docs. Thanks to Kim again for the critical eye.
@@ -829,8 +904,8 @@
 
 -- Wed, 25 Jul 2007 18:22:16 -0000 by deveiant (r416) -----
    Changed: /trunk
-            lib/arrow/applet.rb
-            spec/applet_spec.rb
+            /trunk/lib/arrow/applet.rb
+            /trunk/spec/applet_spec.rb
 
    Merged patch from Kimberly Wallmark <kim (at) arlim (dot) org> that modifies
    loading behavior to not return any incidentally-loaded subclasses by
@@ -839,36 +914,36 @@
 
 
 -- Wed, 25 Jul 2007 17:59:08 -0000 by deveiant (r415) -----
-   Added:   rake (new)
-            rake/helpers.rb (new)
-            rake/svn.rb (new)
-            rake/verifytask.rb (new)
-   Changed: Rakefile
+   Added:   /trunk/rake (new)
+            /trunk/rake/helpers.rb (new)
+            /trunk/rake/svn.rb (new)
+            /trunk/rake/verifytask.rb (new)
+   Changed: /trunk/Rakefile
 
    Adding build system tasklibs
 
 
 -- Wed, 25 Jul 2007 17:47:44 -0000 by deveiant (r414) -----
-   Changed: lib/arrow/applet.rb
+   Changed: /trunk/lib/arrow/applet.rb
 
 
     * Bugfix: Allow calling #run and #subrun with Symbol actions.
 
 
 -- Wed, 25 Jul 2007 01:04:09 -0000 by deveiant (r413) -----
-   Changed: spec/formvalidator_spec.rb
-            lib/arrow/formvalidator.rb
+   Changed: /trunk/spec/formvalidator_spec.rb
+            /trunk/lib/arrow/formvalidator.rb
 
    Fixed a bug in the formvalidator regexp constraint matcher
 
 
 -- Tue, 24 Jul 2007 17:13:27 -0000 by deveiant (r412) -----
-   Changed: spec/formvalidator_spec.rb
-            lib/arrow/appletregistry.rb
-            lib/arrow/logger.rb
-            Arrow TextMate Project.tmproj
-            lib/arrow/applet.rb
-            lib/arrow/config.rb (and 5 other/s)
+   Changed: /trunk/spec/formvalidator_spec.rb
+            /trunk/lib/arrow/appletregistry.rb
+            /trunk/lib/arrow/logger.rb
+            /trunk/Arrow TextMate Project.tmproj
+            /trunk/lib/arrow/applet.rb
+            /trunk/lib/arrow/config.rb (and 5 other/s)
 
    source:trunk/spec/applet_spec.rb
    source:trunk/tests/applet.tests.rb
@@ -893,7 +968,7 @@
 
 
 -- Thu, 19 Jul 2007 20:07:56 -0000 by deveiant (r411) -----
-   Changed: lib/arrow/dispatcher.rb
+   Changed: /trunk/lib/arrow/dispatcher.rb
 
    source:trunk/lib/arrow/dispatcher.rb
    * Renamed outputString to something that actually means something
@@ -902,8 +977,8 @@
 
 
 -- Thu, 19 Jul 2007 18:55:20 -0000 by deveiant (r410) -----
-   Changed: lib/arrow/applet.rb
-            lib/apache/fakerequest.rb
+   Changed: /trunk/lib/arrow/applet.rb
+            /trunk/lib/apache/fakerequest.rb
 
 
     * Cleaned up constants in Apache::FakeRequest
@@ -912,20 +987,20 @@
 
 
 -- Thu, 19 Jul 2007 01:58:35 -0000 by bbleything (r409) -----
-   Changed: lib/arrow/config.rb
+   Changed: /trunk/lib/arrow/config.rb
 
     * remove require arrow from arrow/config
 
 
 -- Wed, 18 Jul 2007 18:27:02 -0000 by bbleything (r408) -----
-   Changed: lib/arrow/session/activerecordstore.rb
+   Changed: /trunk/lib/arrow/session/activerecordstore.rb
 
     * remove orphaned require of diff/lcs
 
 
 -- Wed, 18 Jul 2007 18:15:39 -0000 by deveiant (r407) -----
-   Changed: lib/arrow.rb
-            lib/arrow/dispatcher.rb
+   Changed: /trunk/lib/arrow.rb
+            /trunk/lib/arrow/dispatcher.rb
 
    source:trunk/lib/arrow/dispatcher.rb
    * Escape percents in the error messages sent to Apache::Server#log_crit.
@@ -935,43 +1010,43 @@
 
 
 -- Wed, 18 Jul 2007 17:01:59 -0000 by bbleything (r406) -----
-   Changed: applets/view-template.rb
-            applets/tutorial/imgtext.rb
-            lib/arrow/template/container.rb
-            lib/arrow/fallbackhandler.rb
-            tests/session_id.tests.rb
-            applets/tutorial/subclassed-hello.rb (and 154 other/s)
+   Changed: /trunk/applets/view-template.rb
+            /trunk/applets/tutorial/imgtext.rb
+            /trunk/lib/arrow/template/container.rb
+            /trunk/lib/arrow/fallbackhandler.rb
+            /trunk/tests/session_id.tests.rb
+            /trunk/applets/tutorial/subclassed-hello.rb (and 154 other/s)
 
     * switch shebangs to /usr/bin/env ruby
 
 
 -- Wed, 18 Jul 2007 04:08:00 -0000 by deveiant (r405) -----
-   Changed: Rakefile
-            lib/arrow.rb
+   Changed: /trunk/Rakefile
+            /trunk/lib/arrow.rb
 
    Bumping version and RSpec requirements
 
 
 -- Wed, 18 Jul 2007 04:06:29 -0000 by deveiant (r404) -----
-   Changed: Rakefile
+   Changed: /trunk/Rakefile
 
 
     * Updated gem task
 
 
 -- Wed, 18 Jul 2007 03:03:42 -0000 by deveiant (r403) -----
-   Added:   spec/lib (new)
-            spec/lib/helpers.rb (new)
-            spec/lib/matchers.rb (new)
-            spec/formvalidator_spec.rb (new)
-   Changed: spec/activerecordstore_spec.rb
-            lib/arrow/config-loaders/yaml.rb
-            utils.rb
-            lib/arrow.rb
-            spec/TEMPLATE.rb.tpl
-            lib/arrow/config.rb (and 18 other/s)
-   Deleted: tests/formvalidator.tests.rb
-            tests/transaction.tests.rb
+   Added:   /trunk/spec/lib (new)
+            /trunk/spec/lib/helpers.rb (new)
+            /trunk/spec/lib/matchers.rb (new)
+            /trunk/spec/formvalidator_spec.rb (new)
+   Changed: /trunk/spec/activerecordstore_spec.rb
+            /trunk/lib/arrow/config-loaders/yaml.rb
+            /trunk/utils.rb
+            /trunk/lib/arrow.rb
+            /trunk/spec/TEMPLATE.rb.tpl
+            /trunk/lib/arrow/config.rb (and 18 other/s)
+   Deleted: /trunk/tests/formvalidator.tests.rb
+            /trunk/tests/transaction.tests.rb
 
    source:trunk/.irbrc
    * Preload 'apache/fakerequest' to emulate a mod_ruby environment
@@ -1033,15 +1108,15 @@
 
 
 -- Tue, 17 Jul 2007 20:30:14 -0000 by deveiant (r402) -----
-   Added:   experiments/urimapper.rb (new)
-            spec/broker_spec.rb (new)
-   Changed: spec/activerecordstore_spec.rb
-            lib/arrow/config-loaders/yaml.rb
+   Added:   /trunk/experiments/urimapper.rb (new)
+            /trunk/spec/broker_spec.rb (new)
+   Changed: /trunk/spec/activerecordstore_spec.rb
+            /trunk/lib/arrow/config-loaders/yaml.rb
             /trunk
-            utils.rb
-            spec/rake/verifytask.rb
-            lib/arrow/config.rb (and 17 other/s)
-   Deleted: tests/broker.tests.rb
+            /trunk/utils.rb
+            /trunk/spec/rake/verifytask.rb
+            /trunk/lib/arrow/config.rb (and 17 other/s)
+   Deleted: /trunk/tests/broker.tests.rb
 
    source:trunk/Rakefile
    * Combined coverage tasks to do both RSpec and Test::Unit tests until
@@ -1090,34 +1165,34 @@
 
 
 -- Tue, 26 Jun 2007 18:20:52 -0000 by deveiant (r401) -----
-   Changed: lib/arrow/broker.rb
+   Changed: /trunk/lib/arrow/broker.rb
 
    Again, d'oh.
 
 
 -- Tue, 26 Jun 2007 18:17:16 -0000 by deveiant (r400) -----
-   Changed: lib/arrow/transaction.rb
+   Changed: /trunk/lib/arrow/transaction.rb
 
    Forgot to commit this with the changes to session-handling in the dispatcher
 
 
 -- Tue, 19 Jun 2007 18:22:27 -0000 by deveiant (r399) -----
-   Changed: lib/arrow/dispatcher.rb
+   Changed: /trunk/lib/arrow/dispatcher.rb
 
    Added template rendering benchmark to the log (thanks to Jeff Davis for the suggestion)
 
 
 -- Thu, 29 Mar 2007 19:01:33 -0000 by deveiant (r398) -----
-   Added:   spec/templatefactory_spec.rb (new)
-            lib/arrow/spechelpers.rb (new)
-            spec/transaction_spec.rb (new)
-            spec/applet_spec.rb (new)
-   Changed: spec/activerecordstore_spec.rb
-            lib/arrow/templatefactory.rb
-            Arrow TextMate Project.tmproj
-            lib/apache/fakerequest.rb
-            lib/arrow/session/activerecordstore.rb
-            lib/arrow/template.rb (and 8 other/s)
+   Added:   /trunk/spec/templatefactory_spec.rb (new)
+            /trunk/lib/arrow/spechelpers.rb (new)
+            /trunk/spec/transaction_spec.rb (new)
+            /trunk/spec/applet_spec.rb (new)
+   Changed: /trunk/spec/activerecordstore_spec.rb
+            /trunk/lib/arrow/templatefactory.rb
+            /trunk/Arrow TextMate Project.tmproj
+            /trunk/lib/apache/fakerequest.rb
+            /trunk/lib/arrow/session/activerecordstore.rb
+            /trunk/lib/arrow/template.rb (and 8 other/s)
 
    source:trunk/arrow.css
    * Don't import RubyCrafters CSS anymore, as that domain is gone.
@@ -1152,70 +1227,70 @@
 
 
 -- Wed, 28 Mar 2007 19:24:07 -0000 by bbleything (r397) -----
-   Added:   bin/catlog (new)
-            bin (new)
+   Added:   /trunk/bin/catlog (new)
+            /trunk/bin (new)
 
     * add bin directory for little tools
     * add catlog to translate newlines and tabs in the stack traces of httpd logs
 
 
 -- Tue, 27 Mar 2007 17:47:36 -0000 by bbleything (r396) -----
-   Changed: lib/arrow/transaction.rb
+   Changed: /trunk/lib/arrow/transaction.rb
 
     * alias Transaction#applet to Transaction#applet_uri
 
 
 -- Wed, 21 Mar 2007 17:02:11 -0000 by deveiant (r395) -----
-   Changed: lib/arrow/broker.rb
+   Changed: /trunk/lib/arrow/broker.rb
 
    * Added a start_time attribute to Arrow::Broker for uptime statistics
 
 
 -- Tue, 13 Mar 2007 21:11:26 -0000 by phaedrus (r394) -----
-   Changed: lib/arrow/session/activerecordstore.rb
+   Changed: /trunk/lib/arrow/session/activerecordstore.rb
 
    Okay, I finally figured out how to reproduce it (so slow of brain), so now this should actually work well.
 
 
 -- Tue, 13 Mar 2007 19:19:17 -0000 by phaedrus (r393) -----
-   Changed: lib/arrow/session/activerecordstore.rb
+   Changed: /trunk/lib/arrow/session/activerecordstore.rb
 
    *sigh* I love bugs that only occur on staging
 
 
 -- Tue, 13 Mar 2007 19:14:40 -0000 by phaedrus (r392) -----
-   Changed: lib/arrow/session/activerecordstore.rb
+   Changed: /trunk/lib/arrow/session/activerecordstore.rb
 
    * Okay, this time I am actually trapping the exception. It should work, or my name isnt Joey McScmoey.
 
 
 -- Tue, 13 Mar 2007 18:54:08 -0000 by phaedrus (r391) -----
-   Changed: lib/arrow/session/activerecordstore.rb
+   Changed: /trunk/lib/arrow/session/activerecordstore.rb
 
    * Added fix for transition between file based sessions and database based ones, basically I did not check for a nil value from the db, which was breaking on a YAML::load.
 
 
 -- Thu, 08 Mar 2007 12:09:27 -0000 by deveiant (r390) -----
-   Changed: lib/arrow/session/store.rb
+   Changed: /trunk/lib/arrow/session/store.rb
 
 
     * Corrected documentation for the #create_recommended_lock method.
 
 
 -- Wed, 07 Mar 2007 00:31:26 -0000 by phaedrus (r389) -----
-   Added:   spec/activerecordstore_spec.rb (new)
-            lib/arrow/session/nulllock.rb (new)
-            lib/arrow/session/activerecordstore.rb (new)
-   Changed: spec/cookieset_spec.rb
+   Added:   /trunk/spec/activerecordstore_spec.rb (new)
+            /trunk/lib/arrow/session/nulllock.rb (new)
+            /trunk/lib/arrow/session/activerecordstore.rb (new)
+   Changed: /trunk/spec/cookieset_spec.rb
 
    * Added a PluginFactory plugin to store session in an active record object.
 
 
 -- Fri, 02 Mar 2007 01:34:52 -0000 by deveiant (r388) -----
-   Changed: lib/arrow/session.rb
-            lib/arrow/transaction.rb
-            tests/session.tests.rb
-            tests/transaction.tests.rb
+   Changed: /trunk/lib/arrow/session.rb
+            /trunk/lib/arrow/transaction.rb
+            /trunk/tests/session.tests.rb
+            /trunk/tests/transaction.tests.rb
 
    source:trunk/tests/session.tests.rb
    source:trunk/tests/transaction.tests.rb
@@ -1225,12 +1300,12 @@
 
 
 -- Fri, 02 Mar 2007 01:06:47 -0000 by deveiant (r387) -----
-   Changed: lib/arrow/session.rb
-            lib/arrow/cookieset.rb
-            lib/arrow/transaction.rb
-            tests/session.tests.rb
-            tests/transaction.tests.rb
-            spec/cookieset_spec.rb (and 1 other/s)
+   Changed: /trunk/lib/arrow/session.rb
+            /trunk/lib/arrow/cookieset.rb
+            /trunk/lib/arrow/transaction.rb
+            /trunk/tests/session.tests.rb
+            /trunk/tests/transaction.tests.rb
+            /trunk/spec/cookieset_spec.rb (and 1 other/s)
 
    source:trunk/lib/arrow/cookieset.rb
    source:trunk/spec/cookieset_spec.rb
@@ -1245,9 +1320,9 @@
 
 
 -- Wed, 28 Feb 2007 19:46:51 -0000 by deveiant (r386) -----
-   Changed: Rakefile
-            lib/arrow/applet.rb
-            tests/applet.tests.rb
+   Changed: /trunk/Rakefile
+            /trunk/lib/arrow/applet.rb
+            /trunk/tests/applet.tests.rb
 
 
     * Fixed a bug in signature inheritance (thanks to Jeremiah Jordan for 
@@ -1258,16 +1333,16 @@
 
 
 -- Tue, 27 Feb 2007 23:01:39 -0000 by deveiant (r385) -----
-   Changed: lib/arrow/cookieset.rb
-            spec/cookieset_spec.rb
+   Changed: /trunk/lib/arrow/cookieset.rb
+            /trunk/spec/cookieset_spec.rb
 
 
     * Fixed another case with Symbol cookie names
 
 
 -- Tue, 27 Feb 2007 19:42:52 -0000 by deveiant (r384) -----
-   Changed: lib/arrow/cookieset.rb
-            spec/cookieset_spec.rb
+   Changed: /trunk/lib/arrow/cookieset.rb
+            /trunk/spec/cookieset_spec.rb
 
    source:trunk/spec/cookieset_spec.rb
    source:trunk/lib/arrow/cookieset.rb
@@ -1277,8 +1352,8 @@
 
 -- Tue, 27 Feb 2007 18:54:41 -0000 by deveiant (r383) -----
    Changed: /trunk
-            lib/arrow/dispatcher.rb
-            spec/dispatcher_spec.rb
+            /trunk/lib/arrow/dispatcher.rb
+            /trunk/spec/dispatcher_spec.rb
 
 
     * Fixed broken dispatcher spec that was committed in the last rev.
@@ -1287,25 +1362,25 @@
 
 
 -- Tue, 27 Feb 2007 18:20:47 -0000 by phaedrus (r382) -----
-   Changed: tests/applet.tests.rb
+   Changed: /trunk/tests/applet.tests.rb
 
    changed the tests/applet.tests.rb:test_run_should_track_run_times test to use a function that caused system usage, and hence system time.  As the former array test was only counted as usertime on my machine
 
 
 -- Tue, 27 Feb 2007 17:58:42 -0000 by deveiant (r381) -----
-   Added:   spec/TEMPLATE.rb.tpl (new)
-            spec/rake/verifytask.rb (new)
-            spec/rake (new)
-            Rakefile (new)
-            lib/arrow/cookieset.rb (new)
-            spec/cookieset_spec.rb (new) (and 3 other/s)
-   Changed: docs/CATALOG
-            lib/arrow/rubytokenreactor.rb
-            experiments/dump_constants.rb
-            Arrow TextMate Project.tmproj
-            lib/arrow/config.rb
-            lib/arrow/formvalidator.rb (and 31 other/s)
-   Deleted: tests/dispatcher.tests.rb
+   Added:   /trunk/spec/TEMPLATE.rb.tpl (new)
+            /trunk/spec/rake/verifytask.rb (new)
+            /trunk/spec/rake (new)
+            /trunk/Rakefile (new)
+            /trunk/lib/arrow/cookieset.rb (new)
+            /trunk/spec/cookieset_spec.rb (new) (and 3 other/s)
+   Changed: /trunk/docs/CATALOG
+            /trunk/lib/arrow/rubytokenreactor.rb
+            /trunk/experiments/dump_constants.rb
+            /trunk/Arrow TextMate Project.tmproj
+            /trunk/lib/arrow/config.rb
+            /trunk/lib/arrow/formvalidator.rb (and 31 other/s)
+   Deleted: /trunk/tests/dispatcher.tests.rb
 
    source:trunk/Rakefile
    source:trunk/spec/rake/verifytask.rb
@@ -1359,12 +1434,12 @@
 
 
 -- Mon, 26 Feb 2007 19:41:43 -0000 by deveiant (r380) -----
-   Changed: lib/arrow/template.rb
-            lib/arrow/appletregistry.rb
-            lib/arrow/cache.rb
-            lib/arrow/broker.rb
-            Arrow TextMate Project.tmproj
-            lib/arrow/dispatcher.rb (and 1 other/s)
+   Changed: /trunk/lib/arrow/template.rb
+            /trunk/lib/arrow/appletregistry.rb
+            /trunk/lib/arrow/cache.rb
+            /trunk/lib/arrow/broker.rb
+            /trunk/Arrow TextMate Project.tmproj
+            /trunk/lib/arrow/dispatcher.rb (and 1 other/s)
 
    source:trunk/lib/arrow/applettestcase.rb
    * Made the 
@@ -1384,7 +1459,7 @@
 
 
 -- Wed, 14 Feb 2007 19:35:40 -0000 by phaedrus (r376) -----
-   Changed: lib/arrow/template/urlencode.rb
+   Changed: /trunk/lib/arrow/template/urlencode.rb
 
 
    * lib/arrow/template/urlencode.rb
@@ -1395,27 +1470,27 @@
 
 
 -- Tue, 06 Feb 2007 20:31:33 -0000 by phaedrus (r375) -----
-   Changed: lib/arrow/formvalidator.rb
+   Changed: /trunk/lib/arrow/formvalidator.rb
 
    I added a few method overrides for buggy formvalidator methods: Arrow::FormValidator::filters, FormValidator::ConstraintHelpers
 
 
 -- Mon, 08 Jan 2007 18:23:11 -0000 by ged (r374) -----
-   Changed: lib/arrow/transaction.rb
-            tests/transaction.tests.rb
+   Changed: /trunk/lib/arrow/transaction.rb
+            /trunk/tests/transaction.tests.rb
 
 
     * New method: Arrow::Transaction#is_ajax_request?
 
 
 -- Wed, 03 Jan 2007 21:11:09 -0000 by ged (r373) -----
-   Added:   tests/data/reexport.tmpl (new)
-   Changed: lib/arrow/template/export.rb
-            tests/formvalidator.tests.rb
-            lib/arrow/template/include.rb
-            tests/template.tests.rb
-            Arrow TextMate Project.tmproj
-            lib/arrow/formvalidator.rb (and 1 other/s)
+   Added:   /trunk/tests/data/reexport.tmpl (new)
+   Changed: /trunk/lib/arrow/template/export.rb
+            /trunk/tests/formvalidator.tests.rb
+            /trunk/lib/arrow/template/include.rb
+            /trunk/tests/template.tests.rb
+            /trunk/Arrow TextMate Project.tmproj
+            /trunk/lib/arrow/formvalidator.rb (and 1 other/s)
 
 
     * Make multi-level enclosing templates get exports too, not just the immediate one.
@@ -1426,10 +1501,10 @@
 
 
 -- Tue, 19 Dec 2006 20:04:40 -0000 by ged (r371) -----
-   Added:   lib/arrow/template/export.rb
+   Added:   /trunk/lib/arrow/template/export.rb
             -> renamed from /branches/export-directive/lib/arrow/template/export.rb@r370
-   Changed: tests/template.tests.rb
-            lib/arrow/cache.rb
+   Changed: /trunk/tests/template.tests.rb
+            /trunk/lib/arrow/cache.rb
 
 
     MERGE: Merged export-directive branch @370 into trunk.
@@ -1437,9 +1512,9 @@
 
 -- Tue, 19 Dec 2006 16:28:15 -0000 by ged (r368) -----
    Changed: /branches/export-directive/lib/arrow/template/export.rb
-            lib/arrow/template.rb
+            /trunk/lib/arrow/template.rb
             /branches/export-directive/tests/template.tests.rb
-            lib/arrow/template/nodes.rb
+            /trunk/lib/arrow/template/nodes.rb
 
 
     * Finished initial implementation of the 'export' directive.
@@ -1454,29 +1529,29 @@
 
 
 -- Tue, 28 Nov 2006 07:41:57 -0000 by ged (r367) -----
-   Changed: tests/formvalidator.tests.rb
+   Changed: /trunk/tests/formvalidator.tests.rb
 
     * Committing tests mistakenly uncommitted with [365].
 
 
 -- Tue, 28 Nov 2006 07:39:57 -0000 by ged (r366) -----
-   Changed: lib/arrow/cache.rb
+   Changed: /trunk/lib/arrow/cache.rb
 
     * Added logging overrides and accessors for stats ivars to Arrow::Cache
 
 
 -- Tue, 28 Nov 2006 00:32:14 -0000 by ged (r365) -----
-   Changed: lib/arrow/formvalidator.rb
+   Changed: /trunk/lib/arrow/formvalidator.rb
 
 
     * Fixed bugs in the new auto-generated field description code.
 
 
 -- Sat, 25 Nov 2006 08:40:45 -0000 by ged (r364) -----
-   Changed: tests/formvalidator.tests.rb
-            lib/arrow/applettestcase.rb
-            Arrow TextMate Project.tmproj
-            lib/arrow/logger/coloroutputter.rb
+   Changed: /trunk/tests/formvalidator.tests.rb
+            /trunk/lib/arrow/applettestcase.rb
+            /trunk/Arrow TextMate Project.tmproj
+            /trunk/lib/arrow/logger/coloroutputter.rb
 
 
     * Forgot to commit the test changes for the previous commit to FormValidator.
@@ -1489,21 +1564,21 @@
 
 
 -- Sat, 25 Nov 2006 06:15:24 -0000 by ged (r363) -----
-   Changed: lib/arrow/formvalidator.rb
+   Changed: /trunk/lib/arrow/formvalidator.rb
 
 
     * Added date and float validators.
 
 
 -- Sat, 25 Nov 2006 05:58:41 -0000 by ged (r362) -----
-   Changed: lib/arrow/formvalidator.rb
+   Changed: /trunk/lib/arrow/formvalidator.rb
 
 
     * Made default descriptions a bit more readable, especially for hash fields.
 
 
 -- Sat, 25 Nov 2006 04:03:44 -0000 by ged (r361) -----
-   Changed: lib/arrow/logger.rb
+   Changed: /trunk/lib/arrow/logger.rb
 
 
     * Simplified/corrected the way the trace part of log messages is built in
@@ -1512,16 +1587,16 @@
 
 
 -- Wed, 22 Nov 2006 00:33:05 -0000 by phaedrus (r360) -----
-   Changed: lib/arrow/utils.rb
+   Changed: /trunk/lib/arrow/utils.rb
 
    we were untainting the wrong thing, path instead of @dirs
 
 
 -- Thu, 16 Nov 2006 22:33:16 -0000 by ged (r359) -----
-   Added:   lib/arrow/logger/coloroutputter.rb (new)
-   Changed: lib/arrow/config.rb
-            TEMPLATE.rb.tpl
-            lib/arrow/logger/fileoutputter.rb
+   Added:   /trunk/lib/arrow/logger/coloroutputter.rb (new)
+   Changed: /trunk/lib/arrow/config.rb
+            /trunk/TEMPLATE.rb.tpl
+            /trunk/lib/arrow/logger/fileoutputter.rb
 
 
     * Non-existant config key methods now return nil instead of raising a NameError.
@@ -1530,16 +1605,16 @@
 
 
 -- Tue, 17 Oct 2006 23:58:25 -0000 by ged (r355) -----
-   Changed: lib/arrow/config.rb
+   Changed: /trunk/lib/arrow/config.rb
 
 
     * Fixed config reloading based on timestamp.
 
 
 -- Tue, 17 Oct 2006 23:47:29 -0000 by ged (r354) -----
-   Changed: tests/path.tests.rb
-            lib/arrow/config.rb
-            lib/arrow/dispatcher.rb
+   Changed: /trunk/tests/path.tests.rb
+            /trunk/lib/arrow/config.rb
+            /trunk/lib/arrow/dispatcher.rb
 
 
     * Fixed some path tests that became broken somehow
@@ -1548,25 +1623,25 @@
 
 
 -- Tue, 17 Oct 2006 23:33:20 -0000 by ged (r353) -----
-   Added:   redist/ruby-breakpoint-0.5.1.tgz (new)
+   Added:   /trunk/redist/ruby-breakpoint-0.5.1.tgz (new)
 
     * Adding dependency "breakpoint" library
 
 
 -- Thu, 12 Oct 2006 16:33:36 -0000 by ged (r352) -----
-   Changed: lib/arrow/template/escape.rb
+   Changed: /trunk/lib/arrow/template/escape.rb
 
 
     * Bugfix: quotes weren't being escaped.
 
 
 -- Thu, 05 Oct 2006 03:41:49 -0000 by ged (r351) -----
-   Changed: lib/arrow/appletregistry.rb
-            lib/arrow/session/posixlock.rb
-            lib/arrow/logger.rb
-            lib/arrow/utils.rb
-            lib/arrow/applettestcase.rb
-            Arrow TextMate Project.tmproj (and 5 other/s)
+   Changed: /trunk/lib/arrow/appletregistry.rb
+            /trunk/lib/arrow/session/posixlock.rb
+            /trunk/lib/arrow/logger.rb
+            /trunk/lib/arrow/utils.rb
+            /trunk/lib/arrow/applettestcase.rb
+            /trunk/Arrow TextMate Project.tmproj (and 5 other/s)
 
 
     * Added an Apache::Table analog to the fakerequest utilities.
@@ -1583,91 +1658,91 @@
 
 
 -- Thu, 28 Sep 2006 20:44:51 -0000 by ged (r350) -----
-   Added:   redist/posixlock-0.0.1.tgz (new)
-            redist/flexmock-0.4.1.tgz (new)
-   Deleted: redist/flexmock-0.3.2.tar.bz2
+   Added:   /trunk/redist/posixlock-0.0.1.tgz (new)
+            /trunk/redist/flexmock-0.4.1.tgz (new)
+   Deleted: /trunk/redist/flexmock-0.3.2.tar.bz2
 
    * Updated redist with new version of FlexMock, posixlock
 
 
 -- Wed, 20 Sep 2006 00:11:38 -0000 by ged (r349) -----
-   Changed: lib/arrow/applet.rb
+   Changed: /trunk/lib/arrow/applet.rb
 
 
     * Oops. Fixed bug in my fix for #subrun.
 
 
 -- Tue, 19 Sep 2006 17:16:44 -0000 by ged (r348) -----
-   Changed: lib/arrow/applet.rb
+   Changed: /trunk/lib/arrow/applet.rb
 
 
     * Handle swapped action and transaction in Arrow::Applet#subrun.
 
 
 -- Sat, 09 Sep 2006 15:48:42 -0000 by ged (r347) -----
-   Changed: lib/arrow/formvalidator.rb
+   Changed: /trunk/lib/arrow/formvalidator.rb
 
 
     * Removed mistakenly-included #match_email from the canonical FormValidator
 
 
 -- Sun, 03 Sep 2006 07:02:06 -0000 by ged (r346) -----
-   Changed: lib/arrow/transaction.rb
-            tests/transaction.tests.rb
+   Changed: /trunk/lib/arrow/transaction.rb
+            /trunk/tests/transaction.tests.rb
 
 
     * Overrode #construct_url so proxied requests generate correct self-referential URLs.
 
 
 -- Sun, 03 Sep 2006 04:21:50 -0000 by ged (r345) -----
-   Changed: docs/COPYRIGHT
+   Changed: /trunk/docs/COPYRIGHT
 
 
     * Updated copyright date in COPYRIGHT file.
 
 
 -- Thu, 24 Aug 2006 23:30:25 -0000 by ged (r344) -----
-   Changed: lib/arrow/template/urlencode.rb
+   Changed: /trunk/lib/arrow/template/urlencode.rb
 
 
     * Added require for superclass module.
 
 
 -- Thu, 24 Aug 2006 03:10:07 -0000 by ged (r343) -----
-   Changed: tests/formvalidator.tests.rb
-            lib/arrow/formvalidator.rb
+   Changed: /trunk/tests/formvalidator.tests.rb
+            /trunk/lib/arrow/formvalidator.rb
 
 
     * Added RFC822-compliant email address validation
 
 
 -- Wed, 23 Aug 2006 22:00:49 -0000 by ged (r342) -----
-   Changed: lib/arrow/applet.rb
-            tests/applet.tests.rb
+   Changed: /trunk/lib/arrow/applet.rb
+            /trunk/tests/applet.tests.rb
 
 
     * Added 'appicon' member to the applet signature
 
 
 -- Wed, 23 Aug 2006 02:09:12 -0000 by ged (r341) -----
-   Changed: tests/cookie.tests.rb
-            lib/arrow/cookie.rb
+   Changed: /trunk/tests/cookie.tests.rb
+            /trunk/lib/arrow/cookie.rb
 
 
     * Made cookie time in GMT instead of localtime.
 
 
 -- Wed, 23 Aug 2006 02:03:44 -0000 by ged (r340) -----
-   Changed: tests/cookie.tests.rb
-            lib/arrow/session/store.rb
-            lib/arrow/cookie.rb
+   Changed: /trunk/tests/cookie.tests.rb
+            /trunk/lib/arrow/session/store.rb
+            /trunk/lib/arrow/cookie.rb
 
 
     * Fixed cookie date format.
 
 
 -- Wed, 23 Aug 2006 01:17:30 -0000 by ged (r339) -----
-   Changed: lib/arrow/dispatcher.rb
+   Changed: /trunk/lib/arrow/dispatcher.rb
 
 
     * Added debugging of headers to both ends of the content handler.
@@ -1676,25 +1751,25 @@
 
 
 -- Thu, 17 Aug 2006 22:51:54 -0000 by ged (r338) -----
-   Changed: tests/formvalidator.tests.rb
-            lib/arrow/formvalidator.rb
+   Changed: /trunk/tests/formvalidator.tests.rb
+            /trunk/lib/arrow/formvalidator.rb
 
 
     * Added :integer FormValidator constraint
 
 
 -- Tue, 15 Aug 2006 16:44:04 -0000 by ged (r337) -----
-   Changed: lib/arrow/applet.rb
-            tests/applet.tests.rb
+   Changed: /trunk/lib/arrow/applet.rb
+            /trunk/tests/applet.tests.rb
 
 
     * Fixed bug in transaction setup through #subrun - when #subrun was called via #delegate or some other entry point than #run, the transaction wasn't set up so #vargs and friends were still nil.
 
 
 -- Tue, 15 Aug 2006 07:28:27 -0000 by ged (r335) -----
-   Changed: applets/view-template.rb
-            Arrow TextMate Project.tmproj
-            lib/arrow/template/selectlist.rb
+   Changed: /trunk/applets/view-template.rb
+            /trunk/Arrow TextMate Project.tmproj
+            /trunk/lib/arrow/template/selectlist.rb
 
 
     * Fixed selectlist parsing.
@@ -1703,8 +1778,8 @@
 
 
 -- Tue, 15 Aug 2006 07:25:09 -0000 by ged (r334) -----
-   Changed: tests/template.tests.rb
-   Deleted: lib/arrow/template/export.rb
+   Changed: /trunk/tests/template.tests.rb
+   Deleted: /trunk/lib/arrow/template/export.rb
 
 
     * Moved 'export' directive into a branch.
@@ -1713,23 +1788,23 @@
 
 
 -- Sat, 12 Aug 2006 18:00:13 -0000 by ged (r333) -----
-   Changed: lib/arrow/template/parser.rb
+   Changed: /trunk/lib/arrow/template/parser.rb
 
 
     * Fixed use of deprecated StringScanner method.
 
 
 -- Wed, 09 Aug 2006 21:01:57 -0000 by ged (r331) -----
-   Added:   redist/child_init_handler_fix.patch (new)
-            experiments/useglobal.rb (new)
-            experiments/globaldef.rb (new)
-            lib/arrow/template/selectlist.rb (new)
-   Changed: lib/arrow/testcase.rb
-            lib/arrow/appletregistry.rb
-            tests/template.tests.rb
-            lib/arrow/applettestcase.rb
-            lib/arrow/session.rb
-            lib/arrow/template/nodes.rb (and 6 other/s)
+   Added:   /trunk/redist/child_init_handler_fix.patch (new)
+            /trunk/experiments/useglobal.rb (new)
+            /trunk/experiments/globaldef.rb (new)
+            /trunk/lib/arrow/template/selectlist.rb (new)
+   Changed: /trunk/lib/arrow/testcase.rb
+            /trunk/lib/arrow/appletregistry.rb
+            /trunk/tests/template.tests.rb
+            /trunk/lib/arrow/applettestcase.rb
+            /trunk/lib/arrow/session.rb
+            /trunk/lib/arrow/template/nodes.rb (and 6 other/s)
 
 
     * Added beginnings of new 'selectlist' directive
@@ -1752,27 +1827,27 @@
 
 
 -- Tue, 25 Jul 2006 03:32:49 -0000 by ged (r330) -----
-   Changed: lib/arrow/transaction.rb
+   Changed: /trunk/lib/arrow/transaction.rb
 
 
     * Added an :approot_url alias to match the :approot one.
 
 
 -- Thu, 20 Jul 2006 22:38:51 -0000 by ged (r329) -----
-   Added:   lib/arrow/template/export.rb (new)
+   Added:   /trunk/lib/arrow/template/export.rb (new)
 
 
     * Oops. This was supposed to be part of the last commit.
 
 
 -- Thu, 20 Jul 2006 22:35:43 -0000 by ged (r328) -----
-   Added:   tests/data/export.tmpl (new)
-   Changed: applets/tutorial/logo.rb
-            lib/arrow/template.rb
-            lib/arrow/testcase.rb
-            lib/arrow/appletregistry.rb
-            lib/arrow/template/include.rb
-            tests/template.tests.rb (and 4 other/s)
+   Added:   /trunk/tests/data/export.tmpl (new)
+   Changed: /trunk/applets/tutorial/logo.rb
+            /trunk/lib/arrow/template.rb
+            /trunk/lib/arrow/testcase.rb
+            /trunk/lib/arrow/appletregistry.rb
+            /trunk/lib/arrow/template/include.rb
+            /trunk/tests/template.tests.rb (and 4 other/s)
 
 
     * Fixed bug in the template parser that would catch recursive includes when there wasn't one.
@@ -1785,10 +1860,10 @@
 
 
 -- Wed, 12 Jul 2006 17:14:46 -0000 by ged (r327) -----
-   Added:   lib/arrow/template/unless.rb
+   Added:   /trunk/lib/arrow/template/unless.rb
             -> renamed from /trunk/lib/arrow/template/if.rb@r325
-   Changed: tests/template.tests.rb
-            lib/arrow/applettestcase.rb
+   Changed: /trunk/tests/template.tests.rb
+            /trunk/lib/arrow/applettestcase.rb
 
 
     * Added new conditional template directory 'unless' 
@@ -1797,31 +1872,31 @@
 
 
 -- Wed, 12 Jul 2006 01:42:03 -0000 by ged (r326) -----
-   Changed: lib/arrow/applet.rb
+   Changed: /trunk/lib/arrow/applet.rb
 
 
     * Removed non-functional default proc from applet signature -- Apache::Server isn't loaded at ChildInit, so applets can't ever load .server.admin.
 
 
 -- Mon, 10 Jul 2006 18:38:30 -0000 by ged (r325) -----
-   Changed: tests/cookie.tests.rb
-            lib/arrow/cookie.rb
+   Changed: /trunk/tests/cookie.tests.rb
+            /trunk/lib/arrow/cookie.rb
 
 
     * Some browsers don't grok quoted values for attributes in Set-Cookie: headers. (e.g., Safari)
 
 
 -- Sat, 08 Jul 2006 01:32:28 -0000 by ged (r324) -----
-   Added:   lib/arrow/cookie.rb (new)
-            tests/cookie.tests.rb (new)
-            tests/applets/TEMPLATE.rb.tpl
+   Added:   /trunk/lib/arrow/cookie.rb (new)
+            /trunk/tests/cookie.tests.rb (new)
+            /trunk/tests/applets/TEMPLATE.rb.tpl
             -> renamed from /trunk/tests/TEMPLATE.rb.tpl@r319
-   Changed: README
-            lib/arrow.rb
-            docs/CATALOG
-            lib/arrow/config.rb
-            Arrow TextMate Project.tmproj
-            templates/config/display-table.tmpl (and 17 other/s)
+   Changed: /trunk/README
+            /trunk/lib/arrow.rb
+            /trunk/docs/CATALOG
+            /trunk/lib/arrow/config.rb
+            /trunk/Arrow TextMate Project.tmproj
+            /trunk/templates/config/display-table.tmpl (and 17 other/s)
 
 
     * Created Arrow::Cookie to work around libapreq cookie corruption bug.
@@ -1842,16 +1917,16 @@
 
 
 -- Thu, 06 Jul 2006 20:37:04 -0000 by ged (r323) -----
-   Changed: lib/arrow/exceptions.rb
+   Changed: /trunk/lib/arrow/exceptions.rb
 
 
     * Arrow::Loaderror -> Arrow::LoadError
 
 
 -- Thu, 22 Jun 2006 05:42:31 -0000 by ged (r322) -----
-   Changed: lib/arrow/logger.rb
-            lib/arrow/applettestcase.rb
-            lib/arrow/mixins.rb
+   Changed: /trunk/lib/arrow/logger.rb
+            /trunk/lib/arrow/applettestcase.rb
+            /trunk/lib/arrow/mixins.rb
 
 
     * Added some stuff to FlexMock to provide useful error messages under some
@@ -1866,34 +1941,34 @@
 
 
 -- Wed, 21 Jun 2006 02:10:19 -0000 by ged (r321) -----
-   Changed: lib/arrow/applettestcase.rb
+   Changed: /trunk/lib/arrow/applettestcase.rb
 
 
     * Added missing require of 'flexmock'
 
 
 -- Wed, 21 Jun 2006 01:55:18 -0000 by ged (r320) -----
-   Changed: lib/arrow/config.rb
+   Changed: /trunk/lib/arrow/config.rb
 
 
     * Fixed the documentation/defaults to match the new logging config.
 
 
 -- Wed, 21 Jun 2006 01:43:56 -0000 by ged (r319) -----
-   Added:   tests/lib/injectableobject.rb (new)
-            lib/apache/fakerequest.rb (new)
-            lib/arrow/testcase.rb (new)
-            lib/arrow/applettestcase.rb (new)
-            lib/apache (new)
-            experiments/hierloggers.rb (new) (and 3 other/s)
-   Changed: tests/datasource.tests.rb
-            tests/session_id.tests.rb
-            Arrow TextMate Project.tmproj
-            experiments/generic-iterator-tests.rb
-            lib/arrow/mixins.rb
-            tests/config.tests.rb (and 32 other/s)
-   Deleted: tests/lib/arrowtestcase.rb
-            tests/lib/apacheconstants.rb
+   Added:   /trunk/tests/lib/injectableobject.rb (new)
+            /trunk/lib/apache/fakerequest.rb (new)
+            /trunk/lib/arrow/testcase.rb (new)
+            /trunk/lib/arrow/applettestcase.rb (new)
+            /trunk/lib/apache (new)
+            /trunk/experiments/hierloggers.rb (new) (and 3 other/s)
+   Changed: /trunk/tests/datasource.tests.rb
+            /trunk/tests/session_id.tests.rb
+            /trunk/Arrow TextMate Project.tmproj
+            /trunk/experiments/generic-iterator-tests.rb
+            /trunk/lib/arrow/mixins.rb
+            /trunk/tests/config.tests.rb (and 32 other/s)
+   Deleted: /trunk/tests/lib/arrowtestcase.rb
+            /trunk/tests/lib/apacheconstants.rb
 
 
     * Rewrote logging to use Arrow::Configurable.
@@ -1952,98 +2027,98 @@
 
 
 -- Wed, 21 Jun 2006 00:45:54 -0000 by ged (r318) -----
-   Added:   redist/PluginFactory-1.0.1.tar.gz (new)
-            redist/flexmock-0.3.2.tar.bz2 (new)
-   Deleted: redist/PluginFactory-1.0.0.tar.gz
-            redist/Test-Unit-Mock-0.03.tar.gz
-            redist/hashslice.rb
-            redist/delimscanner.rb
-            redist/crosscase.rb
+   Added:   /trunk/redist/PluginFactory-1.0.1.tar.gz (new)
+            /trunk/redist/flexmock-0.3.2.tar.bz2 (new)
+   Deleted: /trunk/redist/PluginFactory-1.0.0.tar.gz
+            /trunk/redist/Test-Unit-Mock-0.03.tar.gz
+            /trunk/redist/hashslice.rb
+            /trunk/redist/delimscanner.rb
+            /trunk/redist/crosscase.rb
 
    - Updated dependencies
 
 
 -- Sat, 17 Jun 2006 00:31:19 -0000 by ged (r317) -----
-   Added:   experiments/arrowwiki.rb
+   Added:   /trunk/experiments/arrowwiki.rb
             -> renamed from /trunk/lib/arrowwiki.rb@r316
-   Deleted: lib/arrowwiki.rb
+   Deleted: /trunk/lib/arrowwiki.rb
 
    Moving the experimental Arrow wiki applet out of lib/
 
 
 -- Wed, 14 Jun 2006 19:19:06 -0000 by ged (r316) -----
-   Changed: lib/arrow/mixins.rb
-            tests/mixin.tests.rb
+   Changed: /trunk/lib/arrow/mixins.rb
+            /trunk/tests/mixin.tests.rb
 
 
     * Made ::configure take a second argument for dispatcher-keyed configuration.
 
 
 -- Wed, 14 Jun 2006 17:57:55 -0000 by ged (r315) -----
-   Changed: lib/arrow/session/lock.rb
-            lib/arrow/session/id.rb
-            lib/arrow/session/store.rb
-            lib/arrow/session.rb
+   Changed: /trunk/lib/arrow/session/lock.rb
+            /trunk/lib/arrow/session/id.rb
+            /trunk/lib/arrow/session/store.rb
+            /trunk/lib/arrow/session.rb
 
 
     * parseUri -> parse_uri
 
 
 -- Wed, 14 Jun 2006 07:20:39 -0000 by ged (r314) -----
-   Added:   tests/mixin.tests.rb (new)
-   Changed: lib/arrow/mixins.rb
+   Added:   /trunk/tests/mixin.tests.rb (new)
+   Changed: /trunk/lib/arrow/mixins.rb
 
 
     * Initial checkin of Arrow::Configurable.
 
 
 -- Tue, 13 Jun 2006 22:12:35 -0000 by ged (r313) -----
-   Changed: tests/lib/apacheconstants.rb
+   Changed: /trunk/tests/lib/apacheconstants.rb
 
     * Added Apache::Server#loglevel
 
 
 -- Tue, 13 Jun 2006 22:03:41 -0000 by ged (r312) -----
-   Changed: tests/broker.tests.rb
+   Changed: /trunk/tests/broker.tests.rb
 
 
     * Removed unnecessary requirement of 'breakpoint' from the Broker tests.
 
 
 -- Tue, 13 Jun 2006 22:02:30 -0000 by ged (r311) -----
-   Changed: tests/lib/apacheconstants.rb
+   Changed: /trunk/tests/lib/apacheconstants.rb
 
 
     * Removed unnecessary requirement of 'breakpoint' from the apacheconstants test helper lib.
 
 
 -- Tue, 13 Jun 2006 21:50:06 -0000 by ged (r310) -----
-   Changed: docs/Structural-Overview.graffle
+   Changed: /trunk/docs/Structural-Overview.graffle
 
 
     * Added logging diagram to Structural Overview
 
 
 -- Tue, 13 Jun 2006 21:44:50 -0000 by ged (r309) -----
-   Added:   tests/applets/hello.rb
+   Added:   /trunk/tests/applets/hello.rb
             -> renamed from /trunk/applets/tutorial/hello.rb@r297
-            tests/applets/protected.rb
+            /trunk/tests/applets/protected.rb
             -> renamed from /trunk/applets/tutorial/protected.rb@r306
-            tests/applets/counter.rb
+            /trunk/tests/applets/counter.rb
             -> renamed from /trunk/applets/tutorial/counter.rb@r306
-   Changed: tests/template.tests.rb
-            tests/appletregistry.tests.rb
-            lib/arrow/transaction.rb
-            tests/broker.tests.rb
-            tests/transaction.tests.rb
+   Changed: /trunk/tests/template.tests.rb
+            /trunk/tests/appletregistry.tests.rb
+            /trunk/lib/arrow/transaction.rb
+            /trunk/tests/broker.tests.rb
+            /trunk/tests/transaction.tests.rb
 
 
     * Bringing test suite back into line.
 
 
 -- Tue, 13 Jun 2006 21:42:41 -0000 by ged (r308) -----
-   Changed: lib/arrow/logger.rb
-            tests/logger.tests.rb
+   Changed: /trunk/lib/arrow/logger.rb
+            /trunk/tests/logger.tests.rb
 
 
     * Finally got tests around most of Arrow::Logger, discovered some bugs,
@@ -2052,12 +2127,12 @@
 
 
 -- Mon, 12 Jun 2006 19:06:58 -0000 by ged (r307) -----
-   Changed: lib/arrow/template/urlencode.rb
-            lib/arrow/template/include.rb
-            lib/arrow/htmltokenizer.rb
-            lib/arrow/template/for.rb
-            lib/arrow/template/else.rb
-            Arrow TextMate Project.tmproj (and 11 other/s)
+   Changed: /trunk/lib/arrow/template/urlencode.rb
+            /trunk/lib/arrow/template/include.rb
+            /trunk/lib/arrow/htmltokenizer.rb
+            /trunk/lib/arrow/template/for.rb
+            /trunk/lib/arrow/template/else.rb
+            /trunk/Arrow TextMate Project.tmproj (and 11 other/s)
 
 
     * Cleaned up API documentation output. Removed template directive classes and
@@ -2066,25 +2141,25 @@
 
 
 -- Mon, 12 Jun 2006 19:04:00 -0000 by ged (r306) -----
-   Added:   applets/tutorial/imgtext.rb
+   Added:   /trunk/applets/tutorial/imgtext.rb
             -> renamed from /trunk/applets/imgtext.rb@r297
-            applets/tutorial/superhello.rb
+            /trunk/applets/tutorial/superhello.rb
             -> renamed from /trunk/applets/superhello.rb@r297
-            applets/tutorial/hello2.rb
+            /trunk/applets/tutorial/hello2.rb
             -> renamed from /trunk/applets/hello.rb@r297
-            applets/tutorial/subclassed-hello.rb
+            /trunk/applets/tutorial/subclassed-hello.rb
             -> renamed from /trunk/applets/subclassed-hello.rb@r297
-            applets/tutorial/protected.rb
+            /trunk/applets/tutorial/protected.rb
             -> renamed from /trunk/applets/protected.rb@r297
-            applets/tutorial/dingus.rb
+            /trunk/applets/tutorial/dingus.rb
             -> renamed from /trunk/applets/dingus.rb@r297 (and 9 other/s)
-   Changed: applets/args.rb
-   Deleted: applets/dingus.rb
-            applets/protected.rb
-            applets/subclassed-hello.rb
-            applets/logo.rb
-            applets/noSuchApp.rb
-            applets/memcache.rb (and 10 other/s)
+   Changed: /trunk/applets/args.rb
+   Deleted: /trunk/applets/dingus.rb
+            /trunk/applets/protected.rb
+            /trunk/applets/subclassed-hello.rb
+            /trunk/applets/logo.rb
+            /trunk/applets/noSuchApp.rb
+            /trunk/applets/memcache.rb (and 10 other/s)
 
 
     * Moved all applets which weren't generally useful into the applets/tutorial
@@ -2093,10 +2168,10 @@
 
 
 -- Fri, 09 Jun 2006 23:24:36 -0000 by ged (r305) -----
-   Changed: applets/status.rb
-            lib/arrow/broker.rb
-            lib/arrow/transaction.rb
-            lib/arrow/dispatcher.rb
+   Changed: /trunk/applets/status.rb
+            /trunk/lib/arrow/broker.rb
+            /trunk/lib/arrow/transaction.rb
+            /trunk/lib/arrow/dispatcher.rb
 
 
     * Added a workaround for Apache not setting the path_info of requests handled
@@ -2121,20 +2196,20 @@
 
 
 -- Wed, 07 Jun 2006 18:33:45 -0000 by ged (r304) -----
-   Changed: lib/arrow/transaction.rb
-            tests/transaction.tests.rb
+   Changed: /trunk/lib/arrow/transaction.rb
+            /trunk/tests/transaction.tests.rb
 
 
     * Fixed bug in app_root: returned "/" instead of an empty string for an applet installed at the base URL.
 
 
 -- Wed, 07 Jun 2006 08:01:38 -0000 by ged (r303) -----
-   Added:   applets/nosuchapplet.rb (new)
-            experiments/cookiedemo.rb (new)
-   Changed: utils.rb
-            makedist.rb
-            Arrow TextMate Project.tmproj
-            tests/lib/apacheconstants.rb
+   Added:   /trunk/applets/nosuchapplet.rb (new)
+            /trunk/experiments/cookiedemo.rb (new)
+   Changed: /trunk/utils.rb
+            /trunk/makedist.rb
+            /trunk/Arrow TextMate Project.tmproj
+            /trunk/tests/lib/apacheconstants.rb
 
 
     * Miscellaneous cleanup and documentation improvements.
@@ -2143,32 +2218,32 @@
 
 
 -- Wed, 07 Jun 2006 07:59:35 -0000 by ged (r302) -----
-   Changed: lib/arrow/session/filelock.rb
-            lib/arrow/session/lock.rb
-            lib/arrow/session/store.rb
-            lib/arrow/session.rb
+   Changed: /trunk/lib/arrow/session/filelock.rb
+            /trunk/lib/arrow/session/lock.rb
+            /trunk/lib/arrow/session/store.rb
+            /trunk/lib/arrow/session.rb
 
 
     * Session cleanup and documentation improvements.
 
 
 -- Wed, 07 Jun 2006 06:16:08 -0000 by ged (r301) -----
-   Changed: lib/arrow/logger.rb
+   Changed: /trunk/lib/arrow/logger.rb
 
 
     * Made logger objects more compact in inspected objects.
 
 
 -- Wed, 07 Jun 2006 06:15:23 -0000 by ged (r300) -----
-   Changed: tests/formvalidator.tests.rb
-            lib/arrow/formvalidator.rb
+   Changed: /trunk/tests/formvalidator.tests.rb
+            /trunk/lib/arrow/formvalidator.rb
 
 
     * Fixed/tested FormValidator#error_fields
 
 
 -- Wed, 07 Jun 2006 06:08:39 -0000 by ged (r299) -----
-   Changed: lib/arrow/dispatcher.rb
+   Changed: /trunk/lib/arrow/dispatcher.rb
 
 
     * Modified log configuration parsing to allow debugging classes which don't
@@ -2177,98 +2252,98 @@
 
 
 -- Wed, 07 Jun 2006 06:07:52 -0000 by ged (r298) -----
-   Changed: lib/arrow/config.rb
+   Changed: /trunk/lib/arrow/config.rb
 
 
     * Changed default applet glob pattern to recurse into subdirectories.
 
 
 -- Fri, 02 Jun 2006 05:54:41 -0000 by ged (r297) -----
-   Added:   lib/arrow/session/sha1id.rb (new)
+   Added:   /trunk/lib/arrow/session/sha1id.rb (new)
 
     * Added new SHA1 session id class
 
 
 -- Wed, 31 May 2006 20:56:12 -0000 by ged (r295) -----
-   Added:   lib/arrow/template/prettyprint.rb
+   Added:   /trunk/lib/arrow/template/prettyprint.rb
             -> renamed from /branches/broker-rewrite/lib/arrow/template/prettyprint.rb@r294
-            lib/arrow/templatefactory.rb
+            /trunk/lib/arrow/templatefactory.rb
             -> renamed from /branches/broker-rewrite/lib/arrow/templatefactory.rb@r294
-            tests/appletregistry.tests.rb
+            /trunk/tests/appletregistry.tests.rb
             -> renamed from /branches/broker-rewrite/tests/appletregistry.tests.rb@r294
-            applets/sharenotes.rb
+            /trunk/applets/sharenotes.rb
             -> renamed from /branches/broker-rewrite/applets/sharenotes.rb@r294
-            tests/data/test.cfg
+            /trunk/tests/data/test.cfg
             -> renamed from /branches/broker-rewrite/tests/data/test.cfg@r294
-            experiments/dump_constants.rb
+            /trunk/experiments/dump_constants.rb
             -> renamed from /branches/broker-rewrite/experiments/dump_constants.rb@r294 (and 9 other/s)
-   Changed: applets/view-template.rb
-            lib/arrow/template/container.rb
-            templates/protected.tmpl
-            templates/view-applet-nosuch.tmpl
-            tests/session_id.tests.rb
-            notes.txt (and 177 other/s)
-   Deleted: lib/arrow/factories.rb
+   Changed: /trunk/applets/view-template.rb
+            /trunk/lib/arrow/template/container.rb
+            /trunk/templates/protected.tmpl
+            /trunk/templates/view-applet-nosuch.tmpl
+            /trunk/tests/session_id.tests.rb
+            /trunk/notes.txt (and 177 other/s)
+   Deleted: /trunk/lib/arrow/factories.rb
 
    ** Merged changes from broker-rewrite branch
 
 
 -- Tue, 04 Apr 2006 21:59:34 -0000 by ged (r279) -----
-   Deleted: redist/formvalidator-0.1.3.tar.gz
+   Deleted: /trunk/redist/formvalidator-0.1.3.tar.gz
 
     * Removing old FormValidator lib
 
 
 -- Tue, 04 Apr 2006 21:58:56 -0000 by ged (r278) -----
-   Added:   redist/formvalidator-0.1.4.tar.gz
+   Added:   /trunk/redist/formvalidator-0.1.4.tar.gz
             -> renamed from /trunk/redist/formvalidator-0.1.3.tar.gz@r277
 
     * Updating included FormValidator library
 
 
 -- Fri, 14 Oct 2005 05:36:42 -0000 by ged (r274) -----
-   Changed: install.rb
+   Changed: /trunk/install.rb
 
    - Tag cleared.
 
 
 -- Fri, 14 Oct 2005 01:27:49 -0000 by ged (r273) -----
-   Added:   templates/imgtext/form.tmpl
+   Added:   /trunk/templates/imgtext/form.tmpl
             -> renamed from /trunk/templates/imgtext.tmpl@r272
-            templates/imgtext/reload.tmpl (new)
-            templates/config (new)
-            inactive-applets (new)
-            templates/config/display-table.tmpl (new)
-            applets/logo.rb (new) (and 7 other/s)
-   Changed: lib/arrow/template/for.rb
-            lib/arrow/template/iterator.rb
-            applets/imgtext2.rb
-            applets/wiki.rb
-            docs/manual/config.html
-            docs/makedocs.rb (and 4 other/s)
-   Deleted: templates/imgtext.tmpl
-            templates/imgtext-fontlist.tmpl
+            /trunk/templates/imgtext/reload.tmpl (new)
+            /trunk/templates/config (new)
+            /trunk/inactive-applets (new)
+            /trunk/templates/config/display-table.tmpl (new)
+            /trunk/applets/logo.rb (new) (and 7 other/s)
+   Changed: /trunk/lib/arrow/template/for.rb
+            /trunk/lib/arrow/template/iterator.rb
+            /trunk/applets/imgtext2.rb
+            /trunk/applets/wiki.rb
+            /trunk/docs/manual/config.html
+            /trunk/docs/makedocs.rb (and 4 other/s)
+   Deleted: /trunk/templates/imgtext.tmpl
+            /trunk/templates/imgtext-fontlist.tmpl
 
    - Snapshot commit.
 
 
 -- Fri, 14 Oct 2005 00:29:58 -0000 by ged (r272) -----
-   Changed: lib/arrow/utils.rb
+   Changed: /trunk/lib/arrow/utils.rb
 
    - Changed Arrow::Path#to_yaml to reflect changes in 1.8.3's YAML::Syck::Seq.
 
 
 -- Sun, 18 Sep 2005 07:11:42 -0000 by ged (r271) -----
-   Added:   tests/data/recurse.tmpl (new)
-            lib/arrow/fallbackhandler.rb (new)
-            tests/data/loadtest.tmpl (new)
-            tests/lib/fv.rb (new)
-   Changed: lib/arrow/logger/apacheoutputter.rb
-            lib/arrow/template/container.rb
-            lib/arrow/config-loaders/yaml.rb
-            lib/arrow.rb
-            lib/arrow/config.rb
-            lib/arrow/template/parser.rb (and 14 other/s)
+   Added:   /trunk/tests/data/recurse.tmpl (new)
+            /trunk/lib/arrow/fallbackhandler.rb (new)
+            /trunk/tests/data/loadtest.tmpl (new)
+            /trunk/tests/lib/fv.rb (new)
+   Changed: /trunk/lib/arrow/logger/apacheoutputter.rb
+            /trunk/lib/arrow/template/container.rb
+            /trunk/lib/arrow/config-loaders/yaml.rb
+            /trunk/lib/arrow.rb
+            /trunk/lib/arrow/config.rb
+            /trunk/lib/arrow/template/parser.rb (and 14 other/s)
 
    - Lots of miscellanous work and tweaks committed.
    - Added a fallback handler for misconfigured dispatchers.
@@ -2278,8 +2353,8 @@
 
 
 -- Mon, 07 Mar 2005 05:03:06 -0000 by ged (r270) -----
-   Changed: lib/arrow/template.rb
-            tests/template.tests.rb
+   Changed: /trunk/lib/arrow/template.rb
+            /trunk/tests/template.tests.rb
 
    - Make ::load() parse the template after setting the file and loadPath ivars for
    use by directives.
@@ -2288,73 +2363,73 @@
 
 
 -- Sun, 06 Mar 2005 16:10:35 -0000 by ged (r269) -----
-   Added:   tests/data/simplerender.tmpl (new)
-            tests/data/importrender.tmpl (new)
-            lib/arrow/template/render.rb (new)
-   Changed: tests/template.tests.rb
+   Added:   /trunk/tests/data/simplerender.tmpl (new)
+            /trunk/tests/data/importrender.tmpl (new)
+            /trunk/lib/arrow/template/render.rb (new)
+   Changed: /trunk/tests/template.tests.rb
 
    - Initial checkin of the 'render' directive and tests for it.
 
 
 -- Sun, 06 Mar 2005 16:09:18 -0000 by ged (r268) -----
-   Changed: lib/arrow/template/import.rb
+   Changed: /trunk/lib/arrow/template/import.rb
 
    - Made #parseDirectiveContents a protected method.
 
 
 -- Sun, 06 Mar 2005 16:08:13 -0000 by ged (r267) -----
-   Changed: lib/arrow/template/nodes.rb
+   Changed: /trunk/lib/arrow/template/nodes.rb
 
    - Fixed #inspect output when the 'methodchain' is just whitespace
 
 
 -- Sun, 06 Mar 2005 16:07:27 -0000 by ged (r266) -----
-   Changed: lib/arrow/template/attr.rb
+   Changed: /trunk/lib/arrow/template/attr.rb
 
    - Flattened class declaration.
 
 
 -- Sun, 06 Mar 2005 16:06:55 -0000 by ged (r265) -----
-   Changed: lib/arrow/template.rb
+   Changed: /trunk/lib/arrow/template.rb
 
    - Fully-qualified TemplateError in raise.
    - Updated method docs for #render.
 
 
 -- Sun, 06 Mar 2005 16:05:19 -0000 by ged (r264) -----
-   Changed: lib/arrow/template/TEMPLATE.rb.tpl
+   Changed: /trunk/lib/arrow/template/TEMPLATE.rb.tpl
 
    - Brought into line with the changes in this directory.
 
 
 -- Sat, 05 Mar 2005 08:58:47 -0000 by ged (r263) -----
-   Changed: lib/arrow/template.rb
+   Changed: /trunk/lib/arrow/template.rb
 
    - Flattened class declaration and unindented.
 
 
 -- Sat, 05 Mar 2005 00:07:46 -0000 by ged (r262) -----
-   Changed: tests/template.tests.rb
+   Changed: /trunk/tests/template.tests.rb
 
    - Added test for "unknown PI" bug.
 
 
 -- Sat, 05 Mar 2005 00:05:17 -0000 by ged (r261) -----
-   Changed: lib/arrow/template/parser.rb
+   Changed: /trunk/lib/arrow/template/parser.rb
 
    - Made rescue clauses specify fully-qualified exception classes.
    - Flattened class declaration.
 
 
 -- Sat, 05 Mar 2005 00:00:06 -0000 by ged (r260) -----
-   Changed: tests/formvalidator.tests.rb
+   Changed: /trunk/tests/formvalidator.tests.rb
 
    - Removed extemporaneous description section from test profile.
 
 
 -- Fri, 04 Mar 2005 23:53:55 -0000 by ged (r259) -----
-   Changed: lib/arrow/config.rb
-            tests/config.tests.rb
+   Changed: /trunk/lib/arrow/config.rb
+            /trunk/tests/config.tests.rb
 
    - Fixed the "changed" status so it's actually sensitive to changes from the
    client side as well as to changes in the backing file.
@@ -2366,121 +2441,121 @@
 
 
 -- Fri, 04 Mar 2005 22:50:13 -0000 by ged (r258) -----
-   Changed: lib/arrow/config.rb
+   Changed: /trunk/lib/arrow/config.rb
 
    - Added an #each_section alias for #each.
 
 
 -- Tue, 22 Feb 2005 06:00:47 -0000 by ged (r257) -----
-   Changed: lib/arrow/datasource.rb
+   Changed: /trunk/lib/arrow/datasource.rb
 
    - BUGFIX: Fixed constant reference in arrow/datasource.rb.
 
 
 -- Tue, 22 Feb 2005 05:59:11 -0000 by ged (r256) -----
-   Changed: lib/arrow/datasource.rb
+   Changed: /trunk/lib/arrow/datasource.rb
 
    - BUGFIX: Fixed class method declarations in arrow/datasource.rb.
 
 
 -- Tue, 22 Feb 2005 05:57:44 -0000 by ged (r255) -----
-   Changed: lib/arrow/exceptions.rb
-            lib/arrow/datasource.rb
+   Changed: /trunk/lib/arrow/exceptions.rb
+            /trunk/lib/arrow/datasource.rb
 
    - BUGFIX: Moved exception definitions from arrow/datasource.rb into
    arrow/exceptions.rb.
 
 
 -- Tue, 22 Feb 2005 05:46:16 -0000 by ged (r254) -----
-   Changed: tests/formvalidator.tests.rb
+   Changed: /trunk/tests/formvalidator.tests.rb
 
    - Aesthetic fixes to testing validator profile.
 
 
 -- Tue, 22 Feb 2005 05:45:46 -0000 by ged (r253) -----
-   Changed: templates/memcache/display.tmpl
+   Changed: /trunk/templates/memcache/display.tmpl
 
    - Prettyify server display a bit.
 
 
 -- Tue, 22 Feb 2005 05:44:44 -0000 by ged (r252) -----
-   Changed: templates/args-display.tmpl
+   Changed: /trunk/templates/args-display.tmpl
 
    - Cleaned up form field headers.
    - Show error messages from validator if any.
 
 
 -- Tue, 22 Feb 2005 05:43:30 -0000 by ged (r251) -----
-   Changed: redist
+   Changed: /trunk/redist
 
    - Ignore unpacked formvalidator directory.
 
 
 -- Tue, 22 Feb 2005 05:42:42 -0000 by ged (r250) -----
-   Changed: lib/arrow/datasourcecriteria.rb
-            lib/arrow/data-source/test.rb
-            lib/arrow/monitor.rb
-            lib/arrow/monitor/subjects.rb
-            lib/arrow/datasource.rb
+   Changed: /trunk/lib/arrow/datasourcecriteria.rb
+            /trunk/lib/arrow/data-source/test.rb
+            /trunk/lib/arrow/monitor.rb
+            /trunk/lib/arrow/monitor/subjects.rb
+            /trunk/lib/arrow/datasource.rb
 
    - Deindented and merged namespaces.
    - Changed CVS constants to SVN ones.
 
 
 -- Tue, 22 Feb 2005 05:40:47 -0000 by ged (r249) -----
-   Changed: applets/rndimages.rb
+   Changed: /trunk/applets/rndimages.rb
 
    - Converted image struct to anonymous struct.
 
 
 -- Tue, 22 Feb 2005 05:30:25 -0000 by ged (r248) -----
-   Changed: lib/arrow/applet.rb
+   Changed: /trunk/lib/arrow/applet.rb
 
    - Better comments in applet.rb for validator code.
 
 
 -- Tue, 22 Feb 2005 05:25:18 -0000 by ged (r247) -----
-   Changed: applets/args.rb
+   Changed: /trunk/applets/args.rb
 
    - Added field descriptions to the validator profile.
 
 
 -- Tue, 22 Feb 2005 05:23:26 -0000 by ged (r246) -----
-   Changed: lib/arrow/formvalidator.rb
+   Changed: /trunk/lib/arrow/formvalidator.rb
 
    - Added some Usage docs to the header.
 
 
 -- Thu, 02 Dec 2004 04:46:30 -0000 by ged (r245) -----
-   Changed: docs/manual/whatis.html
+   Changed: /trunk/docs/manual/whatis.html
 
    - Updated the "current status" section of the tutorial.
 
 
 -- Thu, 02 Dec 2004 04:42:57 -0000 by ged (r244) -----
-   Changed: docs/manual/whatis.html
+   Changed: /trunk/docs/manual/whatis.html
 
    - Changed wording in "Why another web framework?" section of the tutorial to
    satisfy an objection to the wording of the first point.
 
 
 -- Wed, 01 Dec 2004 19:03:06 -0000 by ged (r243) -----
-   Deleted: tests/.cvsignore
-            lib/.cvsignore
-            docs/.cvsignore
-            templates/.cvsignore
+   Deleted: /trunk/tests/.cvsignore
+            /trunk/lib/.cvsignore
+            /trunk/docs/.cvsignore
+            /trunk/templates/.cvsignore
 
    Removed some unnecessary CVS cruft.
 
 
 -- Wed, 01 Dec 2004 19:00:42 -0000 by ged (r242) -----
-   Changed: tests/config.tests.rb
+   Changed: /trunk/tests/config.tests.rb
 
    - Updated/fleshed out Arrow config tests a bit.
 
 
 -- Wed, 01 Dec 2004 18:56:23 -0000 by ged (r241) -----
-   Changed: lib/arrow/config.rb
+   Changed: /trunk/lib/arrow/config.rb
 
    - Switched to composite class declaration, updated indentation.
 
@@ -2492,110 +2567,110 @@
 
 
 -- Tue, 26 Oct 2004 17:45:57 -0000 by ged (r239) -----
-   Added:   applets/inspect.rb (new)
-            templates/inspect (new)
-            templates/inspect/display.tmpl (new)
+   Added:   /trunk/applets/inspect.rb (new)
+            /trunk/templates/inspect (new)
+            /trunk/templates/inspect/display.tmpl (new)
 
    Initial checkin of request inspector applet.
 
 
 -- Tue, 26 Oct 2004 17:45:10 -0000 by ged (r238) -----
-   Added:   templates/wiki/new.tmpl (new)
-            templates/wiki/formerror.tmpl (new)
-            templates/wiki/markup_help.incl (new)
-            templates/wiki/show.tmpl (new)
-   Changed: applets/wiki.rb
+   Added:   /trunk/templates/wiki/new.tmpl (new)
+            /trunk/templates/wiki/formerror.tmpl (new)
+            /trunk/templates/wiki/markup_help.incl (new)
+            /trunk/templates/wiki/show.tmpl (new)
+   Changed: /trunk/applets/wiki.rb
 
    Checkpoint commit of Instiki applet.
 
 
 -- Tue, 26 Oct 2004 17:44:23 -0000 by ged (r237) -----
-   Added:   tests/formvalidator.tests.rb (new)
+   Added:   /trunk/tests/formvalidator.tests.rb (new)
 
    Initial checkin.
 
 
 -- Tue, 26 Oct 2004 17:43:27 -0000 by ged (r236) -----
-   Changed: lib/arrow/transaction.rb
+   Changed: /trunk/lib/arrow/transaction.rb
 
    -- Added new convenience methods: #referringApplet, #referringAction, #remoteIp,
    and #referer.
 
 
 -- Tue, 26 Oct 2004 17:40:51 -0000 by ged (r235) -----
-   Changed: lib/arrow/template/parser.rb
+   Changed: /trunk/lib/arrow/template/parser.rb
 
    -- Fix the handling of unknown PIs.
 
 
 -- Tue, 26 Oct 2004 17:40:17 -0000 by ged (r234) -----
-   Changed: lib/arrow/logger/apacheoutputter.rb
+   Changed: /trunk/lib/arrow/logger/apacheoutputter.rb
 
    -- Fix the #warn/#warning bug.
 
 
 -- Tue, 26 Oct 2004 17:09:07 -0000 by ged (r233) -----
-   Added:   lib/arrow/formvalidator.rb (new)
+   Added:   /trunk/lib/arrow/formvalidator.rb (new)
 
    Initial checkin.
 
 
 -- Tue, 26 Oct 2004 17:08:38 -0000 by ged (r232) -----
-   Changed: lib/arrow/applet.rb
+   Changed: /trunk/lib/arrow/applet.rb
 
    -- Broke out formvalidator changes into a separate class.
    -- Added convenience method #subrun.
 
 
 -- Sun, 24 Oct 2004 16:18:04 -0000 by ged (r231) -----
-   Changed: TEMPLATE.rb.tpl
+   Changed: /trunk/TEMPLATE.rb.tpl
 
    -- Switched CVS constants to SVN ones.
 
 
 -- Fri, 22 Oct 2004 15:12:19 -0000 by ged (r230) -----
-   Changed: lib/arrow/transaction.rb
+   Changed: /trunk/lib/arrow/transaction.rb
 
    -- COMPAT: Deprecated #action in favor of #applet, as the path returned has
    nothing to do with the applet's action. #action is aliaed to #action for now.
 
 
 -- Fri, 22 Oct 2004 02:13:42 -0000 by ged (r229) -----
-   Added:   htdocs/rubyforge/index.html (new)
-            htdocs (new)
-            htdocs/rubyforge (new)
+   Added:   /trunk/htdocs/rubyforge/index.html (new)
+            /trunk/htdocs (new)
+            /trunk/htdocs/rubyforge (new)
 
    Initial checkin of RubyForge HTML.
 
 
 -- Fri, 22 Oct 2004 02:11:33 -0000 by ged (r228) -----
-   Added:   templates/memcache (new)
-            templates/memcache/display.tmpl (new)
-            templates/enumtable.tmpl (new)
-            applets/memcache.rb (new)
+   Added:   /trunk/templates/memcache (new)
+            /trunk/templates/memcache/display.tmpl (new)
+            /trunk/templates/enumtable.tmpl (new)
+            /trunk/applets/memcache.rb (new)
 
    Initial checkin of memcache applet w/templates.
 
 
 -- Tue, 21 Sep 2004 13:22:26 -0000 by ged (r227) -----
-   Changed: templates/status.tmpl
+   Changed: /trunk/templates/status.tmpl
 
    - Removed unnecessary link to applet source view, as there's an applet that
    does that now.
 
 
 -- Tue, 21 Sep 2004 07:03:02 -0000 by ged (r226) -----
-   Changed: lib/arrow/utils.rb
+   Changed: /trunk/lib/arrow/utils.rb
 
    - Added diagnostics to dropped path members.
 
 
 -- Tue, 21 Sep 2004 07:02:23 -0000 by ged (r225) -----
-   Changed: applets/status.rb
-            lib/arrow.rb
-            lib/arrow/transaction.rb
-            templates/navbar.incl
-            templates/status.tmpl
+   Changed: /trunk/applets/status.rb
+            /trunk/lib/arrow.rb
+            /trunk/lib/arrow/transaction.rb
+            /trunk/templates/navbar.incl
+            /trunk/templates/status.tmpl
 
    - Added Arrow version to transaction class/demo applet navbar. Thanks to Mark
    Smith <xb95@queech.com> for the suggestion.
@@ -2609,52 +2684,52 @@
 
 
 -- Tue, 21 Sep 2004 06:19:34 -0000 by ged (r223) -----
-   Changed: templates/rndimages.tmpl
-            applets/rndimages.rb
+   Changed: /trunk/templates/rndimages.tmpl
+            /trunk/applets/rndimages.rb
 
    - Made rndimages pick only a limited number from the feed to display at a time.
    - Added the link as a caption to each image.
 
 
 -- Mon, 20 Sep 2004 10:42:37 -0000 by stillflame (r222) -----
-   Changed: docs/manual/tutorial-templates.html
+   Changed: /trunk/docs/manual/tutorial-templates.html
 
    - tutorial-templates.html got some corrections for accuracy
 
 
 -- Wed, 08 Sep 2004 18:20:23 -0000 by ged (r221) -----
-   Changed: docs/CATALOG
+   Changed: /trunk/docs/CATALOG
 
    - Fixed upload URL and Webcvs URL.
 
 
 -- Wed, 08 Sep 2004 14:33:39 -0000 by ged (r218) -----
-   Changed: ChangeLog
+   Changed: /trunk/ChangeLog
 
    Updated for release
 
 
 -- Wed, 08 Sep 2004 14:30:18 -0000 by ged (r217) -----
-   Added:   applets/wiki.rb (new)
-            templates/wiki (new)
-            templates/wiki/new_system.tmpl (new)
-            templates/wiki/sectionlist.tmpl (new)
-   Changed: templates/test/list.tmpl
-            templates/test/problem.tmpl
-            applets/test.rb
-            templates/test/harness.tmpl
+   Added:   /trunk/applets/wiki.rb (new)
+            /trunk/templates/wiki (new)
+            /trunk/templates/wiki/new_system.tmpl (new)
+            /trunk/templates/wiki/sectionlist.tmpl (new)
+   Changed: /trunk/templates/test/list.tmpl
+            /trunk/templates/test/problem.tmpl
+            /trunk/applets/test.rb
+            /trunk/templates/test/harness.tmpl
 
    - Checkpointing for beta release tag.
 
 
 -- Wed, 08 Sep 2004 14:29:34 -0000 by ged (r216) -----
-   Changed: lib/arrow/broker.rb
+   Changed: /trunk/lib/arrow/broker.rb
 
    - Introduced some diagnostics into #findAppletFiles.
 
 
 -- Wed, 08 Sep 2004 14:28:56 -0000 by ged (r215) -----
-   Changed: install.rb
+   Changed: /trunk/install.rb
 
    - Upgraded PluginFactory URL.
    - Install applets and templates as writable by owner by default, as the whole
@@ -2663,7 +2738,7 @@
 
 
 -- Wed, 08 Sep 2004 14:27:30 -0000 by ged (r214) -----
-   Changed: demo.cfg
+   Changed: /trunk/demo.cfg
 
    - Turned debugging on by default for the demo installation. Hopefully this will
    eliminate one of the steps when trying to help people debug problems on their
@@ -2671,13 +2746,13 @@
 
 
 -- Wed, 08 Sep 2004 14:26:13 -0000 by ged (r213) -----
-   Changed: MANIFEST
+   Changed: /trunk/MANIFEST
 
    - Added missing templates/navbar.incl
 
 
 -- Wed, 08 Sep 2004 14:08:40 -0000 by ged (r212) -----
-   Changed: README
+   Changed: /trunk/README
 
    - On second thought, removed the stuff from the manual. A README should be
    only the necessities. Oh the bear necessities, that's why a bear can rest at
@@ -2685,7 +2760,7 @@
 
 
 -- Wed, 08 Sep 2004 08:00:14 -0000 by ged (r211) -----
-   Changed: lib/arrow/utils.rb
+   Changed: /trunk/lib/arrow/utils.rb
 
    - Fixed the tainting bug which happened when an Arrow::Path was loaded out of a
    YAML file with the "!rubycrafters.com,2003-10-22/arrowPath" object specifier
@@ -2693,13 +2768,13 @@
 
 
 -- Wed, 08 Sep 2004 06:23:11 -0000 by ged (r210) -----
-   Changed: docs/manual/install.html
+   Changed: /trunk/docs/manual/install.html
 
    - Updated the requirements section.
 
 
 -- Wed, 08 Sep 2004 06:22:05 -0000 by ged (r209) -----
-   Changed: README
+   Changed: /trunk/README
 
    - Fixed indentation so it renders correctly.
    - Added a rudimentary install section. This should be fleshed out before the 1.0
@@ -2707,304 +2782,304 @@
 
 
 -- Wed, 08 Sep 2004 06:20:29 -0000 by ged (r208) -----
-   Changed: test.rb
-            utils.rb
-            makedist.rb
-            install.rb
+   Changed: /trunk/test.rb
+            /trunk/utils.rb
+            /trunk/makedist.rb
+            /trunk/install.rb
 
    - Upgraded dist utilities/merged from project-utils.
 
 
 -- Wed, 08 Sep 2004 06:19:09 -0000 by ged (r207) -----
-   Added:   redist/PluginFactory-1.0.0.tar.gz
+   Added:   /trunk/redist/PluginFactory-1.0.0.tar.gz
             -> renamed from /trunk/redist/PluginFactory-0.01.tar.gz@r192
-   Deleted: redist/PluginFactory-0.01.tar.gz
+   Deleted: /trunk/redist/PluginFactory-0.01.tar.gz
 
    - Upgraded distributed version of PluginFactory.
 
 
 -- Tue, 07 Sep 2004 03:43:30 -0000 by stillflame (r206) -----
-   Changed: docs/manual/tutorial-validation.html
-            docs/manual/tutorial-templates.html
+   Changed: /trunk/docs/manual/tutorial-validation.html
+            /trunk/docs/manual/tutorial-templates.html
 
    - fixed incorrect definitions of escape and urlencode in tutorial-templates
    - filled in example greatly, but sad it is big and complex in tutorial-validation
 
 
 -- Tue, 07 Sep 2004 03:35:18 -0000 by ged (r205) -----
-   Changed: lib/arrow/dispatcher.rb
+   Changed: /trunk/lib/arrow/dispatcher.rb
 
    - Made it possible to both preload via ChildInitHandler and have a location
    which just loads from the content handler. Works for multiple locations, too.
 
 
 -- Tue, 07 Sep 2004 03:33:54 -0000 by ged (r204) -----
-   Changed: lib/arrow/utils.rb
+   Changed: /trunk/lib/arrow/utils.rb
 
    - Whitespace fix.
 
 
 -- Tue, 07 Sep 2004 03:33:17 -0000 by ged (r203) -----
-   Added:   templates/tutorial (new)
-            templates/tutorial/index.tmpl (new)
-            applets/tutorial/index.rb (new)
-            applets/tutorial/missing.rb (new)
-            templates/tutorial/missingapplet.tmpl (new)
+   Added:   /trunk/templates/tutorial (new)
+            /trunk/templates/tutorial/index.tmpl (new)
+            /trunk/applets/tutorial/index.rb (new)
+            /trunk/applets/tutorial/missing.rb (new)
+            /trunk/templates/tutorial/missingapplet.tmpl (new)
 
    - Added some more tutorial applets and templates.
 
 
 -- Tue, 07 Sep 2004 02:19:06 -0000 by stillflame (r202) -----
-   Changed: docs/manual/tutorial-sessions.html
+   Changed: /trunk/docs/manual/tutorial-sessions.html
 
    - filled in missing text and example, still not very thorough
 
 
 -- Tue, 07 Sep 2004 02:08:59 -0000 by ged (r201) -----
-   Changed: install.rb
+   Changed: /trunk/install.rb
 
    - Merged changes from project-utils.
 
 
 -- Tue, 07 Sep 2004 02:06:07 -0000 by stillflame (r200) -----
-   Changed: docs/manual/tutorial-templates.html
+   Changed: /trunk/docs/manual/tutorial-templates.html
 
    - minor grammar and syntax changes
 
 
 -- Tue, 07 Sep 2004 00:36:51 -0000 by stillflame (r199) -----
-   Changed: docs/manual/tutorial-intro.html
-            docs/manual/tutorial-apps.html
+   Changed: /trunk/docs/manual/tutorial-intro.html
+            /trunk/docs/manual/tutorial-apps.html
 
    - minor grammatical changes to tutorial-intro.html
    - played with placement and wording in tutorial-apps.html
 
 
 -- Mon, 06 Sep 2004 22:57:39 -0000 by ged (r198) -----
-   Changed: docs/CATALOG
+   Changed: /trunk/docs/CATALOG
 
    - Fixed 'webcvs' attribute of the docs CATALOG file.
 
 
 -- Mon, 06 Sep 2004 22:56:35 -0000 by ged (r197) -----
-   Added:   templates/rndimages.tmpl (new)
-            applets/rndimages.rb (new)
+   Added:   /trunk/templates/rndimages.tmpl (new)
+            /trunk/applets/rndimages.rb (new)
 
    Initial commit of LJ random-image feed browser.
 
 
 -- Mon, 06 Sep 2004 22:55:57 -0000 by ged (r196) -----
-   Added:   redist/Test-Unit-Mock-0.03.tar.gz (new)
+   Added:   /trunk/redist/Test-Unit-Mock-0.03.tar.gz (new)
 
    - Added Test::Unit::Mock distribution to redist/
 
 
 -- Mon, 06 Sep 2004 22:54:49 -0000 by ged (r195) -----
-   Changed: lib/arrow/template/iterator.rb
-            lib/arrow/template/attr.rb
-            lib/arrow/template/call.rb
+   Changed: /trunk/lib/arrow/template/iterator.rb
+            /trunk/lib/arrow/template/attr.rb
+            /trunk/lib/arrow/template/call.rb
 
    - Documentation updates/fixes for some of the template node types and
    Arrow::Template::Iterator.
 
 
 -- Mon, 06 Sep 2004 22:53:59 -0000 by ged (r194) -----
-   Changed: docs/manual/install.html
-            docs/manual/download.html
-            docs/manual/TEMPLATE.html.tpl
-            docs/manual/tutorial-templates.html
-            docs/manual/whatis.html
-            docs/manual/manual.css (and 2 other/s)
+   Changed: /trunk/docs/manual/install.html
+            /trunk/docs/manual/download.html
+            /trunk/docs/manual/TEMPLATE.html.tpl
+            /trunk/docs/manual/tutorial-templates.html
+            /trunk/docs/manual/whatis.html
+            /trunk/docs/manual/manual.css (and 2 other/s)
 
    - More work on apps and templates sections of the tutorial
    - Brought install and download pages up to date
 
 
 -- Mon, 06 Sep 2004 22:11:36 -0000 by ged (r193) -----
-   Changed: MANIFEST
+   Changed: /trunk/MANIFEST
 
    - Cleaned up and finalized for release.
 
 
 -- Thu, 02 Sep 2004 06:33:01 -0000 by stillflame (r192) -----
-   Changed: docs/manual/config.html
-            docs/manual/install.html
-            docs/manual/whatis.html
-            docs/manual/tutorial.html
+   Changed: /trunk/docs/manual/config.html
+            /trunk/docs/manual/install.html
+            /trunk/docs/manual/whatis.html
+            /trunk/docs/manual/tutorial.html
 
    - corrected, expounded, and touched up documentation
 
 
 -- Thu, 02 Sep 2004 05:04:09 -0000 by stillflame (r191) -----
-   Changed: docs/manual/tutorial-validation.html
-            docs/manual/tutorial-intro.html
-            docs/manual/tutorial-templates.html
-            docs/manual/whatis.html
-            docs/manual/tutorial.html
-            docs/manual/tutorial-apps.html (and 9 other/s)
-   Deleted: docs/manual/linkbox.incl
-            docs/manual/tutorial-linkbox.incl
+   Changed: /trunk/docs/manual/tutorial-validation.html
+            /trunk/docs/manual/tutorial-intro.html
+            /trunk/docs/manual/tutorial-templates.html
+            /trunk/docs/manual/whatis.html
+            /trunk/docs/manual/tutorial.html
+            /trunk/docs/manual/tutorial-apps.html (and 9 other/s)
+   Deleted: /trunk/docs/manual/linkbox.incl
+            /trunk/docs/manual/tutorial-linkbox.incl
 
    - removed server side includes and made linkboxes inline
    - hid the monitor and source tutorials, as they are not done
 
 
 -- Wed, 01 Sep 2004 02:37:10 -0000 by ged (r190) -----
-   Added:   applets/tutorial/hello.rb (new)
-            applets/tutorial (new)
+   Added:   /trunk/applets/tutorial/hello.rb (new)
+            /trunk/applets/tutorial (new)
 
    Initial checkin of tutorial applet code.
 
 
 -- Wed, 01 Sep 2004 02:36:40 -0000 by ged (r189) -----
-   Changed: demo.cfg
+   Changed: /trunk/demo.cfg
 
    - Brought up to date for impending release.
 
 
 -- Wed, 01 Sep 2004 02:36:11 -0000 by ged (r188) -----
-   Deleted: rBuild.rb
+   Deleted: /trunk/rBuild.rb
 
    - No sense in having an rBuild.rb without the corresponding module tool.
 
 
 -- Wed, 01 Sep 2004 02:35:07 -0000 by ged (r187) -----
-   Added:   docs/manual/hello-dave-sshot.png (new)
-   Changed: docs/manual/hello-world-sshot.png
-            docs/manual/tutorial-apps.html
+   Added:   /trunk/docs/manual/hello-dave-sshot.png (new)
+   Changed: /trunk/docs/manual/hello-world-sshot.png
+            /trunk/docs/manual/tutorial-apps.html
 
    Initial checkin and revision of tutorial screenshots.
 
 
 -- Wed, 01 Sep 2004 02:34:14 -0000 by ged (r186) -----
-   Changed: README
+   Changed: /trunk/README
 
    - Brought up to date for impending release.
 
 
 -- Wed, 01 Sep 2004 02:33:43 -0000 by ged (r185) -----
-   Changed: MANIFEST
+   Changed: /trunk/MANIFEST
 
    - Brought up to date for impending release.
 
 
 -- Tue, 24 Aug 2004 02:40:00 -0000 by ged (r184) -----
-   Deleted: .cvsignore
-            applets/.cvsignore
+   Deleted: /trunk/.cvsignore
+            /trunk/applets/.cvsignore
 
    - Removed old CVS cruft.
 
 
 -- Mon, 23 Aug 2004 06:10:32 -0000 by ged (r183) -----
-   Added:   lib/arrowwiki.rb (new)
-   Changed: experiments/dumptokens.rb
-            lib/arrow/template/container.rb
-            lib/arrow/config-loaders/yaml.rb
-            templates/protected.tmpl
-            templates/view-applet-nosuch.tmpl
-            lib/arrow/template/for.rb (and 119 other/s)
+   Added:   /trunk/lib/arrowwiki.rb (new)
+   Changed: /trunk/experiments/dumptokens.rb
+            /trunk/lib/arrow/template/container.rb
+            /trunk/lib/arrow/config-loaders/yaml.rb
+            /trunk/templates/protected.tmpl
+            /trunk/templates/view-applet-nosuch.tmpl
+            /trunk/lib/arrow/template/for.rb (and 119 other/s)
 
    - Set keyword/executable properties.
 
 
 -- Mon, 23 Aug 2004 06:02:59 -0000 by ged (r182) -----
-   Changed: applets/imgtext2.rb
+   Changed: /trunk/applets/imgtext2.rb
 
    - Made debugging not quite so verbose.
 
 
 -- Mon, 23 Aug 2004 06:02:30 -0000 by ged (r181) -----
-   Added:   applets/redirector.rb (new)
-   Changed: lib/arrow/transaction.rb
+   Added:   /trunk/applets/redirector.rb (new)
+   Changed: /trunk/lib/arrow/transaction.rb
 
    - Added redirect support to Arrow::Transaction.
    - Initial checkin of applets/redirector.rb
 
 
 -- Mon, 23 Aug 2004 03:31:26 -0000 by ged (r180) -----
-   Changed: tests/session_lock.tests.rb
+   Changed: /trunk/tests/session_lock.tests.rb
 
    - Added tests for Arrow::Session::PosixLock if the 'posixlock' library is
    installed.
 
 
 -- Mon, 23 Aug 2004 03:30:40 -0000 by ged (r179) -----
-   Changed: tests/broker.tests.rb
+   Changed: /trunk/tests/broker.tests.rb
 
    - Modified tests of to reflect changes in the way applet chains are built:
    Applets can be registered under "/".
 
 
 -- Mon, 23 Aug 2004 03:29:04 -0000 by ged (r178) -----
-   Added:   tests/applets (new)
-            tests/applets/setup.rb (new)
+   Added:   /trunk/tests/applets (new)
+            /trunk/tests/applets/setup.rb (new)
 
    Initial checkin of test applets directory and 'setup' test applet.
 
 
 -- Mon, 23 Aug 2004 03:28:22 -0000 by ged (r177) -----
-   Changed: templates/status.tmpl
+   Changed: /trunk/templates/status.tmpl
 
    - Chopped the namespace-module part off the application class, as it took up too
    much room without really adding any valuable information.
 
 
 -- Mon, 23 Aug 2004 03:27:18 -0000 by ged (r176) -----
-   Added:   lib/arrow/session/posixlock.rb (new)
+   Added:   /trunk/lib/arrow/session/posixlock.rb (new)
 
    Initial checkin of Arrow::Session::PosixLock.
 
 
 -- Mon, 23 Aug 2004 03:26:54 -0000 by ged (r175) -----
-   Changed: lib/arrow/session/filelock.rb
+   Changed: /trunk/lib/arrow/session/filelock.rb
 
    - Added support for the new method Arrow::Session::Lock#finish method.
    - Changed lockfile open mask for portability.
 
 
 -- Mon, 23 Aug 2004 03:26:06 -0000 by ged (r174) -----
-   Changed: lib/arrow/session/lock.rb
+   Changed: /trunk/lib/arrow/session/lock.rb
 
    - Added a new method Arrow::Session::Lock#finish to allow cleanup once session
    manipulation is done.
 
 
 -- Mon, 23 Aug 2004 03:24:42 -0000 by ged (r173) -----
-   Changed: lib/arrow/applet.rb
+   Changed: /trunk/lib/arrow/applet.rb
 
    - Make the default revision-extractor for Subversion constants replace the 'Rev:
    ' bit with 'r'.
 
 
 -- Mon, 23 Aug 2004 03:23:44 -0000 by ged (r172) -----
-   Changed: applets/imgtext2.rb
+   Changed: /trunk/applets/imgtext2.rb
 
    - Use true alpha-channel output only if supported by the GD library that's
    installed. Otherwise just try to get by with compositing.
 
 
 -- Sat, 21 Aug 2004 06:08:58 -0000 by ged (r171) -----
-   Changed: templates/imgtext-fontlist.tmpl
+   Changed: /trunk/templates/imgtext-fontlist.tmpl
 
    - Added links to examples
 
 
 -- Sat, 21 Aug 2004 06:08:13 -0000 by ged (r170) -----
-   Changed: applets/imgtext2.rb
+   Changed: /trunk/applets/imgtext2.rb
 
    - Fixed alpha channel, added min/max checks.
 
 
 -- Sat, 21 Aug 2004 05:39:00 -0000 by ged (r169) -----
-   Changed: applets/status.rb
-            applets/error.rb
-            applets/counter.rb
+   Changed: /trunk/applets/status.rb
+            /trunk/applets/error.rb
+            /trunk/applets/counter.rb
 
    - Removed explicit version from signature.
 
 
 -- Sat, 21 Aug 2004 05:35:13 -0000 by ged (r168) -----
-   Added:   applets/error.rb
+   Added:   /trunk/applets/error.rb
             -> renamed from /trunk/applets/errorHandler.rb@r165
 
    - Combined error.rb (error handler demo) and errorHandler.rb (the default error
@@ -3012,77 +3087,77 @@
 
 
 -- Sat, 21 Aug 2004 05:34:48 -0000 by ged (r167) -----
-   Deleted: applets/errorHandler.rb
+   Deleted: /trunk/applets/errorHandler.rb
 
    - Combined error.rb (error handler demo) and errorHandler.rb (the default error
    handler applet).
 
 
 -- Sat, 21 Aug 2004 05:33:29 -0000 by ged (r166) -----
-   Deleted: applets/error.rb
+   Deleted: /trunk/applets/error.rb
 
    - Combined error.rb (error handler demo) and errorHandler.rb (the default error
    handler applet).
 
 
 -- Thu, 19 Aug 2004 02:28:57 -0000 by ged (r165) -----
-   Changed: applets/imgtext2.rb
-            templates/imgtext-fontlist.tmpl
+   Changed: /trunk/applets/imgtext2.rb
+            /trunk/templates/imgtext-fontlist.tmpl
 
    - Revised to be more useful from the URL line.
 
 
 -- Thu, 19 Aug 2004 00:16:39 -0000 by ged (r164) -----
-   Changed: lib/arrow/dispatcher.rb
+   Changed: /trunk/lib/arrow/dispatcher.rb
 
    - Clarified and fixed some problems in the Synopsis docs.
 
 
 -- Thu, 19 Aug 2004 00:01:59 -0000 by ged (r163) -----
-   Added:   templates/test/problem.tmpl (new)
+   Added:   /trunk/templates/test/problem.tmpl (new)
 
    Initial checkin of templates/test/problem.tmpl.
 
 
 -- Thu, 19 Aug 2004 00:00:41 -0000 by ged (r162) -----
-   Added:   experiments/stagelogger.rb (new)
+   Added:   /trunk/experiments/stagelogger.rb (new)
 
    Initial checkin of experiments/stagelogger.rb.
 
 
 -- Thu, 19 Aug 2004 00:00:10 -0000 by ged (r161) -----
-   Changed: docs/manual/tutorial-apps.html
+   Changed: /trunk/docs/manual/tutorial-apps.html
 
    - Small addition to the applet tutorial of the manual.
 
 
 -- Wed, 18 Aug 2004 23:59:03 -0000 by ged (r160) -----
-   Changed: lib/arrow/transaction.rb
+   Changed: /trunk/lib/arrow/transaction.rb
 
    - :nodoc:'ed the deprecated #templates accessor.
 
 
 -- Wed, 18 Aug 2004 23:58:13 -0000 by ged (r159) -----
-   Changed: lib/arrow/logger.rb
+   Changed: /trunk/lib/arrow/logger.rb
 
    - Setting a logger to a non-existant logging level now raises an error.
 
 
 -- Wed, 18 Aug 2004 23:57:16 -0000 by ged (r158) -----
-   Changed: lib/arrow/dispatcher.rb
+   Changed: /trunk/lib/arrow/dispatcher.rb
 
    - Added support for startup in RubyChildInitHandler. Require mod_ruby 1.2.1 or
    later.
 
 
 -- Wed, 18 Aug 2004 23:54:31 -0000 by ged (r157) -----
-   Changed: lib/arrow/broker.rb
+   Changed: /trunk/lib/arrow/broker.rb
 
    - Added support for applets registered under '/'.
 
 
 -- Wed, 18 Aug 2004 23:21:59 -0000 by ged (r156) -----
-   Changed: lib/arrow/applet.rb
+   Changed: /trunk/lib/arrow/applet.rb
 
    - Brought Applet#delegate up to date re: the Broker's calling convention.
 
@@ -3096,57 +3171,57 @@
 
 
 -- Wed, 04 Aug 2004 05:01:35 -0000 by deveiant (r151) -----
-   Added:   /Arrowdocs/manual/hello-world-sshot.png (new)
+   Added:   /Arrow/trunk/docs/manual/hello-world-sshot.png (new)
 
    Initial checkin
 
 
 -- Wed, 04 Aug 2004 00:57:50 -0000 by deveiant (r150) -----
-   Changed: /Arrowdocs
+   Changed: /Arrow/trunk/docs
 
    - Added ignore prop for the html dir
 
 
 -- Wed, 04 Aug 2004 00:53:50 -0000 by deveiant (r149) -----
-   Changed: /Arrowapplets/args.rb
+   Changed: /Arrow/trunk/applets/args.rb
 
    - Added auto-untainting to the validator profile
 
 
 -- Wed, 04 Aug 2004 00:52:09 -0000 by deveiant (r148) -----
-   Changed: /Arrowtemplates/view-applet.tmpl
+   Changed: /Arrow/trunk/templates/view-applet.tmpl
 
    - Added more useful output.
 
 
 -- Wed, 04 Aug 2004 00:50:29 -0000 by deveiant (r147) -----
-   Changed: /Arrowtemplates/TEMPLATE.tmpl.tpl
+   Changed: /Arrow/trunk/templates/TEMPLATE.tmpl.tpl
 
    - Changed XML mode to NXML mode
 
 
 -- Tue, 03 Aug 2004 18:09:19 -0000 by deveiant (r146) -----
-   Changed: /Arrowapplets/imgtext.rb
+   Changed: /Arrow/trunk/applets/imgtext.rb
 
    - CVS->SVN constants.
 
 
 -- Tue, 03 Aug 2004 18:08:28 -0000 by deveiant (r145) -----
-   Changed: /Arrowlib/arrow/template/escape.rb
+   Changed: /Arrow/trunk/lib/arrow/template/escape.rb
 
    - Fixed comment header.
 
 
 -- Tue, 03 Aug 2004 18:07:16 -0000 by deveiant (r144) -----
-   Changed: /Arrowlib/arrow/applet.rb
-            /Arrowtests/applet.tests.rb
+   Changed: /Arrow/trunk/lib/arrow/applet.rb
+            /Arrow/trunk/tests/applet.tests.rb
 
    - Fixed a bug when defining actions via a Symbol. Thanks to Aidan Rogers
    <aidan@FaerieMUD.org> for the bug report.
 
 
 -- Thu, 29 Jul 2004 06:28:38 -0000 by deveiant (r142) -----
-   Changed: /Arrowtests/template.tests.rb
+   Changed: /Arrow/trunk/tests/template.tests.rb
 
    - Commented out the damned failing scope-bleed test until I can track down the
    problem. In the meantime, it'd only cause trouble under some fairly weird
@@ -3154,59 +3229,59 @@
 
 
 -- Thu, 29 Jul 2004 06:27:05 -0000 by deveiant (r141) -----
-   Changed: /Arrowtemplates/navbar.incl
+   Changed: /Arrow/trunk/templates/navbar.incl
 
    - Added applet-source link.
 
 
 -- Thu, 29 Jul 2004 06:24:20 -0000 by deveiant (r140) -----
-   Changed: /Arrowlib/arrow/applet.rb
+   Changed: /Arrow/trunk/lib/arrow/applet.rb
 
    - Added filename attribute to applet class.
 
 
 -- Thu, 29 Jul 2004 06:20:41 -0000 by deveiant (r139) -----
-   Added:   /Arrowtemplates/view-applet-nosuch.tmpl (new)
-            /Arrowtemplates/view-applet.tmpl (new)
-            /Arrowapplets/view-applet.rb (new)
+   Added:   /Arrow/trunk/templates/view-applet-nosuch.tmpl (new)
+            /Arrow/trunk/templates/view-applet.tmpl (new)
+            /Arrow/trunk/applets/view-applet.rb (new)
 
    Initial checkin.
 
 
 -- Wed, 28 Jul 2004 21:08:05 -0000 by stillflame (r138) -----
-   Changed: /Arrowdocs/manual/tutorial-templates.html
+   Changed: /Arrow/trunk/docs/manual/tutorial-templates.html
 
    added example for templated applets
 
 
 -- Wed, 28 Jul 2004 17:14:33 -0000 by stillflame (r137) -----
-   Changed: /Arrowdocs/manual/tutorial-templates.html
+   Changed: /Arrow/trunk/docs/manual/tutorial-templates.html
 
    corrected and clarified directive descriptions
 
 
 -- Tue, 27 Jul 2004 01:03:37 -0000 by deveiant (r136) -----
-   Changed: /Arrowapplets/TEMPLATE.rb.tpl
+   Changed: /Arrow/trunk/applets/TEMPLATE.rb.tpl
 
    - Changed CVS tags to Subversion tags.
 
 
 -- Mon, 26 Jul 2004 23:50:50 -0000 by deveiant (r135) -----
-   Changed: /Arrowapplets/imgtext.rb
+   Changed: /Arrow/trunk/applets/imgtext.rb
 
    - Set svn:keywords.
 
 
 -- Mon, 26 Jul 2004 23:49:27 -0000 by deveiant (r134) -----
-   Changed: /Arrowapplets/status.rb
+   Changed: /Arrow/trunk/applets/status.rb
 
    - Fixed missing PIDs in applet-status view.
 
 
 -- Mon, 26 Jul 2004 23:49:02 -0000 by deveiant (r133) -----
-   Added:   /Arrowlib/arrow/template/urlencode.rb (new)
-   Changed: /Arrowtemplates/imgtext-fontlist.tmpl
-            /Arrowtemplates/imgtext.tmpl
+   Added:   /Arrow/trunk/lib/arrow/template/urlencode.rb (new)
+   Changed: /Arrow/trunk/templates/imgtext-fontlist.tmpl
+            /Arrow/trunk/templates/imgtext.tmpl
 
    - Updated to reflect changes in rev 132 of imgtext2.rb.
    - Modified to use URL-escaped 'text' argument. Requires new 'urlencode' template
@@ -3215,7 +3290,7 @@
 
 
 -- Mon, 26 Jul 2004 23:46:41 -0000 by deveiant (r132) -----
-   Changed: /Arrowapplets/imgtext2.rb
+   Changed: /Arrow/trunk/applets/imgtext2.rb
 
    - Replaced CVS tags with SVN ones.
    - Added SVN keywords.
@@ -3224,117 +3299,117 @@
 
 
 -- Mon, 26 Jul 2004 17:37:58 -0000 by deveiant (r131) -----
-   Added:   /Arrowtemplates/imgtext-fontlist.tmpl (new)
-            /Arrowtemplates/imgtext.tmpl (new)
+   Added:   /Arrow/trunk/templates/imgtext-fontlist.tmpl (new)
+            /Arrow/trunk/templates/imgtext.tmpl (new)
 
    Initial checkin.
 
 
 -- Mon, 26 Jul 2004 17:37:25 -0000 by deveiant (r130) -----
-   Changed: /Arrowlib/arrow/exceptions.rb
+   Changed: /Arrow/trunk/lib/arrow/exceptions.rb
 
    - Removed the FactoryError exception class to fix a bug in the templating system.
 
 
 -- Mon, 26 Jul 2004 17:37:04 -0000 by deveiant (r129) -----
-   Changed: /Arrowlib/arrow/template.rb
+   Changed: /Arrow/trunk/lib/arrow/template.rb
 
    - Commented out debugging log spam.
 
 
 -- Mon, 26 Jul 2004 17:36:33 -0000 by deveiant (r128) -----
-   Changed: /Arrowtemplates/args-display.tmpl
+   Changed: /Arrow/trunk/templates/args-display.tmpl
 
    - Fixes for XHTML validity.
 
 
 -- Mon, 26 Jul 2004 17:35:49 -0000 by deveiant (r127) -----
-   Changed: /Arrowlib/arrow/template/for.rb
+   Changed: /Arrow/trunk/lib/arrow/template/for.rb
 
    - Commented out some debugging log messages.
 
 
 -- Mon, 26 Jul 2004 17:25:18 -0000 by deveiant (r126) -----
-   Changed: /Arrowlib/arrow/broker.rb
+   Changed: /Arrow/trunk/lib/arrow/broker.rb
 
    - Added the 'uri' attribute to applets so they know where they're being
    installed.
 
 
 -- Mon, 26 Jul 2004 17:24:39 -0000 by deveiant (r125) -----
-   Changed: /Arrowlib/arrow/applet.rb
+   Changed: /Arrow/trunk/lib/arrow/applet.rb
 
    - Removed some old cruft/unimplemented features from the docs.
    - Added the 'uri' attribute to applets so they know where they've been installed.
 
 
 -- Mon, 26 Jul 2004 17:22:23 -0000 by deveiant (r124) -----
-   Changed: /Arrowarrow.css
+   Changed: /Arrow/trunk/arrow.css
 
    - Removed some cruft and cleaned up.
 
 
 -- Mon, 26 Jul 2004 17:21:39 -0000 by deveiant (r123) -----
-   Changed: /Arrowdocs/manual/tutorial-intro.html
-            /Arrowdocs/manual/tutorial-templates.html
-            /Arrowdocs/manual/manual.css
-            /Arrowdocs/manual/tutorial-apps.html
-            /Arrowdocs/manual/index.html
+   Changed: /Arrow/trunk/docs/manual/tutorial-intro.html
+            /Arrow/trunk/docs/manual/tutorial-templates.html
+            /Arrow/trunk/docs/manual/manual.css
+            /Arrow/trunk/docs/manual/tutorial-apps.html
+            /Arrow/trunk/docs/manual/index.html
 
    - Additions and updates. Integrated some stuff from OSCon presentation.
 
 
 -- Mon, 26 Jul 2004 17:18:45 -0000 by deveiant (r122) -----
-   Added:   /Arrowapplets/imgtext.rb (new)
-            /Arrowapplets/imgtext2.rb (new)
+   Added:   /Arrow/trunk/applets/imgtext.rb (new)
+            /Arrow/trunk/applets/imgtext2.rb (new)
 
    Initial checkin.
 
 
 -- Mon, 26 Jul 2004 17:18:10 -0000 by deveiant (r121) -----
-   Changed: /Arrowapplets/args.rb
+   Changed: /Arrow/trunk/applets/args.rb
 
    - Added explanatory comment.
 
 
 -- Sat, 24 Jul 2004 05:30:19 -0000 by stillflame (r120) -----
-   Changed: /Arrowdocs/manual/tutorial-templates.html
-            /Arrowlib/arrow/template/call.rb
+   Changed: /Arrow/trunk/docs/manual/tutorial-templates.html
+            /Arrow/trunk/lib/arrow/template/call.rb
 
    tutorial - added short descriptions of each directive i could figure out.
    call - corrected what statements were allowable.
 
 
 -- Sat, 24 Jul 2004 00:04:06 -0000 by stillflame (r119) -----
-   Changed: /Arrowlib/arrow/template/for.rb
-            /Arrowlib/arrow/template/yield.rb
-            /Arrowdocs/manual/tutorial-templates.html
-            /Arrowlib/arrow/template/attr.rb
-            /Arrowlib/arrow/template/call.rb
-            /Arrowlib/arrow/template/set.rb (and 2 other/s)
+   Changed: /Arrow/trunk/lib/arrow/template/for.rb
+            /Arrow/trunk/lib/arrow/template/yield.rb
+            /Arrow/trunk/docs/manual/tutorial-templates.html
+            /Arrow/trunk/lib/arrow/template/attr.rb
+            /Arrow/trunk/lib/arrow/template/call.rb
+            /Arrow/trunk/lib/arrow/template/set.rb (and 2 other/s)
 
    stubs for the directives in the tutorial, and simple syntax blurbs where i could
 
 
 -- Sat, 17 Jul 2004 16:41:27 -0000 by stillflame (r118) -----
-   Changed: /Arrowdocs/manual/tutorial-templates.html
+   Changed: /Arrow/trunk/docs/manual/tutorial-templates.html
 
    added introductory paragraph
 
 
 -- Mon, 28 Jun 2004 06:36:54 -0000 by deveiant (r117) -----
-   Changed: /Arrowapplets/view-template.rb
+   Changed: /Arrow/trunk/applets/view-template.rb
 
    - Reverted mistakenly-changed call to .templateFactory.getTemplate().
 
 
 -- Mon, 28 Jun 2004 06:17:09 -0000 by deveiant (r116) -----
-   Changed: /Arrowapplets/dingus.rb
-            /Arrowapplets/protected.rb
-            /Arrowapplets/timeclock.rb
-            /Arrowlib/arrow/applet.rb
-            /Arrowapplets/counter.rb
-            /Arrowapplets/files.rb (and 6 other/s)
+   Changed: /Arrow/trunk/applets/dingus.rb
+            /Arrow/trunk/applets/protected.rb
+            /Arrow/trunk/applets/timeclock.rb
+            /Arrow/trunk/lib/arrow/applet.rb
+            /Arrow/trunk/applets/counter.rb
+            /Arrow/trunk/applets/files.rb (and 6 other/s)
 
    - Moved last vestiges of template-loading out of the transaction into the applet
    class. COMPAT: tx.templates[ templatekey ] should still work for the
@@ -3344,41 +3419,41 @@
 
 
 -- Mon, 28 Jun 2004 05:14:16 -0000 by deveiant (r115) -----
-   Changed: /Arrowlib/arrow/broker.rb
+   Changed: /Arrow/trunk/lib/arrow/broker.rb
 
    - Fixed identifier pattern to match single-character identifiers. Thanks to Mark
    Smith <xb95@queech.com> for the bug report.
 
 
 -- Mon, 28 Jun 2004 04:49:37 -0000 by deveiant (r114) -----
-   Changed: /Arrowlib/arrow/transaction.rb
+   Changed: /Arrow/trunk/lib/arrow/transaction.rb
 
    - Added a 'data' attribute for passing free-form data around between applets in
    a chain. Thanks to Mark Smith <xb95@queech.com> for the suggestion.
 
 
 -- Mon, 28 Jun 2004 04:46:47 -0000 by deveiant (r113) -----
-   Changed: /Arrowtemplates/test/list.tmpl
-            /Arrowtemplates/test/harness.tmpl
+   Changed: /Arrow/trunk/templates/test/list.tmpl
+            /Arrow/trunk/templates/test/harness.tmpl
 
    - Edits to the templates for the testing applet.
 
 
 -- Mon, 28 Jun 2004 03:42:16 -0000 by deveiant (r112) -----
-   Added:   /Arrowtemplates/test/list.tmpl
+   Added:   /Arrow/trunk/templates/test/list.tmpl
             -> renamed from /Arrow/trunk/templates/test-list.tmpl@r111
-            /Arrowtemplates/test/harness.tmpl
+            /Arrow/trunk/templates/test/harness.tmpl
             -> renamed from /Arrow/trunk/templates/test-harness.tmpl@r111
-            /Arrowtemplates/test (new)
-   Deleted: /Arrowtemplates/test-harness.tmpl
-            /Arrowtemplates/test-list.tmpl
+            /Arrow/trunk/templates/test (new)
+   Deleted: /Arrow/trunk/templates/test-harness.tmpl
+            /Arrow/trunk/templates/test-list.tmpl
 
    - Moved test templates into a subdir of their own, as there's going to be quite
    a lot of them.
 
 
 -- Mon, 28 Jun 2004 03:20:52 -0000 by deveiant (r111) -----
-   Changed: /Arrowtemplates/filemap.tmpl
+   Changed: /Arrow/trunk/templates/filemap.tmpl
 
    - Fixed javascript ordering bug which caused the 'expand' control to not work on
    the first click.
@@ -3388,7 +3463,7 @@
 
 
 -- Sun, 27 Jun 2004 23:36:46 -0000 by deveiant (r110) -----
-   Changed: /Arrowutils.rb
+   Changed: /Arrow/trunk/utils.rb
 
    - Removed some old cruft.
    - Fixed some embarrassing assumptions about the named of C-based modules,
@@ -3396,71 +3471,71 @@
 
 
 -- Sun, 27 Jun 2004 01:33:40 -0000 by deveiant (r109) -----
-   Changed: /Arrowdocs/manual/manual.css
-            /Arrowdocs/manual/config.html
+   Changed: /Arrow/trunk/docs/manual/manual.css
+            /Arrow/trunk/docs/manual/config.html
 
    - Corrections courtesy of Aaron Son <reltuk@FaerieMUD.org>.
 
 
 -- Sun, 27 Jun 2004 01:00:12 -0000 by deveiant (r108) -----
-   Changed: /Arrowdocs/manual/manual.css
-            /Arrowdocs/manual/config.html
+   Changed: /Arrow/trunk/docs/manual/manual.css
+            /Arrow/trunk/docs/manual/config.html
 
    - Brought config description up to date with changes to Arrow::Config and the
    Broker.
 
 
 -- Sun, 20 Jun 2004 23:58:04 -0000 by deveiant (r107) -----
-   Changed: /Arrowdocs/manual/download.html
+   Changed: /Arrow/trunk/docs/manual/download.html
 
    - Updated download instructions.
 
 
 -- Sun, 13 Jun 2004 00:57:13 -0000 by deveiant (r106) -----
-   Changed: /Arrowtests/template.tests.rb
+   Changed: /Arrow/trunk/tests/template.tests.rb
 
    - Added several new tests. Thanks to Aaron Son <reltuk at FaerieMUD dot org> for
    his help.
 
 
 -- Sun, 13 Jun 2004 00:53:46 -0000 by deveiant (r105) -----
-   Changed: /Arrowtests/lib/arrowtestcase.rb
-            /Arrowtest.rb
+   Changed: /Arrow/trunk/tests/lib/arrowtestcase.rb
+            /Arrow/trunk/test.rb
 
    - Added per-testcase debugging (e.g., test.rb -d nameOfTestCase) so tracking
    down specific failing tests is easier.
 
 
 -- Sun, 13 Jun 2004 00:24:52 -0000 by deveiant (r104) -----
-   Changed: /Arrowlib/arrow/template/for.rb
+   Changed: /Arrow/trunk/lib/arrow/template/for.rb
 
    - Changed call to Template#withOverriddenAttributes to match the new argument
    requirements.
 
 
 -- Sun, 13 Jun 2004 00:24:39 -0000 by deveiant (r103) -----
-   Changed: /Arrowlib/arrow/template/yield.rb
+   Changed: /Arrow/trunk/lib/arrow/template/yield.rb
 
    - Changed call to Template#withOverriddenAttributes to match the new argument
    requirements.
 
 
 -- Sun, 13 Jun 2004 00:24:27 -0000 by deveiant (r102) -----
-   Changed: /Arrowlib/arrow/template/nodes.rb
+   Changed: /Arrow/trunk/lib/arrow/template/nodes.rb
 
    - Changed call to Template#withOverriddenAttributes to match the new argument
    requirements.
 
 
 -- Sun, 13 Jun 2004 00:23:24 -0000 by deveiant (r101) -----
-   Changed: /Arrowlib/arrow/template/iterator.rb
+   Changed: /Arrow/trunk/lib/arrow/template/iterator.rb
 
    - Commented out the debugging in #each I was using to eliminate Iterators from
    the "double-return" bug a while back.
 
 
 -- Sun, 13 Jun 2004 00:22:18 -0000 by deveiant (r100) -----
-   Changed: /Arrowlib/arrow/template.rb
+   Changed: /Arrow/trunk/lib/arrow/template.rb
 
    - Cleaned up handling of attributes and definitions in rendering scope
    code. Thanks to help from Aaron Son <reltuk at FaerieMUD dot org>.
@@ -3471,20 +3546,20 @@
 
 
 -- Sun, 13 Jun 2004 00:17:59 -0000 by deveiant (r99) -----
-   Changed: /Arrowlib/arrow/exceptions.rb
+   Changed: /Arrow/trunk/lib/arrow/exceptions.rb
 
    - Added ScopeError exception class.
 
 
 -- Mon, 07 Jun 2004 18:43:01 -0000 by reltuk (r98) -----
-   Changed: /Arrowtemplates/args-display.tmpl
+   Changed: /Arrow/trunk/templates/args-display.tmpl
 
    Changed occurrences of txn.args to txn.vargs
 
 
 -- Sat, 05 Jun 2004 19:13:10 -0000 by deveiant (r97) -----
-   Changed: /Arrowlib/arrow/applet.rb
-            /Arrowtemplates/applet-status.tmpl
+   Changed: /Arrow/trunk/lib/arrow/applet.rb
+            /Arrow/trunk/templates/applet-status.tmpl
 
    - Uncommented the Arrow::Applet#delegate method, and added a new #delegable?
    method to test for a real delegation method. The method used to test for
@@ -3494,40 +3569,40 @@
 
 
 -- Sat, 05 Jun 2004 19:08:16 -0000 by deveiant (r96) -----
-   Changed: /Arrowtemplates/hello-world.tmpl
+   Changed: /Arrow/trunk/templates/hello-world.tmpl
 
    - Bugfix for illegal comment reported by Aaron Son.
 
 
 -- Wed, 02 Jun 2004 16:41:31 -0000 by deveiant (r95) -----
-   Changed: /Arrowapplets/test.rb
+   Changed: /Arrow/trunk/applets/test.rb
 
    - Added keywords property
 
 
 -- Wed, 02 Jun 2004 13:01:56 -0000 by deveiant (r94) -----
-   Changed: /Arrowlib/arrow/exceptions.rb
+   Changed: /Arrow/trunk/lib/arrow/exceptions.rb
 
    - Made the AppletError default message a bit more useful.
 
 
 -- Wed, 02 Jun 2004 13:01:17 -0000 by deveiant (r93) -----
-   Changed: /Arrowapplets/dingus.rb
-            /Arrowtemplates/dingus.tmpl
+   Changed: /Arrow/trunk/applets/dingus.rb
+            /Arrow/trunk/templates/dingus.tmpl
 
    - Added BlueCloth module revision message to the bottom of the page.
 
 
 -- Wed, 02 Jun 2004 03:04:15 -0000 by deveiant (r92) -----
-   Changed: /Arrowapplets/dingus.rb
-            /Arrowtemplates/dingus.tmpl
+   Changed: /Arrow/trunk/applets/dingus.rb
+            /Arrow/trunk/templates/dingus.tmpl
 
    - Updated keywords property.
 
 
 -- Wed, 02 Jun 2004 03:03:12 -0000 by deveiant (r91) -----
-   Changed: /Arrowapplets/dingus.rb
-            /Arrowtemplates/dingus.tmpl
+   Changed: /Arrow/trunk/applets/dingus.rb
+            /Arrow/trunk/templates/dingus.tmpl
 
    - Fixed initial bugs. Now in working form.
    - Had to remove the :filters argument from the validator profile, as it caused
@@ -3536,14 +3611,14 @@
 
 
 -- Wed, 02 Jun 2004 03:01:19 -0000 by deveiant (r90) -----
-   Changed: /Arrowlib/arrow/broker.rb
+   Changed: /Arrow/trunk/lib/arrow/broker.rb
 
    - Fixed up two old-style invocations of #runAppletChain.
 
 
 -- Wed, 02 Jun 2004 02:20:33 -0000 by deveiant (r89) -----
-   Added:   /Arrowapplets/dingus.rb (new)
-            /Arrowtemplates/dingus.tmpl (new)
+   Added:   /Arrow/trunk/applets/dingus.rb (new)
+            /Arrow/trunk/templates/dingus.tmpl (new)
 
    Initial checkin
 
@@ -3555,45 +3630,45 @@
 
 
 -- Mon, 31 May 2004 18:34:30 -0000 by deveiant (r87) -----
-   Changed: /Arrowmakedist.rb
+   Changed: /Arrow/trunk/makedist.rb
 
    - CVS -> Subversion
 
 
 -- Mon, 31 May 2004 18:33:54 -0000 by deveiant (r86) -----
-   Added:   /Arrowdemo.cfg (new)
+   Added:   /Arrow/trunk/demo.cfg (new)
 
    Initial checkin.
 
 
 -- Mon, 31 May 2004 18:32:16 -0000 by deveiant (r85) -----
-   Changed: /Arrowdefault.cfg
+   Changed: /Arrow/trunk/default.cfg
 
    - Updated to match latest config changes.
 
 
 -- Mon, 31 May 2004 18:28:10 -0000 by deveiant (r84) -----
-   Changed: /Arrowtemplates/hello-world.tmpl
+   Changed: /Arrow/trunk/templates/hello-world.tmpl
 
    - Added a runcount in the comments to help debug the transient
    stats-not-updating problem.
 
 
 -- Mon, 31 May 2004 18:27:25 -0000 by deveiant (r83) -----
-   Changed: /Arrowtemplates/applet-status.tmpl
+   Changed: /Arrow/trunk/templates/applet-status.tmpl
 
    - Added the child server's PID to the stats table.
 
 
 -- Mon, 31 May 2004 18:25:09 -0000 by deveiant (r82) -----
-   Changed: /Arrowlib/arrow/exceptions.rb
+   Changed: /Arrow/trunk/lib/arrow/exceptions.rb
 
    - Added a new exception type for applet chain errors, since they're now exposed
    to the user in delegation.
 
 
 -- Mon, 31 May 2004 18:23:28 -0000 by deveiant (r81) -----
-   Changed: /Arrowlib/arrow/dispatcher.rb
+   Changed: /Arrow/trunk/lib/arrow/dispatcher.rb
 
    - Made changes to the order of execution of output rendering and saving of
    sessions so that changes made to the session or request headers from code
@@ -3602,14 +3677,14 @@
 
 
 -- Mon, 31 May 2004 18:20:58 -0000 by deveiant (r80) -----
-   Changed: /Arrowlib/arrow/broker.rb
+   Changed: /Arrow/trunk/lib/arrow/broker.rb
 
    - Made delegation pass the remaining links in the applet chain to
    Applet#delegate so delegating apps can inject or remove links if they want.
 
 
 -- Mon, 31 May 2004 17:46:21 -0000 by deveiant (r79) -----
-   Changed: /Arrowlib/arrow/applet.rb
+   Changed: /Arrow/trunk/lib/arrow/applet.rb
 
    - Fixed the double-return bug that happened when the default handler was invoked
    by #action_missing_action. Default handler is now handled separately (again?).
@@ -3617,134 +3692,134 @@
 
 
 -- Mon, 31 May 2004 17:43:45 -0000 by deveiant (r78) -----
-   Changed: /Arrowapplets/protected.rb
+   Changed: /Arrow/trunk/applets/protected.rb
 
    - Modified to work with altered delegation model.
 
 
 -- Mon, 31 May 2004 17:43:33 -0000 by deveiant (r77) -----
-   Changed: /Arrowapplets/counter.rb
+   Changed: /Arrow/trunk/applets/counter.rb
 
    - Modified to work with altered delegation model.
 
 
 -- Sat, 29 May 2004 20:53:48 -0000 by deveiant (r76) -----
-   Changed: /Arrowarrow.css
+   Changed: /Arrow/trunk/arrow.css
 
    - Added filemap classes.
 
 
 -- Sat, 29 May 2004 20:46:37 -0000 by deveiant (r75) -----
-   Added:   /Arrowarrow.css (new)
+   Added:   /Arrow/trunk/arrow.css (new)
 
    Initial checkin.
 
 
 -- Sat, 29 May 2004 20:44:24 -0000 by deveiant (r74) -----
-   Changed: /Arrowtests/config.tests.rb
+   Changed: /Arrow/trunk/tests/config.tests.rb
 
    - Fixed reference to old config key.
 
 
 -- Sat, 29 May 2004 20:43:58 -0000 by deveiant (r73) -----
-   Changed: /Arrowlib/arrow/template/iterator.rb
+   Changed: /Arrow/trunk/lib/arrow/template/iterator.rb
 
    - Added debugging to eliminate the Continuation in iterators as the cause of the
    double-return bug.
 
 
 -- Sat, 29 May 2004 20:43:22 -0000 by deveiant (r72) -----
-   Changed: /Arrowlib/arrow/session/lock.rb
+   Changed: /Arrow/trunk/lib/arrow/session/lock.rb
 
    - Added debugging to track down the session-lock problem.
 
 
 -- Sat, 29 May 2004 20:43:07 -0000 by deveiant (r71) -----
-   Changed: /Arrowlib/arrow/session.rb
+   Changed: /Arrow/trunk/lib/arrow/session.rb
 
    - Added debugging to track down the session-lock problem.
 
 
 -- Sat, 29 May 2004 20:42:34 -0000 by deveiant (r70) -----
-   Changed: /Arrowlib/arrow/config.rb
+   Changed: /Arrow/trunk/lib/arrow/config.rb
 
    - Changed Symbol config values to Strings for symmetry.
 
 
 -- Sat, 29 May 2004 20:41:38 -0000 by deveiant (r69) -----
-   Changed: /Arrowapplets/status.rb
+   Changed: /Arrow/trunk/applets/status.rb
 
    - Added some debugging to help track down the double-return bug.
 
 
 -- Sat, 29 May 2004 20:41:14 -0000 by deveiant (r68) -----
-   Changed: /Arrowapplets/protected.rb
+   Changed: /Arrow/trunk/applets/protected.rb
 
    - Modified #delegate to match the signature of delegation-with-chain.
 
 
 -- Sat, 29 May 2004 20:40:16 -0000 by deveiant (r67) -----
-   Changed: /Arrowapplets/counter.rb
+   Changed: /Arrow/trunk/applets/counter.rb
 
    - Made session setup for delegated requests a bit more resilient in the face of
    session errors.
 
 
 -- Sat, 29 May 2004 20:38:23 -0000 by deveiant (r66) -----
-   Added:   /Arrowtemplates/test-harness.tmpl (new)
-            /Arrowtemplates/test-list.tmpl (new)
+   Added:   /Arrow/trunk/templates/test-harness.tmpl (new)
+            /Arrow/trunk/templates/test-list.tmpl (new)
 
    Initial checkin. Just a skeleton at this point.
 
 
 -- Sat, 29 May 2004 20:34:00 -0000 by deveiant (r65) -----
-   Changed: /Arrowlib/arrow/applet.rb
+   Changed: /Arrow/trunk/lib/arrow/applet.rb
 
    - Added debugging for the mysterious double-return bug.
 
 
 -- Sat, 29 May 2004 20:32:44 -0000 by deveiant (r64) -----
-   Added:   /Arrowapplets/test.rb (new)
+   Added:   /Arrow/trunk/applets/test.rb (new)
 
    Initial checkin. Just a skeleton at this point.
 
 
 -- Sat, 22 May 2004 07:02:05 -0000 by deveiant (r63) -----
-   Added:   /Arrowredist/PluginFactory-0.01.tar.gz (new)
+   Added:   /Arrow/trunk/redist/PluginFactory-0.01.tar.gz (new)
 
    Initial checkin.
 
 
 -- Sat, 22 May 2004 07:00:38 -0000 by deveiant (r62) -----
-   Changed: /Arrowtests/broker.tests.rb
+   Changed: /Arrow/trunk/tests/broker.tests.rb
 
    - Removed default layout, as it merged with the user's config.
    - Added a bunch of tests for chaining, etc.
 
 
 -- Sat, 22 May 2004 06:58:12 -0000 by deveiant (r61) -----
-   Changed: /Arrowtest.rb
+   Changed: /Arrow/trunk/test.rb
 
    - Modified file logging to apply to more than just Arrow::Template.
 
 
 -- Sat, 22 May 2004 06:54:12 -0000 by deveiant (r60) -----
-   Changed: /Arrowtemplates/error-display.tmpl
-            /Arrowtemplates/status.tmpl
-            /Arrowtemplates/applet-status.tmpl
+   Changed: /Arrow/trunk/templates/error-display.tmpl
+            /Arrow/trunk/templates/status.tmpl
+            /Arrow/trunk/templates/applet-status.tmpl
 
    - Made changes to reflect changes in the applet-loading and organization code in
    the Broker and Applet classes.
 
 
 -- Sat, 22 May 2004 06:52:55 -0000 by deveiant (r59) -----
-   Changed: /Arrowlib/arrow/session.rb
+   Changed: /Arrow/trunk/lib/arrow/session.rb
 
    - Fixed debugging message with no arguments to its placeholders.
 
 
 -- Sat, 22 May 2004 06:52:28 -0000 by deveiant (r58) -----
-   Changed: /Arrowlib/arrow/config.rb
+   Changed: /Arrow/trunk/lib/arrow/config.rb
 
    - Moved applet config stuff into the applet section of the config object.
    - Removed the default layout, as it would merge with any config the user
@@ -3754,7 +3829,7 @@
 
 
 -- Sat, 22 May 2004 06:50:19 -0000 by deveiant (r57) -----
-   Changed: /Arrowlib/arrow/broker.rb
+   Changed: /Arrow/trunk/lib/arrow/broker.rb
 
    - Rewrote applet registry code to support the URL hierarchy being built from
    config rather than from the applet signatures.
@@ -3764,7 +3839,7 @@
 
 
 -- Sat, 22 May 2004 06:47:41 -0000 by deveiant (r56) -----
-   Changed: /Arrowlib/arrow/applet.rb
+   Changed: /Arrow/trunk/lib/arrow/applet.rb
 
    - Applets are no longer responsible for their own mapping into the URL
    hierarchy, so removed the :uri member from the signature struct.
@@ -3774,19 +3849,19 @@
 
 
 -- Sat, 22 May 2004 06:43:52 -0000 by deveiant (r55) -----
-   Added:   /Arrowtemplates/filemap.tmpl (new)
-            /Arrowapplets/files.rb (new)
+   Added:   /Arrow/trunk/templates/filemap.tmpl (new)
+            /Arrow/trunk/applets/files.rb (new)
 
    Initial checkin.
 
 
 -- Sat, 22 May 2004 06:42:56 -0000 by deveiant (r54) -----
-   Changed: /Arrowapplets/TEMPLATE.rb.tpl
-            /Arrowapplets/error.rb
-            /Arrowapplets/protected.rb
-            /Arrowapplets/subclassed-hello.rb
-            /Arrowapplets/timeclock.rb
-            /Arrowapplets/args.rb (and 8 other/s)
+   Changed: /Arrow/trunk/applets/TEMPLATE.rb.tpl
+            /Arrow/trunk/applets/error.rb
+            /Arrow/trunk/applets/protected.rb
+            /Arrow/trunk/applets/subclassed-hello.rb
+            /Arrow/trunk/applets/timeclock.rb
+            /Arrow/trunk/applets/args.rb (and 8 other/s)
 
    - Moved back out of the Arrow:: namespace, as Kernel::load apparently doesn't
    put them in an anonymous module that way even with the appropriate flag set.
@@ -3795,67 +3870,67 @@
 
 
 -- Tue, 04 May 2004 15:33:37 -0000 by deveiant (r52) -----
-   Changed: /Arrowlib/arrow/template/for.rb
-            /Arrowlib/arrow/template/yield.rb
-            /Arrowlib/arrow/template/else.rb
-            /Arrowlib/arrow/template/iterator.rb
-            /Arrowlib/arrow/template/attr.rb
-            /Arrowlib/arrow/template/import.rb (and 9 other/s)
+   Changed: /Arrow/trunk/lib/arrow/template/for.rb
+            /Arrow/trunk/lib/arrow/template/yield.rb
+            /Arrow/trunk/lib/arrow/template/else.rb
+            /Arrow/trunk/lib/arrow/template/iterator.rb
+            /Arrow/trunk/lib/arrow/template/attr.rb
+            /Arrow/trunk/lib/arrow/template/import.rb (and 9 other/s)
 
    - Converted more CVS-style version constants to Subversion-style ones.
 
 
 -- Tue, 04 May 2004 05:05:28 -0000 by deveiant (r51) -----
-   Changed: /Arrowtests/lib/arrowtestcase.rb
+   Changed: /Arrow/trunk/tests/lib/arrowtestcase.rb
 
    - Fixed message bug
    - Added #assert_same_keys assertion.
 
 
 -- Tue, 04 May 2004 05:04:58 -0000 by deveiant (r50) -----
-   Changed: /Arrowtests/config.tests.rb
+   Changed: /Arrow/trunk/tests/config.tests.rb
 
    - Handle Hash objects separately from ConfigStructs when comparing configs.
 
 
 -- Tue, 04 May 2004 05:04:09 -0000 by deveiant (r49) -----
-   Added:   /Arrowtests/broker.tests.rb (new)
+   Added:   /Arrow/trunk/tests/broker.tests.rb (new)
 
    Initial checkin.
 
 
 -- Tue, 04 May 2004 05:03:28 -0000 by deveiant (r48) -----
-   Changed: /Arrowlib/arrow/template/for.rb
-            /Arrowlib/arrow/rubytokenreactor.rb
-            /Arrowlib/arrow/session/usertrackid.rb
-            /Arrowlib/arrow/template/iterator.rb
-            /Arrowlib/arrow/mixins.rb
-            /Arrowlib/arrow/monitor/subjects.rb (and 44 other/s)
+   Changed: /Arrow/trunk/lib/arrow/template/for.rb
+            /Arrow/trunk/lib/arrow/rubytokenreactor.rb
+            /Arrow/trunk/lib/arrow/session/usertrackid.rb
+            /Arrow/trunk/lib/arrow/template/iterator.rb
+            /Arrow/trunk/lib/arrow/mixins.rb
+            /Arrow/trunk/lib/arrow/monitor/subjects.rb (and 44 other/s)
 
    - Converted CVS-style constants/comments to Subversion-style ones.
 
 
 -- Tue, 04 May 2004 05:02:38 -0000 by deveiant (r47) -----
-   Changed: /Arrowdocs/makedocs.rb
+   Changed: /Arrow/trunk/docs/makedocs.rb
 
    - Fixed template name -- RDoc 'css' template was renamed to 'html'.
 
 
 -- Tue, 04 May 2004 05:01:37 -0000 by deveiant (r46) -----
-   Changed: /Arrowdefault.cfg
+   Changed: /Arrow/trunk/default.cfg
 
    - Updated to match lib/arrow/config.rb changes.
 
 
 -- Tue, 04 May 2004 05:00:24 -0000 by deveiant (r45) -----
-   Changed: /ArrowREADME
+   Changed: /Arrow/trunk/README
 
    - Credit where credit is due.
 
 
 -- Tue, 04 May 2004 04:59:12 -0000 by deveiant (r44) -----
-   Changed: /Arrowlib/arrow/broker.rb
-            /Arrowlib/arrow/config.rb
+   Changed: /Arrow/trunk/lib/arrow/broker.rb
+            /Arrow/trunk/lib/arrow/config.rb
 
    - Converted CVS-style constants/comments to Subversion-style ones.
    - Initial conversion of applet-to-uri mapping in the config file (a new 'layout'
@@ -3863,20 +3938,20 @@
 
 
 -- Tue, 04 May 2004 04:46:29 -0000 by deveiant (r43) -----
-   Deleted: /Arrowapplets/protected-hello.rb
-            /Arrowapplets/counted-hello.rb
+   Deleted: /Arrow/trunk/applets/protected-hello.rb
+            /Arrow/trunk/applets/counted-hello.rb
 
    - Removed, since the purpose they served can now be accomplished by mapping
    hello.rb into multiple urls.
 
 
 -- Tue, 04 May 2004 04:44:15 -0000 by deveiant (r42) -----
-   Changed: /Arrowapplets/error.rb
-            /Arrowapplets/protected.rb
-            /Arrowapplets/subclassed-hello.rb
-            /Arrowapplets/timeclock.rb
-            /Arrowapplets/args.rb
-            /Arrowapplets/counter.rb (and 7 other/s)
+   Changed: /Arrow/trunk/applets/error.rb
+            /Arrow/trunk/applets/protected.rb
+            /Arrow/trunk/applets/subclassed-hello.rb
+            /Arrow/trunk/applets/timeclock.rb
+            /Arrow/trunk/applets/args.rb
+            /Arrow/trunk/applets/counter.rb (and 7 other/s)
 
    - Changed CVS-style constants over to Subversion-style ones.
    - Removed explicit URL references in signatures.
@@ -3884,117 +3959,117 @@
 
 
 -- Tue, 04 May 2004 04:41:43 -0000 by deveiant (r41) -----
-   Changed: /Arrowapplets/TEMPLATE.rb.tpl
+   Changed: /Arrow/trunk/applets/TEMPLATE.rb.tpl
 
    - Fixed closing comment.
 
 
 -- Fri, 30 Apr 2004 14:27:09 -0000 by deveiant (r40) -----
-   Added:   /Arrowtests/rubytokenparser.tests.rb
+   Added:   /Arrow/trunk/tests/rubytokenparser.tests.rb
             -> renamed from /Arrow/trunk/tests/07_rubytokenparser.tests.rb@r32
-            /Arrowtests/session_id.tests.rb
+            /Arrow/trunk/tests/session_id.tests.rb
             -> renamed from /Arrow/trunk/tests/21_session_id.tests.rb@r31
-            /Arrowtests/session_store.tests.rb
+            /Arrow/trunk/tests/session_store.tests.rb
             -> renamed from /Arrow/trunk/tests/23_session_store.tests.rb@r31
-            /Arrowtests/config.tests.rb
+            /Arrow/trunk/tests/config.tests.rb
             -> renamed from /Arrow/trunk/tests/01_config.tests.rb@r32
-            /Arrowtests/template.tests.rb
+            /Arrow/trunk/tests/template.tests.rb
             -> renamed from /Arrow/trunk/tests/05_template.tests.rb@r31
-            /Arrowtests/logger.tests.rb
+            /Arrow/trunk/tests/logger.tests.rb
             -> renamed from /Arrow/trunk/tests/10_logger.tests.rb@r31 (and 7 other/s)
-   Deleted: /Arrowtests/22_session_lock.tests.rb
-            /Arrowtests/21_session_id.tests.rb
-            /Arrowtests/23_session_store.tests.rb
-            /Arrowtests/07_rubytokenparser.tests.rb
-            /Arrowtests/01_config.tests.rb
-            /Arrowtests/10_logger.tests.rb (and 7 other/s)
+   Deleted: /Arrow/trunk/tests/22_session_lock.tests.rb
+            /Arrow/trunk/tests/21_session_id.tests.rb
+            /Arrow/trunk/tests/23_session_store.tests.rb
+            /Arrow/trunk/tests/07_rubytokenparser.tests.rb
+            /Arrow/trunk/tests/01_config.tests.rb
+            /Arrow/trunk/tests/10_logger.tests.rb (and 7 other/s)
 
    - Renamed tests to non-numbered files.
 
 
 -- Thu, 22 Apr 2004 17:43:21 -0000 by deveiant (r39) -----
-   Changed: /Arrowlib/arrow/applet.rb
+   Changed: /Arrow/trunk/lib/arrow/applet.rb
 
    - Fixed bug that prevented actions being defined with Symbols as names.
 
 
 -- Thu, 22 Apr 2004 17:42:44 -0000 by deveiant (r38) -----
-   Changed: /Arrowlib/arrow/config.rb
+   Changed: /Arrow/trunk/lib/arrow/config.rb
 
    - Masked kernel methods away from config object to prevent collision.
 
 
 -- Thu, 22 Apr 2004 17:41:23 -0000 by deveiant (r37) -----
-   Changed: /Arrowdocs/manual/tutorial-intro.html
+   Changed: /Arrow/trunk/docs/manual/tutorial-intro.html
 
    - Updated to new diagram graphic.
 
 
 -- Thu, 22 Apr 2004 17:38:53 -0000 by deveiant (r36) -----
-   Added:   /Arrowdocs/manual/structural-overview.png (new)
+   Added:   /Arrow/trunk/docs/manual/structural-overview.png (new)
 
    Initial checkin.
 
 
 -- Thu, 22 Apr 2004 16:53:30 -0000 by deveiant (r35) -----
-   Changed: /Arrowdocs/manual/tutorial-monitors.html
-            /Arrowdocs/manual/tutorial-validation.html
-            /Arrowdocs/manual/tutorial-intro.html
-            /Arrowdocs/manual/tutorial-templates.html
-            /Arrowdocs/manual/whatis.html
-            /Arrowdocs/manual/manual.css (and 9 other/s)
+   Changed: /Arrow/trunk/docs/manual/tutorial-monitors.html
+            /Arrow/trunk/docs/manual/tutorial-validation.html
+            /Arrow/trunk/docs/manual/tutorial-intro.html
+            /Arrow/trunk/docs/manual/tutorial-templates.html
+            /Arrow/trunk/docs/manual/whatis.html
+            /Arrow/trunk/docs/manual/manual.css (and 9 other/s)
 
    Set keywords for manual
 
 
 -- Wed, 21 Apr 2004 23:17:50 -0000 by stillflame (r34) -----
-   Changed: /Arrowdocs/manual/install.html
+   Changed: /Arrow/trunk/docs/manual/install.html
 
    added more dependancies to the installation docs - pluginfactory, test-unit-mock, and diff
 
 
 -- Mon, 19 Apr 2004 21:22:03 -0000 by stillflame (r33) -----
-   Changed: /Arrowdocs/manual/tutorial-sessions.html
+   Changed: /Arrow/trunk/docs/manual/tutorial-sessions.html
 
    filled in a bit of the sessions tutorial
 
 
 -- Tue, 23 Mar 2004 16:37:28 -0000 by deveiant (r32) -----
-   Added:   /Arrowapplets
+   Added:   /Arrow/trunk/applets
             -> renamed from /Arrow/branches/applet-conversion/applets@r31
-            /Arrowtemplates/nosuchapplet.tmpl
+            /Arrow/trunk/templates/nosuchapplet.tmpl
             -> renamed from /Arrow/branches/applet-conversion/templates/nosuchapplet.tmpl@r31
-            /Arrowtemplates/applet-status.tmpl
+            /Arrow/trunk/templates/applet-status.tmpl
             -> renamed from /Arrow/branches/applet-conversion/templates/applet-status.tmpl@r31
-            /Arrowlib/arrow/applet.rb
+            /Arrow/trunk/lib/arrow/applet.rb
             -> renamed from /Arrow/branches/applet-conversion/lib/arrow/applet.rb@r31
-            /Arrowdocs/manual/draft-wm.png
+            /Arrow/trunk/docs/manual/draft-wm.png
             -> renamed from /Arrow/branches/applet-conversion/docs/manual/draft-wm.png@r31
-            /Arrowdocs/Structural-Overview.graffle
+            /Arrow/trunk/docs/Structural-Overview.graffle
             -> renamed from /Arrow/branches/applet-conversion/docs/Structural-Overview.graffle@r31 (and 4 other/s)
-   Changed: /Arrowlib/arrow/config.rb
-            /Arrowtests/07_rubytokenparser.tests.rb
-            /Arrowlib/arrow/monitor/subjects.rb
-            /Arrowdocs/manual/index.html
-            /Arrowlib/arrow/session/id.rb
-            /Arrowlib/arrow.rb (and 46 other/s)
-   Deleted: /Arrowtemplates/app-status.tmpl
-            /Arrowapps
-            /Arrowlib/arrow/application.rb
-            /Arrowtests/15_factory.tests.rb
-            /Arrowtemplates/nosuchapp.tmpl
-            /Arrowtests/40_application.tests.rb (and 1 other/s)
+   Changed: /Arrow/trunk/lib/arrow/config.rb
+            /Arrow/trunk/tests/07_rubytokenparser.tests.rb
+            /Arrow/trunk/lib/arrow/monitor/subjects.rb
+            /Arrow/trunk/docs/manual/index.html
+            /Arrow/trunk/lib/arrow/session/id.rb
+            /Arrow/trunk/lib/arrow.rb (and 46 other/s)
+   Deleted: /Arrow/trunk/templates/app-status.tmpl
+            /Arrow/trunk/apps
+            /Arrow/trunk/lib/arrow/application.rb
+            /Arrow/trunk/tests/15_factory.tests.rb
+            /Arrow/trunk/templates/nosuchapp.tmpl
+            /Arrow/trunk/tests/40_application.tests.rb (and 1 other/s)
 
    Merged applet-conversion branch [3:31]
 
 
 -- Sat, 20 Mar 2004 23:17:01 -0000 by deveiant (r2) -----
-   Added:   /Arrowexperiments/sysv_msgcreate.rb (new)
-            /Arrowmakedist.rb (new)
-            /Arrowtests/22_session_lock.tests.rb (new)
-            /Arrowtests/data/subdir (new)
-            /ArrowTODO (new)
-            /Arrowlib/arrow/data-source (new) (and 194 other/s)
+   Added:   /Arrow/trunk/experiments/sysv_msgcreate.rb (new)
+            /Arrow/trunk/makedist.rb (new)
+            /Arrow/trunk/tests/22_session_lock.tests.rb (new)
+            /Arrow/trunk/tests/data/subdir (new)
+            /Arrow/trunk/TODO (new)
+            /Arrow/trunk/lib/arrow/data-source (new) (and 194 other/s)
 
    Initial import of CVS-controlled sources
 

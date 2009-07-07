@@ -103,9 +103,8 @@ class Arrow::Logger::FileOutputter < Arrow::Logger::Outputter
 			else
 				'(IO: fd %d)' % [ @io.fileno ]
 			end
-		
+
 		return [ super, io_desc ].join(', ')
 	end
-	
-	
+
 end # class Arrow::Logger::FileOutputter

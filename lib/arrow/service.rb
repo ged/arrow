@@ -57,14 +57,14 @@ class Arrow::Service < Arrow::Applet
 	HTTP_METHOD_MAPPING = {
 		:single => {
 			:options    => 'OPTIONS',
-			:fetch      => 'GET, HEAD',
+			:fetch      => 'GET',
 			:create     => 'POST',
 			:update     => 'PUT',
 			:delete     => 'DELETE',
 		},
 		:collection => {
 			:options    => 'OPTIONS',
-			:fetch_all  => 'GET, HEAD',
+			:fetch_all  => 'GET',
 			:create     => 'POST',
 			:update_all => 'PUT',
 			:delete_all => 'DELETE',
@@ -81,7 +81,7 @@ class Arrow::Service < Arrow::Applet
 		Apache::HTTP_NOT_MODIFIED,
 		Apache::HTTP_USE_PROXY,
 	]
-	
+
 	# The list of content-types and the corresponding message to send to transform
 	# a Ruby object to that content type, in order of preference. See #negotiate_content.
 	SERIALIZERS = [
@@ -105,7 +105,7 @@ class Arrow::Service < Arrow::Applet
 	# The content-type that's used for HTTP content negotiation if none
 	# is set on the transaction
 	DEFAULT_CONTENT_TYPE = RUBY_OBJECT_MIMETYPE
-	
+
 	# The key for POSTed/PUT JSON entity bodies that will be unwrapped as a simple string value.
 	# This is necessary because JSON doesn't have a simple value type of its own, whereas all
 	# the other serialization types do.
@@ -113,18 +113,23 @@ class Arrow::Service < Arrow::Applet
 
 	# Struct for containing thrown HTTP status responses
 	StatusResponse = Struct.new( "ArrowServiceStatusResponse", :status, :message )
-	
-	
+
+
 	######
 	public
 	######
 
 	### OPTIONS /
 	### Return a service document containing links to all 
+	### :TODO: Integrate HTTP Access Control preflighted requests?
+	###        (https://developer.mozilla.org/en/HTTP_access_control)
 	def options( txn, *args )
-		
+		allowed_methods = self.allowed_methods( args )
+		txn.headers_out['Allow'] = allowed_methods.join(', ')
+
+		return allowed_methods
 	end
-	
+
 
 	#########
 	protected
@@ -144,11 +149,11 @@ class Arrow::Service < Arrow::Applet
 			msym = tuple[ id ? 1 : 0 ]
 			self.log.debug "  picked the %p method (%s ID argument)" %
 				[ msym, id ? 'has an' : 'no' ]
-			
+
 		else
 			self.log.debug "  URI refers to a sub-resource (args = %p)" % [ args ]
 			ops = args.collect {|arg| arg[/^([a-z]\w+)$/, 1].untaint }
-			
+
 			mname = "%s_%s" % [ tuple[1], ops.compact.join('_') ]
 			msym = mname.to_sym
 			self.log.debug "  picked the %p method (args = %p)" % [ msym, args ]
@@ -156,7 +161,7 @@ class Arrow::Service < Arrow::Applet
 
 		return msym, id, *args
 	end
-	
+
 
 	### Given a +txn+, an +action+ name, and any other remaining URI path +args+ from 
 	### the request, return a Method object that will handle the request (or at least something
@@ -175,7 +180,7 @@ class Arrow::Service < Arrow::Applet
 		self.log.debug "calling %p( id: %p, args: %p ) for service request" %
 			[ action, id, args ]
 		content = nil
-		
+
 		# Run the action. If it executes normally, 'content' will contain the
 		# object that should make up the response entity body. If :finish is
 		# thrown early, e.g. via #finish_with, content will be nil and
@@ -191,7 +196,7 @@ class Arrow::Service < Arrow::Applet
 			self.log.debug "  service finished successfully"
 			nil # rvalue for catch
 		end
-		
+
 		# Handle finishing with a status first
 		if content
 			txn.status ||= Apache::HTTP_OK
@@ -205,7 +210,7 @@ class Arrow::Service < Arrow::Applet
 		return nil
 	rescue => err
 		raise if err.class.name =~ /^Spec::/
-		
+
 		msg = "%s: %s %s" % [ err.class.name, err.message, err.backtrace.first ]
 		self.log.error( msg )
 		return self.prepare_status_response( txn, Apache::SERVER_ERROR, msg )
@@ -214,19 +219,28 @@ class Arrow::Service < Arrow::Applet
 
 	### Return a METHOD_NOT_ALLOWED response
 	def not_allowed( txn, *args )
-		allowed = nil
+		txn.err_headers_out['Allow'] = self.build_allow_header( args )
+		finish_with( Apache::METHOD_NOT_ALLOWED, "%s is not allowed" % [txn.request_method] )
+	end
 
-		# Pick the allowed methods based on whether the request was to the collection resource or a
-        # single resource
-		type = args.empty? ? :collection : :single
+
+	### Return a valid 'Allow' header for the receiver for the given +path_components+ (relative to 
+	### its mountpoint)
+	def build_allow_header( path_components )
+		return self.allowed_methods( path_components ).join(', ')
+	end
+
+
+	### Return an Array of valid HTTP methods for the given +path_components+
+	def allowed_methods( path_components )
+		type = path_components.empty? ? :collection : :single
 		allowed = HTTP_METHOD_MAPPING[ type ].keys.
 			find_all {|msym| self.respond_to?(msym) }.
 			inject([]) {|ary,msym| ary << HTTP_METHOD_MAPPING[type][msym]; ary }
 
-		txn.err_headers_out['Allow'] = allowed.uniq.sort.join(', ')
-		finish_with( Apache::METHOD_NOT_ALLOWED, "%s is not allowed" % [txn.request_method] )
+		allowed += ['HEAD'] if allowed.include?( 'GET' )
+		return allowed.uniq.sort
 	end
-
 
 	### Validates the given string as a non-negative integer, either
 	### returning it after untainting it or aborting with BAD_REQUEST. Override this
@@ -274,7 +288,7 @@ class Arrow::Service < Arrow::Applet
 				self.log.debug "  client accepts HTML"
 				return prepare_hypertext_response( txn, content )
 			end
-		
+
 			return prepare_status_response( txn, Apache::NOT_ACCEPTABLE, "" )
 		end
 	end
@@ -292,7 +306,7 @@ class Arrow::Service < Arrow::Applet
 			txn.content_type = 'text/plain'
 			return message.to_s
 		end
-		
+
 		# For bodiless responses, just tell the dispatcher that we've handled 
 		# everything.
 		return true
@@ -314,10 +328,10 @@ class Arrow::Service < Arrow::Applet
 		tmpl.body = body
 		tmpl.txn = txn
 		tmpl.applet = self
-		
+
 		txn.content_type = HTML_MIMETYPE
 		# txn.content_encoding = 'utf8'
-		
+
 		return tmpl
 	end
 	template :service => 'service-response.tmpl'
@@ -340,7 +354,7 @@ class Arrow::Service < Arrow::Applet
 
 		return body
 	end
-	
+
 
 	### Read the request body from the specified transaction, deserialize it if 
 	### necessary, and return one or more Ruby objects. If there isn't a deserializer
@@ -351,7 +365,7 @@ class Arrow::Service < Arrow::Applet
 		self.log.debug "Trying to deserialize a %p request body." % [ content_type ]
 
 		mname = DESERIALIZERS[ content_type ]
-		
+
 		if mname && self.respond_to?( mname )
 			self.log.debug "  calling deserializer: #%s" % [ mname ]
 			return self.send( mname, txn ) 
@@ -364,14 +378,14 @@ class Arrow::Service < Arrow::Applet
 				"don't know how to handle %p requests" % [content_type, txn.request_method] )
 		end
 	end
-	
-	
+
+
 	### Deserialize the given transaction's request body from an HTML form.
 	def deserialize_form_body( txn )
 		return txn.all_params
 	end
-	
-	
+
+
 	### Deserialize the given transaction's request body as JSON and return it.
 	def deserialize_json_body( txn )
 		rval = JSON.load( txn )
@@ -381,20 +395,20 @@ class Arrow::Service < Arrow::Applet
 			return rval
 		end
 	end
-	
+
 
 	### Deserialize the given transaction's request body as YAML and return it.
 	def deserialize_yaml_body( txn )
 		return YAML.load( txn )
 	end
-	
+
 
 	### Deserialize the given transaction's request body as a marshalled Ruby 
 	### object and return it.
 	def deserialize_marshalled_body( txn )
 		return Marshal.load( txn )
 	end
-	
+
 
 	#######
 	private
@@ -415,7 +429,7 @@ class Arrow::Service < Arrow::Applet
 		self.log.debug "Untainting a result %s" % [ obj.class.name ]
 		return obj unless obj.tainted?
 		newobj = nil
-		
+
 		case obj
 		when Hash
 			newobj = {}
@@ -432,7 +446,7 @@ class Arrow::Service < Arrow::Applet
 			newobj = obj.dup
 			newobj.untaint
 		end
-		
+
 		return newobj
 	end
 

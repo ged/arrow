@@ -1,10 +1,13 @@
 #!/usr/bin/env ruby
 
+require 'rubygems'
 require 'uri'
 require 'pluginfactory'
 require 'forwardable'
 require 'uri'
 
+require 'arrow'
+require 'arrow/constants'
 require 'arrow/mixins'
 require 'arrow/exceptions'
 require 'arrow/object'

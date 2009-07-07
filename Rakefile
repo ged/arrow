@@ -96,7 +96,7 @@ RELEASE_FILES = TEXT_FILES +
 	RAKE_TASKLIBS +
 	EXTRA_PKGFILES
 
-RELEASE_FILES << LOCAL_RAKEFILE if LOCAL_RAKEFILE.exist?
+RELEASE_FILES << LOCAL_RAKEFILE.to_s if LOCAL_RAKEFILE.exist?
 
 COVERAGE_MINIMUM = ENV['COVERAGE_MINIMUM'] ? Float( ENV['COVERAGE_MINIMUM'] ) : 85.0
 RCOV_EXCLUDES = 'spec,tests,/Library/Ruby,/var/lib,/usr/local/lib'
@@ -176,6 +176,7 @@ DEVELOPMENT_DEPENDENCIES = {
 	'tmail'       => '>= 1.2.3.1',
 	'ultraviolet' => '>= 0.10.2',
 	'libxml-ruby' => '>= 0.8.3',
+	'rdoc'        => '>= 2.4.3',
 	'activerecord' => '=2.1.1',
 	'flexmock' => '>=0.8.2',
 	'json' => '>=1.1.3',
@@ -217,7 +218,8 @@ GEMSPEC   = Gem::Specification.new do |gem|
 	gem.extra_rdoc_files  = %w[ChangeLog README LICENSE]
 
 	gem.bindir            = BINDIR.relative_path_from(BASEDIR).to_s
-	gem.executables       = BIN_FILES.select {|pn| File.executable?(pn) }
+	gem.executables       = BIN_FILES.select {|pn| File.executable?(pn) }.
+	                            collect {|pn| File.basename(pn) }
 
 	if EXTCONF.exist?
 		gem.extensions << EXTCONF.relative_path_from( BASEDIR ).to_s

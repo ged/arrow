@@ -59,7 +59,7 @@ describe Arrow::Service do
 				public :deserialize_request_body
 			end
 		end
-		
+
 		before( :each ) do
 			@request_headers = mock( "request headers" )
 			@service = @service_class.new( @config, @factory, @uri )
@@ -161,7 +161,7 @@ describe Arrow::Service do
 			@service.deserialize_request_body( @txn ).should == :form_fields
 		end
 	end
-	
+
 	describe " subclass which doesn't provide implementations of any operation" do
 
 		before( :all ) do
@@ -171,19 +171,26 @@ describe Arrow::Service do
 		before( :each ) do
 			@service = @service_class.new( @config, @factory, @uri )
 			@txn.stub!( :uri ).and_return( @uri )
-			@err_headers = mock( "error headers table" )
+			@txn.stub!( :accepts? ).and_return( true )
+			@headers = mock( "headers table" )
+			@txn.stub!( :headers_out ).and_return( @headers )
+			@err_headers = mock( "headers table" )
 			@txn.stub!( :err_headers_out ).and_return( @err_headers )
+			@txn.stub!( :content_type ).and_return( 'application/x-rubyobject' )
+			@txn.stub!( :normalized_accept_string ).and_return( "acceptable types" )
+			@txn.stub!( :explicitly_accepts? ).and_return( true )
+			@txn.stub!( :status ).and_return( nil )
 		end
-		
+
 		it "knows that it doesn't implement any HTTP method except OPTIONS" do
 			@txn.stub!( :request_method ).and_return( 'OPTIONS' )
 
-			@err_headers.should_receive( :[]= ).with( 'Allow', 'OPTIONS' )
-			@txn.should_receive( :content_type= ).with( 'text/plain' )
+			@headers.should_receive( :[]= ).with( 'Allow', 'OPTIONS' )
+			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
 
-			@service.run( @txn )
+			@service.run( @txn ).should == ['OPTIONS']
 		end
-		
+
 		it "maps a GET to #not_allowed" do
 			@txn.stub!( :request_method ).and_return( 'GET' )
 
@@ -193,7 +200,7 @@ describe Arrow::Service do
 
 			@service.run( @txn ).should =~ /GET is not allowed/i
 		end
-	
+
 		it "maps a GET with an ID to #not_allowed" do
 			@txn.stub!( :request_method ).and_return( 'GET' )
 			@txn.stub!( :uri ).and_return( @uri + '/18' )
@@ -204,7 +211,7 @@ describe Arrow::Service do
 
 			@service.run( @txn ).should =~ /GET is not allowed/i
 		end
-	
+
 		it "maps a HEAD without an ID to #not_allowed" do
 			@txn.stub!( :request_method ).and_return( 'HEAD' )
 
@@ -214,7 +221,7 @@ describe Arrow::Service do
 
 			@service.run( @txn ).should =~ /HEAD is not allowed/i
 		end
-	
+
 		it "maps a HEAD with an ID to #not_allowed" do
 			@txn.stub!( :request_method ).and_return( 'HEAD' )
 			@txn.stub!( :uri ).and_return( @uri + '/18' )
@@ -225,7 +232,7 @@ describe Arrow::Service do
 
 			@service.run( @txn ).should =~ /HEAD is not allowed/i
 		end
-	
+
 		it "maps a POST to #not_allowed" do
 			@txn.stub!( :request_method ).and_return( 'POST' )
 
@@ -235,7 +242,7 @@ describe Arrow::Service do
 
 			@service.run( @txn ).should =~ /POST is not allowed/i
 		end
-	
+
 		it "maps a PUT to #not_allowed" do
 			@err_headers = mock( "error headers table" )
 			@txn.stub!( :err_headers_out ).and_return( @err_headers )
@@ -247,7 +254,7 @@ describe Arrow::Service do
 
 			@service.run( @txn ).should =~ /PUT is not allowed/i
 		end
-	
+
 		it "maps a DELETE to #not_allowed" do
 			@err_headers = mock( "error headers table" )
 			@txn.stub!( :err_headers_out ).and_return( @err_headers )
@@ -259,7 +266,7 @@ describe Arrow::Service do
 
 			@service.run( @txn ).should =~ /DELETE is not allowed/i
 		end
-	
+
 	end
 
 	describe " subclass which provides implementations of all operations" do
@@ -282,69 +289,82 @@ describe Arrow::Service do
 			@txn.stub!( :accepts? ).and_return( true )
 			@txn.stub!( :normalized_accept_string ).and_return( "acceptable types" )
 			@txn.stub!( :status ).and_return( nil )
+
+			@headers = mock( "headers table" )
+			@txn.stub!( :headers_out ).and_return( @headers )
 		end
 
-		
+
+		it "knows that it implements all HTTP methods including OPTIONS" do
+			@txn.stub!( :request_method ).and_return( 'OPTIONS' )
+
+			@headers.should_receive( :[]= ).with( 'Allow', 'DELETE, GET, HEAD, OPTIONS, POST, PUT' )
+			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
+
+			@service.run( @txn ).should == %w[DELETE GET HEAD OPTIONS POST PUT]
+		end
+
 		it "maps a GET without an ID to #fetch_all" do
 			@txn.stub!( :request_method ).and_return( 'GET' )
 			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
 			@service.run( @txn ).should == :resource_collection
 		end
-	
+
 		it "maps a GET with an ID to #fetch" do
 			@txn.stub!( :request_method ).and_return( 'GET' )
 			@txn.stub!( :uri ).and_return( @uri + '/199' )
 			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
 			@service.run( @txn, '199' ).should == :one_resource
 		end
-	
+
 		it "maps a POST without an ID to #create" do
 			@txn.stub!( :request_method ).and_return( 'POST' )
 			@txn.stub!( :uri ).and_return( @uri )
 			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
 			@service.run( @txn ).should == :new_resource
 		end
-	
+
 		it "maps a POST with an ID to #create" do
 			@txn.stub!( :request_method ).and_return( 'POST' )
 			@txn.stub!( :uri ).and_return( @uri + '/199' )
 			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
 			@service.run( @txn, '199' ).should == :new_resource
 		end
-	
+
 		it "maps a PUT without an ID to #update_all" do
 			@txn.stub!( :request_method ).and_return( 'PUT' )
 			@txn.stub!( :uri ).and_return( @uri )
 			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
 			@service.run( @txn ).should == :updated_collection
 		end
-	
+
 		it "maps a PUT with an ID to #update" do
 			@txn.stub!( :request_method ).and_return( 'PUT' )
 			@txn.stub!( :uri ).and_return( @uri + '/199' )
 			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
 			@service.run( @txn, '199' ).should == :updated_resource
 		end
-	
+
 		it "maps a DELETE without an ID to #delete_all" do
 			@txn.stub!( :request_method ).and_return( 'DELETE' )
 			@txn.stub!( :uri ).and_return( @uri )
 			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
 			@service.run( @txn ).should == :deleted_collection
 		end
-	
+
 		it "maps a DELETE with an ID to #delete" do
 			@txn.stub!( :request_method ).and_return( 'DELETE' )
 			@txn.stub!( :uri ).and_return( @uri + '/199' )
 			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
 			@service.run( @txn, '199' ).should == :deleted_resource
 		end
-	
+
 	end
 
 	describe " subclass which supports resource operations" do
 		before( :all ) do
 			@service_class = Class.new( Arrow::Service ) do
+				def options_test( txn, id ); :test_options; end
 				def fetch_test( txn, id ); :one_resource_test; end
 				def fetch_test_subresource( txn, id ); :one_resource_test_subresource; end
 				def create_test( txn, id=nil ); :new_resource_test; end
@@ -362,16 +382,25 @@ describe Arrow::Service do
 			@txn.stub!( :accepts? ).and_return( true )
 			@txn.stub!( :normalized_accept_string ).and_return( "acceptable types" )
 			@txn.stub!( :status ).and_return( nil )
+
+			@headers = mock( "headers table" )
+			@txn.stub!( :headers_out ).and_return( @headers )
 		end
 
-		
+
+		it "maps an OPTIONS request with an ID and one operation to #options_«operation»" do
+			@txn.stub!( :request_method ).and_return( 'OPTIONS' )
+			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
+			@service.run( @txn, '199', 'test' ).should == :test_options
+		end
+
 		it "maps a GET with an ID and one operation to #fetch_«operation»" do
 			@txn.stub!( :request_method ).and_return( 'GET' )
 			@txn.stub!( :uri ).and_return( @uri + '/199/test' )
 			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
 			@service.run( @txn, '199', 'test' ).should == :one_resource_test
 		end
-	
+
 		it "maps a GET with an ID and two operations to #fetch_«op1»_«op2»" do
 			@txn.stub!( :request_method ).and_return( 'GET' )
 			@txn.stub!( :uri ).and_return( @uri + '/199/test/subresource' )
@@ -379,7 +408,7 @@ describe Arrow::Service do
 			@service.run( @txn, '199', 'test', 'subresource' ).
 				should == :one_resource_test_subresource
 		end
-	
+
 		it "maps a DELETE with an ID and two operations to #fetch_«op1»_«op2»" do
 			@txn.stub!( :request_method ).and_return( 'DELETE' )
 			@txn.stub!( :uri ).and_return( @uri + '/199/test/subresource' )
@@ -387,32 +416,32 @@ describe Arrow::Service do
 			@service.run( @txn, '199', 'test', 'subresource' ).
 				should == :deleted_resource_test_subresource
 		end
-	
+
 		it "maps a POST with an ID and operation to #create_«operation»" do
 			@txn.stub!( :request_method ).and_return( 'POST' )
 			@txn.stub!( :uri ).and_return( @uri + '/199/test' )
 			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
 			@service.run( @txn, '199', 'test' ).should == :new_resource_test
 		end
-	
+
 		it "maps a PUT with an ID and operation to #update_«operation»" do
 			@txn.stub!( :request_method ).and_return( 'PUT' )
 			@txn.stub!( :uri ).and_return( @uri + '/199/test' )
 			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
 			@service.run( @txn, '199', 'test' ).should == :updated_resource_test
 		end
-	
+
 		it "maps a DELETE with an ID and operation to #delete_«operation»" do
 			@txn.stub!( :request_method ).and_return( 'DELETE' )
 			@txn.stub!( :uri ).and_return( @uri + '/fookles/test' )
 			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
 			@service.run( @txn, 'fookles', 'test' ).should == :deleted_resource_test
 		end
-	
+
 	end
 
 	describe " subclass whose resources have (default) simple integer IDs" do
-		
+
 		before( :all ) do
 			@service_class = Class.new( Arrow::Service ) do
 				def fetch( txn, id ); :one_resource; end
@@ -424,7 +453,7 @@ describe Arrow::Service do
 				def delete_all( txn ); :deleted_collection; end
 			end
 		end
-		
+
 		before( :each ) do
 			@service = @service_class.new( @config, @factory, @uri )
 			@txn.stub!( :uri ).and_return( @uri )
@@ -432,14 +461,14 @@ describe Arrow::Service do
 			@txn.stub!( :accepts? ).and_return( true )
 			@txn.stub!( :normalized_accept_string ).and_return( "acceptable types" )
 		end
-		
+
 		it " returns a BAD_REQUEST response for a GET request with an invalid ID" do
 			@txn.stub!( :request_method ).and_return( 'GET' )
 			@txn.stub!( :explicitly_accepts? ).and_return( false )
 			@txn.stub!( :accepts_html? ).and_return( false )
 			@txn.should_receive( :status= ).with( Apache::BAD_REQUEST )
 			@txn.should_receive( :content_type= ).with( 'text/plain' )
-			
+
 			@service.run( @txn, 'ryanisthebest' ).should =~ /invalid id/i
 		end
 
@@ -459,7 +488,7 @@ describe Arrow::Service do
 			:key3 => 'value6',
 		},
 	]
-  
+
 	describe "subclass which returns Ruby objects" do
 		before( :all ) do
 			@service_class = Class.new( Arrow::Service ) do
@@ -469,7 +498,7 @@ describe Arrow::Service do
 				end
 
 				attr_reader :objects
-				
+
 				def fetch( txn, id )
 					return @objects[ id - 1 ]
 				end
@@ -478,7 +507,7 @@ describe Arrow::Service do
 				end
 			end
 		end
-		
+
 		before( :each ) do
 			@request_headers = mock( "request headers" )
 			@response_headers = mock( "response headers" )
@@ -498,7 +527,7 @@ describe Arrow::Service do
 			@txn.stub!( :normalized_accept_string ).and_return( "acceptable types" )
 			@txn.stub!( :status ).and_return( nil )
 		end
-		
+
 		it "serves a single fetched object as HTML if the request doesn't specify acceptable " +
 		   "content types" do
 			template = mock( "service template" ).as_null_object
@@ -512,7 +541,7 @@ describe Arrow::Service do
 
 			@service.run( @txn, '2' ).should == template
 		end
-		
+
 		it "serves an object collection as HTML if the request doesn't specify acceptable " +
 		   "content types" do
 			template = mock( "service template" ).as_null_object
@@ -534,12 +563,12 @@ describe Arrow::Service do
 			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
 
 			@service.objects[1].should_receive( :to_json ).and_return( :json_object2 )
-				
+
 			@txn.should_not_receive( :accepts_html? ).and_return( true )
 
 			@service.run( @txn, '2' ).should == :json_object2
 		end
-		
+
 		it "serves an object collection as JSON if the request prefers it" do
 			@txn.stub!( :explicitly_accepts? ).with( 'application/json' ).
 				and_return( true )
@@ -549,7 +578,7 @@ describe Arrow::Service do
 			@txn.should_not_receive( :accepts_html? ).and_return( true )
 
 			@service.objects.should_receive( :to_json ).and_return( :json_object_collection )
-				
+
 			@service.run( @txn ).should == :json_object_collection
 		end
 
@@ -565,7 +594,7 @@ describe Arrow::Service do
 
 			@service.run( @txn, '2' ).should == :yaml_object2
 		end
-		
+
 		it "serves an object collection as YAML if the request prefers it" do
 			@txn.stub!( :explicitly_accepts? ).with( 'text/x-yaml' ).
 				and_return( true )
@@ -591,7 +620,7 @@ describe Arrow::Service do
 
 			@service.run( @txn, '2' ).should == :xml_object2
 		end
-		
+
 		it "serves an object collection as XML if the request prefers it" do
 			@txn.stub!( :explicitly_accepts? ).with( 'application/xml+rubyobject' ).
 				and_return( true )
