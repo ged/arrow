@@ -53,7 +53,7 @@ class Arrow::Logger::FileOutputter < Arrow::Logger::Outputter
 		else
 			case uri.opaque
 			when /(std|def)err/i
-				@io = $deferr
+				@io = $stderr
 			when /(std|def)out/i
 				@io = $defout
 			when /^(\d+)$/

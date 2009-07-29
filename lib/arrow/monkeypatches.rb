@@ -48,7 +48,7 @@ end
 ### Add some stuff to the String class to allow easy transformation to Regexp
 ### and in-place interpolation.
 module Arrow::StringExtensions
-	
+
 	### Return the receiving String as a Regexp.
 	def to_re( casefold=false, extended=false )
 		return Regexp.new( self.dup )

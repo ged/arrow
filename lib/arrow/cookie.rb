@@ -4,6 +4,8 @@ require 'date'
 require 'time'
 require 'uri'
 
+require 'arrow/object'
+
 # The Arrow::Cookie class, a class for parsing and generating HTTP cookies.
 # 
 # Large parts of this code were copied from the Webrick::Cookie class

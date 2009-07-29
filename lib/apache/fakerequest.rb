@@ -201,7 +201,7 @@ module Apache # :nodoc: all
 		
 		def self::inherited( mod )
 			@derivatives[ mod ] = caller( 1 ).first.split(/:/)
-			$deferr.puts "Registering simulated %s at %p" % 
+			$stderr.puts "Registering simulated %s at %p" % 
 				[ mod.name, @derivatives[mod] ] if $DEBUG
 			super
 		end
@@ -216,7 +216,7 @@ module Apache # :nodoc: all
 		end
 		
 		def install_method( file, line, code )
-			$deferr.puts "Installing method at line %d in %s" % [ line, file ]
+			$stderr.puts "Installing method at line %d in %s" % [ line, file ]
 			lines = File.readlines( file )
 			tmpfile = "#{file}.#{Process.pid}"
 			File.open( tmpfile, File::WRONLY|File::CREAT|File::EXCL ) do |fh|
@@ -235,7 +235,7 @@ module Apache # :nodoc: all
 				sourcefile = source[0]
 				sourceline = Integer( source[1] )
 				
-				$deferr.puts "call to missing method %s" % [ sym ]
+				$stderr.puts "call to missing method %s" % [ sym ]
 
 				code = generate_method( sym, args.length )
 				install_method( sourcefile, sourceline, code )
@@ -417,7 +417,7 @@ module Apache # :nodoc: all
 			:emerg,
 		].each do |sym|
 			define_method( "log_#{sym}" ) {|msg|
-				$deferr.puts "#{sym.to_s.upcase}: #{msg}" if $DEBUG
+				$stderr.puts "#{sym.to_s.upcase}: #{msg}" if $DEBUG
 			}
 		end
 		

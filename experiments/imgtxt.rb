@@ -17,7 +17,7 @@ require 'GD'
 require 'ft2'
 
 def debugMsg( fmt, *args )
-	$deferr.puts( fmt % args )
+	$stderr.puts( fmt % args )
 end
 
 

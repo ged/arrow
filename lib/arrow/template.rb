@@ -245,10 +245,10 @@ class Arrow::Template < Arrow::Object
 				filename = fn
 				break
 			end
-			
+
 			Arrow::Logger[self].debug "  %p does not exist or is not a plain file." % [ fn ]
 		end
-		
+
 		raise Arrow::TemplateError,
 			"Template '%s' not found. Search path was %p" %
 			[ file, path ] unless filename
@@ -341,7 +341,7 @@ class Arrow::Template < Arrow::Object
 	### Initialize a copy of the +original+ template object.
 	def initialize_copy( original )
 		super
-		
+
 		@attributes = {}
 		tree = original._syntax_tree.collect {|node| node.clone}
 		self.install_syntax_tree( tree )
@@ -404,7 +404,7 @@ class Arrow::Template < Arrow::Object
 			@syntax_tree.length,
 		]
 	end
-	
+
 
 	### Return the approximate size of the template, in bytes. Used by
 	### Arrow::Cache for size thresholds.
@@ -486,7 +486,7 @@ class Arrow::Template < Arrow::Object
 		end
 	end
 	alias_method :before_rendering, :prerender
-	
+
 
 	### Render the template to text and return it as a String. If called with an
 	### Array of +nodes+, the template will render them instead of its own
@@ -500,7 +500,7 @@ class Arrow::Template < Arrow::Object
 		rval = []
 		nodes ||= self.get_prepped_nodes
 		scope ||= self.make_rendering_scope
-		
+
 		self.prerender( enclosing_template )
 
 		# Render each node
@@ -525,7 +525,7 @@ class Arrow::Template < Arrow::Object
 		return @postrender_done
 	end
 
-	
+
 	### Clean up after template rendering, calling each of its nodes' 
 	### #after_rendering hook.
 	def postrender( enclosing_template=nil )
@@ -667,8 +667,8 @@ class Arrow::Template < Arrow::Object
 			end
 		end
 	end
-	
-	
+
+
 	### Autoload accessor/mutator methods for attributes.
 	def method_missing( sym, *args, &block )
 		name = sym.to_s.gsub( /=$/, '' )
