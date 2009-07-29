@@ -4,6 +4,8 @@ require 'yaml'
 
 require 'arrow/config'
 require 'arrow/path'
+require 'arrow/constants'
+
 
 # The Arrow::Config::YamlLoader class, a derivative of Arrow::Config::Loader. It 
 # is used to load configuration files written in YAML for the Arrow web 
@@ -24,6 +26,7 @@ require 'arrow/path'
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
 class Arrow::Config::YamlLoader < Arrow::Config::Loader
+	include Arrow::Constants
 
 	# SVN Revision
 	SVNRev = %q$Rev$
@@ -34,7 +37,7 @@ class Arrow::Config::YamlLoader < Arrow::Config::Loader
 
 	# Add YAML domain types for Arrow classes
 
-	YAML.add_domain_type( Arrow::YAML_DOMAIN, "arrowPath" ) do |type, val|
+	YAML.add_domain_type( YAML_DOMAIN, "arrowPath" ) do |type, val|
 		obj = nil
 		case val
 		when Array

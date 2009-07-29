@@ -3,9 +3,9 @@
 BEGIN {
 	require 'pathname'
 	basedir = Pathname.new( __FILE__ ).dirname.parent.parent
-	
+
 	libdir = basedir + "lib"
-	
+
 	$LOAD_PATH.unshift( libdir ) unless $LOAD_PATH.include?( libdir )
 }
 
@@ -42,9 +42,9 @@ describe Arrow, "mixins" do
 					:barang => { :kerklang => 'dumdumdum' },
 				}
 			}
-			
+
 			result = Arrow::HashUtilities.stringify_keys( testhash )
-			
+
 			result.should be_an_instance_of( Hash )
 			result.should_not be_equal( testhash )
 			result.should == {
@@ -65,9 +65,9 @@ describe Arrow, "mixins" do
 					'barang' => { 'kerklang' => 'dumdumdum' },
 				}
 			}
-			
+
 			result = Arrow::HashUtilities.symbolify_keys( testhash )
-			
+
 			result.should be_an_instance_of( Hash )
 			result.should_not be_equal( testhash )
 			result.should == {
@@ -83,9 +83,9 @@ describe Arrow, "mixins" do
 	describe Arrow::ArrayUtilities do
 		it "includes a function for stringifying Array elements" do
 			testarray = [:a, :b, :c, [:d, :e, [:f, :g]]]
-			
+
 			result = Arrow::ArrayUtilities.stringify_array( testarray )
-			
+
 			result.should be_an_instance_of( Array )
 			result.should_not be_equal( testarray )
 			result.should == ['a', 'b', 'c', ['d', 'e', ['f', 'g']]]
@@ -94,9 +94,9 @@ describe Arrow, "mixins" do
 
 		it "includes a function for symbolifying Array elements" do
 			testarray = ['a', 'b', 'c', ['d', 'e', ['f', 'g']]]
-			
+
 			result = Arrow::ArrayUtilities.symbolify_array( testarray )
-			
+
 			result.should be_an_instance_of( Array )
 			result.should_not be_equal( testarray )
 			result.should == [:a, :b, :c, [:d, :e, [:f, :g]]]
@@ -114,8 +114,8 @@ describe Arrow, "mixins" do
 		end
 
 	end
-	
-	
+
+
 	describe Arrow::Configurable do
 
 		before( :each ) do
@@ -126,7 +126,7 @@ describe Arrow, "mixins" do
 		after( :each ) do
 			Arrow::Configurable.modules.replace( @real_configurable_modules )
 		end
-		
+
 
 		it "does not allow extension of non-module objects" do
 			lambda {
@@ -136,13 +136,13 @@ describe Arrow, "mixins" do
 
 
 		describe "mixed into a class without an implementation of the API" do
-			
+
 			before( :each ) do
 				@configurable_class = Class.new do
 					include Arrow::Configurable
 				end
 			end
-			
+
 			it "generates an exception if it's configured" do
 				@configurable_class.should respond_to( :configure )
 				lambda {
@@ -158,7 +158,7 @@ describe Arrow, "mixins" do
 			end
 
 		end
-		
+
 		describe "mixed into a class with additional setup" do
 
 			before( :each ) do
@@ -178,18 +178,18 @@ describe Arrow, "mixins" do
 			it "provides a declarative so an including class can set its own key" do
 				@configurable_class.config_key.should == :foo
 			end
-		
+
 			it "passes config section which corresponds to known modules when passed a config object" do
 				dispatcher = mock( "arrow dispatcher" )
 				config = mock( "config object" )
 				foosection = mock( "config section" )
-			
+
 				config.should_receive( :member? ).with( :foo ).and_return( true )
 				config.should_receive( :foo ).and_return( foosection )
-			
+
 				foosection.should_receive( :passed )
 				dispatcher.should_receive( :passed )
-			
+
 				Arrow::Configurable.configure_modules( config, dispatcher )
 			end
 		end

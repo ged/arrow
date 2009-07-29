@@ -126,6 +126,7 @@ class Arrow::Service < Arrow::Applet
 	def options( txn, *args )
 		allowed_methods = self.allowed_methods( args )
 		txn.headers_out['Allow'] = allowed_methods.join(', ')
+		txn.content_type = RUBY_OBJECT_MIMETYPE
 
 		return allowed_methods
 	end

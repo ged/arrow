@@ -183,9 +183,12 @@ describe Arrow::Service do
 		end
 
 		it "knows that it doesn't implement any HTTP method except OPTIONS" do
+			headers_out = mock( "headers table" )
 			@txn.stub!( :request_method ).and_return( 'OPTIONS' )
 
-			@headers.should_receive( :[]= ).with( 'Allow', 'OPTIONS' )
+			@txn.should_receive( :headers_out ).and_return( headers_out )
+			headers_out.should_receive( :[]= ).with( 'Allow', 'OPTIONS' )
+			@txn.should_receive( :content_type= ).with( RUBY_OBJECT_MIMETYPE )
 			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
 
 			@service.run( @txn ).should == ['OPTIONS']
@@ -300,6 +303,7 @@ describe Arrow::Service do
 
 			@headers.should_receive( :[]= ).with( 'Allow', 'DELETE, GET, HEAD, OPTIONS, POST, PUT' )
 			@txn.should_receive( :status= ).with( Apache::HTTP_OK )
+			@txn.should_receive( :content_type= ).with( RUBY_OBJECT_MIMETYPE )
 
 			@service.run( @txn ).should == %w[DELETE GET HEAD OPTIONS POST PUT]
 		end
