@@ -39,22 +39,12 @@ module Arrow
 
 
 	# Try loading stuff through Rubygems if the require fails and Rubygems isn't loaded yet
-	begin
-		require 'arrow/constants'
-		require 'arrow/monkeypatches'
-		require 'arrow/exceptions'
-		require 'arrow/mixins'
-		require 'arrow/logger'
-	rescue LoadError
-		if ! Object.constant_defined?( :Gem )
-			require 'rubygems'
-			retry
-		end
-		raise
-	end
+	require 'arrow/constants'
+	require 'arrow/monkeypatches'
+	require 'arrow/exceptions'
+	require 'arrow/mixins'
+	require 'arrow/logger'
 
-	include Arrow::Constants
-	
 
 	# Hook up PluginFactory logging to Arrow logging
 	# PluginFactory.logger_callback = lambda do |lvl, msg|
@@ -68,7 +58,7 @@ module Arrow
 	### the first request each child handles. See the docs for dispatcher.rb 
 	### for an example of how to use this.
 	class DispatcherLoader
-		
+
 		### Create a loader that will create dispatchers from the given 
 		### +hostsfile+, which is a YAML hash that maps dispatcher names to 
 		### a configfile path. 
@@ -79,8 +69,8 @@ module Arrow
 
 			@hostsfile = hostsfile
 		end
-		
-		
+
+
 		### Load the dispatchers according to the registered hosts file.
 		def child_init( req )
 			req.server.log_info( "Loading dispatcher configs from " + @hostsfile + "." )

@@ -53,7 +53,10 @@ require 'arrow/exceptions'
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
 class Arrow::Path
-	include Enumerable, Arrow::Loggable
+	include Enumerable,
+	        Arrow::Loggable,
+	        Arrow::Constants
+
 	extend Forwardable
 
 
@@ -77,7 +80,7 @@ class Arrow::Path
 
 	### Return the YAML type for this class
 	def self::to_yaml_type
-		"!%s/arrowPath" % Arrow::YAML_DOMAIN
+		"!%s/arrowPath" % [ Arrow::Constants::YAML_DOMAIN ]
 	end
 
 

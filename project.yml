@@ -1,15 +1,14 @@
 --- 
 rubyforge_project: arrow
 project_requirements: 
-  mod_ruby: ">= 1.2.6"
-  Apache: ">= 2.2.8"
+  mod_ruby: ">= 1.3.0"
+  Apache: ">= 2.2.11"
 project_pubdir: /usr/local/www/public/code
 project_description: |-
   Arrow is a web application framework for mod_ruby. It was designed to make
   development of web applications under Apache easier and more fun without
   sacrificing the power of being able to access the native Apache API.
 rubyforge_group: deveiate
-author_name: Michael Granger
 project_pubhost: deveiate
 project_homepage: http://deveiate.org/projects/Arrow/
 project_dependencies: 
@@ -21,12 +20,11 @@ project_name: Arrow
 version_file: arrow.rb
 additional_pkgfiles: 
 - docs/manual/{layouts,lib,resources,source}/**
-dev_dependencies:
-  json: >=1.1.3
-  activerecord: =2.1.1
-  flexmock: >=0.8.2
-
-author_email: ged@FaerieMUD.org
+dev_dependencies: 
+  json: ">=1.1.3"
+authors: 
+  Martin Chase: stillflame@FaerieMUD.org
+  Michael Granger: ged@FaerieMUD.org
 post_install_message: |-
   You will need to install mod_ruby separately if you have not already done so.
   

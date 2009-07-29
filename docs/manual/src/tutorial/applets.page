@@ -267,9 +267,13 @@ h3. Error Handlers
 
 h3. Missing Applet Applet
 
-h3. REST services with Arrow::Service
+h3. Arrow::Service
+
+The <?api Arrow::Service ?> applet class provides a way to publish a resource via a "REST":http://en.wikipedia.org/wiki/Representational_State_Transfer interface. 
 
 h4. HTTP Verbs
+
+
 
 h4. Content-negotiation
 

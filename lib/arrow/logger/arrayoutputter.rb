@@ -1,9 +1,10 @@
 #!/usr/bin/env ruby
 
 require 'arrow/mixins'
-require 'arrow/logger/fileoutputter'
+require 'arrow/logger/outputter'
+require 'arrow/logger/htmloutputter'
 
-# Output logging messages in HTML fragments with classes that match their level. 
+# Accumulate logging messages in HTML fragments into an Array which can later be fetched.
 # 
 # == Subversion Id
 #
@@ -19,7 +20,7 @@ require 'arrow/logger/fileoutputter'
 #
 # Please see the file LICENSE in the BASE directory for licensing details.
 #
-class Arrow::Logger::HtmlOutputter < Arrow::Logger::FileOutputter
+class Arrow::Logger::ArrayOutputter < Arrow::Logger::Outputter
 	include Arrow::HTMLUtilities
 
 	# SVN Revision
@@ -29,7 +30,7 @@ class Arrow::Logger::HtmlOutputter < Arrow::Logger::FileOutputter
 	SVNId = %q$Id$
 
 	# Default decription used when creating instances
-	DEFAULT_DESCRIPTION = "HTML Fragment Logging Outputter"
+	DEFAULT_DESCRIPTION = "Array Outputter"
 
 	# The default logging output format
 	HTML_FORMAT = %q{
@@ -43,11 +44,19 @@ class Arrow::Logger::HtmlOutputter < Arrow::Logger::FileOutputter
 	</div>
 	}
 
-
-	### Override the default argument values.
+	### Override the default to intitialize the Array.
 	def initialize( uri, description=DEFAULT_DESCRIPTION, format=HTML_FORMAT ) # :notnew:
+		@array = []
 		super
 	end
+
+
+	######
+	public
+	######
+
+	# The Array any output log messages get appended to
+	attr_reader :array
 
 
 	### Write the given +level+, +name+, +frame+, and +msg+ to the target
@@ -58,11 +67,11 @@ class Arrow::Logger::HtmlOutputter < Arrow::Logger::FileOutputter
 	def write( time, level, name, frame, msg )
 		escaped_msg = escape_html( msg )
 		escaped_name = escape_html( name )
-		html = @format.interpolate( binding )
+		html = self.format.interpolate( binding )
 
-		@io.puts( html )
+		@array << html
 	end
 
 
-end # class Arrow::Logger::HtmlOutputter
+end # class Arrow::Logger::ArrayOutputter
 
