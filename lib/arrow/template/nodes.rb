@@ -46,7 +46,7 @@ class Arrow::Template
 			false
 		end
 		alias_method :rendering?, :is_rendering_node?
-		
+
 
 		### Install the node object into the given +template+ object.
 		def add_to_template( template )
@@ -148,7 +148,7 @@ class Arrow::Template
 		######
 		public
 		######
-		
+
 		# The node body
 		attr_accessor :body
 
@@ -176,7 +176,7 @@ class Arrow::Template
 		def is_rendering_node?
 			true
 		end
-		
+
 
 		### Return the node as a String.
 		def to_s
@@ -196,7 +196,7 @@ class Arrow::Template
 		def inspect
 			%Q{<%s Node: %s>} % [ @type.capitalize, @body.inspect ]
 		end
-	
+
 	end # class TextNode
 
 
@@ -292,11 +292,11 @@ class Arrow::Template
 			rary = []
 			rary << template.render_comment( self.inspect ) if
 				template._config[:debuggingComments]
-			
+
 			return rary
 		end
 
-		
+
 		### Return a human-readable version of the object suitable for debugging
 		### messages.
 		def inspect
@@ -396,8 +396,8 @@ class Arrow::Template
 		def is_rendering_node?
 			true
 		end
-		
-		
+
+
 		### Try to pre-render any attributes which correspond to this node.
 		def before_rendering( template )
 			if attrib = template[ self.name ]
@@ -419,7 +419,7 @@ class Arrow::Template
 					# self.name
 			end
 		end
-		
+
 
 		### Render the directive node's contents as a String and return it.
 		def render( template, scope )
@@ -573,7 +573,7 @@ class Arrow::Template
 			@subnodes = []
 			super
 		end
-		
+
 
 		######
 		public
@@ -589,7 +589,7 @@ class Arrow::Template
 		def is_rendering_node?
 			false
 		end
-		
+
 
 		### Install the behaviour defined by the directive and its subnodes
 		### into the given +template+ object. This by default just installs
@@ -714,7 +714,7 @@ class Arrow::Template
 		def is_rendering_node?
 			false
 		end
-		
+
 
 		### Returns +true+ if this Directive, in the context of the given
 		### +template+ (an Arrow::Template) and +scope+ (a Binding object),

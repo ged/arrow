@@ -48,7 +48,7 @@ class Arrow::Logger::HtmlOutputter < Arrow::Logger::FileOutputter
 	### output mechanism. Subclasses can call this with a block which will
 	### be passed the formatted message. If no block is supplied by the
 	### child, this method will check to see if $DEBUG is set, and if it is,
-	### write the log message to $deferr.
+	### write the log message to $stderr.
 	def write( time, level, name, frame, msg )
 		escaped_msg = escape_html( msg )
 		escaped_name = escape_html( name )

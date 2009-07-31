@@ -93,14 +93,14 @@ class Arrow::Logger::Outputter
 	### output mechanism. Subclasses can call this with a block which will
 	### be passed the formatted message. If no block is supplied by the
 	### child, this method will check to see if $DEBUG is set, and if it is,
-	### write the log message to $deferr.
+	### write the log message to $stderr.
 	def write( time, level, name, frame, msg )
 		msg = @format.interpolate( binding )
 
 		if block_given?
 			yield( msg )
 		else
-			$deferr.puts( msg ) if $DEBUG
+			$stderr.puts( msg ) if $DEBUG
 		end
 	end
 

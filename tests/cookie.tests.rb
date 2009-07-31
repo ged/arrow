@@ -17,9 +17,10 @@ unless defined? Arrow::TestCase
 	
 	testsdir = Pathname.new(__FILE__).dirname.expand_path
 	basedir = testsdir.parent
+	libdir = basedir + 'lib'
 
-	$LOAD_PATH.unshift( basedir + lib ) unless
-		$LOAD_PATH.include?( basedir + lib )
+	$LOAD_PATH.unshift( libdir.to_s ) unless
+		$LOAD_PATH.include?( libdir.to_s )
 
 	require 'arrow/testcase'
 end
