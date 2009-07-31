@@ -24,12 +24,6 @@ require 'bluecloth'
 ### The class namespace.
 module ArrowWiki
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	### Abstract base data class for wiki objects.
 	class WikiDataObject < TableAdapter

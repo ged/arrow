@@ -18,12 +18,6 @@ require 'arrow/applet'
 ### A superclass applet for testing inheritance
 class SuperHello < Arrow::Applet
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	# Applet signature -- since it defines no 'uri' item, it shouldn't be loaded
 	# by the appserver directly.

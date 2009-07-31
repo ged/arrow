@@ -21,12 +21,6 @@ require 'arrow/applet'
 ### An example applet that you can chain through for simple authentication.
 class ProtectedDelegator < Arrow::Applet
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	Users = {
 		'ged'			=> "30ff9a6c184a0fde7ac7ade1479ee19f",

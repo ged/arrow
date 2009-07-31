@@ -22,12 +22,6 @@ require 'arrow/logger/fileoutputter'
 class Arrow::Logger::HtmlOutputter < Arrow::Logger::FileOutputter
 	include Arrow::HTMLUtilities
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	# Default decription used when creating instances
 	DEFAULT_DESCRIPTION = "HTML Fragment Logging Outputter"
 

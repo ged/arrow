@@ -23,12 +23,6 @@ require 'arrow/session/id'
 #
 class Arrow::Session::UserTrackId < Arrow::Session::Id
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 
 	#############################################################

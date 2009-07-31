@@ -18,12 +18,6 @@ require 'arrow/applet'
 ### It's a simple wiki that can serve as a proof of concept
 class WikiApplet < Arrow::Applet
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	# Applet signature
 	Signature = {

@@ -24,12 +24,6 @@ require 'arrow/applet'
 ### An Arrow appserver status applet.
 class ServerStatus < Arrow::Applet
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	# Applet signature
 	Signature = {

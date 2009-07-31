@@ -18,12 +18,6 @@ require 'GD'
 ### It generates a blank logo of a given size and format.
 class LogoGenerator < Arrow::Applet
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	# Applet signature
 	Signature = {

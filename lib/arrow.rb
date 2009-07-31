@@ -28,12 +28,6 @@ require 'pathname'
 #
 module Arrow
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	# Library version
 	VERSION = '1.0.5'
 

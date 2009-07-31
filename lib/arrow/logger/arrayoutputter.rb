@@ -23,12 +23,6 @@ require 'arrow/logger/htmloutputter'
 class Arrow::Logger::ArrayOutputter < Arrow::Logger::Outputter
 	include Arrow::HTMLUtilities
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	# Default decription used when creating instances
 	DEFAULT_DESCRIPTION = "Array Outputter"
 

@@ -20,12 +20,6 @@ require 'arrow/applet'
 ### applets in a running Arrow application.
 class AppletViewer < Arrow::Applet
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	# Width of tabs in prettified code
 	DefaultTabWidth = 4

@@ -19,12 +19,6 @@ require 'arrow/config'
 ### An Arrow applet class for viewing/editing Arrow configurations.
 class ConfigApplet < Arrow::Applet
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	# Applet signature
 	Signature = {
 		:name => "ConfigApplet",

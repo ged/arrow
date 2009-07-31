@@ -24,12 +24,6 @@ Arrow::Logger.global.debug "SubclassedHello: Past the requires"
 ### An applet for testing inheritance from other derived applets
 class SubclassedHello < SuperHello
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	# Applet signature
 	Signature = {

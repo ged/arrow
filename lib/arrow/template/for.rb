@@ -73,12 +73,6 @@ require 'arrow/template/iterator'
 class Arrow::Template::ForDirective < Arrow::Template::BracketingDirective # :nodoc:
 	include Arrow::Template::Parser::Patterns
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	# The regexp for matching the 'in' part of the directive
 	IN = WHITESPACE + /in/i + WHITESPACE
 

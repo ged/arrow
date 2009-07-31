@@ -43,12 +43,6 @@ class Arrow::CookieSet < Arrow::Object
 	include Enumerable
 
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	#################################################################
 	###	I N S T A N C E   M E T H O D S

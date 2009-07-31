@@ -104,12 +104,6 @@ class Arrow::Session::Store < Arrow::Object
 	include PluginFactory
 	extend Forwardable
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	# The URI of the lock class recommended for use with this Store.
 	RecommendedLocker = URI.parse( 'file:.' )
 

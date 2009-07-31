@@ -25,12 +25,6 @@ require 'arrow/session/lock'
 #
 class Arrow::Session::PosixLock < Arrow::Session::Lock
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	# The path to the default lockdir
 	DefaultLockDir = '/tmp'

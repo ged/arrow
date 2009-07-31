@@ -38,12 +38,6 @@ class Arrow::Template::UnlessDirective < Arrow::Template::BracketingDirective # 
 	require 'arrow/template/else'
 	require 'arrow/template/elsif'
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	#############################################################
 	###	I N S T A N C E   M E T H O D S

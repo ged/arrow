@@ -24,12 +24,6 @@ require 'arrow/applet'
 ### An error-handling applet.
 class ErrorHandler < Arrow::Applet
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	# Applet signature
 	Signature = {

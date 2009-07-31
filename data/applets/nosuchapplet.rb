@@ -18,12 +18,6 @@ require 'arrow/applet'
 ### An example missingApplet applet.
 class NoSuchAppletHandler < Arrow::Applet
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	# Applet signature
 	applet_name "No-such-applet handler"

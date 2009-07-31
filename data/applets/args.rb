@@ -19,12 +19,6 @@ require 'arrow/applet'
 ### An applet for testing/debugging the argument validator.
 class ArgumentTester < Arrow::Applet
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	# Applet signature
 	applet_name "Argument Tester"
 	applet_description "This app is for testing/debugging the argument validator."

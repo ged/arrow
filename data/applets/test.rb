@@ -26,12 +26,6 @@ at_exit { Test::Unit.run = true }
 ### by chaining through it.
 class UnitTester < Arrow::Applet
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	# Default options for the BDB::Env object
 	EnvOptions = {

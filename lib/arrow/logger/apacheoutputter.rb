@@ -24,12 +24,6 @@ require 'arrow/logger/outputter'
 #
 class Arrow::Logger::ApacheOutputter < Arrow::Logger::Outputter
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	# The default description
 	DefaultDescription = "Apache Log Outputter"
 

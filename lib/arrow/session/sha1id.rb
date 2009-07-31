@@ -30,12 +30,6 @@ require 'arrow/session/id'
 #
 class Arrow::Session::SHA1Id < Arrow::Session::Id
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	# Default salt characters
 	DEFAULT_SALT = 'sadblkw456jbhgsdfi7283hnehonaseegop26m'
 

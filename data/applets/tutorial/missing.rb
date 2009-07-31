@@ -18,12 +18,6 @@ require 'arrow/applet'
 ### An example missingApplet applet.
 class MissingApplet < Arrow::Applet
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	# Applet signature
 	Signature = {

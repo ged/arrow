@@ -18,12 +18,6 @@ require 'arrow/applet'
 ### It is an applet which generates an image from one or more characters of text.
 class ImageText < Arrow::Applet
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	# Applet signature
 	Signature = {

@@ -46,12 +46,6 @@ require 'arrow/template'
 class Arrow::Template::Iterator < Arrow::Object
 	include Enumerable
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 
 	#############################################################

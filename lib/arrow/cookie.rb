@@ -31,12 +31,6 @@ require 'uri'
 #
 class Arrow::Cookie < Arrow::Object
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	CookieDateFormat = '%a, %d-%b-%Y %H:%M:%S GMT'
 
 	### Strip surrounding double quotes from a copy of the specified string 

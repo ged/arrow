@@ -25,12 +25,6 @@ require 'arrow/template/call'
 #
 class Arrow::Template::URLEncodeDirective < Arrow::Template::CallDirective # :nodoc:
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	# Non-URIC Characters (RFC 2396)
 	NonUricRegexp = /[^A-Za-z0-9\-_.!~*'()]/
 

@@ -39,12 +39,6 @@ class Arrow::AcceptParam
 	include Comparable,
 		Arrow::Loggable
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	# The default quality value (weight) if none is specified
 	Q_DEFAULT = 1.0
 	

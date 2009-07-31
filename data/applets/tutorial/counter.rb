@@ -25,12 +25,6 @@ require 'arrow/applet'
 ### An applet for testing session persistance and applet-chaining.
 class AccessCounter < Arrow::Applet
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	# Applet signature
 	Signature = {
 		:name => "Session Access Counter",

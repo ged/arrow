@@ -19,12 +19,6 @@ require 'arrow/htmltokenizer'
 ### A template viewer applet
 class TemplateViewer < Arrow::Applet
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	# Applet signature
 	applet_name "Template Viewer"

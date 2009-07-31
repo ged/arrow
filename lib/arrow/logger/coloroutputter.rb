@@ -21,12 +21,6 @@ require 'arrow/logger/fileoutputter'
 #
 class Arrow::Logger::ColorOutputter < Arrow::Logger::FileOutputter
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	# Set some ANSI escape code constants (Shamelessly stolen from Perl's
 	# Term::ANSIColor by Russ Allbery <rra@stanford.edu> and Zenin <zenin@best.com>
 	AnsiAttributes = {

@@ -18,12 +18,6 @@ require 'bluecloth'
 ### Render a shared document after being transformed via Markdown
 class ShareNotes < Arrow::Applet
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	# Default share directory
 	DefaultDirectory = "/Users/ged/Documents"
 

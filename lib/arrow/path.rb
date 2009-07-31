@@ -60,12 +60,6 @@ class Arrow::Path
 	extend Forwardable
 
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	# The character to split path Strings on, and join on when
 	# converting back to a String.
 	SEPARATOR = File::PATH_SEPARATOR

@@ -24,12 +24,6 @@ require 'arrow/logger/outputter'
 #
 class Arrow::Logger::FileOutputter < Arrow::Logger::Outputter
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	# The default description
 	DEFAULT_DESCRIPTION = "File Outputter"
 

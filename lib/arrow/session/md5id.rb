@@ -23,12 +23,6 @@ require 'arrow/session/id'
 #
 class Arrow::Session::MD5Id < Arrow::Session::Id
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	#############################################################
 	###	C L A S S   M E T H O D S

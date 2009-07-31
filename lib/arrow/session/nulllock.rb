@@ -23,12 +23,6 @@ require 'arrow/session/lock'
 #
 class Arrow::Session::NullLock < Arrow::Session::Lock
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	def initialize( uri, id )
 		super
 	end

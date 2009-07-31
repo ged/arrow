@@ -39,12 +39,6 @@ class Arrow::Session < Arrow::Object
 	require 'arrow/session/id'
 
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	
 	#############################################################
 	###	C L A S S   M E T H O D S

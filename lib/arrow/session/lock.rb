@@ -55,12 +55,6 @@ require 'arrow/session'
 class Arrow::Session::Lock < Arrow::Object
 	include PluginFactory
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	# Lock status flags
 	UNLOCKED	= 0b00
 	READ		= 0b01

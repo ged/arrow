@@ -22,12 +22,23 @@ BEGIN {
 	$LOAD_PATH.unshift( extdir.to_s ) unless $LOAD_PATH.include?( extdir.to_s )
 }
 
+begin
+	require 'readline'
+	include Readline
+rescue LoadError
+	# Fall back to a plain prompt
+	def readline( text )
+		$stderr.print( text.chomp )
+		return $stdin.gets
+	end
+end
+
 require 'rbconfig'
 require 'rake'
 require 'rake/testtask'
 require 'rake/packagetask'
 require 'rake/clean'
-require 'rake/191_compat.rb'
+# require 'rake/191_compat.rb'
 
 $dryrun = false
 
@@ -90,6 +101,8 @@ RAKE_TASKLIBS = Rake::FileList.new( "#{RAKE_TASKDIR}/*.rb" )
 PKG_TASKLIBS  = Rake::FileList.new( "#{RAKE_TASKDIR}/{191_compat,helpers,packaging,rdoc,testing}.rb" )
 PKG_TASKLIBS.include( "#{RAKE_TASKDIR}/manual.rb" ) if MANUALDIR.exist?
 
+RAKE_TASKLIBS_URL = 'http://repo.deveiate.org/rake-tasklibs'
+
 LOCAL_RAKEFILE = BASEDIR + 'Rakefile.local'
 
 EXTRA_PKGFILES = Rake::FileList.new
@@ -119,6 +132,25 @@ RCOV_OPTS = [
 
 
 ### Load some task libraries that need to be loaded early
+if !RAKE_TASKDIR.exist?
+	$stderr.puts "It seems you don't have the build task directory. Shall I fetch it "
+	ans = readline( "for you? [y]" )
+	ans = 'y' if !ans.nil? && ans.empty?
+
+	if ans =~ /^y/i
+		$stderr.puts "Okay, fetching #{RAKE_TASKLIBS_URL} into #{RAKE_TASKDIR}..."
+		system 'hg', 'clone', RAKE_TASKLIBS_URL, RAKE_TASKDIR
+		if ! $?.success?
+			fail "Damn. That didn't work. Giving up; maybe try manually fetching?"
+		end
+	else
+		$stderr.puts "Then I'm afraid I can't continue. Best of luck."
+		fail "Rake tasklibs not present."
+	end
+
+	RAKE_TASKLIBS.include( "#{RAKE_TASKDIR}/*.rb" )
+end
+
 require RAKE_TASKDIR + 'helpers.rb'
 
 # Define some constants that depend on the 'svn' tasklib

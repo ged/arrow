@@ -18,12 +18,6 @@ require 'arrow/applet'
 ### Blah
 class ArrowTutorial < Arrow::Applet
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	# Applet signature
 	Signature = {

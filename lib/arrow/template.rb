@@ -37,12 +37,6 @@ class Arrow::Template < Arrow::Object
 	require 'arrow/template/nodes'
 	require 'arrow/template/iterator'
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	# Configuration defaults. Valid members are the same as those listed for
 	# the +config+ item of the #new method.

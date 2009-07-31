@@ -40,12 +40,6 @@ require 'arrow/template/nodes'
 class Arrow::Template::YieldDirective < Arrow::Template::BracketingDirective # :nodoc:
 	include Arrow::Template::Parser::Patterns
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	# The regexp format of the 'yield' part of the directive tag.
 	FROM = WHITESPACE + /from/i + WHITESPACE
 

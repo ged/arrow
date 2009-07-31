@@ -21,12 +21,6 @@ require 'bluecloth'
 ### It presents a text box into which
 class BlueClothDingus < Arrow::Applet
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	# Applet signature
 	applet_name "BlueCloth Dingus"
 	applet_description "It presents a text box into which one can input " \

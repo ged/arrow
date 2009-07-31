@@ -19,12 +19,6 @@ require 'arrow/applet'
 ### It's only a demonstration of the Transaction's #redirect method.
 class RedirectorApplet < Arrow::Applet
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	# The default URI to redirect to
 	DefaultURI = "status"

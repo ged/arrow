@@ -26,12 +26,6 @@ require 'arrow/applet'
 ### A timeclock applet
 class TimeClock < Arrow::Applet
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	# Applet signature
 	Signature = {

@@ -29,12 +29,6 @@ class Arrow::Broker < Arrow::Object
 
 	### Class constants/methods
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	# A regular expression that matches the file separator on this system
 	FILE_SEPARATOR = Regexp.new( Regexp.compile(File::SEPARATOR) )
 

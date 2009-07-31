@@ -30,12 +30,6 @@ require 'arrow/logger'
 class Arrow::Object < ::Object
 	include Arrow::Loggable
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	### Create a method that warns of deprecation for an instance method. If
 	### <tt>newSym</tt> is specified, the method is being renamed, and this

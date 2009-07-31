@@ -22,12 +22,6 @@ require 'arrow/session/store'
 #
 class Arrow::Session::FileStore < Arrow::Session::Store
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	# The default flags to use when opening the backing store file
 	DefaultIoFlags = File::RDWR|File::CREAT
 

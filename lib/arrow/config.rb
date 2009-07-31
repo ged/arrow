@@ -113,12 +113,6 @@ class Arrow::Config < Arrow::Object
 	include Arrow::HashUtilities
 	extend Forwardable
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	require 'arrow/path'
 
 	# Define the layout and defaults for the underlying structs

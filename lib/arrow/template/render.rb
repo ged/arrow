@@ -28,12 +28,6 @@ require 'arrow/template/parser'
 class Arrow::Template::RenderDirective < Arrow::Template::AttributeDirective # :nodoc:
 	include Arrow::Template::Parser::Patterns
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	# Parse tokens
 	AS = /\s+as\s+/i

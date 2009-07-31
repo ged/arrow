@@ -28,12 +28,6 @@ class Arrow::AppletRegistry < Arrow::Object
 	extend Forwardable
 	include Enumerable, Arrow::Loggable
 	
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	# Pattern for matching valid components of the uri
 	IDENTIFIER = /^\w[-\w]*/
 	

@@ -18,12 +18,6 @@ require 'arrow/applet'
 ### It displays the disposition
 class LoadedFiles < Arrow::Applet
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	# Applet signature
 	Signature = {

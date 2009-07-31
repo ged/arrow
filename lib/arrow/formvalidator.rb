@@ -98,12 +98,6 @@ class Arrow::FormValidator < ::FormValidator
 	include Arrow::Loggable
 	
 	
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	Defaults = {
 		:descriptions => {},
 	}

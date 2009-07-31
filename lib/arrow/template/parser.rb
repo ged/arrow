@@ -231,12 +231,6 @@ class Arrow::Template::Parser < Arrow::Object
 	end # class State
 
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	# Default configuration hash
 	Defaults = {
 		:strict_end_tags			=> false,

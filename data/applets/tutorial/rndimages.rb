@@ -21,12 +21,6 @@ require 'arrow/applet'
 ### It shows the 'latest images' feed from LiveJournal as a page full of clickable links.
 class RandomImages < Arrow::Applet
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	# Default feed URL if none is configured
 	DefaultFeedUrl = 'http://www.livejournal.com/stats/latest-img.bml'

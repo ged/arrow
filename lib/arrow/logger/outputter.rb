@@ -25,12 +25,6 @@ require 'uri'
 class Arrow::Logger::Outputter
 	include PluginFactory
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	# The default description
 	DEFAULT_DESCRIPTION = "Logging Outputter"

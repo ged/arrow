@@ -28,12 +28,6 @@ require 'arrow/constants'
 class Arrow::Config::YamlLoader < Arrow::Config::Loader
 	include Arrow::Constants
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	# Add YAML domain types for Arrow classes
 

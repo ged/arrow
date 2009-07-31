@@ -17,12 +17,6 @@ require 'memcache'
 ### This is a web interface to MemCached.
 class MemCacheApplet < Arrow::Applet
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	# Applet signature
 	Signature = {

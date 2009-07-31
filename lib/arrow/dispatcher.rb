@@ -82,12 +82,6 @@ require 'arrow/fallbackhandler'
 #
 class Arrow::Dispatcher < Arrow::Object
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 
 	#################################################################
 	###	C L A S S   M E T H O D S
