@@ -37,7 +37,7 @@ class Arrow::Transaction < Arrow::Object
 
 	# Regex to match the mimetypes that browsers use for sending form data
 	FORM_CONTENT_TYPES = %r{application/x-www-form-urlencoded|multipart/form-data}i
-	
+
 	# A minimal HTML document for #status_doc
 	HTML_DOC = <<-"EOF".gsub(/^\t/, '')
 	<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
@@ -65,7 +65,7 @@ class Arrow::Transaction < Arrow::Object
 		DelegatedMethods = Apache::Request.instance_methods(false) - [
 			"inspect", "to_s"
 		]
-		
+
 	# Otherwise, just use the ones that were define when this was written (2007/03/20)
 	else
 		raise "No mod_ruby loaded. Try requiring 'apache/fakerequest' " +
@@ -152,7 +152,7 @@ class Arrow::Transaction < Arrow::Object
 
 	# The handler status code to return to Apache
 	attr_accessor :handler_status
-	
+
 
 	### Returns a human-readable String representation of the transaction,
 	### suitable for debugging.
@@ -183,7 +183,7 @@ class Arrow::Transaction < Arrow::Object
 		return nil unless self.status
 		return (self.status / 100) == 2
 	end
-	
+
 
 	### Returns true if the transaction's server status will cause the 
 	### request to be declined (i.e., not handled by Arrow)
@@ -192,7 +192,7 @@ class Arrow::Transaction < Arrow::Object
 		 	[self.handler_status]
 		return self.handler_status == Apache::DECLINED ? true : false
 	end
-	
+
 
 
 	# Apache::Request attributes under various conditions. Need to determine 
@@ -234,7 +234,7 @@ class Arrow::Transaction < Arrow::Object
 		uripat = Regexp.new( "^" + self.app_root )
 		return path.sub( uripat, '' )
 	end
-	
+
 
 	### Return the portion of the request's URI that serves as the base URI for
 	### the application. All self-referential URLs created by the application
@@ -252,7 +252,7 @@ class Arrow::Transaction < Arrow::Object
 		return construct_url( self.app_root )
 	end
 	alias_method :approot_url, :app_root_url
-	
+
 
 	### Return an absolute uri that refers back to the applet the transaction is
 	### being run in
@@ -268,7 +268,7 @@ class Arrow::Transaction < Arrow::Object
 	def applet_url
 		return construct_url( self.applet )
 	end
-	
+
 
 	### If the referer was another applet under the same Arrow instance, return
 	### the uri to it. If there was no 'Referer' header, or the referer wasn't
@@ -329,7 +329,7 @@ class Arrow::Transaction < Arrow::Object
 			end
 		end
 	end
-	
+
 
 	### Overridden from Apache::Request to take Apache mod_proxy headers into
 	### account. If the 'X-Forwarded-Host' or 'X-Forwarded-Server' headers
@@ -345,7 +345,7 @@ class Arrow::Transaction < Arrow::Object
 			uriobj.host = host
 			url = uriobj.to_s
 		end
-		
+
 		return url
 	end
 
@@ -358,7 +358,7 @@ class Arrow::Transaction < Arrow::Object
 		headers = @request.headers_in
 		return headers['x-forwarded-host'] || headers['x-forwarded-server']
 	end
-	
+
 
 	### Fetch the client's IP, either from proxy headers or the connection's IP.
 	def remote_ip
@@ -376,12 +376,12 @@ class Arrow::Transaction < Arrow::Object
 	### Set the result's 'Content-Disposition' header to 'attachment' and set
 	### the attachment's +filename+.
 	def attachment=( filename )
-		
+
 		# IE flubs attachments of any mimetype it handles directly.
 		if self.browser_is_ie?
 			self.content_type = 'application/octet-stream'
 		end
-		
+
 		val = %q{attachment; filename="%s"} % [ filename ]
 		self.headers_out['Content-Disposition'] = val
 	end
@@ -391,18 +391,18 @@ class Arrow::Transaction < Arrow::Object
 	def parsed_uri
 		return URI.parse( self.request.unparsed_uri )
 	end
-	
-	
+
+
 	### Return the Content-type header given in the request's headers, if any
 	def request_content_type
 		return self.headers_in['Content-type']
 	end
-	
-	
+
+
 	# 
 	# HTTP content negotiation
 	# 
-	
+
 	### Return the contents of the 'Accept' header as an Array of Arrow::AcceptParam objects.
 	def accepted_types
 		@accepted_types ||= parse_accept_header( self.headers_in['Accept'] )
@@ -432,13 +432,13 @@ class Arrow::Transaction < Arrow::Object
 	def accepts_html?
 		return self.accepts?( XHTML_MIMETYPE ) || self.accepts?( HTML_MIMETYPE )
 	end
-	
-	
+
+
 	### Return a normalized list of acceptable types, sorted by q-value and specificity.
 	def normalized_accept_string
 		return self.accepted_types.sort.collect {|ap| ap.to_s }.join( ', ' )
 	end
-	
+
 
 	# 
 	# Browser detection/workarounds
@@ -451,8 +451,8 @@ class Arrow::Transaction < Arrow::Object
 		agent = self.headers_in['user-agent'] || ''
 		return agent =~ /MSIE/ ? true : false
 	end
-	
-	
+
+
 	### Execute a block if the User-Agent header indicates that the remote
 	### browser is Internet Explorer. Useful for making the inevitable IE 
 	### workarounds.
@@ -468,8 +468,8 @@ class Arrow::Transaction < Arrow::Object
 		return true if !xrw_header.nil? && xrw_header =~ /xmlhttprequest/i
 		return false
 	end
-	
-	
+
+
 	### Return +true+ if there are HTML form parameters in the request, either in the
 	### query string with a GET request, or in the body of a POST with a mimetype of 
 	### either 'application/x-www-form-urlencoded' or 'multipart/form-data'.
@@ -478,15 +478,15 @@ class Arrow::Transaction < Arrow::Object
 		when 'GET', 'HEAD', 'DELETE', 'PUT'
 			return (!self.parsed_uri.query.nil? || 
 				self.request_content_type =~ FORM_CONTENT_TYPES) ? true : false
-			
+
 		when 'POST'
 			return self.request_content_type =~ FORM_CONTENT_TYPES ? true : false
-			
+
 		else
 			return false
 		end
 	end
-	
+
 
 	#
 	# Redirection methods
@@ -539,7 +539,7 @@ class Arrow::Transaction < Arrow::Object
 		if !URI.parse( url ).absolute?
 			url = self.construct_url( url )
 		end
-		
+
 		self.headers_out['Refresh'] = "%d;%s" % [seconds, url]
 	end
 
@@ -554,11 +554,11 @@ class Arrow::Transaction < Arrow::Object
 	# 
 	# SSL convenience methods
 	# 
-	
-	
-	
-	
-	
+
+
+
+
+
 	#######
 	private
 	#######
@@ -578,7 +578,7 @@ class Arrow::Transaction < Arrow::Object
 		hash = Arrow::Cookie.parse( request.headers_in['cookie'] )
 		return Arrow::CookieSet.new( hash.values )
 	end
-	
+
 
 	### Parse the given +header+ and return a list of mimetypes in order of
 	### specificity and q-value, with most-specific and highest q-values sorted

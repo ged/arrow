@@ -2,6 +2,7 @@
 
 require 'yaml'
 require 'tmpdir'
+require 'rubygems'
 
 require 'pathname'
 
