@@ -1,2 +1,4 @@
 ^commit\-msg\.txt$
 \.(orig|rej)$
+^pkg$
+^ChangeLog$
