@@ -22,12 +22,23 @@ BEGIN {
 	$LOAD_PATH.unshift( extdir.to_s ) unless $LOAD_PATH.include?( extdir.to_s )
 }
 
+begin
+	require 'readline'
+	include Readline
+rescue LoadError
+	# Fall back to a plain prompt
+	def readline( text )
+		$stderr.print( text.chomp )
+		return $stdin.gets
+	end
+end
+
 require 'rbconfig'
 require 'rake'
 require 'rake/testtask'
 require 'rake/packagetask'
 require 'rake/clean'
-require 'rake/191_compat.rb'
+# require 'rake/191_compat.rb'
 
 $dryrun = false
 
@@ -90,10 +101,12 @@ RAKE_TASKLIBS = Rake::FileList.new( "#{RAKE_TASKDIR}/*.rb" )
 PKG_TASKLIBS  = Rake::FileList.new( "#{RAKE_TASKDIR}/{191_compat,helpers,packaging,rdoc,testing}.rb" )
 PKG_TASKLIBS.include( "#{RAKE_TASKDIR}/manual.rb" ) if MANUALDIR.exist?
 
+RAKE_TASKLIBS_URL = 'http://repo.deveiate.org/rake-tasklibs'
+
 LOCAL_RAKEFILE = BASEDIR + 'Rakefile.local'
 
 EXTRA_PKGFILES = Rake::FileList.new
-EXTRA_PKGFILES.include "#{BASEDIR}/docs/manual/{layouts,lib,resources,source}/**"
+EXTRA_PKGFILES.include( "#{BASEDIR}/docs/manual/{layouts,lib,resources,source}/**" )
 
 RELEASE_FILES = TEXT_FILES + 
 	SPEC_FILES + 
@@ -104,6 +117,7 @@ RELEASE_FILES = TEXT_FILES +
 	DATA_FILES + 
 	RAKE_TASKLIBS +
 	EXTRA_PKGFILES
+
 
 RELEASE_FILES << LOCAL_RAKEFILE.to_s if LOCAL_RAKEFILE.exist?
 
@@ -119,12 +133,31 @@ RCOV_OPTS = [
 
 
 ### Load some task libraries that need to be loaded early
+if !RAKE_TASKDIR.exist?
+	$stderr.puts "It seems you don't have the build task directory. Shall I fetch it "
+	ans = readline( "for you? [y]" )
+	ans = 'y' if !ans.nil? && ans.empty?
+
+	if ans =~ /^y/i
+		$stderr.puts "Okay, fetching #{RAKE_TASKLIBS_URL} into #{RAKE_TASKDIR}..."
+		system 'hg', 'clone', RAKE_TASKLIBS_URL, RAKE_TASKDIR
+		if ! $?.success?
+			fail "Damn. That didn't work. Giving up; maybe try manually fetching?"
+		end
+	else
+		$stderr.puts "Then I'm afraid I can't continue. Best of luck."
+		fail "Rake tasklibs not present."
+	end
+
+	RAKE_TASKLIBS.include( "#{RAKE_TASKDIR}/*.rb" )
+end
+
 require RAKE_TASKDIR + 'helpers.rb'
 
 # Define some constants that depend on the 'svn' tasklib
 if hg = which( 'hg' )
-	id = IO.read('|-') or exec hg, 'id', '-q'
-	PKG_BUILD = id.chomp
+	id = IO.read('|-') or exec hg.to_s, 'id', '-n'
+	PKG_BUILD = id.chomp[ /^[[:xdigit:]]+/ ]
 else
 	PKG_BUILD = 0
 end
@@ -166,19 +199,16 @@ DEPENDENCIES = {
 
 # Developer Gem dependencies: gemname => version
 DEVELOPMENT_DEPENDENCIES = {
-	'amatch'      => '>= 0.2.3',
-	'rake'        => '>= 0.8.1',
+	'rake'        => '>= 0.8.7',
 	'rcodetools'  => '>= 0.7.0.0',
-	'rcov'        => '>= 0',
+	'rcov'        => '>= 0.8.1.2.0',
+	'rdoc'        => '>= 2.4.3',
 	'RedCloth'    => '>= 4.0.3',
-	'rspec'       => '>= 0',
+	'rspec'       => '>= 1.2.6',
 	'rubyforge'   => '>= 0',
 	'termios'     => '>= 0',
 	'text-format' => '>= 1.0.0',
 	'tmail'       => '>= 1.2.3.1',
-	'ultraviolet' => '>= 0.10.2',
-	'libxml-ruby' => '>= 0.8.3',
-	'rdoc'        => '>= 2.4.3',
 	'json' => '>=1.1.3',
 }
 
@@ -220,6 +250,7 @@ GEMSPEC   = Gem::Specification.new do |gem|
 	gem.bindir            = BINDIR.relative_path_from(BASEDIR).to_s
 	gem.executables       = BIN_FILES.select {|pn| File.executable?(pn) }.
 	                            collect {|pn| File.basename(pn) }
+	gem.require_paths << EXTDIR.relative_path_from( BASEDIR ).to_s if EXTDIR.exist?
 
 	if EXTCONF.exist?
 		gem.extensions << EXTCONF.relative_path_from( BASEDIR ).to_s
@@ -233,14 +264,6 @@ GEMSPEC   = Gem::Specification.new do |gem|
 		gem.add_runtime_dependency( name, version )
 	end
 
-	# Developmental dependencies don't work as of RubyGems 1.2.0
-	unless Gem::Version.new( Gem::RubyGemsVersion ) <= Gem::Version.new( "1.2.0" )
-		DEVELOPMENT_DEPENDENCIES.each do |name, version|
-			version = '>= 0' if version.length.zero?
-			gem.add_development_dependency( name, version )
-		end
-	end
-
 	REQUIREMENTS.each do |name, version|
 		gem.requirements << [ name, version ].compact.join(' ')
 	end
@@ -248,14 +271,14 @@ end
 
 $trace = Rake.application.options.trace ? true : false
 $dryrun = Rake.application.options.dryrun ? true : false
-
+$include_dev_dependencies = false
 
 # Load any remaining task libraries
 RAKE_TASKLIBS.each do |tasklib|
 	next if tasklib.to_s =~ %r{/helpers\.rb$}
 	begin
 		trace "  loading tasklib %s" % [ tasklib ]
-		require tasklib
+		import tasklib
 	rescue ScriptError => err
 		fail "Task library '%s' failed to load: %s: %s" %
 			[ tasklib, err.class.name, err.message ]
@@ -280,7 +303,6 @@ task :default  => [:clean, :local, :spec, :rdoc, :package]
 
 ### Task the local Rakefile can append to -- no-op by default
 task :local
-
 
 ### Task: clean
 CLEAN.include 'coverage'
