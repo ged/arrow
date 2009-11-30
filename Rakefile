@@ -33,6 +33,14 @@ rescue LoadError
 	end
 end
 
+begin
+	require 'rubyfems'
+rescue LoadError
+	module Gem
+		class Specification; end
+	end
+end
+
 require 'rbconfig'
 require 'rake'
 require 'rake/testtask'
@@ -106,7 +114,7 @@ RAKE_TASKLIBS_URL = 'http://repo.deveiate.org/rake-tasklibs'
 LOCAL_RAKEFILE = BASEDIR + 'Rakefile.local'
 
 EXTRA_PKGFILES = Rake::FileList.new
-EXTRA_PKGFILES.include "#{BASEDIR}/docs/manual/{layouts,lib,resources,source}/**"
+EXTRA_PKGFILES.include( "#{BASEDIR}/docs/manual/{layouts,lib,resources,source}/**" )
 
 RELEASE_FILES = TEXT_FILES + 
 	SPEC_FILES + 
@@ -117,6 +125,7 @@ RELEASE_FILES = TEXT_FILES +
 	DATA_FILES + 
 	RAKE_TASKLIBS +
 	EXTRA_PKGFILES
+
 
 RELEASE_FILES << LOCAL_RAKEFILE.to_s if LOCAL_RAKEFILE.exist?
 
@@ -155,8 +164,8 @@ require RAKE_TASKDIR + 'helpers.rb'
 
 # Define some constants that depend on the 'svn' tasklib
 if hg = which( 'hg' )
-	id = IO.read('|-') or exec hg, 'id', '-q'
-	PKG_BUILD = id.chomp.gsub( /\W+/, '' )
+	id = IO.read('|-') or exec hg.to_s, 'id', '-n'
+	PKG_BUILD = id.chomp[ /^[[:xdigit:]]+/ ]
 else
 	PKG_BUILD = 0
 end
@@ -192,25 +201,23 @@ RUBYFORGE_PROJECT = 'arrow'
 # Gem dependencies: gemname => version
 DEPENDENCIES = {
 	'pluginfactory' => '>= 1.0.3',
-	'formvalidator' => '>= 0.1.4',
 	'ruby-cache' => '>= 0.3.0',
+	'formvalidator' => '>= 0.1.4',
 }
 
 # Developer Gem dependencies: gemname => version
 DEVELOPMENT_DEPENDENCIES = {
-	'amatch'      => '>= 0.2.3',
-	'rake'        => '>= 0.8.1',
+	'rake'        => '>= 0.8.7',
 	'rcodetools'  => '>= 0.7.0.0',
-	'rcov'        => '>= 0',
+	'rcov'        => '>= 0.8.1.2.0',
+	'rdoc'        => '>= 2.4.3',
 	'RedCloth'    => '>= 4.0.3',
-	'rspec'       => '>= 0',
+	'rspec'       => '>= 1.2.6',
 	'rubyforge'   => '>= 0',
 	'termios'     => '>= 0',
 	'text-format' => '>= 1.0.0',
 	'tmail'       => '>= 1.2.3.1',
-	'ultraviolet' => '>= 0.10.2',
-	'libxml-ruby' => '>= 0.8.3',
-	'rdoc'        => '>= 2.4.3',
+	'diff-lcs'    => '>= 1.1.2',
 	'json' => '>=1.1.3',
 }
 
@@ -243,7 +250,9 @@ GEMSPEC   = Gem::Specification.new do |gem|
 	gem.authors           = "Martin Chase, Michael Granger"
 	gem.email             = ["stillflame@FaerieMUD.org", "ged@FaerieMUD.org"]
 	gem.homepage          = 'http://deveiate.org/projects/Arrow/'
-	gem.rubyforge_project = RUBYFORGE_PROJECT
+
+	# Apparently this isn't actually the 'project'?
+	gem.rubyforge_project = RUBYFORGE_GROUP
 
 	gem.has_rdoc          = true
 	gem.rdoc_options      = RDOC_OPTIONS
@@ -252,6 +261,7 @@ GEMSPEC   = Gem::Specification.new do |gem|
 	gem.bindir            = BINDIR.relative_path_from(BASEDIR).to_s
 	gem.executables       = BIN_FILES.select {|pn| File.executable?(pn) }.
 	                            collect {|pn| File.basename(pn) }
+	gem.require_paths << EXTDIR.relative_path_from( BASEDIR ).to_s if EXTDIR.exist?
 
 	if EXTCONF.exist?
 		gem.extensions << EXTCONF.relative_path_from( BASEDIR ).to_s
@@ -265,14 +275,6 @@ GEMSPEC   = Gem::Specification.new do |gem|
 		gem.add_runtime_dependency( name, version )
 	end
 
-	# Developmental dependencies don't work as of RubyGems 1.2.0
-	unless Gem::Version.new( Gem::RubyGemsVersion ) <= Gem::Version.new( "1.2.0" )
-		DEVELOPMENT_DEPENDENCIES.each do |name, version|
-			version = '>= 0' if version.length.zero?
-			gem.add_development_dependency( name, version )
-		end
-	end
-
 	REQUIREMENTS.each do |name, version|
 		gem.requirements << [ name, version ].compact.join(' ')
 	end
@@ -280,14 +282,14 @@ end
 
 $trace = Rake.application.options.trace ? true : false
 $dryrun = Rake.application.options.dryrun ? true : false
-
+$include_dev_dependencies = false
 
 # Load any remaining task libraries
 RAKE_TASKLIBS.each do |tasklib|
 	next if tasklib.to_s =~ %r{/helpers\.rb$}
 	begin
 		trace "  loading tasklib %s" % [ tasklib ]
-		require tasklib
+		import tasklib
 	rescue ScriptError => err
 		fail "Task library '%s' failed to load: %s: %s" %
 			[ tasklib, err.class.name, err.message ]
@@ -312,7 +314,6 @@ task :default  => [:clean, :local, :spec, :rdoc, :package]
 
 ### Task the local Rakefile can append to -- no-op by default
 task :local
-
 
 ### Task: clean
 CLEAN.include 'coverage'
