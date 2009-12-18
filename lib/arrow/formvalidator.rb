@@ -49,10 +49,6 @@ require 'arrow/object'
 #		return failure_template
 #	end
 #
-# == Rcsid
-# 
-# $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>

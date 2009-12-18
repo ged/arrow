@@ -1,4 +1,6 @@
 --- 
+excluded_pkgfiles: []
+
 rubyforge_project: arrow
 project_requirements: 
   mod_ruby: ">= 1.3.0"

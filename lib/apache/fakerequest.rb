@@ -8,6 +8,7 @@
 require 'fileutils'
 require 'uri'
 require 'forwardable'
+require 'tmpdir'
 
 class Integer # :nodoc: all
 	def of
@@ -90,7 +91,7 @@ module Apache # :nodoc: all
 	HTTP_CONTINUE            = 100
 	HTTP_SWITCHING_PROTOCOLS = 101
 	HTTP_PROCESSING          = 102
-	
+
 	DOCUMENT_FOLLOWS       = 200
 	HTTP_OK                = 200
 	HTTP_CREATED           = 201
@@ -101,7 +102,7 @@ module Apache # :nodoc: all
 	HTTP_PARTIAL_CONTENT   = 206
 	PARTIAL_CONTENT        = 206
 	HTTP_MULTI_STATUS      = 207
-	
+
 	HTTP_MULTIPLE_CHOICES   = 300
 	MULTIPLE_CHOICES        = 300
 	HTTP_MOVED_PERMANENTLY  = 301
@@ -113,7 +114,7 @@ module Apache # :nodoc: all
 	USE_LOCAL_COPY          = 304
 	HTTP_USE_PROXY          = 305
 	HTTP_TEMPORARY_REDIRECT = 307
-	
+
 	BAD_REQUEST                        = 400
 	HTTP_BAD_REQUEST                   = 400
 	AUTH_REQUIRED                      = 401
@@ -143,7 +144,7 @@ module Apache # :nodoc: all
 	HTTP_UNPROCESSABLE_ENTITY          = 422
 	HTTP_LOCKED                        = 423
 	HTTP_FAILED_DEPENDENCY             = 424
-	
+
 	HTTP_INTERNAL_SERVER_ERROR = 500
 	SERVER_ERROR               = 500
 	HTTP_NOT_IMPLEMENTED       = 501
@@ -169,21 +170,21 @@ module Apache # :nodoc: all
 		end
 
 		def_delegators :@hash, :clear, :each, :each_key, :each_value
-		
+
 		def []( key )
 			@hash[ key.downcase ]
 		end
 		alias_method :get, :[]
-		
+
 		def []=( key, val )
 			@hash[ key.downcase ] = val
 		end
 		alias_method :set, :[]=
-		
+
 		def key?( key )
 			@hash.key?( key.downcase )
 		end
-		
+
 		def merge( key, val )
 			key = key.downcase
 			@hash[key] = [@hash[key]] unless @hash[key].is_a?( Array )
@@ -198,7 +199,7 @@ module Apache # :nodoc: all
 		class << self
 			attr_reader :derivatives
 		end
-		
+
 		def self::inherited( mod )
 			@derivatives[ mod ] = caller( 1 ).first.split(/:/)
 			$stderr.puts "Registering simulated %s at %p" % 
@@ -214,7 +215,7 @@ module Apache # :nodoc: all
 		def generate_method( name, argcount )
 			return %q{def %s( %s ); end} % [ name, argcount.of {|i| "arg#{i}"}.join(", ") ]
 		end
-		
+
 		def install_method( file, line, code )
 			$stderr.puts "Installing method at line %d in %s" % [ line, file ]
 			lines = File.readlines( file )
@@ -224,7 +225,7 @@ module Apache # :nodoc: all
 				fh.puts( code )
 				fh.puts( lines[line .. -1] )
 			end
-			
+
 			FileUtils.mv( tmpfile, file )
 		end
 
@@ -234,12 +235,12 @@ module Apache # :nodoc: all
 			if (( source = Apache::ModRubySimObject.derivatives[ self.class ] ))
 				sourcefile = source[0]
 				sourceline = Integer( source[1] )
-				
+
 				$stderr.puts "call to missing method %s" % [ sym ]
 
 				code = generate_method( sym, args.length )
 				install_method( sourcefile, sourceline, code )
-				
+
 				eval( code )
 				self.__send__( sym, *args )
 			else
@@ -270,14 +271,14 @@ module Apache # :nodoc: all
 
 	# Returns the server's root directory (ie., the one set by the ServerRoot directive).
 	def server_root
-		Dir.pwd
+		Dir.tmpdir
 	end
 
 	# Returns the server built date string.
 	def server_built
 		return "Mar 20 2006 14:30:49"
 	end
-	
+
 	# Returns the server version string.
 	def server_version
 		return "Apache/2.2.0 (Unix) mod_ruby/1.2.5 Ruby/1.8.4(2005-12-24)"
@@ -287,8 +288,8 @@ module Apache # :nodoc: all
 	def unescape_url( str )
 		return URI.unescape( str )
 	end
-	
-	
+
+
 	# Apache::Request
 	class Request < ModRubySimObject
 
@@ -370,11 +371,11 @@ module Apache # :nodoc: all
 		def server
 			@server ||= Apache::Server.new
 		end
-		
+
 		def request_method
 			return Apache::METHOD_NUMBERS_TO_NAMES[ @method_number ]
 		end
-		
+
 		def request_method=( methodname )
 			@method_number = Apache::METHOD_NAMES_TO_NUMBERS[ methodname ] or
 				raise "No such HTTP method '%s'" % [methodname]
@@ -391,16 +392,16 @@ module Apache # :nodoc: all
 		def status
 			return Apache::OK
 		end
-	
+
 	end
 
 	class Server < ModRubySimObject
 		def initialize
 			@loglevel = 99 # No logging by default
 		end
-		
+
 		attr_accessor :loglevel
-	
+
 		def hostname
 			"localhost"
 		end
@@ -420,7 +421,7 @@ module Apache # :nodoc: all
 				$stderr.puts "#{sym.to_s.upcase}: #{msg}" if $DEBUG
 			}
 		end
-		
+
 		def admin
 			"jrandomhacker@localhost"
 		end
@@ -431,16 +432,16 @@ module Apache # :nodoc: all
 			return '127.0.0.1'
 		end
 	end	  
-		  
+
 	class Cookie < ModRubySimObject
 	end	  
-		  
+
 	class MultiVal < ModRubySimObject
 	end	  
-		  
+
 	class Upload < ModRubySimObject
 	end	  
-		  
+
 	class ParamTable < ModRubySimObject
 	end
 

@@ -34,7 +34,6 @@ DEMO_APPLETS_GEMSPEC = Gem::Specification.new do |gem|
 	gem.authors           = 'Michael Granger'
 	gem.email             = 'ged@FaerieMUD.org'
 	gem.homepage          = 'http://deveiate.org/projects/Arrow/'
-	gem.rubyforge_project = RUBYFORGE_PROJECT
 
 	gem.has_rdoc          = false
 

@@ -28,7 +28,6 @@ It features:
 * single-file YAML-based configuration for both the appserver and applications
 * Hierarchical pluggable logging facilities
 
-For more information about Arrow's history and design, see "Arrow's History and Design Philosophy":history.html.
 
 h2. A Quick Example
 

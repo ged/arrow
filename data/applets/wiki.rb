@@ -3,10 +3,6 @@
 # The ArrowWiki class, a derivative of Arrow::Applet. It's a
 # simple wiki to demonstrate the Arrow framework.
 # 
-# == Rcsid
-# 
-# $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>

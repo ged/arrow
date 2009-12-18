@@ -9,10 +9,6 @@ require 'arrow/template/call'
 # Arrow::Template::CallDirective. This is the class which defines the
 # behaviour of the 'urlencode' template directive.
 # 
-# == Rcsid
-# 
-# $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>

@@ -3,10 +3,6 @@
 # The FancyImageText class, a derivative of Arrow::Applet. It
 # is an applet which generates an image of a string of TrueType text.
 # 
-# == Rcsid
-# 
-# $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>

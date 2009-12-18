@@ -9,7 +9,6 @@ BEGIN {
 	$LOAD_PATH.unshift( libdir ) unless $LOAD_PATH.include?( libdir )
 }
 
-require 'rubygems'
 require 'spec'
 require 'tempfile'
 require 'tmpdir'
@@ -34,7 +33,7 @@ describe Arrow::Dispatcher do
 	include Arrow::TimeMatchers
 
 	before(:all) do
-		@tmpfile = Tempfile.new( 'test.conf', '.' )
+		@tmpfile = Tempfile.new( 'test.conf' )
 		TEST_CONFIG.dup.write( @tmpfile.path )
 		@tmpfile.close
 	end
@@ -96,7 +95,7 @@ describe Arrow::Dispatcher do
 
 		describe " running under $SAFE = 1" do
 			before(:all) do
-				@configfile = Tempfile.new( 'test.conf', '.' )
+				@configfile = Tempfile.new( 'test.conf' )
 				@configfile.print( YAML.dump(TEST_CONFIG_HASH) )
 				@configfile.close
 
