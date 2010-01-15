@@ -2,3 +2,5 @@
 \.(orig|rej)$
 ^pkg$
 ^ChangeLog$
+^docs/api
+^docs/manual/output
