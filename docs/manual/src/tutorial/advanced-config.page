@@ -7,7 +7,7 @@ filters:
   - textile
 ---
 
-h1. Arrow Tutorial: Advanced Configuration
+h1. Tutorial: Advanced Configuration
 
 Arrow's configuration system provides quite a few ways to control the appserver, which it loads,
 where it loads it from, and how it is cached, as well as facilities for adding configuration for 

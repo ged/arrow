@@ -34,11 +34,9 @@
 	</div>
  
 	<div id="footer">
-		<p>
 			<div class="copyright">Copyright &copy; 2008-<%= Time.now.year %> Michael Granger.</div>
 			<div class="vcsrev">Rev: $Revision$</div>
 			<div class="timestamp">Built: <%= Time.now.strftime("%Y%m%d %H:%M:%S %Z") %></div>
-		</p>
 	</div>
 	
 </body>

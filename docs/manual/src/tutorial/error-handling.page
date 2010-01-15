@@ -7,7 +7,7 @@ filters:
   - textile
 ---
 
-h1. Error Handling
+h1. Tutorial: Error Handling
 
 Sometimes errors happen. Don't worry, we've got you covered! No worries!
 

@@ -7,7 +7,7 @@ filters:
   - textile
 ---
 
-h1. Applets
+h1. Tutorial: Applets
 
 The @Arrow::Applet@ class is the main workhorse of the Arrow framework; it, in concert with
 @Arrow::Transaction@, provides most of the functionality that application developers will be

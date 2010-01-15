@@ -9,8 +9,6 @@ example_prelude: |-
   require 'arrow'
 ---
 
-h1. Arrow
-
 Arrow is a web application framework for "mod_ruby":http://www.modruby.net/, a module for "the Apache webserver":http://httpd.apache.org/ that exposes most of the server's module API to Ruby via an embedded interpreter.
 
 It features:
