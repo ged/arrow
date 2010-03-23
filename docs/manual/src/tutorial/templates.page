@@ -10,7 +10,7 @@ filters:
   - textile
 ---
 
-h1. Templating
+h1. Tutorial: Templating
 
 Putting code and html together (either html in the code or vice versa) becomes unwieldy and ugly
 after a certain level of complexity (a little after "hello world"), and for this reason, web

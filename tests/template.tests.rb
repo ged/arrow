@@ -77,7 +77,7 @@ class Arrow::TemplateTestCase < Arrow::TestCase
 			debugMsg "#{linenum}: #{line.chomp}"
 			next unless seenEnd
 			line.chomp!
-			
+
 			case line
 
 			# Directive changes look like:
@@ -258,18 +258,18 @@ class Arrow::TemplateTestCase < Arrow::TestCase
 	def test_default_renderer_understands_arrays
 		template = Arrow::Template.new
 		rval = nil
-		
+
 		assert_nothing_raised do
 			rval = template.render_objects( ["foo", "bar"] )
 		end
-		
+
 		assert_equal "foobar", rval
 	end
 
 	def test_render_calls_pre_and_post_render_hook_for_nodes_that_respond_to_them
 		template = Arrow::Template.new
 		rval = nil
-		
+
 		FlexMock.use( "node object" ) do |node|
 			node.should_receive( :respond_to? ).with( :before_rendering ).
 				and_return( true )
@@ -279,7 +279,7 @@ class Arrow::TemplateTestCase < Arrow::TestCase
 				and_return( true )
 			node.should_receive( :after_rendering ).
 				with( template )
-				
+
 			template.render( [node] )
 		end
 	end
@@ -290,7 +290,7 @@ class Arrow::TemplateTestCase < Arrow::TestCase
 		template = Arrow::Template.new( "<?attr foo ?><?attr bar ?>" )
 		template.foo = "[foo]"
 		template.bar = "[bar]"
-		
+
 		begin
 			sep = $,
 			$, = ':'
@@ -300,7 +300,7 @@ class Arrow::TemplateTestCase < Arrow::TestCase
 		ensure
 			$, = sep
 		end
-		
+
 		assert_equal "[foo]:[bar]", rval
 	end
 end
@@ -1238,7 +1238,8 @@ assert_nothing_raised { template.pairs = pairs }
 
 assert_nothing_raised { rval = template.render }
 debugMsg "\n" + hruleSection( rval, "Rendered" )
-assert_match( templateContentRe("Key => integer\n  Val => 1\nKey => hash\n  Val => \nKey => subsubhash\n  Val => \nKey => hope, faith\n  Val => and charity\n\n\nKey => foo\n  Val => 2\nKey => bar\n  Val => 1\n\n\nKey => string\n  Val => A string"), rval )
+assert_match( /Key => integer\n  Val => 1\n/m, rval )
+assert_match( /Key => hash\n  Val => .*Key => subsubhash\n  Val => \nKey => hope, faith\n  Val => and charity/m, rval )
 ===
 
 === With Complex Methodchain

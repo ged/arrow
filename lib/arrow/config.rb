@@ -365,7 +365,14 @@ class Arrow::Config < Arrow::Object
 
 			when Array
 				# Arrow::Logger[ self ].debug "Untainting array %p" % val
-				newval = val.collect {|v| v.dup.untaint}
+				newval = val.collect do |v|
+					case v
+					when NilClass, TrueClass, FalseClass, Numeric, Symbol
+						v
+					else
+						v.dup.untaint
+					end
+				end
 				newhash[ key ] = newval
 
 			else

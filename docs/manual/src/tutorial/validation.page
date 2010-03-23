@@ -7,7 +7,7 @@ filters:
   - textile
 ---
 
-h1. Input Validation
+h1. Tutorial: Input Validation
 
 Most web applications process input from forms at some point in their execution. While under some
 circumstances it may be okay to accept incoming data as is, the chance of malevolent data, even from

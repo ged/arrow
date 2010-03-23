@@ -30,7 +30,7 @@ require 'pathname'
 module Arrow
 
 	# Library version
-	VERSION = '1.0.5'
+	VERSION = '1.0.6'
 
 
 	# Try loading stuff through Rubygems if the require fails and Rubygems isn't loaded yet
@@ -42,10 +42,10 @@ module Arrow
 
 
 	# Hook up PluginFactory logging to Arrow logging
-	# PluginFactory.logger_callback = lambda do |lvl, msg|
-	# 	Arrow::Logger[PluginFactory].debug( msg )
-	# end
-	# PluginFactory.log( :debug, "Hooked up PluginFactory logging through Arrow's logger." )
+	PluginFactory.logger_callback = lambda do |lvl, msg|
+		Arrow::Logger[PluginFactory].debug( msg )
+	end
+	PluginFactory.log.debug( "Hooked up PluginFactory logging through Arrow's logger." )
 
 
 	### A +RubyChildInitHandler+ class which loads one or more dispatchers

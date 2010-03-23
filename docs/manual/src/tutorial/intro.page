@@ -11,7 +11,7 @@ filters:
   - textile
 ---
 
-h1. Arrow Tutorial: Introduction
+h1. Tutorial: Introduction
 
 First a brief overview of the big parts of Arrow you are likely to hear about later on in the
 tutorial.
@@ -66,7 +66,7 @@ h2. The Basic Parts
 
 An Arrow blogging application might look conceptually something like this:
 
-!.<%= page.basepath %>/images/basic-structure.png!
+!<%= page.basepath %>/images/basic-structure.png!
 
 h3. <?api "Dispatcher":Arrow::Dispatcher ?>
 

@@ -10,7 +10,7 @@ filters:
   - textile
 ---
 
-h1. Sessions
+h1. Tutorial: Sessions
 
 A functional web interface needs to be able to treat each person accessing the site as an
 individual. The way this works out in practice is by associating a "session" with each user, through
