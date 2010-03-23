@@ -14,19 +14,11 @@ require 'arrow/template/nodes'
 #   <?call var.any(other_var.method).chain ?>
 #   <?call "$%0.2f" % var.any(other_var.method).chain ?>
 #
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Template::CallDirective < Arrow::Template::AttributeDirective # :nodoc:
 

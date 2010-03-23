@@ -9,7 +9,7 @@ require 'arrow/template/call'
 # Arrow::Template::CallDirective. This is the class which defines the
 # behaviour of the 'urlencode' template directive.
 # 
-# == Rcsid
+# == VCS Id
 # 
 # $Id$
 # 
@@ -17,19 +17,9 @@ require 'arrow/template/call'
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Template::URLEncodeDirective < Arrow::Template::CallDirective # :nodoc:
-
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
 
 	# Non-URIC Characters (RFC 2396)
 	NonUricRegexp = /[^A-Za-z0-9\-_.!~*'()]/

@@ -10,7 +10,7 @@ require 'forwardable'
 # maintaining the collection of Arrow::Applets registered with an 
 # Arrow::Broker.
 # 
-# == Rcsid
+# == VCS Id
 # 
 # $Id$
 # 
@@ -18,34 +18,24 @@ require 'forwardable'
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::AppletRegistry < Arrow::Object
 	extend Forwardable
 	include Enumerable, Arrow::Loggable
-	
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
 
 	# Pattern for matching valid components of the uri
 	IDENTIFIER = /^\w[-\w]*/
-	
+
 
 	# Link in an applet chain
 	ChainLink = Struct.new( 'ArrowAppletChainLink', :applet, :path, :args )
 
 	### Registry applet filemap data structure.
 	class AppletFile < Arrow::Object
-		
+
 		DEFAULT_SOURCE_WINDOW_SIZE = 20
-		
+
 		### Create a new Arrow::AppletRegistry::AppletFile for the applet at
 		### the given +path+.
 		def initialize( path )
@@ -56,30 +46,30 @@ class Arrow::AppletRegistry < Arrow::Object
 			@exception = nil
 		end
 
-		
+
 		######
 		public
 		######
-		
+
 		# The fully-qualified path to the applet file
 		attr_reader :path
-		
+
 		# An Array of URIs that applets contained in this file are mapped to
 		attr_reader :uris
-		
+
 		# A Time object representing the modification time of the file when it was loaded
 		attr_reader :timestamp
-		
+
 		# The Exception object that was thrown when trying to load this file, if any
 		attr_accessor :exception
-		
-		
+
+
 		### Returns +true+ if this file loaded without error
 		def loaded_okay?
 			@exception.nil?
 		end
 
-		
+
 		### Returns +true+ if the corresponding file has changed since it was loaded
 		def has_changed?
 			@timestamp != File.mtime( path )
@@ -93,7 +83,7 @@ class Arrow::AppletRegistry < Arrow::Object
 				self.log.debug "Loading applet classes from #{@path}"
 				@appletclasses = Arrow::Applet.load( @path )
 			end
-			
+
 		rescue ::Exception => err
 			@exception = err
 			frames = self.filtered_backtrace
@@ -119,7 +109,7 @@ class Arrow::AppletRegistry < Arrow::Object
 
 			return filtered
 		end
-		
+
 
 		### Return the lines from the applet's source as an Array.
 		def source_lines
@@ -141,10 +131,10 @@ class Arrow::AppletRegistry < Arrow::Object
 			after_line = linenum + (window_size / 2.0).ceil
 
 			before_line = 0 if before_line < 0
-			
+
 			self.log.debug "Reading lines %d-%d from %s for source window on line %d" %
 				[ before_line, after_line, @path, linenum + 1 ]
-			
+
 			rval = []
 			lines = self.source_lines[ before_line .. after_line ]
 			lines.each_with_index do |line, i|
@@ -154,11 +144,11 @@ class Arrow::AppletRegistry < Arrow::Object
 					:target  => (before_line + i) == linenum,
 				}
 			end
-			
+
 			return rval
 		end
-		
-		
+
+
 		### Return the line of the exception that occurred while loading the
 		### applet, if any. If there was no exception, this method returns
 		### +nil+.
@@ -166,7 +156,7 @@ class Arrow::AppletRegistry < Arrow::Object
 			return nil unless @exception
 			targetline = nil
 			line = nil
-			
+
 			# ScriptErrors have the target line in the message; everything else
 			# is assumed to have it in the first line of the backtrace
 			if @exception.is_a?( ScriptError )
@@ -182,11 +172,11 @@ class Arrow::AppletRegistry < Arrow::Object
 				raise "Couldn't parse exception backtrace '%s' for error line." %
 					[ targetline ]
 			end
-			
+
 			return line
 		end
-		
-		
+
+
 		### Return +window_size+ lines surrounding the line of the applet's
 		### loading exception. If there was no loading exception, returns
 		### an empty Array.
@@ -194,7 +184,7 @@ class Arrow::AppletRegistry < Arrow::Object
 			return [] unless @exception
 			return self.source_window( self.exception_line, window_size )
 		end
-		
+
 	end
 
 
@@ -219,7 +209,7 @@ class Arrow::AppletRegistry < Arrow::Object
 		Arrow::Logger[ self ].info "Got safe gem home: %p" % [ gemhome ]
 		return gemhome
 	end
-	
+
 
 
 
@@ -231,11 +221,11 @@ class Arrow::AppletRegistry < Arrow::Object
 	#
 	# * Map of uri to applet object [maps incoming requests to applet/s]
 	# * Map of file to uri/s [for deleting entries from map of uris when a file disappears]
-	
+
 	### Create a new Arrow::AppletRegistry object.
 	def initialize( config )
 		@config = config
-	
+
 		@path = @config.applets.path
 		@classmap = nil
 		@filemap = {}
@@ -245,11 +235,11 @@ class Arrow::AppletRegistry < Arrow::Object
 
 		self.load_gems
 		self.load_applets
-		
+
 		super()
 	end
-	
-	
+
+
 	### Copy initializer -- reload applets for cloned registries.
 	def initialize_copy( other ) # :nodoc:
 		@config = other.config.dup
@@ -263,7 +253,7 @@ class Arrow::AppletRegistry < Arrow::Object
 
 		self.load_gems
 		self.load_applets
-		
+
 		super
 	end
 
@@ -274,23 +264,23 @@ class Arrow::AppletRegistry < Arrow::Object
 
 	# The internal hash of Entry objects, keyed by URI
 	attr_reader :urispace
-	
+
 	# The internal hash of Entry objects keyed by the file they were loaded 
 	# from
 	attr_reader :filemap
 
 	# The Arrow::Config object which specified the registry's behavior.
 	attr_reader :config
-	
+
 	# The Arrow::TemplateFactory which will be given to any loaded applet
 	attr_reader :template_factory
-	
+
 	# The Time when the registry was last loaded
 	attr_accessor :load_time
-	
+
 	# The path the registry will search when looking for new/updated/deleted applets
 	attr_reader :path
-	
+
 
 	# Delegate hash-ish methods to the uri-keyed internal hash
 	def_delegators :@urispace, :[], :[]=, :key?, :keys, :length, :each
@@ -306,18 +296,23 @@ class Arrow::AppletRegistry < Arrow::Object
 			return
 		end
 
+		self.log.debug "  using gem config: %p" % [ config.gems ]
+
 		# Make sure the 'gem home' is a directory and not world-writable; don't use it
 		# otherwise
 		gemhome = self.class.get_safe_gemhome
 		paths = @config.gems.path.collect {|path| path.untaint }
+		self.log.debug "  safe gem paths: %p" % [ paths ]
 		Gem.use_paths( Apache.server_root, paths )
 
 		@config.gems.applets.to_h.each do |gemname, reqstring|
+			self.log.debug "    trying to load %s %s" % [ gemname, reqstring ]
 			reqstring = '>= 0' if reqstring.nil? or reqstring.empty?
 
 			begin
 				self.log.info "Activating gem %s (%s)" % [ gemname, reqstring ]
 				Gem.activate( gemname.to_s, reqstring )
+				self.log.info "  gem %s activated." % [ gemname ]
 			rescue LoadError => err
 				self.log.crit "%s while activating '%s': %s" %
 					[ err.class.name, gemname, err.message ]
@@ -334,9 +329,10 @@ class Arrow::AppletRegistry < Arrow::Object
 				@template_factory.path << templatedir.to_s
 			end
 		end
-		
+
 		self.log.info "  done loading gems (path is now: %p)." % [ @path ]
 	end
+	alias_method :reload_gems, :load_gems
 
 
 	### Loading and reloading the applet registy uses the following strategy:
@@ -349,7 +345,7 @@ class Arrow::AppletRegistry < Arrow::Object
 	###	   reload applets for any whose timestamp has changed since the applets
 	###	   were loaded.
 	### 4. For new files, load the applets they contain.
-	
+
 	### Load any new applets in the registry's path, reload any previously-
 	### loaded applets whose files have changed, and discard any applets whose
 	### files have disappeared.
@@ -418,6 +414,7 @@ class Arrow::AppletRegistry < Arrow::Object
 			if Time.now - self.load_time > interval
 				self.log.debug "Checking for applet updates: poll interval at %ds" % [ interval ]
 				self.reload_applets
+				self.reload_gems
 			end
 		else
 			self.log.debug "Dynamic applet reloading turned off, continuing"
@@ -439,7 +436,7 @@ class Arrow::AppletRegistry < Arrow::Object
 				self.log.debug "  Removing %p, registered at %p" % [ @urispace[uri], uri ]
 				@urispace.delete( uri )
 			end
-			
+
 			@filemap.delete( filename )
 		end
 	end
@@ -454,7 +451,7 @@ class Arrow::AppletRegistry < Arrow::Object
 		# Reload mode -- don't do anything unless the file's been updated
 		if @filemap.key?( path )
 			file = @filemap[ path ]
-			
+
 			if file.has_changed?
 				self.log.info "File %p has changed since loaded. Reloading." % [path]
 				self.purge_deleted_applets( path )
@@ -472,7 +469,7 @@ class Arrow::AppletRegistry < Arrow::Object
 
 		self.log.debug "Attempting to load applet objects from %p" % path
 		@filemap[ path ] = AppletFile.new( path )
-	
+
 		@filemap[ path ].appletclasses.each do |appletclass|
 			self.log.debug "Registering applet class %s from %p" % [appletclass.name, path]
 			begin
@@ -488,7 +485,7 @@ class Arrow::AppletRegistry < Arrow::Object
 				@filemap[ path ].exception = err
 			end
 		end
-			
+
 	end
 
 
@@ -507,7 +504,7 @@ class Arrow::AppletRegistry < Arrow::Object
 		# if there is one.
 		if @classmap.key?( appletname )
 			self.log.debug "  Found one or more uris for '%s'" % appletname
-			
+
 
 			# Create a new instance of the applet for each uri it's
 			# registered under, then wrap that in a RegistryEntry
@@ -519,7 +516,7 @@ class Arrow::AppletRegistry < Arrow::Object
 		else
 			self.log.debug "No uri for '%s': Not instantiated" % appletname
 		end
-		
+
 		return uris
 	end
 

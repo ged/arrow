@@ -38,19 +38,11 @@ require 'arrow/exceptions'
 #    template_path.cache_lifespan = 0
 #    paths = template_path.valid_dirs
 #    
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Path
 	include Enumerable,
@@ -59,12 +51,6 @@ class Arrow::Path
 
 	extend Forwardable
 
-
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
 
 	# The character to split path Strings on, and join on when
 	# converting back to a String.

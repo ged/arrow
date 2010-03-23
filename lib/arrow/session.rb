@@ -13,19 +13,11 @@ require 'arrow/config'
 # The Arrow::Session class, a container for maintaining state across multiple 
 # transactions.
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Session < Arrow::Object
 	include PluginFactory,
@@ -38,12 +30,6 @@ class Arrow::Session < Arrow::Object
 	require 'arrow/session/lock'
 	require 'arrow/session/id'
 
-
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
 
 	
 	#############################################################

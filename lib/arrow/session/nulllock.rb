@@ -7,7 +7,7 @@ require 'arrow/session/lock'
 # This is to be used with an ActiveRecord session store that uses
 # Optomistic Concurrency Control.
 # 
-# == Subversion ID
+# == VCS Id
 # 
 # $Id$
 # 
@@ -15,19 +15,9 @@ require 'arrow/session/lock'
 # 
 # * Jeremiah Jordan <phaedrus@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Session::NullLock < Arrow::Session::Lock
-
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
 
 	def initialize( uri, id )
 		super

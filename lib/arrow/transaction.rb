@@ -17,29 +17,15 @@ require 'arrow/constants'
 # Arrow::Object. Instances of this class encapsulate a transaction within a web
 # application implemented using the Arrow application framework.
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Transaction < Arrow::Object
 	extend Forwardable
 	include Arrow::Constants
-
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
 
 	# Regex to match the mimetypes that browsers use for sending form data
 	FORM_CONTENT_TYPES = %r{application/x-www-form-urlencoded|multipart/form-data}i

@@ -11,7 +11,7 @@ require 'arrow/template/parser'
 #
 #	<?render foo as bar in baz.tmpl ?>
 # 
-# == Subversion Id
+# == VCS Id
 # 
 # $Id$
 # 
@@ -19,26 +19,16 @@ require 'arrow/template/parser'
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Template::RenderDirective < Arrow::Template::AttributeDirective # :nodoc:
 	include Arrow::Template::Parser::Patterns
-
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
 
 
 	# Parse tokens
 	AS = /\s+as\s+/i
 	IN = /in/i
-	
+
 
 	#############################################################
 	###	C L A S S   M E T H O D S
@@ -93,7 +83,7 @@ class Arrow::Template::RenderDirective < Arrow::Template::AttributeDirective # :
 	### Parse the contents of the directive.
 	def parse_directive_contents( parser, state )
 		scanner = state.scanner
-		
+
 		@name = parser.scan_for_identifier( state, true ) or
 			raise Arrow::ParseError, "missing or malformed identifier"
 
@@ -166,13 +156,13 @@ class Arrow::Template::RenderDirective < Arrow::Template::AttributeDirective # :
 		load_path = state.template._load_path
 		path = Arrow::Template.find_file( filename, load_path )
 		subtemplate = nil
-		
+
 		# If the template has already been loaded, just reuse the nodelist
 		state.data[:loadCache] ||= {}
 		if state.data[:loadCache].include?( path )
 			self.log.debug "Re-using cache template instance for %p" % path
 			subtemplate = state.data[:loadCache][ path ]
-			
+
 		else
 			# Load the content of the file and untaint it
 			self.log.debug "Loading %p for the first time" % path

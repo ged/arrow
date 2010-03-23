@@ -26,19 +26,11 @@ require 'arrow/applet'
 #       end
 #   end
 #   
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <mgranger@laika.com>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 module Arrow::SpecHelpers
 

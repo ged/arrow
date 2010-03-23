@@ -18,10 +18,6 @@ require 'arrow/mixins'
 #	ap.qvalue       #=> 0.9
 #	ap =~ 'text/*'  #=> true
 #
-# == Version
-#
-#  $Id$
-#
 # == Authors
 # 
 # This class was originally written as part of the ThingFish project.
@@ -29,21 +25,11 @@ require 'arrow/mixins'
 # * Michael Granger <ged@FaerieMUD.org>
 # * Mahlon E. Smith <mahlon@martini.nu>
 #
-# :include: LICENSE
-#
-#---
-#
 # Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::AcceptParam
 	include Comparable,
 		Arrow::Loggable
-
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
 
 	# The default quality value (weight) if none is specified
 	Q_DEFAULT = 1.0

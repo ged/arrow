@@ -49,7 +49,7 @@ require 'arrow/object'
 #		return failure_template
 #	end
 #
-# == Rcsid
+# == VCS Id
 # 
 # $Id$
 # 
@@ -57,11 +57,7 @@ require 'arrow/object'
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 #
 # Portions of this file are from Ruby on Rails' CGIMethods class from the
@@ -98,12 +94,6 @@ class Arrow::FormValidator < ::FormValidator
 	include Arrow::Loggable
 	
 	
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
-
 	Defaults = {
 		:descriptions => {},
 	}

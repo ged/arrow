@@ -18,31 +18,17 @@ require 'arrow/template/nodes'
 # conditional, and must have a valid associated identifier (the <em>name</em>
 # bit).
 #
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Template::IfDirective < Arrow::Template::BracketingDirective # :nodoc:
 	include Arrow::Template::ConditionalDirective
 
 	require 'arrow/template/else'
 	require 'arrow/template/elsif'
-
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
 
 
 	#############################################################

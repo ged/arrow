@@ -41,7 +41,7 @@ module Arrow
 	#   sends a request for a resource they are not authorized to interact with. By
 	#   default, this method returns a simple HTTP FORBIDDEN response.
 	#
-	# == Subversion Id
+	# == VCS Id
 	#
 	#  $Id$
 	# 
@@ -53,7 +53,7 @@ module Arrow
 	#
 	#--
 	#
-	# Please see the file LICENSE in the BASE directory for licensing details.
+	# Please see the file LICENSE in the top-level directory for licensing details.
 	#
 	module AppletAuthentication
 		

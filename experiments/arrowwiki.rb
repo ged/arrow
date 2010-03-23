@@ -3,7 +3,7 @@
 # The Arrow::Wiki class, a small collection of data classes
 # used by the demo Arrow wiki application.
 # 
-# == Subversion ID
+# == VCS Id
 # 
 # $Id$
 # 
@@ -11,11 +11,7 @@
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 
 require 'tableadapter'
@@ -23,12 +19,6 @@ require 'bluecloth'
 
 ### The class namespace.
 module ArrowWiki
-
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
 
 
 	### Abstract base data class for wiki objects.

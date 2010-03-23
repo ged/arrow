@@ -6,28 +6,14 @@ require 'arrow/logger/htmloutputter'
 
 # Accumulate logging messages in HTML fragments into an Array which can later be fetched.
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Logger::ArrayOutputter < Arrow::Logger::Outputter
 	include Arrow::HTMLUtilities
-
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
 
 	# Default decription used when creating instances
 	DEFAULT_DESCRIPTION = "Array Outputter"

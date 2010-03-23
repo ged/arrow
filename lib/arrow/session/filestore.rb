@@ -6,27 +6,13 @@ require 'arrow/session/store'
 # The Arrow::Session::FileStore class, a derivative of Arrow::Session::Store. 
 # Instances of this class store a session object as a marshalled hash on disk.
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Session::FileStore < Arrow::Session::Store
-
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
 
 	# The default flags to use when opening the backing store file
 	DefaultIoFlags = File::RDWR|File::CREAT

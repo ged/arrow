@@ -5,6 +5,7 @@
 # 
 # 
 
+require 'arrow'
 require 'arrow/logger/htmloutputter'
 
 ### A module of miscellaneous stuff that makes running RSpec a little nicer

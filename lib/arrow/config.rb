@@ -95,29 +95,15 @@ require 'arrow/object'
 #	  documentation for Apache::Cookie#expires for the format of the string.
 # 
 #
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Config < Arrow::Object
 	include Arrow::HashUtilities
 	extend Forwardable
-
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
 
 	require 'arrow/path'
 
@@ -371,7 +357,14 @@ class Arrow::Config < Arrow::Object
 
 			when Array
 				# Arrow::Logger[ self ].debug "Untainting array %p" % val
-				newval = val.collect {|v| v.dup.untaint}
+				newval = val.collect do |v|
+					case v
+					when NilClass, TrueClass, FalseClass, Numeric, Symbol
+						v
+					else
+						v.dup.untaint
+					end
+				end
 				newhash[ key ] = newval
 
 			else

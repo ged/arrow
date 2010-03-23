@@ -2,7 +2,7 @@
 module Arrow
 
 	require 'arrow/exceptions'
-	
+
 	### A collection of utilities for working with Hashes.
 	module HashUtilities
 
@@ -82,7 +82,7 @@ module Arrow
 		alias_method :internify_keys, :symbolify_keys
 
 	end
-	
+
 
 	### A collection of utilities for working with Arrays.
 	module ArrayUtilities
@@ -123,7 +123,7 @@ module Arrow
 		end
 
 	end
-	
+
 
 	### A collection of HTML utility functions
 	module HTMLUtilities
@@ -177,7 +177,7 @@ module Arrow
 				gsub(/\n/, '&#8629;').
 				gsub(/\t/, '&#8594;')
 		end
-		
+
 
 		### Return an HTML fragment describing the specified +object+.
 		def make_html_for_object( object )
@@ -333,7 +333,7 @@ module Arrow
 		class << self
 			attr_accessor :modules
 		end
-		
+
 
 		### Make the given object (which must be a Module) configurable via
 		### a section of an Arrow::Config object.
@@ -354,20 +354,20 @@ module Arrow
 				return :anonymous
 			end
 		end
-		
+
 
 		### Mixin hook: extend including classes
 		def self::included( mod )
 			mod.extend( self )
 			super
 		end
-		
-		
+
+
 		### Configure Configurable classes with the sections of the specified
 		### +config+ that correspond to their +config_key+, if present.
 		### (Undocumented)
 		def self::configure_modules( config, dispatcher )
-			
+
 			# Have to keep messages from being logged before logging is 
 			# configured.
 			logmessages = []
@@ -377,7 +377,7 @@ module Arrow
 
 			@modules.each do |mod|
 				key = mod.config_key
-				
+
 				if config.member?( key )
 					value = config.send( key )
 					logmessages << [
@@ -397,7 +397,7 @@ module Arrow
 						[mod.name, key] ]
 				end
 			end
-			
+
 			logmessages.each do |lvl, message|
 				Arrow::Logger[ self ].send( lvl, message )
 			end
@@ -406,8 +406,8 @@ module Arrow
 				[ @modules.length, @modules ]
 			return @modules
 		end
-		
-		
+
+
 		#############################################################
 		### A P P E N D E D	  M E T H O D S
 		#############################################################
@@ -429,8 +429,8 @@ module Arrow
 			@config_key ||= Arrow::Configurable.make_key_from_classname( self )
 			@config_key
 		end
-		
-		
+
+
 		### Default configuration method.
 		def configure( config, dispatcher )
 			raise NotImplementedError,
@@ -484,13 +484,13 @@ module Arrow
 			mod.extend( self )
 			super
 		end
-		
-		
+
+
 		### Return the Class object for the given derivative +classname+, 
 		### attempting to load it if it hasn't been already.
 		def self::load_class( classname )
 			Arrow::Logger[self].debug "Loading injectable class '#{classname}'"
-			
+
 			unless Arrow::Injectable.derivatives.include?( classname )
 				modname = classname.downcase.gsub( /::/, '/' )
 				Arrow::Logger[self].debug "Class not loaded yet. Trying to " +
@@ -516,10 +516,10 @@ module Arrow
 			klass.extend( Arrow::Injectable )
 			super
 		end
-		
+
 	end # module Injectable
 
-	
+
 	# A mixin that adds a #log method to including classes that calls
 	# Arrow::Logger with the class of the receiving object.
 	#

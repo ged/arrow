@@ -11,28 +11,14 @@ require 'arrow/constants'
 # is used to load configuration files written in YAML for the Arrow web 
 # application framework.
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Config::YamlLoader < Arrow::Config::Loader
 	include Arrow::Constants
-
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
 
 
 	# Add YAML domain types for Arrow classes

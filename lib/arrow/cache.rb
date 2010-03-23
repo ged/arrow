@@ -15,19 +15,11 @@ require 'arrow/mixins'
 # track of the cached object's modification time, expiring the cached
 # version when the disk-based version changes (e.g., for template caching).
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Cache < ::Cache
 	extend Forwardable

@@ -14,19 +14,11 @@ require 'arrow/path'
 # Arrow::Object. This is the default parser class for the default Arrow
 # templating system.
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Template::Parser < Arrow::Object
 	include Arrow::HashUtilities
@@ -230,12 +222,6 @@ class Arrow::Template::Parser < Arrow::Object
 		end
 	end # class State
 
-
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
 
 	# Default configuration hash
 	Defaults = {

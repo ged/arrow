@@ -12,10 +12,6 @@ require 'arrow/template/call'
 #
 #   <?timedelta process.uptime ?>
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
@@ -27,12 +23,6 @@ require 'arrow/template/call'
 # Please see the file LICENSE in the 'docs' directory for licensing details.
 #
 class Arrow::Template::TimeDeltaDirective < Arrow::Template::CallDirective # :nodoc:
-
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
 
 	# Approximate Time Constants (in seconds)
 	MINUTES = 60

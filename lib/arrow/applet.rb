@@ -53,27 +53,13 @@ require 'arrow/transaction'
 #
 #	end
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Applet < Arrow::Object
-
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
 
 
 	### Applet signature struct. The fields are as follows:
@@ -126,8 +112,10 @@ class Arrow::Applet < Arrow::Object
 			return klass.const_get( :SVNRev ).gsub(/Rev: /, 'r')
 		elsif klass.const_defined?( :Version )
 			return klass.const_get( :Version )
-		elsif klass.const_defined?( :Revision )
-			return klass.const_get( :Revision )
+		elsif klass.const_defined?( :VERSION )
+			return klass.const_get( :VERSION )
+		elsif klass.const_defined?( :REVISION )
+			return klass.const_get( :REVISION )
 		elsif klass.const_defined?( :Rcsid )
 			return klass.const_get( :Rcsid )
 		else
@@ -165,7 +153,7 @@ class Arrow::Applet < Arrow::Object
 			@signature[:templates][@action_name] = tmpl
 		end
 
-		
+
 		### Get the validator profile associated with the same name as the
 		### proxied action.
 		def validator_profile
@@ -210,10 +198,10 @@ class Arrow::Applet < Arrow::Object
 		case sym
 		when Symbol, String
 			self.signature.templates[ sym ] = path
-			
+
 		when Hash
 			self.signature.templates.merge!( sym )
-			
+
 		else
 			raise ArgumentError, "cannot convert %s to Symbol" % [ sym ]
 		end
@@ -228,14 +216,14 @@ class Arrow::Applet < Arrow::Object
 	def self::applet_name( name )
 		self.signature.name = name
 	end
-	
-	
+
+
 	### Set the description of the applet to +desc+.
 	def self::applet_description( desc )
 		self.signature.description = desc		
 	end
-	
-	
+
+
 	### Set the contact information for the maintainer of the applet to +info+.
 	def self::applet_maintainer( info )
 		self.signature.maintainer = info
@@ -278,8 +266,8 @@ class Arrow::Applet < Arrow::Object
 			Arrow::Applet.inherited( klass )
 		end
 	end
-	
-	
+
+
 	### Have any subclasses of this class been created?
 	def self::inherited_from?
 		@inherited_from
@@ -319,7 +307,7 @@ class Arrow::Applet < Arrow::Object
 				applet.inherited_from?
 			end
 		end
-		
+
 		return newderivatives
 	end
 
@@ -405,7 +393,7 @@ class Arrow::Applet < Arrow::Object
 	### the Synopsis in lib/arrow/applet.rb for examples of how to use this.
 	def self::def_action( name, &block )
 		name = '_default' if name.to_s.empty?
-		
+
 		# Action must accept at least a transaction argument
 		unless block.arity.nonzero?
 			raise ScriptError,
@@ -486,14 +474,14 @@ class Arrow::Applet < Arrow::Object
 			name, *newargs = self.get_action_name( txn, *args )
 			txn.vargs = self.make_validator( name, txn )
 			action = self.find_action_method( txn, name, *newargs )
-			
+
 			# Decline the request if the action isn't a callable object
 			unless action.respond_to?( :arity )
 				self.log.info "action method (%p) doesn't do #arity, returning it as-is." %
 					[ action ]
 				return action
 			end
-			
+
 			self.log.debug "calling action method %p with args (%p)" % [ action, newargs ]
 			self.call_action_method( txn, action, *newargs )
 		end
@@ -579,8 +567,8 @@ class Arrow::Applet < Arrow::Object
 			"[PID %d] Runcount: %d, User: %0.2f/%0.2f, System: %0.2f/%0.2f" %
 			[ Process.pid, @run_count, utime, @total_utime, stime, @total_stime ]
 	end
-	
-	
+
+
 	### Get the expected action name from the specified +txn+ and the +args+ extracted from the
 	### URI path; return the action as a Symbol and the remaining arguments as a splatted Array.
 	def get_action_name( txn, *args )
@@ -605,7 +593,7 @@ class Arrow::Applet < Arrow::Object
 	### fallback action ('action_missing' by default).
 	def map_to_valid_action( action )
 		self.log.debug "trying to map %p to a valid action method" % [ action ]
-		
+
 		if (( match = @actions_regexp.match(action.to_s) ))
 			action = match.captures[0]
 			action.untaint
@@ -616,8 +604,8 @@ class Arrow::Applet < Arrow::Object
 			return nil
 		end
 	end
-	
-	
+
+
 	### Given an +action+ name and any other URI path +args+ from the request, return 
 	### a Method object that will handle the request, and the remaining arguments
 	### as a splatted Array.
@@ -645,7 +633,7 @@ class Arrow::Applet < Arrow::Object
 				"Malformed action: Must accept at least a transaction argument"
 		end
 	end
-	
+
 
 	### Run an action with a duped transaction (e.g., from another action)
 	def subrun( action, txn, *args )
@@ -712,7 +700,7 @@ class Arrow::Applet < Arrow::Object
 			self.log.warning "Invalid action '#{action.inspect}'"
 			action = :__default__
 		end
-		
+
 		# Look up the profile for the applet or the default one
 		profile = @signature.validator_profiles[ action.to_sym ] ||
 			@signature.validator_profiles[ :__default__ ]

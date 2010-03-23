@@ -14,19 +14,11 @@ require 'arrow/template/call'
 #   <pre><?escape data.to_yaml?></pre>
 #   <?escape some_string_with_htmlish_bits?>
 #
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Template::EscapeDirective < Arrow::Template::CallDirective # :nodoc:
 

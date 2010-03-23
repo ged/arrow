@@ -15,7 +15,7 @@ require 'arrow/template/nodes'
 #	  <!-- Some content for 'foo' attributes of enclosing templates. -->
 #	<?end?>
 #
-# == Subversion Id
+# == VCS Id
 # 
 # $Id$
 # 
@@ -23,11 +23,7 @@ require 'arrow/template/nodes'
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Template::ExportDirective < Arrow::Template::BracketingDirective # :nodoc:
 	include Arrow::Template::Parser::Patterns

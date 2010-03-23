@@ -15,19 +15,11 @@ require 'arrow/path'
 # 
 #   :TODO: Write some useful Arrow::Template examples
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Template < Arrow::Object
 	extend Forwardable
@@ -36,12 +28,6 @@ class Arrow::Template < Arrow::Object
 	require 'arrow/template/parser'
 	require 'arrow/template/nodes'
 	require 'arrow/template/iterator'
-
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
 
 
 	# Configuration defaults. Valid members are the same as those listed for

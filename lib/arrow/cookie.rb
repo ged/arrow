@@ -17,7 +17,7 @@ require 'arrow/object'
 #   Copyright (c) 2002 Internet Programming with Ruby writers. All rights
 #   reserved.
 # 
-# == Subversion Id
+# == VCS Id
 # 
 #   $Id$
 # 
@@ -25,19 +25,9 @@ require 'arrow/object'
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Cookie < Arrow::Object
-
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
 
 	CookieDateFormat = '%a, %d-%b-%Y %H:%M:%S GMT'
 

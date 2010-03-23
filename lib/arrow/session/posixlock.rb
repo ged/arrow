@@ -9,7 +9,7 @@ require 'arrow/session/lock'
 # Arrow::Session::Lock. This lock type uses the 'posixlock' library
 # (http://raa.ruby-lang.org/project/posixlock/).
 # 
-# == Subversion ID
+# == VCS Id
 # 
 # $Id$
 # 
@@ -17,19 +17,9 @@ require 'arrow/session/lock'
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Session::PosixLock < Arrow::Session::Lock
-
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
 
 
 	# The path to the default lockdir

@@ -86,29 +86,15 @@ require 'arrow/session/lock'
 #     return DBITransactionLock.new( idobj.to_s )
 #   end
 #
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Session::Store < Arrow::Object
 	include PluginFactory
 	extend Forwardable
-
-	# SVN Revision
-	SVNRev = %q$Rev$
-
-	# SVN Id
-	SVNId = %q$Id$
 
 	# The URI of the lock class recommended for use with this Store.
 	RecommendedLocker = URI.parse( 'file:.' )
@@ -155,7 +141,7 @@ class Arrow::Session::Store < Arrow::Object
 		unless idobj.new?
 			self.retrieve
 		end
-		
+
 		super()
 	end
 
@@ -238,8 +224,8 @@ class Arrow::Session::Store < Arrow::Object
 	def modified?
 		@modified
 	end
-	
-	
+
+
 	### Returns +true+ if the data in the receiver has not yet been saved to
 	### the backing store, or if the entry in the backing store has been deleted
 	### since it was last saved.
@@ -258,7 +244,7 @@ class Arrow::Session::Store < Arrow::Object
 		end
 	end		
 
-	
+
 	### Insert the current +data+ hash into whatever permanent storage the
 	### Store object is acting as an interface to. Concrete implementations
 	### should provide an overriding implementation of this method that
@@ -351,12 +337,12 @@ class Arrow::Session::Store < Arrow::Object
 		end
 	end
 
-	
+
 
 	#######
 	private
 	#######
-	
+
 	### Return a copy of the given +hash+ with all non-serializable
 	### objects stripped out of it.
 	def strip_hash( hash, cloned=true )
@@ -366,15 +352,15 @@ class Arrow::Session::Store < Arrow::Object
 			case newhash[ key ]
 			when Hash
 				newhash[ key ] = strip_hash( newhash[key], false )
-				
+
 			when Proc, Method, UnboundMethod, IO
 				self.log.warning "Stripping unserializable object from session " \
 					"hash: %p" % newhash[ key ]
 				newhash[ key ] = "[Can't serialize a %s]" % newhash[ key ].class
 			end
 		}
-		
+
 		return newhash
 	end
-	
+
 end # class Arrow::Session::Store

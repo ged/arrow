@@ -1,5 +1,8 @@
 ^commit\-msg\.txt$
-\.rej$
-\.orig$
+\.(orig|rej)$
 ^pkg$
-ChangeLog
+^ChangeLog$
+^docs/api
+^docs/manual/output
+^coverage/
+^coverage\.info
