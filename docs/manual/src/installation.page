@@ -13,7 +13,7 @@ h2. Step One: Install "Apache":http://httpd.apache.org/
 
 All development and testing is done using the Apache 2.2.x series webserver on Linux, FreeBSD, and
 MacOS X, though you should be able to run it under earlier versions or other platforms. We'd love to
-hear about you experiences under other configurations, and patches for portability are of course
+hear about your experiences under other configurations, and patches for portability are of course
 always welcomed.
 
 
