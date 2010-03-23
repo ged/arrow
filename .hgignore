@@ -4,3 +4,5 @@
 ^ChangeLog$
 ^docs/api
 ^docs/manual/output
+^coverage/
+^coverage\.info
