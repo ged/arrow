@@ -476,11 +476,11 @@ class Arrow::Template < Arrow::Object
 
 	### Prep the template for rendering, calling each of its nodes' 
 	### #before_rendering hook.
-	def prerender( enclosing_template=nil )
+	def prerender( nodes, enclosing_template=nil )
 		@enclosing_templates << enclosing_template
 
-		@syntax_tree.each do |node|
-			# self.log.debug "    pre-rendering %p" % [node]
+		nodes.each do |node|
+			self.log.debug "    pre-rendering %p" % [node]
 			node.before_rendering( self ) if
 				node.respond_to?( :before_rendering )
 		end
@@ -491,7 +491,7 @@ class Arrow::Template < Arrow::Object
 	### Render the template to text and return it as a String. If called with an
 	### Array of +nodes+, the template will render them instead of its own
 	### syntax_tree. If given a scope (a Module object), a Binding of its
-	### internal state it will be used as the context of evaluation for the
+	### internal state will be used as the context of evaluation for the
 	### render. If not specified, a new anonymous Module instance is created for
 	### the render. If a +enclosing_template+ is given, make it available during
 	### rendering for variable-sharing, etc. Returns the results of each nodes'
@@ -501,11 +501,11 @@ class Arrow::Template < Arrow::Object
 		nodes ||= self.get_prepped_nodes
 		scope ||= self.make_rendering_scope
 
-		self.prerender( enclosing_template )
+		self.prerender( nodes, enclosing_template )
 
 		# Render each node
 		nodes.each do |node|
-			# self.log.debug "  rendering %p" % [ node ]
+			self.log.debug "  rendering %p" % [ node ]
 			begin
 				rval << node.render( self, scope )
 			rescue ::Exception => err
@@ -515,7 +515,7 @@ class Arrow::Template < Arrow::Object
 
 		return self.render_objects( *rval )
 	ensure
-		self.postrender
+		self.postrender( nodes )
 	end
 	alias_method :to_s, :render
 
@@ -528,8 +528,8 @@ class Arrow::Template < Arrow::Object
 
 	### Clean up after template rendering, calling each of its nodes' 
 	### #after_rendering hook.
-	def postrender( enclosing_template=nil )
-		@syntax_tree.each do |node|
+	def postrender( nodes, enclosing_template=nil )
+		nodes.each do |node|
 			# self.log.debug "    post-rendering %p" % [node]
 			node.after_rendering( self ) if
 				node.respond_to?( :after_rendering )
@@ -627,8 +627,7 @@ class Arrow::Template < Arrow::Object
 	def get_prepped_nodes
 		tree = @syntax_tree.dup
 
-		self.strip_directive_whitespace( tree ) if
-		 	@config[:elideDirectiveLines]
+		self.strip_directive_whitespace( tree ) if @config[:elideDirectiveLines]
 
 		return tree
 	end

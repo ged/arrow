@@ -34,16 +34,16 @@ class Arrow::Template::ExportDirective < Arrow::Template::BracketingDirective # 
 
 	# SVN Revision
 	SVNRev = %q$Rev$
-	
+
 	# SVN Id
 	SVNId = %q$Id$
-	
+
 
 
 	#############################################################
 	###	C L A S S   M E T H O D S
 	#############################################################
-	
+
 	### Disallow formats and methodchains
 	def self::allows_format?; false; end
 	def self::allows_method_chains?; false; end
@@ -52,14 +52,14 @@ class Arrow::Template::ExportDirective < Arrow::Template::BracketingDirective # 
 	#############################################################
 	###	I N S T A N C E   M E T H O D S
 	#############################################################
-	
+
 	### Add the imported attributes when this node is rendered.
 	def before_rendering( template )
 		st = template
-		
+
 		while st = st._enclosing_template
 			surrogate = template.class.new( self.subnodes )
-		
+
 			# :TODO: Does appending to the attribute make more sense?
 			st._attributes[ self.name ] = surrogate
 		end
@@ -86,6 +86,6 @@ class Arrow::Template::ExportDirective < Arrow::Template::BracketingDirective # 
 	def render_contents( template, scope )
 		return []
 	end
-	
-	
+
+
 end # class Arrow::Template::ExportDirective

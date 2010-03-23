@@ -42,7 +42,6 @@ describe Arrow::Template do
 	end
 
 
-
 	it "supports Arrow::Cache's interface for memory-size introspection" do
 		tmplfile = @datadir + 'loadtest.tmpl'
 		tmpl = Arrow::Template.load( tmplfile )
@@ -50,55 +49,34 @@ describe Arrow::Template do
 	end
 
 
-	### Test template loading
-	def test_template_memsize_should_be_equal_to_the_source_length
-		template = size = nil
-		source = File.read( File.join(TestDataDir, "loadtest.tmpl") )
-
-		# Test the .load method loads template using the path
-		assert_nothing_raised do
-			template = Arrow::Template.load( "loadtest.tmpl" )
-		end
-		assert_instance_of Arrow::Template, template
-
-		# Test for source-size bug
-		assert_nothing_raised do
-			size = template.memsize
-		end
-		assert_equal source.length, size,
-			"Template memsize should equal source length"
+	it "should report a memory size of 0 for a blank template" do
+		Arrow::Template.new.memsize.should == 0
 	end
 
-	def test_template_memsize_should_be_zero_for_blank_template
-		size = nil
+
+	it "adds attributes for <?attr?> processing-instructions" do
+		tmplfile = @datadir + 'loadtest.tmpl'
+		template = Arrow::Template.load( tmplfile )
+		template._attributes.should include( 'mooselips' )
+		template._attributes.should include( 'queenofallbroccoli' )
+	end
+
+
+	it "renders Arrays by concatenating its members" do
+		Arrow::Template.new.render_objects(%w[foo bar]).should == 'foobar'
+	end
+
+
+	it "calls :before_rendering before rendering for nodes that respond to it" do
+		node = mock( "template node" )
 		template = Arrow::Template.new
 
-		assert_nothing_raised do
-			size = template.memsize
-		end
+		node.should_receive( :respond_to? ).with( :before_rendering ).and_return( true )
+		node.should_receive( :before_rendering ).with( template )
 
-		assert_equal 0, size
+		template.render([ node ])
 	end
 
-	def test_loading_template_should_define_template_attributes
-		template = Arrow::Template.load( "loadtest.tmpl" )
-
-		assert template._attributes.key?( 'mooselips' ),
-			"Expect loaded template to have a 'mooselips' attribute"
-		assert template._attributes.key?( 'queenofallbroccoli' ),
-			"Expect loaded template to have a 'queenofallbroccoli' attribute"
-	end
-
-	def test_default_renderer_understands_arrays
-		template = Arrow::Template.new
-		rval = nil
-
-		assert_nothing_raised do
-			rval = template.render_objects( ["foo", "bar"] )
-		end
-
-		assert_equal "foobar", rval
-	end
 
 	def test_render_calls_pre_and_post_render_hook_for_nodes_that_respond_to_them
 		template = Arrow::Template.new
