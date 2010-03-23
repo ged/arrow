@@ -3,10 +3,6 @@
 # The LoadedFiles class, a derivative of Arrow::Applet. It
 # displays the disposition of all the files that are being monitored by Arrow.
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>

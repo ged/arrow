@@ -4,7 +4,7 @@
 # an introspection applet that can be used to view the code for Arrow applets in
 # a running Arrow application.
 # 
-# == Subversion Id
+# == VCS Id
 # 
 # $Id$
 # 

@@ -4,7 +4,7 @@
 # shows the 'latest images' feed from LiveJournal as a page full of clickable
 # links.
 # 
-# == Subversion Id
+# == VCS Id
 # 
 # $Id$
 # 

@@ -4,10 +4,6 @@
 # Arrow::Applet. The UnitTest applet can be used to define and run tests for
 # another applet by chaining through it.
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>

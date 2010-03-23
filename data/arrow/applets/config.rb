@@ -3,7 +3,7 @@
 # The ConfigApplet class, a derivative of Arrow::Applet. It
 # can be used to view/edit Arrow configurations.
 # 
-# == Subversion Id
+# == VCS Id
 # 
 # $Id$
 # 

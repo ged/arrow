@@ -3,10 +3,6 @@
 # The NoSuchAppletHandler class, a derivative of
 # Arrow::Applet. It is an example 'noSuchAppletHandler' applet.
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>

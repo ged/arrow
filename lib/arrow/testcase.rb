@@ -26,7 +26,7 @@
 #		end
 #	end
 # 
-# == Rcsid
+# == VCS Id
 # 
 #  $Id$
 # 

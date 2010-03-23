@@ -12,10 +12,6 @@ require 'arrow/template/call'
 #
 #   <?timedelta process.uptime ?>
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>

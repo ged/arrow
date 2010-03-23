@@ -8,19 +8,11 @@ require 'arrow/logger/outputter'
 # Apache::Logger::Outputter. Instances of this class write log messages of the
 # corresponding error level to the Apache log
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Logger::ApacheOutputter < Arrow::Logger::Outputter
 

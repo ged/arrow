@@ -53,19 +53,11 @@ require 'arrow/transaction'
 #
 #	end
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Applet < Arrow::Object
 
@@ -122,8 +114,8 @@ class Arrow::Applet < Arrow::Object
 			return klass.const_get( :Version )
 		elsif klass.const_defined?( :VERSION )
 			return klass.const_get( :VERSION )
-		elsif klass.const_defined?( :Revision )
-			return klass.const_get( :Revision )
+		elsif klass.const_defined?( :REVISION )
+			return klass.const_get( :REVISION )
 		elsif klass.const_defined?( :Rcsid )
 			return klass.const_get( :Rcsid )
 		else

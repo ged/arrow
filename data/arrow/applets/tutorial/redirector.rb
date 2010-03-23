@@ -4,7 +4,7 @@
 # Arrow::Applet. It's only a demonstration of the Transaction's #redirect
 # method.
 # 
-# == Subversion Id
+# == VCS Id
 # 
 # $Id$
 # 

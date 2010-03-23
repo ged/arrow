@@ -3,9 +3,9 @@
 BEGIN {
 	require 'pathname'
 	basedir = Pathname.new( __FILE__ ).dirname.parent.parent
-	
+
 	libdir = basedir + "lib"
-	
+
 	$LOAD_PATH.unshift( libdir ) unless $LOAD_PATH.include?( libdir )
 }
 
@@ -34,7 +34,7 @@ describe Arrow::Transaction do
 
 	before( :each ) do
 		@options = {}
-		
+
 		@request = mock( "request object" )
 		@request.stub!( :options ).and_return( @options )
 		@request.stub!( :hostname ).and_return( 'testhost' )
@@ -45,31 +45,31 @@ describe Arrow::Transaction do
 		@request.stub!( :headers_out ).and_return( @headers_out )
 		@request.stub!( :sync_header= )
 	end
-	
+
 
 	after( :all ) do
 		reset_logging()
 	end
 
-	
+
 	it "knows it's dispatched from a handler mounted at / when its request " +
 		"has the root_dispatcher option set to 'yes'" do
 		@options['root_dispatcher'] = 'yes'
 		Arrow::Transaction.new( @request, nil, nil ).root_dispatcher?.should be_true()
 	end
-	
+
 	it "knows it's dispatched from a handler mounted at / when its request " +
 		"has the root_dispatcher option set to 'true'" do
 		@options['root_dispatcher'] = 'true'
 		Arrow::Transaction.new( @request, nil, nil ).root_dispatcher?.should be_true()
 	end
-	
+
 	it "knows it's dispatched from a handler mounted at / when its request " +
 		"has the root_dispatcher option set to '1'" do
 		@options['root_dispatcher'] = '1'
 		Arrow::Transaction.new( @request, nil, nil ).root_dispatcher?.should be_true()
 	end
-	
+
 	it "knows it's not dispatched from a handler mounted at / when its request " +
 		"has the root_dispatcher option set to 'false'" do
 		@options['root_dispatcher'] = 'false'
@@ -130,7 +130,7 @@ describe Arrow::Transaction do
 		#it "knows that it wasn't served over secure transport if its request's schema isn't 'https'" do
 		#	@request.should_receive( :unparsed_uri ).and_return( )
 		#end
-		
+
 
 		it "should indicate a successful response when the status is 200" do
 			@request.should_receive( :status ).at_least( :once ).and_return( Apache::HTTP_OK )
@@ -168,7 +168,7 @@ describe Arrow::Transaction do
 			@headers_in[ 'X-Forwarded-Host' ] = 'foo.bar.com'
 			@txn.proxied_host.should == 'foo.bar.com'
 		end
-	
+
 		it "returns the X-Forwarded-Server header if X-Forwarded-Host is not " +
 			"present for the value returned by #proxied_host" do
 			@headers_in[ 'X-Forwarded-Server' ] = 'foo.bar.com'
@@ -179,7 +179,7 @@ describe Arrow::Transaction do
 		it "uses the proxy header for #construct_url" do
 			@headers_in[ 'X-Forwarded-Host' ] = 'foo.bar.com'
 			@headers_in[ 'X-Forwarded-Server' ] = 'foo.bar.com'
-		
+
 			@request.should_receive( :construct_url ).and_return( 'http://hostname/bar' )
 
 			@txn.construct_url( "/bar" ).should == 'http://foo.bar.com/bar'
@@ -189,19 +189,19 @@ describe Arrow::Transaction do
 			@headers_in[ 'X-Requested-With' ] = 'XMLHttpRequest'
 			@txn.is_ajax_request?.should be_true()
 		end
-	
-	
+
+
 		it "knows when the transaction is not requested via XHR by the absence " +
 			"of an X-Requested-With header" do
 			@txn.is_ajax_request?.should be_false()
 		end
-	
+
 		it "knows when the transaction is not requested via XHR by a non-AJAX " +
 			"X-Requested-With header" do
 			@headers_in[ 'X-Requested-With' ] = 'magic jellybeans of doom'
 			@txn.is_ajax_request?.should be_false()
 		end
-	
+
 
 		it "returns cookies from its headers as an Arrow::CookieSet" do
 			@headers_in[ 'Cookie' ] = 'foo=12'
@@ -219,7 +219,7 @@ describe Arrow::Transaction do
 			@request.should_receive( :status ).
 				at_least(:once).
 				and_return( Apache::HTTP_OK )
-		
+
 			@headers_out.should_receive( :[]= ).with( 'Set-Cookie', /glah=locke/i ) 
 			@headers_out.should_receive( :[]= ).with( 'Set-Cookie', /foo=bar/i ) 
 			@headers_out.should_receive( :[]= ).with( 'Set-Cookie', /pants=velcro/i )
@@ -228,10 +228,10 @@ describe Arrow::Transaction do
 			@txn.cookies['foo'] = 'bar'
 			@txn.cookies['pants'] = 'velcro!'
 			@txn.cookies['pants'].expires = 'Sat Nov 12 22:04:00 1955'
-		
+
 			@txn.add_cookie_headers
 		end
-	
+
 		it "adds Cookie error headers for each cookie in an non-OK response" do
 			output_headers = mock( "output headers", :null_object => true )
 			err_output_headers = mock( "error output headers", :null_object => true )
@@ -242,7 +242,7 @@ describe Arrow::Transaction do
 			@request.should_receive( :status ).
 				at_least(:once).
 				and_return( Apache::REDIRECT )
-		
+
 			err_output_headers.should_receive( :[]= ).with( 'Set-Cookie', /glah=locke/i ) 
 			err_output_headers.should_receive( :[]= ).with( 'Set-Cookie', /foo=bar/i ) 
 			err_output_headers.should_receive( :[]= ).with( 'Set-Cookie', /pants=velcro/i )
@@ -251,10 +251,10 @@ describe Arrow::Transaction do
 			@txn.cookies['foo'] = 'bar'
 			@txn.cookies['pants'] = 'velcro!'
 			@txn.cookies['pants'].expires = 'Sat Nov 12 22:04:00 1955'
-		
+
 			@txn.add_cookie_headers
 		end
-	
+
 		it "parses the 'Accept' header into one or more AcceptParam structs" do
 			@headers_in['Accept'] = TEST_ACCEPT_HEADER
 
@@ -263,7 +263,7 @@ describe Arrow::Transaction do
 			@txn.accepted_types[1].mediatype.should == 'application/json'
 			@txn.accepted_types[2].mediatype.should == 'text/xml'
 		end
-		
+
 		it "knows what mimetypes are acceptable responses" do
 			@headers_in[ 'Accept' ] = 'text/html, text/plain; q=0.5, image/*;q=0.1'
 
@@ -299,18 +299,18 @@ describe Arrow::Transaction do
 			@headers_in[ 'Accept' ] = 'text/html, text/plain; q=0.5, image/*;q=0.1'
 			@txn.accepts_html?.should be_true()
 		end
-		
+
 		it "knows that the request accepts HTML if its Accept: header indicates it accepts " +
 		   "'application/xhtml+xml'" do
 			@headers_in[ 'Accept' ] = 'application/xhtml+xml, text/plain; q=0.5, image/*;q=0.1'
 			@txn.accepts_html?.should be_true()
 		end
-		
+
 		it "knows that the request doesn't accept HTML if its Accept: header indicates it doesn't" do
 			@headers_in[ 'Accept' ] = 'text/plain; q=0.5, image/*;q=0.1'
 			@txn.accepts_html?.should be_false()
 		end
-		
+
 
 	end
 end

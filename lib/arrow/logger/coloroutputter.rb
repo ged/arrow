@@ -5,19 +5,11 @@ require 'arrow/logger/fileoutputter'
 # A derivative of Arrow::Logger::FileOutputter that outputs logging messages 
 # in ANSI colors according to their level.
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Logger::ColorOutputter < Arrow::Logger::FileOutputter
 

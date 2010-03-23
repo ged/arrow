@@ -3,7 +3,7 @@
 # The ArrowWiki class, a derivative of Arrow::Applet. It's a
 # simple wiki to demonstrate the Arrow framework.
 # 
-# == Rcsid
+# == VCS Id
 # 
 # $Id$
 # 

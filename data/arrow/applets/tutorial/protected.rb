@@ -4,10 +4,6 @@
 # Arrow::Applet. It is an applet you can chain through for authentication
 # purposes.
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>

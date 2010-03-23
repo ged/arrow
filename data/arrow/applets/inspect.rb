@@ -3,7 +3,7 @@
 # The InspectorApplet class, a derivative of
 # Arrow::Applet. It dumps data that might be useful to applet developers.
 # 
-# == Subversion Id
+# == VCS Id
 # 
 # $Id$
 # 

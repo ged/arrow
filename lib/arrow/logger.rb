@@ -32,7 +32,7 @@ require 'arrow/mixins'
 #       end
 #   end
 #
-# == Subversion Id
+# == VCS Id
 #
 #   $Id$
 #   
@@ -40,11 +40,7 @@ require 'arrow/mixins'
 #   
 # * Michael Granger <ged@FaerieMUD.org>
 #   
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Logger
 	require 'arrow/logger/outputter'

@@ -3,7 +3,7 @@
 # The ShareNotes class, a derivative of Arrow::Applet. Render
 # a shared document after being transformed via Markdown
 # 
-# == Subversion Id
+# == VCS Id
 # 
 # $Id$
 # 

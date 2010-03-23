@@ -3,19 +3,11 @@
 # The TimeClock class, a derivative of Arrow::Applet; it
 # implements a web-based timeclock applet.
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 
 require 'bdb'

@@ -3,10 +3,6 @@
 # The MissingApplet class, a derivative of Arrow::Applet. It
 # is an example 'missingApplet' applet.
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>

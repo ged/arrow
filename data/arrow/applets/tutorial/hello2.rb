@@ -3,10 +3,6 @@
 # The HelloWorld class, a derivative of Arrow::Applet. A
 # "hello world" applet.
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>

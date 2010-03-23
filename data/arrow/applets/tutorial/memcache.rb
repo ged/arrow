@@ -2,7 +2,7 @@
 # 
 # The MemCache class, a derivative of Arrow::Applet. This is a web interface to MemCached.
 # 
-# == Subversion Id
+# == VCS Id
 # 
 # $Id$
 # 

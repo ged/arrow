@@ -3,7 +3,7 @@
 # The ImageText class, a derivative of Arrow::Applet. It is
 # an applet which generates an image from one or more characters of text.
 # 
-# == Rcsid
+# == VCS Id
 # 
 # $Id$
 # 

@@ -3,7 +3,7 @@
 # The LogoGenerator class, a derivative of Arrow::Applet. It
 # generates a blank logo of a given size and format.
 # 
-# == Subversion Id
+# == VCS Id
 # 
 # $Id$
 # 

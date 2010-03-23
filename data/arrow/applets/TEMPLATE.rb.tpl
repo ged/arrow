@@ -2,7 +2,7 @@
 # 
 # The (>>>class<<<) class, a derivative of Arrow::Applet. (>>>desc<<<)
 # 
-# == Subversion Id
+# == VCS Id
 # 
 # $Id$
 # 

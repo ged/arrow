@@ -4,10 +4,6 @@
 # Arrow::Applet. This applet is for testing/debugging/demonstrating the argument
 # validator.
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>

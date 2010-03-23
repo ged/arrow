@@ -3,7 +3,7 @@
 # The ArrowTutorial class, a derivative of Arrow::Applet. It
 # is the applet which loads and displays the tutorial (or will eventually).
 # 
-# == Subversion Id
+# == VCS Id
 # 
 # $Id$
 # 

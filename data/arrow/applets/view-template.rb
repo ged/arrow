@@ -4,10 +4,6 @@
 # Arrow::Applet. It is an introspection applet that displays information about
 # Arrow templates.
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>

@@ -3,10 +3,6 @@
 # The SubclassedHello class, a derivative of the Hello
 # applet to test applet inheritance.
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Martin Chase <stillflame@FaerieMUD.org>

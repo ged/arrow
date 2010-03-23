@@ -5,7 +5,7 @@
 # which when submitted will be transformed into HTML via the BlueCloth library
 # and displayed.
 # 
-# == Subversion ID
+# == VCS Id
 # 
 # $Id$
 # 

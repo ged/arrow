@@ -95,19 +95,11 @@ require 'arrow/object'
 #	  documentation for Apache::Cookie#expires for the format of the string.
 # 
 #
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Config < Arrow::Object
 	include Arrow::HashUtilities

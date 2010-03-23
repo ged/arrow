@@ -11,7 +11,7 @@ require 'arrow/template/parser'
 #
 #	<?render foo as bar in baz.tmpl ?>
 # 
-# == Subversion Id
+# == VCS Id
 # 
 # $Id$
 # 
@@ -19,11 +19,7 @@ require 'arrow/template/parser'
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Template::RenderDirective < Arrow::Template::AttributeDirective # :nodoc:
 	include Arrow::Template::Parser::Patterns

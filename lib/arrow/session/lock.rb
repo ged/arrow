@@ -38,19 +38,11 @@ require 'arrow/session'
 # #release_write_lock::
 #   Release an exclusive lock on the session data.
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Session::Lock < Arrow::Object
 	include PluginFactory

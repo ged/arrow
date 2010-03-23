@@ -10,7 +10,7 @@ require 'forwardable'
 # maintaining the collection of Arrow::Applets registered with an 
 # Arrow::Broker.
 # 
-# == Rcsid
+# == VCS Id
 # 
 # $Id$
 # 
@@ -18,11 +18,7 @@ require 'forwardable'
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::AppletRegistry < Arrow::Object
 	extend Forwardable
