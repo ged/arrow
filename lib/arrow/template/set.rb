@@ -20,10 +20,10 @@ class Arrow::Template::SetDirective < Arrow::Template::Directive # :nodoc:
 
 	# SVN Revision
 	SVNRev = %q$Rev$
-	
+
 	# SVN Id
 	SVNId = %q$Id$
-	
+
 
 	### Create and return a new Arrow::Template::SetDirective object.
 	def initialize( type, parser, state )

@@ -12,12 +12,6 @@ class Arrow::Template
 	class Node < Arrow::Object
 		include Arrow::HTMLUtilities
 
-		# SVN Revision
-		SVNRev = %q$Rev$
-
-		# SVN Id
-		SVNId = %q$Id$
-
 
 		#############################################################
 		###	I N S T A N C E   M E T H O D S
@@ -128,12 +122,6 @@ class Arrow::Template
 	### Arrow::Template object.
 	class TextNode < Arrow::Template::Node
 
-		# SVN Revision
-		SVNRev = %q$Rev$
-
-		# SVN Id
-		SVNId = %q$Id$
-
 
 		#############################################################
 		###	I N S T A N C E   M E T H O D S
@@ -205,12 +193,6 @@ class Arrow::Template
 	### debugging.
 	class CommentNode < Arrow::Template::TextNode
 
-		# SVN Revision
-		SVNRev = %q$Rev$
-
-		# SVN Id
-		SVNId = %q$Id$
-
 
 		#############################################################
 		###	I N S T A N C E   M E T H O D S
@@ -245,12 +227,6 @@ class Arrow::Template
 	### class define template behaviour and content.
 	class Directive < Arrow::Template::Node
 		include PluginFactory
-
-		# SVN Revision
-		SVNRev = %q$Rev$
-
-		# SVN Id
-		SVNId = %q$Id$
 
 
 		#############################################################
@@ -341,12 +317,6 @@ class Arrow::Template
 	### message-passing and content-injection (e.g., <?attr?>, <?set?>,
 	### <?config?>, etc.)
 	class AttributeDirective < Arrow::Template::Directive
-
-		# SVN Revision
-		SVNRev = %q$Rev$
-
-		# SVN Id
-		SVNId = %q$Id$
 
 
 		#############################################################
@@ -556,12 +526,6 @@ class Arrow::Template
 	### (e.g., <?foreach?>, <?if?>).
 	class BracketingDirective < AttributeDirective
 
-		# SVN Revision
-		SVNRev = %q$Rev$
-
-		# SVN Id
-		SVNId = %q$Id$
-
 
 		#############################################################
 		###	I N S T A N C E   M E T H O D S
@@ -692,12 +656,6 @@ class Arrow::Template
 
 	### Mixin which adds the notion of boolean evaluability to a directive.
 	module ConditionalDirective
-
-		# SVN Revision
-		SVNRev = %q$Rev$
-
-		# SVN Id
-		SVNId = %q$Id$
 
 
 		#############################################################

@@ -272,14 +272,14 @@ class Arrow::Template::Parser < Arrow::Object
 		begin
 			state = State.new( string, template, initialData )
 			syntax_tree = self.scan_for_nodes( state )
-		
+
 		rescue Arrow::TemplateError => err
 			Kernel.raise( err ) unless defined? state
 			state.scanner.unscan if state.scanner.matched? #<- segfaults
-			
+
 			# Get the linecount and chunk of erroring content
 			errorContent = get_parse_context( state.scanner )
-			
+
 			msg = err.message.split( /:/ ).uniq.join( ':' ) +
 				%{ at line %d of %s: %s...} %
 				[ state.line, template._file, errorContent ]
@@ -305,7 +305,7 @@ class Arrow::Template::Parser < Arrow::Object
 					startpos = scanner.pos
 					#self.log.debug %{Scanning from %d:%p} %
 					#	[ scanner.pos, scanner.rest[0,20] + '..' ]
-				
+
 					# Scan for the next directive. When the scanner reaches
 					# the end of the parsed string, just append any plain
 					# text that's left and stop scanning.
@@ -541,7 +541,7 @@ class Arrow::Template::Parser < Arrow::Object
 
 	### Handle an unknown ProcessingInstruction.
 	def handle_unknown_pi( state, tag="" )
-		
+
 		# If the configuration doesn't say to ignore unknown PIs or it's an
 		# [?alternate-synax?] directive, raise an error.
 		if state.tag_open == '[?' || !@config[:ignore_unknown_PIs]
@@ -561,10 +561,10 @@ class Arrow::Template::Parser < Arrow::Object
 	### being parsed.
 	def get_parse_context( scanner )
 		str = scanner.string
-		
+
 		pre = str[ scanner.pos < 40 ? 0 : scanner.pos - 40, 39 ]
 		post = scanner.rest[ 0, 40 ]
-		
+
 		return "#{pre}[*** ERROR ***]#{post}"
 	end
 

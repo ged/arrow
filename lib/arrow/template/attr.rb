@@ -20,12 +20,7 @@ require 'arrow/template/nodes'
 #
 class Arrow::Template::AttrDirective < Arrow::Template::AttributeDirective # :nodoc:
 
-	# SVN Revision
-	SVNRev = %q$Rev$
-	
-	# SVN Id
-	SVNId = %q$Id$
-	
+	# Attrs don't have any behaviors
 
 end # class Arrow::Template::AttrDirective
 

@@ -71,33 +71,23 @@ describe Arrow::Template do
 		node = mock( "template node" )
 		template = Arrow::Template.new
 
-		node.should_receive( :respond_to? ).with( :before_rendering ).and_return( true )
 		node.should_receive( :before_rendering ).with( template )
 
 		template.render([ node ])
 	end
 
 
-	def test_render_calls_pre_and_post_render_hook_for_nodes_that_respond_to_them
+	it "calls :after_rendering after rendering for nodes that respond to it" do
+		node = mock( "template node" )
 		template = Arrow::Template.new
-		rval = nil
 
-		FlexMock.use( "node object" ) do |node|
-			node.should_receive( :respond_to? ).with( :before_rendering ).
-				and_return( true )
-			node.should_receive( :before_rendering ).
-				with( template )
-			node.should_receive( :respond_to? ).with( :after_rendering ).
-				and_return( true )
-			node.should_receive( :after_rendering ).
-				with( template )
+		node.should_receive( :after_rendering ).with( template )
 
-			template.render( [node] )
-		end
+		template.render([ node ])
 	end
 
 
-	def test_render_uses_string_separator_when_joining_rendered_nodes
+	it "renders the template by joining rendered nodes with the default string separator" do
 		rval = nil
 		template = Arrow::Template.new( "<?attr foo ?><?attr bar ?>" )
 		template.foo = "[foo]"
@@ -106,164 +96,126 @@ describe Arrow::Template do
 		begin
 			sep = $,
 			$, = ':'
-			assert_nothing_raised do
-				rval = template.render
-			end
+			rval = template.render
 		ensure
 			$, = sep
 		end
 
-		assert_equal "[foo]:[bar]", rval
+		rval.should == "[foo]:[bar]"
 	end
 
 
-	# it "implements simple imports" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
-	# 
-	# 	<?import foo?>
-	# 	<?attr foo?>
-	# 
-	# 
-	# 	TEMPLATE_END
-	# 
-	# 	template = Arrow::Template.new( source )
-	# 	template._config[:debuggingComments] = true if $DEBUG
-	# 
-	# 		superTemplate = Arrow::Template.new( "<?attr subtempl?>" )
-	# 	superTemplate.foo = "Passed."
-	# 	superTemplate.subtempl = template
-	# 
-	# 	assert_nothing_raised { rval = superTemplate.render }
-	# 	assert_match( templateContentRe(/Passed\./), rval )
-	# 
-	# end
-	# 
-	# it "implements list imports" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
-	# 
-	# 	<?import foo, bar?>
-	# 	<?attr foo?> <?attr bar?>
-	# 
-	# 
-	# 	TEMPLATE_END
-	# 
-	# 	template = Arrow::Template.new( source )
-	# 	template._config[:debuggingComments] = true if $DEBUG
-	# 
-	# 		superTemplate = Arrow::Template.new( "<?attr subtempl?>" )
-	# 	superTemplate.foo = "Passed foo."
-	# 	superTemplate.bar = "Passed bar."
-	# 	superTemplate.subtempl = template
-	# 
-	# 	assert_nothing_raised { rval = superTemplate.render }
-	# 	assert_match( templateContentRe(/Passed foo\./,/Passed bar\./), rval )
-	# 
-	# end
-	# 
-	# it "implements mixed list imports" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
-	# 
-	# 	<?import foo, bar as superbar?>
-	# 	<?attr foo?> <?attr bar?> <?attr superbar?>
-	# 
-	# 
-	# 	TEMPLATE_END
-	# 
-	# 	template = Arrow::Template.new( source )
-	# 	template._config[:debuggingComments] = true if $DEBUG
-	# 
-	# 		superTemplate = Arrow::Template.new( "<?attr subtempl?>" )
-	# 	superTemplate.foo = "Passed foo."
-	# 	superTemplate.bar = "Passed bar."
-	# 	superTemplate.subtempl = template
-	# 
-	# 	template.bar = "Passed real bar."
-	# 
-	# 	assert_nothing_raised { rval = superTemplate.render }
-	# 	pat = templateContentRe(/Passed foo\./,/Passed real bar\./,/Passed bar\./)
-	# 	assert_match( pat, rval )
-	# 
-	# end
-	# 
-	# it "implements aliased imports" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
-	# 
-	# 	<?import foo as bar?>
-	# 	<?attr bar?>
-	# 
-	# 
-	# 	TEMPLATE_END
-	# 
-	# 	template = Arrow::Template.new( source )
-	# 	template._config[:debuggingComments] = true if $DEBUG
-	# 
-	# 		superTemplate = Arrow::Template.new( "<?attr subtempl?>" )
-	# 	superTemplate.foo = "Passed."
-	# 	superTemplate.subtempl = template
-	# 
-	# 	assert_nothing_raised { rval = superTemplate.render }
-	# 	assert_match( templateContentRe(/Passed\./), rval )
-	# 
-	# end
-	# 
-	# it "implements unknown pi (ignored) imports" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
-	# 
-	# 	<?xml version="1.0" encoding="utf-8"?>
-	# 
-	# 
-	# 	TEMPLATE_END
-	# 
-	# 	template = Arrow::Template.new( source )
-	# 	template._config[:debuggingComments] = true if $DEBUG
-	# 
-	# 		assert_instance_of Arrow::Template, template
-	# 
-	# end
-	# 
-	# it "implements aliased list imports" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
-	# 
-	# 	<?import foo as bar, bar as foo?>
-	# 	<?attr foo?> <?attr bar?>
-	# 
-	# 
-	# 	TEMPLATE_END
-	# 
-	# 	template = Arrow::Template.new( source )
-	# 	template._config[:debuggingComments] = true if $DEBUG
-	# 
-	# 		superTemplate = Arrow::Template.new( "<?attr subtempl?>" )
-	# 	superTemplate.foo = "Passed foo."
-	# 	superTemplate.bar = "Passed bar."
-	# 	superTemplate.subtempl = template
-	# 
-	# 	assert_nothing_raised { rval = superTemplate.render }
-	# 	assert_match( templateContentRe(/Passed bar\./,/Passed foo\./), rval )
-	# 
-	# end
-	# 
+	it "implements simple imports" do
+		source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
+			<?import foo?>
+			<?attr foo?>
+		TEMPLATE_END
+
+		template = Arrow::Template.new( source )
+		template._config[:debuggingComments] = true if $DEBUG
+
+		container = Arrow::Template.new( "<?attr subtempl?>" )
+		container.foo = "Passed."
+		container.subtempl = template
+
+		container.render.should =~ /Passed\./
+	end
+
+	it "implements list imports" do
+		source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
+			<?import foo, bar?>
+			<?attr foo?> <?attr bar?>
+		TEMPLATE_END
+
+		template = Arrow::Template.new( source )
+		template._config[:debuggingComments] = true if $DEBUG
+
+		container = Arrow::Template.new( "<?attr subtempl?>" )
+		container.foo = "Passed foo."
+		container.bar = "Passed bar."
+		container.subtempl = template
+
+		container.render.should =~ /Passed foo\..*Passed bar\./
+	end
+
+	it "implements mixed list imports" do
+		source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
+			<?import foo, bar as superbar?>
+			<?attr foo?> <?attr bar?> <?attr superbar?>
+		TEMPLATE_END
+
+		template = Arrow::Template.new( source )
+		template._config[:debuggingComments] = true if $DEBUG
+
+		container = Arrow::Template.new( "<?attr subtempl?>" )
+		container.foo = "Passed foo."
+		container.bar = "Passed bar."
+		container.subtempl = template
+
+		template.bar = "Passed real bar."
+
+		container.render.should =~ /Passed foo\..*Passed real bar\..*Passed bar\./
+	end
+
+	it "implements aliased imports" do
+		source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
+			<?import foo as bar?>
+			<?attr bar?>
+		TEMPLATE_END
+
+		template = Arrow::Template.new( source )
+		template._config[:debuggingComments] = true if $DEBUG
+
+		container = Arrow::Template.new( "<?attr subtempl?>" )
+		container.foo = "Passed."
+		container.subtempl = template
+
+		container.render.should =~ /Passed\./
+	end
+
+	it "implements unknown pi (ignored) imports" do
+		source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
+			<?xml version="1.0" encoding="utf-8"?>
+		TEMPLATE_END
+
+		Arrow::Template.new( source ).render.
+			should include( '<?xml version="1.0" encoding="utf-8"?>' )
+	end
+
+	it "implements aliased list imports" do
+		source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
+			<?import foo as bar, bar as foo?>
+			<?attr foo?> <?attr bar?>
+		TEMPLATE_END
+
+		template = Arrow::Template.new( source )
+		template._config[:debuggingComments] = true if $DEBUG
+
+		container = Arrow::Template.new( "<?attr subtempl?>" )
+		container.foo = "Passed foo."
+		container.bar = "Passed bar."
+		container.subtempl = template
+
+		container.render.should =~ /Passed bar\..*Passed foo\./
+	end
+
 	# it "implements simple sets" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
-	# 
-	# 	<?set time = Time.now ?>
-	# 
-	# 
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
+	# 		<?set time = Time.now ?>
 	# 	TEMPLATE_END
 	# 
+	# 	this_moment = Time.now
+	# 	Time.should_receive( :now ).and_return( this_moment )
 	# 	template = Arrow::Template.new( source )
 	# 	template._config[:debuggingComments] = true if $DEBUG
 	# 
-	# 		assert_nothing_raised { rval = template['time'] }
+	# 	# template['time'].should == this_moment
 	# 
-	# 	assert_nothing_raised { rval = template.render }
-	# 	debugMsg "\n" + hruleSection( rval, "Rendered" )
-	# 	assert_match( templateContentRe(), rval )
-	# 
+	# 	template.render.should include( this_moment.to_s )
 	# end
 	# 
 	# it "implements rendered later sets" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?set val = "Passed."?>
 	# 	<?attr val?>
@@ -283,7 +235,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements method chain sets" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?set time = Time.now.strftime( "%Y%m%d %H:%M:%S" ) ?>
 	# 
@@ -303,7 +255,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements simple renders" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?render foo as bar in simplerender.tmpl ?>
 	# 
@@ -324,7 +276,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements with import renders" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	Something: <?attr something?>
 	# 	<?render foo as bar in importrender.tmpl ?>
@@ -350,7 +302,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements with complex methodchain renders" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?render pairs['hash'] as pairs in recurse.tmpl ?>
 	# 
@@ -379,7 +331,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements recursion renders" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?render pairs as pairs in recurse.tmpl ?>
 	# 
@@ -408,7 +360,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "raises an error when parsing a template with a malformed1 call" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?call?>
 	# 
@@ -419,7 +371,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements simple calls" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?call test?>
 	# 
@@ -444,7 +396,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "raises an error when parsing a template with a malformed2 call" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?call "%s" tests ?>
 	# 
@@ -455,7 +407,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements idsub test calls" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?call test ? "test" : "no test"?>
 	# 
@@ -473,7 +425,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements with format and additional quotes calls" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?call '|%-15s|' % test?>
 	# 	'Some more "quoted" stuff to make sure the match doesn't grab them.
@@ -496,7 +448,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements with format calls" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?call '|%-15s|' % test?>
 	# 
@@ -518,7 +470,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements inside iterator ifs" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 		<?yield foo from test.each?>
 	# 	<?if foo?>
 	# 	Passed.
@@ -540,7 +492,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements with match ifs" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?if test.match(/foo/) ?>
 	# 	Passed.
@@ -560,7 +512,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements simple ifs" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?if test?>
 	# 	Passed.
@@ -580,7 +532,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements methodchain with question mark ifs" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 		<?if test.is_a?( Arrow::Exception ) ?>
 	# 	Passed.
 	# 	<?else?>
@@ -601,7 +553,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements simple with mismatched end ifs" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?if test?>
 	# 	Passed.
@@ -621,7 +573,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements complex with success ifs" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?if test > 5?>
 	# 	Passed.
@@ -643,7 +595,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements complex with failure ifs" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?if test <= 5?>
 	# 	Failed.
@@ -665,7 +617,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements with no match ifs" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?if test.match(/foo/) ?>
 	# 	Failed.
@@ -685,7 +637,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements complex2 ifs" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?if test > 5 or test == 0?>
 	# 	Passed.
@@ -707,7 +659,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements simple with executed else ifs" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?if test?>
 	# 	Failed.
@@ -729,7 +681,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements match with binding operator ifs" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?if test =~ /foo/ ?>
 	# 	Passed.
@@ -749,7 +701,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements simple with unexecuted else ifs" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?if test?>
 	# 	Passed.
@@ -771,7 +723,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements simple with explicit end ifs" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?if test?>
 	# 	Passed.
@@ -791,7 +743,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements inside iterator with comparison ifs" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 		<?yield foo from test.each?>
 	# 	<?if foo == "bar"?>
 	# 	Passed.
@@ -813,7 +765,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements simple exports" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?attr headsections ?>
 	# 	<?attr subtemplate ?>
@@ -834,7 +786,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements inside iterator unlesss" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 		<?yield foo from test.each?>
 	# 	<?unless foo?>
 	# 	Passed.
@@ -856,7 +808,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements with match unlesss" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?unless test.match(/foo/) ?>
 	# 	Failed.
@@ -876,7 +828,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements simple unlesss" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?unless test?>
 	# 	Passed.
@@ -896,7 +848,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements methodchain with question mark unlesss" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 		<?unless test.is_a?( Arrow::Exception ) ?>
 	# 	Passed.
 	# 	<?else?>
@@ -917,7 +869,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements simple with mismatched end unlesss" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?unless test?>
 	# 	Passed.
@@ -937,7 +889,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements complex with success unlesss" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?unless test > 5?>
 	# 	Passed.
@@ -959,7 +911,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements complex with failure unlesss" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?unless test <= 5?>
 	# 	Failed.
@@ -981,7 +933,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements with no match unlesss" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?unless test.match(/foo/) ?>
 	# 	Passed.
@@ -1001,7 +953,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements complex2 unlesss" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?unless test > 5 or test == 0?>
 	# 	Failed.
@@ -1023,7 +975,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements simple with executed else unlesss" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?unless test?>
 	# 	Failed.
@@ -1045,7 +997,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements match with binding operator unlesss" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?unless test =~ /foo/ ?>
 	# 	Passed.
@@ -1065,7 +1017,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements simple with unexecuted else unlesss" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?unless test?>
 	# 	Passed.
@@ -1087,7 +1039,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements simple with explicit end unlesss" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?unless test?>
 	# 	Passed.
@@ -1107,7 +1059,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements inside iterator with comparison unlesss" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 		<?yield foo from test.each?>
 	# 	<?unless foo == "bar"?>
 	# 	Passed.
@@ -1129,7 +1081,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements simple selectlists" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 		<?selectlist categories ?>
 	# 	<?end?>
 	# 
@@ -1155,7 +1107,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements named selectlists" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 		<?selectlist category FROM categories ?>
 	# 	<?end?>
 	# 
@@ -1182,7 +1134,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements simple fors" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?for item in tests ?>
 	# 		<?attr item?>
@@ -1202,7 +1154,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements with methodchain fors" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?for word, length in tests.collect {|item| [item, item.length]}.
 	# 		sort_by {|item| item[1]} ?>
@@ -1223,7 +1175,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements array of hashes fors" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?for entry in svn_ret?>
 	# 		<?call entry.inspect?>
@@ -1248,7 +1200,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements iterator in evaled region fors" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?for key in purchases.keys ?>
 	# 	  <?if foo.key?(key) ?>
@@ -1273,7 +1225,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements multiple items fors" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?for key, val in tests ?>
 	# 		<?attr key?>: <?attr val?>
@@ -1293,7 +1245,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements cannot override definitions ivar fors" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?for definitions in array ?>
 	# 		Failed.
@@ -1312,7 +1264,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements simple yields" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?yield item from tests.each ?>
 	# 		<?attr item?>
@@ -1331,7 +1283,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements non each iteration yields" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?yield match from tests.scan(%r{\w+}) ?>
 	# 		<?attr match?>
@@ -1350,7 +1302,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements simple two args yields" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?yield key, value from tests.each ?>
 	# 		<?attr key ?>: <?attr value ?>
@@ -1369,7 +1321,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements recursive includes" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?include outerTest.incl ?>
 	# 
@@ -1385,7 +1337,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements simple includes" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?include test.incl?>
 	# 
@@ -1401,7 +1353,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements circular includes" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?include circular1.incl ?>
 	# 
@@ -1421,7 +1373,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements with subdirectory and identifier includes" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?include subdir/include.incl as sub?>
 	# 
@@ -1441,7 +1393,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements with subdirectory includes" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?include subdir/include.incl?>
 	# 
@@ -1458,7 +1410,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements with identifier includes" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?include subtemplate.incl as sub?>
 	# 
@@ -1478,7 +1430,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "raises an error when parsing a template with a malformed1 attribute" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?attr?>
 	# 
@@ -1489,7 +1441,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements simple attributes" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?attr test?>
 	# 
@@ -1514,7 +1466,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "raises an error when parsing a template with a malformed2 attribute" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?attr '%s' test ?>
 	# 
@@ -1525,7 +1477,7 @@ describe Arrow::Template do
 	# end
 	# 
 	# it "implements with format attributes" do
-	# 	source = <<-'TEMPLATE_END'.gsub(/^	/, '')
+	# 	source = <<-'TEMPLATE_END'.gsub(/^\t{3}/, '')
 	# 
 	# 	<?attr '|%-15s|' % test?>
 	# 

@@ -70,7 +70,7 @@ module Arrow::AppletMatchers
 	### A matcher that wraps an applet's #run method and can assert things about the
 	### generated response.
 	class RunWithMatcher
-		
+
 		### Create a new FinishWithMatcher that should finish with the given
 		### 
 		def initialize( status, message=:any_message )
@@ -78,8 +78,8 @@ module Arrow::AppletMatchers
 			@expected_message = message
 			@actual = nil
 		end
-		
-		
+
+
 		### Returns true if the code executed in the given +procobj+ calls
 		### 'finish_with' 
 		def matches?( procobj )
@@ -91,7 +91,7 @@ module Arrow::AppletMatchers
 				return statuses_match? && messages_match?
 			end
 		end
-		
+
 		### Returns true if the expected status is the same as the actual
 		### status
 		def statuses_match?
@@ -145,8 +145,8 @@ module Arrow::AppletMatchers
 		def description
 			return "the action to %s" % self.expectation_description
 		end
-		
-		
+
+
 		### Return a description of the expected status and message.
 		def expectation_description
 			if @expected_message.is_a?( Regexp )
@@ -168,7 +168,7 @@ module Arrow::AppletMatchers
 
 	### A matcher that wraps an action method and can trap abnormal responses
 	class FinishWithMatcher
-		
+
 		### Create a new FinishWithMatcher that should finish with the given
 		### 
 		def initialize( status, message=:any_message )
@@ -176,8 +176,8 @@ module Arrow::AppletMatchers
 			@expected_message = message
 			@actual = nil
 		end
-		
-		
+
+
 		### Returns true if the code executed in the given +procobj+ calls
 		### 'finish_with' 
 		def matches?( procobj )
@@ -189,7 +189,7 @@ module Arrow::AppletMatchers
 				return statuses_match? && messages_match?
 			end
 		end
-		
+
 		### Returns true if the expected status is the same as the actual
 		### status
 		def statuses_match?
@@ -243,8 +243,8 @@ module Arrow::AppletMatchers
 		def description
 			return "the action to %s" % self.expectation_description
 		end
-		
-		
+
+
 		### Return a description of the expected status and message.
 		def expectation_description
 			if @expected_message.is_a?( Regexp )

@@ -3,9 +3,9 @@
 BEGIN {
 	require 'pathname'
 	basedir = Pathname.new( __FILE__ ).dirname.parent.parent.parent
-	
+
 	libdir = basedir + "lib"
-	
+
 	$LOAD_PATH.unshift( libdir ) unless $LOAD_PATH.include?( libdir )
 }
 
@@ -63,18 +63,18 @@ describe Arrow::Template::Iterator do
 	it "can be constructed with unsplatted arrays" do
 		Arrow::Template::Iterator.new( @items ).items.should == @items
 	end
-	
+
 
 	it "can be constructed with a splatted list" do
 		Arrow::Template::Iterator.new( :fii, :baq, :bax ).items.should == [:fii, :baq, :bax]
 	end
-	
+
 
 	before( :each ) do
 		@items = TEST_ITERATOR_ITEMS.dup
 		@iter = Arrow::Template::Iterator.new( @items )
 	end
-	
+
 
 	it "is enumerable" do
 		@iter.map {|iter, item| item }.should == @items
@@ -115,11 +115,11 @@ describe Arrow::Template::Iterator do
 		@items.each_with_index do |item, i|
 			expected << item if ( i % 2 ).zero?
 		end
-		
+
 		stuff.should == expected
 	end
-	
-	
+
+
 	it "knows how to skip backwards" do
 		stuff = []
 
@@ -132,8 +132,8 @@ describe Arrow::Template::Iterator do
 
 		stuff.should == expected
 	end
-	
-	
+
+
 	it "knows if the previous iteration skipped one or more items" do
 		stuff = []
 
@@ -148,10 +148,10 @@ describe Arrow::Template::Iterator do
 
 		expected = @items.dup
 		expected[0,2] = [:skipped]
-		
+
 		stuff.should == expected
 	end
-	
+
 
 	it "knows how to redo an iterations" do
 		stuff = []
@@ -204,7 +204,7 @@ describe Arrow::Template::Iterator do
 		expected = @items.inject([]) {|a,i| a << ((a.length % 2).zero? ? :even : i); a }
 		stuff.should == expected
 	end
-	
+
 
 	it "can produce 'even' or 'odd' depending on whether the iteration is even or odd" do
 		stuff = []
@@ -215,7 +215,7 @@ describe Arrow::Template::Iterator do
 		expected = @items.inject([]) {|a,i| a << ((a.length % 2).zero? ? 'even' : 'odd'); a }
 		stuff.should == expected
 	end
-	
+
 end
 
 

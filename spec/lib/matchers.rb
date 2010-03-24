@@ -6,16 +6,16 @@
 BEGIN {
 	require 'pathname'
 	basedir = Pathname.new( __FILE__ ).dirname.parent.parent
-	
+
 	libdir = basedir + "lib"
-	
+
 	$LOAD_PATH.unshift( libdir ) unless $LOAD_PATH.include?( libdir )
 }
 
 require 'arrow'
 
 module Arrow
-	
+
 	module TimeMatchers
 	    class BeAfter
 	        def initialize( expected )

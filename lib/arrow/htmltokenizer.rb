@@ -30,13 +30,7 @@ module Arrow
 	class HTMLTokenizer < Arrow::Object
 		include Enumerable
 
-		# SVN Revision
-		SVNRev = %q$Rev$
-
-		# SVN Id
-		SVNId = %q$Id$
-
-
+super_template
 		### Create a new Arrow::HtmlTokenizer object.
 		def initialize( source )
 			@source = source

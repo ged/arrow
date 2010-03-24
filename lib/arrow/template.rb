@@ -466,9 +466,10 @@ class Arrow::Template < Arrow::Object
 		@enclosing_templates << enclosing_template
 
 		nodes.each do |node|
-			self.log.debug "    pre-rendering %p" % [node]
-			node.before_rendering( self ) if
-				node.respond_to?( :before_rendering )
+			if node.respond_to?( :before_rendering )
+				self.log.debug "    pre-rendering %p" % [node]
+				node.before_rendering( self )
+			end
 		end
 	end
 	alias_method :before_rendering, :prerender
@@ -516,9 +517,10 @@ class Arrow::Template < Arrow::Object
 	### #after_rendering hook.
 	def postrender( nodes, enclosing_template=nil )
 		nodes.each do |node|
-			# self.log.debug "    post-rendering %p" % [node]
-			node.after_rendering( self ) if
-				node.respond_to?( :after_rendering )
+			if node.respond_to?( :after_rendering )
+				self.log.debug "    post-rendering %p" % [node]
+				node.after_rendering( self ) 
+			end
 		end
 		@enclosing_templates.pop
 	end
