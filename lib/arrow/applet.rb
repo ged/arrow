@@ -9,7 +9,7 @@ require 'arrow/transaction'
 # An abstract base class for Arrow applets. Provides execution logic,
 # argument-parsing/untainting/validation, and templating through an injected
 # factory.
-# 
+#
 # == Synopsis
 #
 #   require 'arrow/applet'
@@ -43,7 +43,7 @@ require 'arrow/transaction'
 #       end
 #       formaction.template = "form.tmpl"
 #
-#       # Make a page full of 
+#       # Make a page full of character +char+.
 #       def make_character_page( char )
 #           page = ''
 #           40.times do
@@ -52,12 +52,20 @@ require 'arrow/transaction'
 #       end
 #
 #	end
+#
+# == Subversion Id
+#
+#  $Id$
 # 
 # == Authors
-# 
+#
 # * Michael Granger <ged@FaerieMUD.org>
-# 
-# Please see the file LICENSE in the top-level directory for licensing details.
+#
+# :include: LICENSE
+#
+#--
+#
+# Please see the file LICENSE in the BASE directory for licensing details.
 #
 class Arrow::Applet < Arrow::Object
 
@@ -83,8 +91,7 @@ class Arrow::Applet < Arrow::Object
 	###	  per action. See the documentation for FormValidator for the format
 	###	  of each profile hash.
 	SignatureStruct = Struct.new( :name, :description, :maintainer,
-		:version, :config, :default_action, :templates, :validator_profiles,
-		:appicon )
+		:version, :config, :default_action, :templates, :validator_profiles )
 
 	# Default-generators for Signatures which are missing one or more of the
 	# optional pairs.
@@ -103,8 +110,7 @@ class Arrow::Applet < Arrow::Object
 					:action => /^\w+$/,
 				},
 			},
-		},
-		:appicon			=> 'application-x-executable.png',
+		}
 	}
 
 	SignatureStructDefaults[:version] = proc {|rawsig, klass|
@@ -116,6 +122,8 @@ class Arrow::Applet < Arrow::Object
 			return klass.const_get( :VERSION )
 		elsif klass.const_defined?( :REVISION )
 			return klass.const_get( :REVISION )
+		elsif klass.const_defined?( :Revision )
+			return klass.const_get( :Revision )
 		elsif klass.const_defined?( :Rcsid )
 			return klass.const_get( :Rcsid )
 		else
@@ -220,7 +228,7 @@ class Arrow::Applet < Arrow::Object
 
 	### Set the description of the applet to +desc+.
 	def self::applet_description( desc )
-		self.signature.description = desc		
+		self.signature.description = desc
 	end
 
 
@@ -245,13 +253,12 @@ class Arrow::Applet < Arrow::Object
 
 	### Set the validator +rules+ for the specified +action+.
 	def self::validator( action, rules={} )
+		if action.is_a?( Hash ) && rules.empty?
+			Arrow::Logger[ self ].debug "Assuming hash syntax for validation definition: %p" % [ action ]
+			action, rules = *action.to_a.first
+		end
+		Arrow::Logger[ self ].debug "Defining validator for action %p with rules %p" % [ action, rules ]
 		self.signature.validator_profiles[ action ] = rules
-	end
-
-
-	### Set the appicon for the applet to +imgfile+.
-	def self::appicon( imgfile )
-		self.signature.appicon = imgfile
 	end
 
 

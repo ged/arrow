@@ -97,7 +97,7 @@ Then in the template:
     <h1>Argument Validation/Untainting/Testing applet</h1>
     <p>This is an applet to test argument validation.</p>
 
-    <form action="[?call txn.action?]" method="get">
+    <form action="[?call txn.applet_uri?]" method="get">
         <p>Name: <input id="name-field" type="text" name="name" 
           value="[?call txn.request.param('name') ?]" size="20"/></p>
         <p>Email: <input id="email-field" type="text" name="email"
