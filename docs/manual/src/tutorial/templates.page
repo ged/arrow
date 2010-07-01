@@ -147,6 +147,13 @@ h3. The Directives
   also specifies one or more methods that should be called on the
   inserted objects before replacing the tag.</dd>
 
+  <dt>comment</dt>
+  <dd class="format">
+    <samp>&lt;?comment Content that will not be rendered ?&gt;</samp><br />
+  </dd>
+  <dd>The comment directive is used solely for template documentation
+  that (unlike HTML comments) won't be rendered in the final output.</dd>
+  
   <dt>set</dt>
   <dd class="format">
 	<samp>&lt;?set <var>attribute</var> <var>value</var> ?&gt;</samp><br />

@@ -439,6 +439,26 @@ assert_match( templateContentRe(/^test/), rval )
 ===
 
 
+### Comment directive
+=== Single line
+<?comment hungry mouth ?>
+---
+assert_nothing_raised { rval = template.render }
+assert_match( templateContentRe(/^$/), rval )
+
+=== Multiline
+<?comment 
+
+You're a demanding consumer.
+
+	And you demand instant gratification.
+
+?>
+---
+assert_nothing_raised { rval = template.render }
+assert_match( templateContentRe(/^$/), rval )
+
+
 ### Set directive
 === Simple
 
