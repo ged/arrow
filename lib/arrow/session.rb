@@ -2,6 +2,7 @@
 
 require 'uri'
 require 'pluginfactory'
+require 'configurability'
 
 require 'arrow/object'
 require 'arrow/exceptions'
@@ -21,8 +22,8 @@ require 'arrow/config'
 #
 class Arrow::Session < Arrow::Object
 	include PluginFactory,
-		Enumerable,
-		Arrow::Configurable
+	        Enumerable
+	extend Configurability
 
 	config_key :session
 
