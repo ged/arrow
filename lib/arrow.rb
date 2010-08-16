@@ -21,7 +21,7 @@ require 'pathname'
 module Arrow
 
 	# Library version
-	VERSION = '1.0.7'
+	VERSION = '1.0.8'
 
 	# VCS revision
 	REVISION = %q$Revision$

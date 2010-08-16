@@ -213,6 +213,7 @@ PROJECT_SCPDOCURL = "#{PROJECT_HOST}:#{PROJECT_DOCDIR}"
 # Gem dependencies: gemname => version
 DEPENDENCIES = {
 	'pluginfactory' => '>= 1.0.3',
+	'configurability' => '>= 1.0.1',
 	'ruby-cache' => '>= 0.3.0',
 	'formvalidator' => '>= 0.1.4',
 }
