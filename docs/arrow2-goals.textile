@@ -1,0 +1,19 @@
+
+h1. Arrow 2
+
+* Applications deployed as gems
+** Map static resources onto gem data dirs via TransHandler
+
+* Split out the template system into a separate library
+** Replace hand-written parser with nokogiri + ripper or similar
+
+* Easier/more-flexible routes
+
+* Untainting/validation for action arguments
+
+* Include the HTTP verb in applet action declarations, Sinatra-style. E.g.,
+      post '/something' do |txn, *args|
+          ...
+      end
+
+

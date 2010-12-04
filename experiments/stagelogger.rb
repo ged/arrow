@@ -13,6 +13,7 @@
 #   RubyTransHandler           StageLogger.instance  
 #   
 #   <Location /stages>
+#       RubyHandler                StageLogger.instance
 #   	RubyInitHandler			   StageLogger.instance
 #   	RubyHeaderParserHandler	   StageLogger.instance
 #   	RubyAccessHandler		   StageLogger.instance
@@ -46,21 +47,40 @@ class StageLogger
 		:cleanup		   => 'CleanupHandler',
 	}
 
+	### Handle any of the methods that mod_ruby handlers call, logging each of them
+	### with the method that was called, the handler, and the arguments it was called 
+	### with.
 	def method_missing( sym, req, *args )
 		if MethodMap.key?( sym )
 			stage = MethodMap[ sym ]
-			req.server.log_error "in %s [%s]: %p" %
-				[stage, sym, args]
-			return Apache::DECLINED
+			req.server.log_error "StageLogger {%d}>> in %s %s(%p, %p)" % [
+				Process.pid,
+				stage,
+				sym,
+				req,
+				args
+			  ]
 		else
-			super
+			req.server.log_error "StageLogger {%d}>> unknown handler: %s(%p, %p)" % [
+				Process.pid,
+				sym,
+				req,
+				args
+			  ]
 		end
+
+		return Apache::DECLINED
 	end
 
+
+	### Handle the content handler differently so requests don't 404.
 	def handler( req )
 		req.content_type = "text/plain"
 		req.puts "In content handler."
-		req.server.log_error( "in content handler" )
+		req.server.log_error "StageLogger {%d}>> RubyHandler: handler(%p)" % [
+			Process.pid,
+			req
+		  ]
 
 		return Apache::OK
 	end
@@ -69,15 +89,26 @@ end
 
 # Results:
 
-# [Fri Aug  6 20:15:22 2004] [error] in child_init: []
-# [Fri Aug  6 20:15:25 2004] [error] in post_read_request: []
-# [Fri Aug  6 20:15:25 2004] [error] in translate_uri: []
-# [Fri Aug  6 20:15:25 2004] [error] in init: []
-# [Fri Aug  6 20:15:25 2004] [error] in header_parse: []
-# [Fri Aug  6 20:15:25 2004] [error] in check_access: []
-# [Fri Aug  6 20:15:25 2004] [error] in find_types: []
-# [Fri Aug  6 20:15:26 2004] [error] in fixup: []
-# [Fri Aug  6 20:15:26 2004] [error] [client 127.0.0.1] File does not exist: /stages
-# [Fri Aug  6 20:15:26 2004] [error] in log_transaction: []
-# [Fri Aug  6 20:15:26 2004] [error] in cleanup: []
+# [Sat Nov 13 10:50:12 2010] [error] StageLogger {42170} \
+# 	>> in ChildInitHandler child_init(#<Apache::Request:0x102730de0>, [])
+# [Sat Nov 13 10:50:22 2010] [error] StageLogger {42170} \
+# 	>> in PostReadRequestHandler post_read_request(#<Apache::Request:0x1020b2798>, [])
+# [Sat Nov 13 10:50:22 2010] [error] StageLogger {42170} \
+# 	>> in TransHandler translate_uri(#<Apache::Request:0x1020b2798>, [])
+# [Sat Nov 13 10:50:22 2010] [error] StageLogger {42170} \
+# 	>> in AccessHandler check_access(#<Apache::Request:0x1020b2798>, [])
+# [Sat Nov 13 10:50:22 2010] [error] StageLogger {42170} \
+# 	>> in TypeHandler find_types(#<Apache::Request:0x1020b2798>, [])
+# [Sat Nov 13 10:50:22 2010] [error] StageLogger {42170} \
+# 	>> in FixupHandler fixup(#<Apache::Request:0x1020b2798>, [])
+# [Sat Nov 13 10:50:22 2010] [error] StageLogger {42170} \
+# 	>> RubyHandler: handler(#<Apache::Request:0x1020b2798>)
+# [Sat Nov 13 10:50:22 2010] [error] StageLogger {42170} \
+# 	>> in LogHandler log_transaction(#<Apache::Request:0x1020b2798>, [])
+# [Sat Nov 13 10:50:22 2010] [error] StageLogger {42170} \
+# 	>> in CleanupHandler cleanup(#<Apache::Request:0x1020a77d0>, [])
+# [Sat Nov 13 10:50:22 2010] [error] StageLogger {42170} \
+# 	>> in PostReadRequestHandler post_read_request(#<Apache::Request:0x1020a5ac0>, [])
+# [Sat Nov 13 10:50:22 2010] [error] StageLogger {42170} \
+# 	>> in TransHandler translate_uri(#<Apache::Request:0x1020a5ac0>, [])
 
