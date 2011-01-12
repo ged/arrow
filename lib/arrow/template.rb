@@ -220,7 +220,7 @@ class Arrow::Template < Arrow::Object
 	### Find the specified +file+ in the given +path+ (or the Template
 	### class's #load_path if not specified).
 	def self::find_file( file, path=[] )
-		raise TemplateError, "Filename #{file} is tainted." if
+		raise Arrow::TemplateError, "Filename #{file} is tainted." if
 			file.tainted?
 
 		filename = nil

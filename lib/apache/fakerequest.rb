@@ -8,6 +8,7 @@
 require 'fileutils'
 require 'uri'
 require 'forwardable'
+require 'tmpdir'
 
 class Integer # :nodoc: all
 	def of
@@ -270,7 +271,7 @@ module Apache # :nodoc: all
 
 	# Returns the server's root directory (ie., the one set by the ServerRoot directive).
 	def server_root
-		Dir.pwd
+		Dir.tmpdir
 	end
 
 	# Returns the server built date string.

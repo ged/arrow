@@ -55,8 +55,7 @@ rescue LoadError
 end
 
 begin
-	require 'rubygems'
-rescue LoadError
+	rescue LoadError
 end
 
 require 'test/unit'

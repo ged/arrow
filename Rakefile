@@ -7,6 +7,7 @@
 # Copyright (c) 2007-2010 The FaerieMUD Consortium
 #
 # Authors:
+#  * Martin Chase <stillflame@FaerieMUD.org>
 #  * Michael Granger <ged@FaerieMUD.org>
 #
 

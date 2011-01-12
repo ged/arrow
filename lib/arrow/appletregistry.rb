@@ -3,16 +3,10 @@
 require 'arrow/broker'
 require 'forwardable'
 
-
-
 # The Arrow::AppletRegistry class, a derivative of
 # Arrow::Object. Instances of this class are responsible for loading and
 # maintaining the collection of Arrow::Applets registered with an 
 # Arrow::Broker.
-# 
-# == VCS Id
-# 
-# $Id$
 # 
 # == Authors
 # 
@@ -296,6 +290,7 @@ class Arrow::AppletRegistry < Arrow::Object
 			return
 		end
 
+		require 'rubygems'
 		self.log.debug "  using gem config: %p" % [ config.gems ]
 
 		# Make sure the 'gem home' is a directory and not world-writable; don't use it

@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# coding: utf-8
+#encoding: utf-8
 
 require 'uri'
 require 'forwardable'
@@ -50,10 +50,6 @@ require 'arrow/object'
 #		return failure_template
 #	end
 #
-# == VCS Id
-# 
-# $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>

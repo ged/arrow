@@ -6,10 +6,6 @@ require 'arrow'
 # The Arrow::FallbackHandler class, a request handler for Arrow that is used to 
 # handle misconfigured handler requests.
 # 
-# == VCS Id
-# 
-# $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>

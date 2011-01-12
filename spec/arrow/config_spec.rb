@@ -25,8 +25,7 @@ begin
 	require 'spec/lib/constants'
 rescue LoadError
 	unless Object.const_defined?( :Gem )
-		require 'rubygems'
-		retry
+				retry
 	end
 	raise
 end

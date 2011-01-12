@@ -18,8 +18,7 @@ begin
 	require 'date'
 rescue LoadError
 	unless Object.const_defined?( :Gem )
-		require 'rubygems'
-		retry
+				retry
 	end
 	raise
 end
