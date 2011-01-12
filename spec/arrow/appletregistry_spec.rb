@@ -9,9 +9,9 @@
 BEGIN {
 	require 'pathname'
 	basedir = Pathname.new( __FILE__ ).dirname.parent.parent
-	
+
 	libdir = basedir + "lib"
-	
+
 	$LOAD_PATH.unshift( libdir ) unless $LOAD_PATH.include?( libdir )
 }
 
@@ -25,8 +25,7 @@ begin
 	require 'spec/lib/helpers'
 rescue LoadError
 	unless Object.const_defined?( :Gem )
-		require 'rubygems'
-		retry
+				retry
 	end
 	raise
 end
@@ -38,7 +37,7 @@ end
 
 describe Arrow::AppletRegistry do
 	include Arrow::SpecHelpers
-	
+
 	APPLETREGISTRY_TEST_CONFIG = {
 		:applets => {
 			:path			=> Arrow::Path.new( "applets:specs/data/applets" ),
@@ -89,11 +88,11 @@ describe Arrow::AppletRegistry do
 			:normalized_name => classname,
 			:new => applet
 		  )
-	
+
 		Arrow::Applet.should_receive( :load ).with( path ).once.
 			and_return([ appletclass ])
 		File.should_receive( :mtime ).with( path ).and_return( Time.now )
-	
+
 		return applet, appletclass
 	end
 
@@ -102,7 +101,7 @@ describe Arrow::AppletRegistry do
 	before( :all ) do
 		setup_logging( :crit )
 	end
-	
+
 	after( :all ) do
 		reset_logging()
 	end
@@ -123,7 +122,7 @@ describe Arrow::AppletRegistry do
 
 		Arrow::AppletRegistry.get_safe_gemhome.should be_nil()
 	end
-	
+
 
 	it "ignores the gem home if it's world-writable" do
 		homepath = mock( 'Pathname object for gem home' )
@@ -139,7 +138,7 @@ describe Arrow::AppletRegistry do
 
 		Arrow::AppletRegistry.get_safe_gemhome.should be_nil()
 	end
-	
+
 
 	it "returns an untainted Pathname for the gem home if it's sane" do
 		homepath = mock( 'Pathname object for gem home' )
@@ -155,11 +154,11 @@ describe Arrow::AppletRegistry do
 		homepath_stat.should_receive( :mode ).and_return( 0755 )
 
 		rval = Arrow::AppletRegistry.get_safe_gemhome
-		
+
 		rval.should == homepath
 		rval.should_not be_tainted()
 	end
-	
+
 
 	it "loads any configured gems when it is created, and adds their template/ and applet/ " +
 	   "directories to the template factory and path" do
@@ -178,14 +177,14 @@ describe Arrow::AppletRegistry do
 
 		config = Arrow::Config.new( GEM_CONFIG )
 		registry = Arrow::AppletRegistry.new( config )
-		
+
 		registry.template_factory.path.should have(5).members
 		registry.template_factory.path.dirs.should include( 
 			'/some/path/arrow-demo-apps/data/templates',
 			'/some/path/arrow-management-apps/data/templates',
 			'/some/path/arrow-laikapedia/data/templates'
 		)
-		
+
 		registry.path.should have(5).members
 		registry.path.dirs.should include(
 			'/some/path/arrow-demo-apps/data/applets',
@@ -194,7 +193,7 @@ describe Arrow::AppletRegistry do
 		)
 	end
 
-	
+
 	it "searches for applets in its list of paths, and loads all of them" do
 		test_applet, test_appletclass = fixture_appletclass( 'test.rb', 'test', 'TestApplet' )
 		bargle_applet, bargle_appletclass = fixture_appletclass( 'bargle.rb', 'bargle', 'BargleApplet' )
@@ -212,7 +211,7 @@ describe Arrow::AppletRegistry do
 		registry.urispace.should have(2).members
 		registry.urispace.values.should include( bargle_applet, test_applet )
 	end
-	
+
 
 	describe "instance" do
 
@@ -235,7 +234,7 @@ describe Arrow::AppletRegistry do
 			@registry = Arrow::AppletRegistry.new( @config )
 			@registry.instance_variable_set( :@urispace, TEST_URISPACE )
 		end
-		
+
 
 		it "can create an applet chain for a uri" do
 			@registry.find_applet_chain( '/protected/hello' ).should have(3).members
@@ -271,7 +270,7 @@ describe Arrow::AppletRegistry do
 			@registry.should_receive( :reload_applets ).once
 			@registry.check_for_updates
 		end
-		
+
 		it "doesn't reload its applets if the configured interval hasn't passed since " +
 		   "applets were loaded" do
 			# Make sure the load time is far enough in the past
@@ -279,7 +278,7 @@ describe Arrow::AppletRegistry do
 			@registry.should_not_receive( :reload_applets )
 			@registry.check_for_updates
 		end
-		
+
 		it "doesn't reload its applets if reloading is turned off (interval is zero)" do
 			# Make sure the load time is far enough in the past
 			@config.applets.pollInterval = 0
@@ -287,8 +286,8 @@ describe Arrow::AppletRegistry do
 			@registry.should_not_receive( :reload_applets )
 			@registry.check_for_updates
 		end
-		
+
 	end
-	
+
 end
 

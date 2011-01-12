@@ -219,7 +219,7 @@ class Arrow::Broker < Arrow::Object
 			emsg = "Argument list is a %s: expected an Array" %
 				args.class.name
 			raise Arrow::AppletChainError, emsg
-		end					
+		end
 
 		return applet, path, args
 	end

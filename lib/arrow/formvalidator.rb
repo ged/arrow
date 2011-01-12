@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+#encoding: utf-8
 
 require 'uri'
 require 'forwardable'
@@ -49,10 +50,6 @@ require 'arrow/object'
 #		return failure_template
 #	end
 #
-# == VCS Id
-# 
-# $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
@@ -92,8 +89,8 @@ require 'arrow/object'
 class Arrow::FormValidator < ::FormValidator
 	extend Forwardable
 	include Arrow::Loggable
-	
-	
+
+
 	Defaults = {
 		:descriptions => {},
 	}
@@ -111,7 +108,7 @@ class Arrow::FormValidator < ::FormValidator
 	######
 
 	attr_reader :raw_form
-	
+
 
 	### Delegate Hash methods to the valid form variables hash
 	def_delegators :@form,
@@ -140,7 +137,7 @@ class Arrow::FormValidator < ::FormValidator
 	def validate( params, additional_profile=nil )
 		@raw_form = params.dup
 		profile = @profile
-		
+
 		if additional_profile
 			self.log.debug "Merging additional profile %p" % [additional_profile]
 			profile = @profile.merge( additional_profile ) 
@@ -192,8 +189,8 @@ class Arrow::FormValidator < ::FormValidator
 	def okay?
 		self.missing.empty? && self.invalid.empty?
 	end
-	
-	
+
+
 	### Returns +true+ if the given +field+ is one that should be untainted.
 	def untaint?( field )
 		self.log.debug "Checking to see if %p should be untainted." % [field]
@@ -203,10 +200,10 @@ class Arrow::FormValidator < ::FormValidator
 		else
 			self.log.debug "  ...nope."
 		end
-		
+
 		return rval
 	end
-	
+
 
 
 	### Return an array of field names which had some kind of error associated
@@ -220,14 +217,14 @@ class Arrow::FormValidator < ::FormValidator
 	def get_description( field )
 		return @profile[:descriptions][ field.to_s ] if
 			@profile[:descriptions].key?( field.to_s )
-		
+
 		desc = field.to_s.
 			gsub( /.*\[(\w+)\]/, "\\1" ).
 			gsub( /_(.)/ ) {|m| " " + m[1,1].upcase }.
 			gsub( /^(.)/ ) {|m| m.upcase }
 		return desc
 	end
-	
+
 
 	### Return an error message for each missing or invalid field; if
 	### +includeUnknown+ is +true+, also include messages for unknown fields.
@@ -258,7 +255,7 @@ class Arrow::FormValidator < ::FormValidator
 	def missing
 		@missing_fields.uniq.sort_by {|f| f.to_s}
 	end
-	
+
 	### Returns a distinct list of unknown fields.
 	def unknown
 		(@unknown_fields - @invalid_fields.keys).uniq.sort_by {|f| f.to_s}
@@ -287,7 +284,7 @@ class Arrow::FormValidator < ::FormValidator
 
 
 	### Constraint methods
-	
+
 	### Constrain a value to +true+ (or +yes+) and +false+ (or +no+).
 	def match_boolean( val )
 		rval = nil
@@ -296,7 +293,7 @@ class Arrow::FormValidator < ::FormValidator
 		elsif ( val =~ /^(no?|f(?:alse)?)|0$/i )
 			rval = false
 		end
-		
+
 		return rval
 	end
 
@@ -305,20 +302,20 @@ class Arrow::FormValidator < ::FormValidator
 	def match_integer( val )
 		return Integer( val ) rescue nil
 	end
-	
+
 
 	### Contrain a value to a Float
 	def match_float( val )
 		return Float( val ) rescue nil
 	end
-	
-	
+
+
 	### Constrain a value to a parseable Date
 	def match_date( val )
 		return Date.parse( val ) rescue nil
 	end
-	
-	
+
+
 	### Constrain a value to alpha characters (a-z, case-insensitive)
 	def match_alpha( val )
 		if val =~ /^([a-z]+)$/i
@@ -327,8 +324,8 @@ class Arrow::FormValidator < ::FormValidator
 			return nil
 		end
 	end
-	
-	
+
+
 	### Constrain a value to alpha characters (a-z, case-insensitive and 0-9)
 	def match_alphanumeric( val )
 		if val =~ /^([a-z0-9]+)$/i
@@ -337,8 +334,8 @@ class Arrow::FormValidator < ::FormValidator
 			return nil
 		end
 	end
-	
-	
+
+
 	### Constrain a value to any printable characters
 	def match_printable( val )
 		if val =~ /^([[:print:][:space:]]{0,255})$/
@@ -347,9 +344,9 @@ class Arrow::FormValidator < ::FormValidator
 			return nil
 		end
 	end
-	
-	
-	
+
+
+
 	#
 	# RFC822 Email Address Regex
 	# --------------------------
@@ -378,7 +375,7 @@ class Arrow::FormValidator < ::FormValidator
 		addr_spec = "#{local_part}\\x40#{domain}"
 		/\A#{addr_spec}\z/
 	end
-	
+
 	### Override the parent class's definition to (not-sloppily) match email 
 	### addresses.
 	def match_email( val )
@@ -387,8 +384,8 @@ class Arrow::FormValidator < ::FormValidator
 			[ val, match ]
 		return match ? match[0] : nil
 	end
-	
-	
+
+
 	RFC1738Hostname = begin
 		alphadigit = /[a-z0-9]/i
 		# toplabel		 = alpha | alpha *[ alphadigit | "-" ] alphadigit
@@ -416,7 +413,7 @@ class Arrow::FormValidator < ::FormValidator
 		self.log.debug "Ignoring bug in URI#parse"
 		return nil
 	end
-	
+
 
 	### Apply one or more +constraints+ to the field value/s corresponding to
 	### +key+.
@@ -446,8 +443,8 @@ class Arrow::FormValidator < ::FormValidator
 			[ @form[key].to_s, rval ]
 		self.set_form_value( key, rval, constraint )
 	end
-	
-	
+
+
 	### Apply a constraint given as a Hash to the value/s corresponding to the
 	### specified +key+:
 	### 
@@ -460,7 +457,7 @@ class Arrow::FormValidator < ::FormValidator
 	###   fields to send to the Proc.
 	def apply_hash_constraint( key, constraint )
 		action = constraint["constraint"]
-		
+
 		rval = case action
 			when String
 				self.apply_string_constraint( key, action )
@@ -474,32 +471,32 @@ class Arrow::FormValidator < ::FormValidator
 					self.apply_proc_constraint( key, action )
 				end
 			end
-	
+
 		# If the validation failed, and there's a name for this constraint, replace
 		# the name in @invalid_fields with the name
 		if !rval && constraint["name"]
 			@invalid_fields[key] = constraint["name"]
 		end
-	
+
 		return rval
 	end
-	
-	
+
+
 	### Apply a constraint that was specified as a Proc to the value for the given 
 	### +key+
 	def apply_proc_constraint( key, constraint, *params )
 		value = nil
-	
+
 		unless params.empty?
 			value = constraint.call( *params )
 		else
 			value = constraint.call( @form[key] )
 		end
-	
+
 		self.set_form_value( key, value, constraint )
 	end
-	
-	
+
+
 	### Applies regexp constraint to form[key]
 	def apply_regexp_constraint( key, constraint )
 		self.log.debug "Validating '%p' via regexp %p" % [@form[key], constraint]
@@ -521,28 +518,28 @@ class Arrow::FormValidator < ::FormValidator
 			self.set_form_value( key, nil, constraint )
 		end
 	end
-	
-	
+
+
 	### Set the form value for the given +key+. If +value+ is false, add it to
 	### the list of invalid fields with a description derived from the specified
 	### +constraint+.
 	def set_form_value( key, value, constraint )
 		key.untaint
-	
+
 		if !value.nil? 
 			self.log.debug "Setting form value for %p to %p (constraint was %p)" %
 				[ key, value, constraint ]
 			@form[key] = value
 			@form[key].untaint if self.untaint?( key )
 			return true
-			
+
 		else
 			self.log.debug "Clearing form value for %p (constraint was %p)" %
 				[ key, constraint ]
 			@form.delete( key )
 			@invalid_fields ||= {}
 			@invalid_fields[ key ] ||= []
-	
+
 			unless @invalid_fields[ key ].include?( constraint )
 				@invalid_fields[ key ].push( constraint )
 			end

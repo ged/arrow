@@ -6,3 +6,5 @@
 ^docs/manual/output
 ^coverage/
 ^coverage\.info
+tags
+.yardoc

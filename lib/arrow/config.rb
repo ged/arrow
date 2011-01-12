@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'rubygems'
 require 'uri'
 require 'pluginfactory'
 require 'forwardable'
@@ -245,7 +244,7 @@ class Arrow::Config < Arrow::Object
 	def loader
 		@loader ||= self.class.get_loader
 	end
-	
+
 
 	### Write the configuration object using the specified name and any
 	### additional +args+.
@@ -260,7 +259,7 @@ class Arrow::Config < Arrow::Object
 
 	### Returns +true+ for methods which can be autoloaded
 	def respond_to?( sym )
-		return true if @struct.member?( sym.to_s.sub(/(=|\?)$/, '').to_sym )
+		return true if @struct.member?( sym.to_s.sub(/(=|\?)$/, '') )
 		super
 	end
 
@@ -277,7 +276,7 @@ class Arrow::Config < Arrow::Object
 	### returns nil.
 	def changed_reason
 		return "Struct was modified" if @struct.modified?
-		
+
 		if self.name && self.loader.is_newer?( self.name, self.create_time )
 			return "Config source (%s) has been updated since %s" %
 				[ self.name, self.create_time ]
@@ -285,13 +284,13 @@ class Arrow::Config < Arrow::Object
 
 		return nil
 	end
-	
+
 
 	### Reload the configuration from the original source if it has
 	### changed. Returns +true+ if it was reloaded and +false+ otherwise.
 	def reload
 		return false unless @loader && @name
-		
+
 		# Even if reloading fails, reset the creation time so we don't keep
 		# trying to reload a broken config
 		self.create_time = Time.now
@@ -299,13 +298,13 @@ class Arrow::Config < Arrow::Object
 		confighash = @loader.load( @name )
 		ihash = internify_keys( untaint_values(confighash) )
 		mergedhash = DEFAULTS.merge( ihash, &HashMergeFunction )
-		
+
 		@struct = ConfigStruct.new( mergedhash )
 
 	rescue => err
 		self.log.error "Error while trying to reload the config: %s" % err.message
 		err.backtrace.each {|frame| self.log.debug "  " + frame }
-		
+
 		return false
 	else
 		return true
@@ -341,7 +340,7 @@ class Arrow::Config < Arrow::Object
 	### untainted.
 	def untaint_values( hash )
 		newhash = {}
-		
+
 		hash.each do |key,val|
 			case val
 			when Hash
@@ -374,7 +373,7 @@ class Arrow::Config < Arrow::Object
 				newhash[ key ] = newval
 			end
 		end
-		
+
 		return newhash
 	end
 
@@ -447,13 +446,13 @@ class Arrow::Config < Arrow::Object
 			return rhash
 		end
         alias_method :to_h, :to_hash
-        
+
 
 		### Return +true+ if the receiver responds to the given
 		### method. Overridden to grok autoloaded methods.
 		def respond_to?( sym, priv=false )
 			key = sym.to_s.sub( /(=|\?)$/, '' ).to_sym
-			return true if @hash.key?( key )
+			return true if self.member?( key )
 			super
 		end
 
@@ -467,7 +466,7 @@ class Arrow::Config < Arrow::Object
 		### Returns +true+ if the given +name+ is the name of a member of
 		### the receiver.
 		def member?( name )
-			return @hash.key?( name.to_s.to_sym )
+			return @hash.key?( name.to_sym )
 		end
 		alias_method :key?, :member?
 		alias_method :has_key?, :key?

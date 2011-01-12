@@ -19,6 +19,7 @@ project_dependencies:
   pluginfactory: ">= 1.0.3"
   ruby-cache: ">= 0.3.0"
   formvalidator: ">= 0.1.4"
+  configurability: ">= 1.0.1"
 project_summary: A mod_ruby web application framework
 version_file: arrow.rb
 additional_pkgfiles: 

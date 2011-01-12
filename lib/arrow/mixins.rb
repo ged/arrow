@@ -217,7 +217,7 @@ module Arrow
 
 			else
 				if object.instance_variables.empty?
-					return IMMEDIATE_OBJECT_HTML_CONTAINER % 
+					return IMMEDIATE_OBJECT_HTML_CONTAINER %
 						[ HTMLUtilities.escape_html(object.inspect) ]
 				else
 					object_html << make_object_html_wrapper( object )
@@ -308,136 +308,6 @@ module Arrow
 		end
 
 	end # HtmlInspectableObject
-
-
-	# A mixin that collects classes that expect to be configured by an 
-	# Arrow::Config instance.
-	#
-	# == Usage
-	# 
-	#	require "arrow/mixins"
-	#
-	#	class MyClass
-	#	  include Arrow::Configurable
-	# 
-	#	  config_key :myclass
-	#
-	#	  def self::configure( config )
-	#		@@host = config.host
-	#	  end
-	#	end
-	# 
-	module Configurable
-
-		@modules = []
-		class << self
-			attr_accessor :modules
-		end
-
-
-		### Make the given object (which must be a Module) configurable via
-		### a section of an Arrow::Config object.
-		def self::extend_object( obj )
-			raise ArgumentError, "can't make a #{obj.class} Configurable" unless
-				obj.is_a?( Module )
-
-			super
-			@modules << obj
-		end
-
-
-		### Generate a config key from the name of the given +klass+.
-		def self::make_key_from_classname( klass )
-			unless klass.name == ''
-				return klass.name.sub( /^Arrow::/, '' ).gsub( /\W+/, '_' ).downcase.to_sym
-			else
-				return :anonymous
-			end
-		end
-
-
-		### Mixin hook: extend including classes
-		def self::included( mod )
-			mod.extend( self )
-			super
-		end
-
-
-		### Configure Configurable classes with the sections of the specified
-		### +config+ that correspond to their +config_key+, if present.
-		### (Undocumented)
-		def self::configure_modules( config, dispatcher )
-
-			# Have to keep messages from being logged before logging is 
-			# configured.
-			logmessages = []
-			# logmessages << [
-			# 	:debug, "Propagating config to Configurable classes: %p" %
-			# 	[@modules] ]
-
-			@modules.each do |mod|
-				key = mod.config_key
-
-				if config.member?( key )
-					value = config.send( key )
-					logmessages << [
-						:debug, 
-						"Configuring %s with the %s section of the config: %p" %
-							[mod.name, key, value] ]
-
-					if mod.method(:configure).arity == 2
-						mod.configure( value, dispatcher )
-					else
-						mod.configure( value )
-					end
-				else
-					logmessages << [
-						:debug,
-						"Skipping %s: no %s section in the config" %
-						[mod.name, key] ]
-				end
-			end
-
-			logmessages.each do |lvl, message|
-				Arrow::Logger[ self ].send( lvl, message )
-			end
-
-			Arrow::Logger[ self ].debug "Propagated config to %d modules: %p" %
-				[ @modules.length, @modules ]
-			return @modules
-		end
-
-
-		#############################################################
-		### A P P E N D E D	  M E T H O D S
-		#############################################################
-
-		### The symbol which corresponds to the section of the configuration
-		### used to configure the Configurable class.
-		attr_writer :config_key
-
-		### :TODO:
-		### * Change #config_key to #class_config_key and #instance_config_key
-		### * Add a ::configure_instances method that would iterate over
-		###   instances that had marked themselves as configurable in the same
-		###   way the classed do now.
-
-
-		### Get (and optionally set) the +config_key+.
-		def config_key( sym=nil )
-			@config_key = sym unless sym.nil?
-			@config_key ||= Arrow::Configurable.make_key_from_classname( self )
-			@config_key
-		end
-
-
-		### Default configuration method.
-		def configure( config, dispatcher )
-			raise NotImplementedError,
-				"#{self.name} does not implement required method 'configure'"
-		end
-
-	end # module Configurable
 
 
 	# Adds dependency-injection bejavior to a class. Classes which are Injectable

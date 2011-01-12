@@ -28,7 +28,11 @@ sacrificing the power of being able to access the native Apache API.
 We're working on a manual which will provide more comprehensive instructions
 and an in-depth tutorial. You can view it at:
 
-  http://deveiate.org/code/Arrow-manual/
+  http://deveiate.org/code/Arrow/
+
+You can also view API docs online at:
+
+  http://deveiate.org/code/Arrow/api/
 
 We'd be happy to hear your suggestions, bug reports, or complaints.
 
@@ -37,33 +41,23 @@ We'd be happy to hear your suggestions, bug reports, or complaints.
 
 === Requirements
 
-* Apache (2.0 or 2.2) - http://httpd.apache.org/
-* mod_ruby (>= 1.3.1) - http://modruby.net/
+* Apache (2.2.x) - http://httpd.apache.org/
+* mod_ruby (>= 1.3.0) - http://modruby.net/
 
 === (Non-Standard) Ruby Library Dependencies
 
-If you use RubyGems, appropriate versions can be installed using the
-'install_dependencies' Rakefile task. Otherwise, you'll need to build and
-install these by hand:
+If you install via RubyGems, appropriate versions should be installed as dependencies. Dependencies
+can also be installed using the 'install_dependencies' Rakefile task.
 
-ruby-cache (0.3.0)::    `gem install ruby-cache`
-formvalidator (0.1.4):: `gem install formvalidator`
-pluginfactory (1.0.4):: `gem install pluginfactory`
-
-
-==== Quickstart
-
-Install:
-
-  $ rake install
-
-The install task will check for dependencies, install the libraries, and then offer some
-advice about how to configure your server.
+* ruby-cache (>= 0.3.0)
+* formvalidator (>= 0.1.4)
+* pluginfactory (>= 1.0.4)
 
 
 == Contact
 
 * Project Page: http://deveiate.org/projects/Arrow
+* IRC: irc://freenode.net/#arrow
 
 
 == Legal

@@ -3,10 +3,6 @@
 # The ImageText class, a derivative of Arrow::Applet. It is
 # an applet which generates an image from one or more characters of text.
 # 
-# == VCS Id
-# 
-# $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>

@@ -147,6 +147,13 @@ h3. The Directives
   also specifies one or more methods that should be called on the
   inserted objects before replacing the tag.</dd>
 
+  <dt>comment</dt>
+  <dd class="format">
+    <samp>&lt;?comment Content that will not be rendered ?&gt;</samp><br />
+  </dd>
+  <dd>The comment directive is used solely for template documentation
+  that (unlike HTML comments) won't be rendered in the final output.</dd>
+  
   <dt>set</dt>
   <dd class="format">
 	<samp>&lt;?set <var>attribute</var> <var>value</var> ?&gt;</samp><br />
@@ -251,6 +258,18 @@ h3. The Directives
   sub-template which has <code>&lt;?import foo ?></code> in it would
   cause the sub-template's <var>foo</var> to be set to the container
   template's <var>foo</var> at the point at which it is rendered.</dd>
+
+  <dt>export</dt>
+  <dd class="format">
+	<samp>
+	  &lt;?export <var>attribute</var> ?&gt;<br/>
+	  &lt;?end export ?&gt;
+	</samp>
+  </dd>
+
+  <dd>This defines and exposes template content in a subordinate template, up
+  to its containing templates.  Useful for bubbling values up through an applet
+  delegation chain, such as HTML titles.</dd>
 
   <dt>include</dt>
   <dd class="format">
