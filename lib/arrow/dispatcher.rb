@@ -176,7 +176,7 @@ class Arrow::Dispatcher < Arrow::Object
 		@@Instance = self.create_configured_dispatchers( configs )
 		return @@Instance
 	end
-	
+
 
 	### Create dispatchers for the config files given in +configspec+ and return
 	### them in a Hash keyed by both the configname key and the expanded path to
@@ -360,7 +360,7 @@ class Arrow::Dispatcher < Arrow::Object
 		table.each do |k,v|
 			lines << "%s: %s" % [ k, v ]
 		end
-		
+
 		return lines.join( "; " )
 	end
 

@@ -19,6 +19,7 @@ BEGIN {
 	libdir = basedir + "lib"
 	extdir = libdir + Config::CONFIG['sitearch']
 
+	$LOAD_PATH.unshift( basedir.to_s ) unless $LOAD_PATH.include?( basedir.to_s )
 	$LOAD_PATH.unshift( libdir.to_s ) unless $LOAD_PATH.include?( libdir.to_s )
 	$LOAD_PATH.unshift( extdir.to_s ) unless $LOAD_PATH.include?( extdir.to_s )
 }
@@ -131,8 +132,7 @@ RELEASE_FILES = TEXT_FILES +
 RELEASE_FILES << LOCAL_RAKEFILE.to_s if LOCAL_RAKEFILE.exist?
 
 RELEASE_ANNOUNCE_ADDRESSES = [
-	"Ruby-Talk List <ruby-talk@ruby-lang.org>",
-	"Mod Ruby List <modruby@modruby.net>",
+	"Ruby-Talk List <ruby-talk@ruby-lang.org>\nMod Ruby List <modruby@modruby.net>",
 ]
 
 COVERAGE_MINIMUM = ENV['COVERAGE_MINIMUM'] ? Float( ENV['COVERAGE_MINIMUM'] ) : 85.0
@@ -214,9 +214,9 @@ PROJECT_SCPDOCURL = "#{PROJECT_HOST}:#{PROJECT_DOCDIR}"
 # Gem dependencies: gemname => version
 DEPENDENCIES = {
 	'pluginfactory' => '>= 1.0.3',
-	'configurability' => '>= 1.0.1',
 	'ruby-cache' => '>= 0.3.0',
 	'formvalidator' => '>= 0.1.4',
+	'configurability' => '>= 1.0.1',
 }
 
 # Developer Gem dependencies: gemname => version

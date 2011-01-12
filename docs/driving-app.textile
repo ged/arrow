@@ -1,0 +1,32 @@
+h1. An Outline of an Application to Drive Implementation
+
+Tentatively the LAIKA intranet application: LAIKApedia.
+
+h2. Features
+
+h3. 'Doc' Handler
+
+The default handler should map request URIs to files with the .page extension relative to the default content directory, read them, and render them with a list of filters.
+
+h3. 'Forms' Handler
+
+For requests that map to a 'forms' directory, map the request to a forms directory under the department path on the network filestore, and either serve the form if it resolves to one, or present an index of forms with thumbnails, title-parsing, etc. if it maps to a subdirectory.
+
+h3. Company Directory
+
+Read the LDAP directory, and present a sorted view of active accounts in it, with thumbnail portraits and list views. 
+
+h3. Services
+
+Allow access to various data structures via REST services.
+
+h4. Directory
+
+Present a view of the employee directory for the laika firefox extension's use.
+
+h4. Dialer
+
+Allow limited access to the Asterisk server's manager interface for web-based dialing, phone status, etc.
+
+
+
