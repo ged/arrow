@@ -17,19 +17,11 @@ require 'arrow/acceptparam'
 #   * new action dispatch mechanism that takes the HTTP request method into account
 #   * convenience functions for returning a non-OK HTTP status
 #
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Service < Arrow::Applet
 	include Arrow::Loggable,
@@ -39,7 +31,7 @@ class Arrow::Service < Arrow::Applet
 	# Subversion revision
 	SVNRev = %q$Rev$
 
-	# Subversion id
+	# VCS Id
 	SvnId  = %q$Id$
 
 	# Map of HTTP methods to their Ruby equivalents as tuples of the form:

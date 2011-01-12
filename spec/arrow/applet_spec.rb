@@ -192,7 +192,40 @@ describe Arrow::Applet do
 			@applet.run( txn, 'test' )
 		end
 
-	end # describe "concrete subclass"
+	end # describe "instance"
+
+
+	describe "instance with an action that accepts form parameters" do
+		before( :all ) do
+			setup_logging( :crit )
+		end
+
+		it "allows a validator to be declared using 'action, hash' syntax" do
+			appletclass = Class.new( Arrow::Applet ) do
+				def comma_action( txn, *args )
+					return 'yay'
+				end
+
+				validator :comma, :optional => :formy
+			end
+			appletclass.signature.validator_profiles[ :comma ].should == {
+				:optional => :formy
+			}
+		end
+
+		it "allows a validator to be declared using 'action => { hash }' syntax" do
+			appletclass = Class.new( Arrow::Applet ) do
+				def hash_action( txn, *args )
+					return 'yay'
+				end
+
+				validator :hash => { :optional => :formy }
+			end
+			appletclass.signature.validator_profiles[ :hash ].should == {
+				:optional => :formy
+			}
+		end
+	end
 
 
 	describe "instance without an #action_missing_action method" do

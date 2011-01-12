@@ -13,7 +13,7 @@ module Arrow
 	# Some of the code and design were stolen from the excellent HTMLTokenizer
 	# library by Ben Giddings <bg@infofiend.com>.
 	# 
-	# == Subversion Id
+	# == VCS Id
 	#
 	#  $Id$
 	# 
@@ -25,7 +25,7 @@ module Arrow
 	#
 	#--
 	#
-	# Please see the file LICENSE in the BASE directory for licensing details.
+	# Please see the file LICENSE in the top-level directory for licensing details.
 	#
 	class HTMLTokenizer < Arrow::Object
 		include Enumerable

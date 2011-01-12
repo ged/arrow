@@ -2,6 +2,7 @@
 
 require 'benchmark'
 require 'tmpdir'
+require 'configurability'
 
 require 'arrow/object'
 require 'arrow/config'
@@ -66,19 +67,11 @@ require 'arrow/fallbackhandler'
 #   help:
 #     /other/directory/help.yml
 #
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Dispatcher < Arrow::Object
 
@@ -249,18 +242,24 @@ class Arrow::Dispatcher < Arrow::Object
 
 	### The key used to indentify this dispatcher
 	attr_reader :name
-	
+
 
 	### (Re)configure the dispatcher based on the values in the given
 	### +config+ (an Arrow::Config object).
 	def configure( config )
-
 		self.log.notice "Configuring a dispatcher for '%s' from '%s': child server %d" %
 			[ Apache.request.server.hostname, config.name, Process.pid ]
 
-        # Configure any modules that have mixed in Arrow::Configurable
-        Arrow::Configurable.configure_modules( config, self )
+        # Configure any modules that have mixed in Configurability
+		if defined?( Apache )
+			require 'apache/logger'
+			Configurability.logger = Logger.new( Apache::LogDevice.new )
+			Configurability.logger.formatter = Apache::LogFormatter.new
+		else
+			Configurability.reset_logger
+		end
 
+       	Configurability.configure_objects( config )
 	end
 
 

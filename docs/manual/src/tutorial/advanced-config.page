@@ -7,7 +7,7 @@ filters:
   - textile
 ---
 
-h1. Arrow Tutorial: Advanced Configuration
+h1. Tutorial: Advanced Configuration
 
 Arrow's configuration system provides quite a few ways to control the appserver, which it loads,
 where it loads it from, and how it is cached, as well as facilities for adding configuration for 
@@ -114,15 +114,15 @@ to configuration values.
 
 				  <dt>maxSize</dt>
 				  <dd>The maximum number of bytes allowed in the cache before it begins expiring items.
-					Defaults to </dd>
+					Defaults to <code>2621440</code>, or 2.5Mb.</dd>
 
 				  <dt>maxObjSize</dt>
 				  <dd>The size (in bytes) of the largest single cacheable template. Templates larger than
-		          this will not be cached.</dd>
+		          this will not be cached.  Defaults to <code>131072</code>, or 128k.</dd>
 
 				  <dt>expiration</dt>
 				  <dd>The maximum number of seconds an object can stay in the cache after its last
-		          access.</dd>
+		          access.  Defaults to <code>36</code> seconds.</dd>
 
 				</dl>
 			</dd>

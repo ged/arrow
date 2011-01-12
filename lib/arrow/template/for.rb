@@ -56,19 +56,11 @@ require 'arrow/template/iterator'
 #  	<?attr word?>: <?attr length?>
 #  <?end for?>
 #
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Template::ForDirective < Arrow::Template::BracketingDirective # :nodoc:
 	include Arrow::Template::Parser::Patterns

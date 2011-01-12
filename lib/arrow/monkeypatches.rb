@@ -5,21 +5,13 @@ require 'arrow/constants'
 # 
 # A (hopefully) minimal collection of extensions to core classes.
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Martin Chase <mchase@rubycrafters.com>
 # * Michael Granger <mgranger@rubycrafters.com>
 # * David McCorkhill <dmccorkhill@rubycrafters.com>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 
 ### Add some operator methods to regular expression objects for catenation,
@@ -86,17 +78,17 @@ end
 
 
 ### Override RubyGem's use of values out of ENV since they're always tainted.
-module Gem
-	def self::find_home
-		if defined?( Apache )
-			return Apache.server_root
-		else
-			homedir = ENV['HOME'].dup
-			homedir.untaint
-
-			return homedir
-		end
-	end
-end
+# module Gem
+# 	def self::find_home
+# 		if defined?( Apache )
+# 			return Apache.server_root
+# 		else
+# 			homedir = ENV['HOME'].dup
+# 			homedir.untaint
+# 
+# 			return homedir
+# 		end
+# 	end
+# end
 
 

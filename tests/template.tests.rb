@@ -439,6 +439,26 @@ assert_match( templateContentRe(/^test/), rval )
 ===
 
 
+### Comment directive
+=== Single line
+<?comment hungry mouth ?>
+---
+assert_nothing_raised { rval = template.render }
+assert_match( templateContentRe(/^$/), rval )
+
+=== Multiline
+<?comment 
+
+You're a demanding consumer.
+
+	And you demand instant gratification.
+
+?>
+---
+assert_nothing_raised { rval = template.render }
+assert_match( templateContentRe(/^$/), rval )
+
+
 ### Set directive
 === Simple
 
@@ -1238,7 +1258,8 @@ assert_nothing_raised { template.pairs = pairs }
 
 assert_nothing_raised { rval = template.render }
 debugMsg "\n" + hruleSection( rval, "Rendered" )
-assert_match( /charity/, rval )
+assert_match( /Key => integer\n  Val => 1\n/m, rval )
+assert_match( /Key => hash\n  Val => .*Key => subsubhash\n  Val => \nKey => hope, faith\n  Val => and charity/m, rval )
 ===
 
 === With Complex Methodchain

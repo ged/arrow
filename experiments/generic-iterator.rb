@@ -6,19 +6,11 @@
 # Lots of the ideas for this class were stolen/influenced in no small way by Hal
 # Fulton's "super-iterator" post to the Ruby-talk ML [ruby-talk: 46337].
 #
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 
 require 'arrow/exceptions'

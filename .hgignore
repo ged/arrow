@@ -2,6 +2,9 @@
 \.(orig|rej)$
 ^pkg$
 ^ChangeLog$
-docs/manual/output
-docs/api
-.DS_Store
+^docs/api
+^docs/manual/output
+^coverage/
+^coverage\.info
+tags
+.yardoc

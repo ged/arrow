@@ -14,7 +14,7 @@ require 'arrow/template/nodes'
 #   <?selectlist category FROM categories ?><?end?>
 #   <?selectlist category FROM categories.sort_by {|c| c.name } ?><?end?>
 #
-# == Subversion Id
+# == VCS Id
 # 
 # $Id$
 # 
@@ -22,11 +22,7 @@ require 'arrow/template/nodes'
 # 
 # * Michael Granger <mgranger@rubycrafters.com>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Template::SelectListDirective < Arrow::Template::BracketingDirective
 	include Arrow::Template::Parser::Patterns

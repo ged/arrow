@@ -18,20 +18,12 @@ require 'arrow/mixins'
 #	ap.qvalue       #=> 0.9
 #	ap =~ 'text/*'  #=> true
 #
-# == Version
-#
-#  $Id$
-#
 # == Authors
 # 
 # This class was originally written as part of the ThingFish project.
 #
 # * Michael Granger <ged@FaerieMUD.org>
 # * Mahlon E. Smith <mahlon@martini.nu>
-#
-# :include: LICENSE
-#
-#---
 #
 # Please see the file LICENSE in the top-level directory for licensing details.
 #

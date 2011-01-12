@@ -7,7 +7,7 @@ filters:
   - textile
 ---
 
-h1. Applets
+h1. Tutorial: Applets
 
 The @Arrow::Applet@ class is the main workhorse of the Arrow framework; it, in concert with
 @Arrow::Transaction@, provides most of the functionality that application developers will be
@@ -102,11 +102,6 @@ what they do.
   <dd>A hash containing profiles for the built in form validator, one
   per action. See the <a href="tutorial-validation.html">input
   validation section</a> of the tutorial for more.</dd>
-
-  <dt><code>appicon</code> <var>String</var></dt>
-  <dd>The URL for the icon that will be used to represent this applet in
-	introspection output. Optional, defaults to <code>'application-x-executable.png'</code>,
-	which is an icon in the </dd>
 </dl>
 
 h3. Actions
@@ -164,7 +159,7 @@ h4. Action Execution
 
 When an action method is called, it should do the necessary processing to build the response data
 and return it to its caller. This return value will then be converted to a @String@ (via
-@#to_s@) and sent to the client after doing the necessary header senting and Apache
+@#to_s@) and sent to the client after doing the necessary header sending and Apache
 housekeeping. Returning a non-true value causes a @DECLINED@ status to be sent back to Apache. This
 can be used to pass control to a further handler if the action determines it cannot handle the
 request.
@@ -210,8 +205,8 @@ class HelloWorldApplet < Arrow::Applet
   def greet_action( txn )
     return <<-EOF
 	<html>
-	  <head><title>Hello</title></head>
-	  <body><p>Hello, world.</p></body>
+	  <head><title>Hello, World</title></head>
+	  <body><p>Hello, World</p></body>
 	</html>
     EOF
   end
@@ -226,11 +221,15 @@ arrow config file:
 <?example { language: yaml, caption: "Installing the Hello World applet." } ?>
 applets:
   layout:
-    "/hello": Hello
+    "/hello": HelloWorldApplet
 <?end?>
 
 After the config has been loaded, requests for @/<arrow-root>/hello/greet@ (and simply
 @/<arrow-root>/hello@, because @greet@ is the default action) will return something that looks like:
+
+<div class="screenshot">
+!../images/helloworld.png(Why, hello there, world!)!
+</div>
 
 h2. Passing Arguments in the URL
 
@@ -238,7 +237,7 @@ Now let's add a bit of personalization to the applet. Perhaps it should be able 
 customizable messages in addition to greeting the entire world. To do this, we can make the @greet@
 action take an additional argument specified in the URL:
 
-<?example { language: ruby, caption: "" } ?>
+
   # Define the 'greet' (default) action
   def greet_action( txn, name=nil )
     name ||= "world"
@@ -254,7 +253,7 @@ action take an additional argument specified in the URL:
 Calling the applet with a URL like @/hello/greet/Dave@ will now cause it to greet only Dave instead:
 
 <div class="screenshot">
-!.../images/hello-dave-sshot.png(I don't think I can do that, Dave.)!
+!../images/hello-dave-sshot.png(I don't think I can do that, Dave.)!
 </div>
 
 Note that we're required to call the action '@greet@' explicitly to be able to pass in URL-style

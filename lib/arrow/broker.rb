@@ -11,19 +11,11 @@ require 'arrow/appletregistry'
 # The broker is the applet manager. It maintains a registry of applets, and delegates 
 # transactions based on the request's URI.
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <mgranger@RubyCrafters.com>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Broker < Arrow::Object
 
@@ -227,7 +219,7 @@ class Arrow::Broker < Arrow::Object
 			emsg = "Argument list is a %s: expected an Array" %
 				args.class.name
 			raise Arrow::AppletChainError, emsg
-		end					
+		end
 
 		return applet, path, args
 	end

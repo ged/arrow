@@ -7,19 +7,11 @@ require 'arrow/session/id'
 # The Arrow::Session::MD5Id class, a derivative of Arrow::Session::Id. Instances 
 # of this class are session IDs created by MD5-hashing some semi-random data.
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Session::MD5Id < Arrow::Session::Id
 

@@ -39,7 +39,7 @@ end
 ### caption::
 ###   A small blurb to put below the pulled-out example in the HTML.
 class ExamplesFilter < Manual::Page::Filter
-
+	
 	DEFAULTS = {
 		:language     => :ruby,
 		:line_numbers => :inline,
@@ -62,7 +62,7 @@ class ExamplesFilter < Manual::Page::Filter
 			)?
 		\?>
 	  }x
-
+	
 	EndPI = %r{ <\? end (?: \s+ example )? \s* \?> }x
 
 
@@ -78,14 +78,15 @@ class ExamplesFilter < Manual::Page::Filter
 			require 'erb'
 		rescue LoadError => err
 			unless Object.const_defined?( :Gem )
-								retry
+				require 'rubygems'
+				retry
 			end
 
 			raise
 		end
 	end
-
-
+	
+	
 	######
 	public
 	######

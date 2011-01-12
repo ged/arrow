@@ -5,19 +5,11 @@ require 'arrow/logger/fileoutputter'
 
 # Output logging messages in HTML fragments with classes that match their level. 
 # 
-# == Subversion Id
-#
-#  $Id$
-# 
 # == Authors
 # 
 # * Michael Granger <ged@FaerieMUD.org>
 # 
-# :include: LICENSE
-#
-#--
-#
-# Please see the file LICENSE in the BASE directory for licensing details.
+# Please see the file LICENSE in the top-level directory for licensing details.
 #
 class Arrow::Logger::HtmlOutputter < Arrow::Logger::FileOutputter
 	include Arrow::HTMLUtilities
