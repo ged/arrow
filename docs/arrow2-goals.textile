@@ -1,13 +1,49 @@
 
 h1. Arrow 2
 
-* Applications deployed as gems
+* Applications deployable as gems
 ** Map static resources onto gem data dirs via TransHandler
+
+	$ gem install firefox-syncserver
+	
+	# httpd.conf
+	LoadModule ruby_module ext/mod_ruby.so
+
+	<VirtualHost *:443>
+		RubyRequire rubygems
+		RubyRequire firefox/syncserver
+
+		# Map static content to the gem's data directory
+		RubyTransHandler Arrow::StaticContentMapper.new( 'firefox-syncserver' )
+
+		<Location /1.0>
+			SetHandler ruby-object
+			RubyHandler Firefox::SyncServer.sync_service( 1.0 )
+		</Location>
+		
+		<Location /user/1.0>
+			SetHandler ruby-object
+			RubyHandler Firefox::SyncServer.user_service( 1.0 )
+		</Location>
+		
+	</VirtualHost>
+
 
 * Split out the template system into a separate library
 ** Replace hand-written parser with nokogiri + ripper or similar
 
-* Easier/more-flexible routes
+* Easy/more-flexible routes
+
+	class Firefox::SyncServer::UserService < Arrow::RestService
+		
+		get '/:apiversion/:username' do |req, match|
+			apiver = match[:apiversion]
+			username = match[:username]
+
+			template = 
+		end
+	
+	end
 
 * Untainting/validation for action arguments
 
@@ -17,3 +53,8 @@ h1. Arrow 2
       end
 
 
+* Provide a collection of subclassable handlers that make it easier to implement various mod_ruby handlers
+** Arrow::AuthenHandler
+** Arrow::AuthzHandler
+** Arrow::AccessHandler
+** Arrow::LogHandler
